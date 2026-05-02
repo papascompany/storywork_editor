@@ -22,9 +22,19 @@
       "from-filename"
     ]
   },
+  "ingest": {
+    "recursive": true,
+    "ignorePatterns": ["Thumbs.db", ".DS_Store", "*.tmp"],
+    "subfolderRules": {
+      "동물":  { "categoryTag": "animal",      "include": true },
+      "사랑":  { "categoryTag": "love-couple", "include": true },
+      "중복":  { "categoryTag": "duplicate",   "include": false, "reason": "사용자가 중복으로 격리한 자산. 적재 제외." }
+    }
+  },
   "_comment": [
     "이 파일은 폴더 디폴트 라이선스입니다. 동일 폴더의 모든 PNG 자산이 이 라이선스를 상속합니다.",
     "개별 자산이 다른 라이선스를 가져야 한다면 같은 디렉토리에 <id>.kp.json 사이드카를 두고 license 필드를 덮어쓰세요.",
+    "하위 폴더 적재/제외 규칙은 ingest.subfolderRules 에서 관리합니다.",
     "수정 시 ADR-0011 을 함께 갱신하고, 변경 이력을 git log 로 추적하세요."
   ]
 }
