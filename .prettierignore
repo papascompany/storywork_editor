@@ -1,0 +1,33 @@
+# Dependencies
+node_modules/
+.pnpm-store/
+
+# Build output
+dist/
+.next/
+out/
+build/
+.turbo/
+
+# Generated files
+*.tsbuildinfo
+coverage/
+storybook-static/
+playwright-report/
+test-results/
+
+# Prisma generated
+prisma/generated/
+
+# Data assets
+data/poses/
+
+# Lock files
+pnpm-lock.yaml
+package-lock.json
+yarn.lock
+
+# Markdown (preserve manual formatting)
+CLAUDE.md
+SKILLS.md
+docs/**/*.md

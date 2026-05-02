@@ -1,0 +1,48 @@
+{
+  "$schema": "https://json.schemastore.org/tsconfig",
+  "compilerOptions": {
+    "target": "ES2023",
+    "lib": ["ES2023", "DOM", "DOM.Iterable"],
+    "module": "ESNext",
+    "moduleResolution": "Bundler",
+    "moduleDetection": "force",
+
+    "verbatimModuleSyntax": true,
+
+    "strict": true,
+    "noUncheckedIndexedAccess": true,
+    "noImplicitOverride": true,
+    "exactOptionalPropertyTypes": false,
+
+    "jsx": "preserve",
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+
+    "noEmit": true,
+    "declaration": true,
+    "declarationMap": true,
+    "sourceMap": true,
+    "incremental": true,
+
+    "paths": {
+      "@storywork/editor-core": ["./packages/editor-core/src/index.ts"],
+      "@storywork/editor-layers": ["./packages/editor-layers/src/index.ts"],
+      "@storywork/editor-history": ["./packages/editor-history/src/index.ts"],
+      "@storywork/editor-template": ["./packages/editor-template/src/index.ts"],
+      "@storywork/editor-pose": ["./packages/editor-pose/src/index.ts"],
+      "@storywork/editor-text": ["./packages/editor-text/src/index.ts"],
+      "@storywork/editor-effects": ["./packages/editor-effects/src/index.ts"],
+      "@storywork/editor-export": ["./packages/editor-export/src/index.ts"],
+      "@storywork/editor-ui": ["./packages/editor-ui/src/index.ts"],
+      "@storywork/ai-script": ["./packages/ai-script/src/index.ts"],
+      "@storywork/ai-recommend": ["./packages/ai-recommend/src/index.ts"],
+      "@storywork/ai-layout": ["./packages/ai-layout/src/index.ts"],
+      "@storywork/pdf-engine": ["./packages/pdf-engine/src/index.ts"],
+      "@storywork/schema": ["./packages/shared-schema/src/index.ts"],
+      "@storywork/ui": ["./packages/shared-ui/src/index.ts"],
+      "@storywork/utils": ["./packages/shared-utils/src/index.ts"]
+    }
+  }
+}
