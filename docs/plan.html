@@ -1,0 +1,1232 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>StoryWork — 개발 계획 대시보드</title>
+<style>
+  :root{
+    --bg:#0b0d12; --panel:#11141b; --panel2:#161a23; --line:#1f2533;
+    --ink:#e6e9ef; --ink2:#a9b0c0; --mute:#6b7388;
+    --accent:#7c5cff; --accent2:#22d3ee; --ok:#22c55e; --warn:#f59e0b; --err:#ef4444;
+    --pose:#f472b6; --bg-c:#60a5fa; --bub:#34d399; --fx:#facc15; --tpl:#a78bfa; --pdf:#fb923c; --ai:#22d3ee;
+    --r:12px;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;background:var(--bg);color:var(--ink);font:14px/1.55 -apple-system,BlinkMacSystemFont,"SF Pro Text","Pretendard","Segoe UI",sans-serif}
+  a{color:var(--accent2);text-decoration:none}
+  a:hover{text-decoration:underline}
+  code,kbd{font:12.5px/1.4 ui-monospace,SFMono-Regular,Menlo,monospace;background:#0f131c;border:1px solid var(--line);padding:1px 6px;border-radius:6px;color:#cbd1df}
+  h1,h2,h3,h4{margin:0 0 .4em;letter-spacing:-.01em}
+  h1{font-size:28px}
+  h2{font-size:20px;padding-top:8px}
+  h3{font-size:16px;color:#dfe3ec}
+  h4{font-size:13.5px;color:var(--ink2);text-transform:uppercase;letter-spacing:.06em}
+  .layout{display:grid;grid-template-columns:260px 1fr;min-height:100vh}
+  /* Sidebar */
+  aside{position:sticky;top:0;height:100vh;border-right:1px solid var(--line);background:linear-gradient(180deg,#0d1018,#0a0c12);padding:18px 14px;overflow:auto}
+  .brand{display:flex;align-items:center;gap:10px;margin-bottom:18px}
+  .brand .dot{width:28px;height:28px;border-radius:8px;background:conic-gradient(from 210deg,var(--accent),var(--accent2),var(--pose),var(--accent));box-shadow:0 0 0 1px #20253344, 0 6px 24px #7c5cff33}
+  .brand b{font-size:16px}
+  .brand small{display:block;color:var(--mute);font-size:11px}
+  nav a{display:block;padding:7px 10px;border-radius:8px;color:var(--ink2);font-size:13px;margin:2px 0}
+  nav a:hover{background:#161a25;color:var(--ink);text-decoration:none}
+  nav a.active{background:#1a1f2d;color:#fff}
+  nav .group{margin-top:14px;color:var(--mute);font-size:11px;text-transform:uppercase;letter-spacing:.08em;padding:0 10px}
+  /* Main */
+  main{padding:28px 36px 80px;max-width:1400px}
+  section{padding:24px 0;border-bottom:1px dashed var(--line)}
+  section:last-child{border-bottom:0}
+  .lead{color:var(--ink2);max-width:820px}
+  .grid{display:grid;gap:14px}
+  .g2{grid-template-columns:repeat(2,1fr)}
+  .g3{grid-template-columns:repeat(3,1fr)}
+  .g4{grid-template-columns:repeat(4,1fr)}
+  @media (max-width: 1100px){.g3,.g4{grid-template-columns:repeat(2,1fr)}}
+  @media (max-width: 720px){.layout{grid-template-columns:1fr}aside{position:static;height:auto}.g2,.g3,.g4{grid-template-columns:1fr}main{padding:18px}}
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:var(--r);padding:16px}
+  .card h3{margin-bottom:6px}
+  .card p{color:var(--ink2);margin:0}
+  .pill{display:inline-flex;align-items:center;gap:6px;padding:2px 8px;border-radius:999px;font-size:11px;border:1px solid var(--line);background:#0f131c;color:var(--ink2)}
+  .pill.ok{color:#86efac;border-color:#143b22;background:#0e1c14}
+  .pill.warn{color:#fde68a;border-color:#3a2c0e;background:#1c170a}
+  .pill.err{color:#fca5a5;border-color:#3a1414;background:#1c0d0d}
+  .pill.acc{color:#cabaff;border-color:#2a2148;background:#15102a}
+  .pill.cyan{color:#a8eaf3;border-color:#13384a;background:#0a1c25}
+  .row{display:flex;flex-wrap:wrap;gap:8px}
+  .kv{display:grid;grid-template-columns:170px 1fr;gap:6px 16px}
+  .kv b{color:var(--ink2);font-weight:500}
+  /* Timeline */
+  .timeline{position:relative;display:grid;gap:10px;margin-top:14px}
+  .ms{display:grid;grid-template-columns:90px 1fr 110px;gap:14px;align-items:center;background:var(--panel);border:1px solid var(--line);border-radius:var(--r);padding:12px 14px;position:relative;overflow:hidden}
+  .ms::before{content:"";position:absolute;left:0;top:0;bottom:0;width:4px;background:var(--accent)}
+  .ms[data-tone="curate"]::before{background:var(--pose)}
+  .ms[data-tone="ai"]::before{background:var(--ai)}
+  .ms[data-tone="admin"]::before{background:var(--tpl)}
+  .ms[data-tone="pdf"]::before{background:var(--pdf)}
+  .ms[data-tone="social"]::before{background:var(--bub)}
+  .ms[data-tone="ops"]::before{background:var(--warn)}
+  .ms .id{font-weight:700;letter-spacing:.04em;color:#fff}
+  .ms .title{color:var(--ink)}
+  .ms .meta{color:var(--mute);font-size:12px;text-align:right}
+  /* Bars (gantt) */
+  .gantt{display:grid;grid-template-columns:160px 1fr;gap:10px;align-items:center;margin-top:10px}
+  .gantt .lab{color:var(--ink2);font-size:12px}
+  .track{position:relative;height:14px;background:#0f131c;border:1px solid var(--line);border-radius:7px;overflow:hidden}
+  .bar{position:absolute;top:0;bottom:0;border-radius:7px;background:linear-gradient(90deg,var(--accent),var(--accent2));opacity:.92}
+  .bar.t-curate{background:linear-gradient(90deg,var(--pose),#f0abfc)}
+  .bar.t-ai{background:linear-gradient(90deg,var(--ai),#67e8f9)}
+  .bar.t-admin{background:linear-gradient(90deg,var(--tpl),#c4b5fd)}
+  .bar.t-pdf{background:linear-gradient(90deg,var(--pdf),#fdba74)}
+  .bar.t-social{background:linear-gradient(90deg,var(--bub),#86efac)}
+  .bar.t-ops{background:linear-gradient(90deg,var(--warn),#fcd34d)}
+  /* Tasks */
+  details.task{background:var(--panel);border:1px solid var(--line);border-radius:var(--r);padding:12px 14px}
+  details.task + details.task{margin-top:8px}
+  details.task summary{cursor:pointer;list-style:none;display:flex;gap:10px;align-items:center}
+  details.task summary::-webkit-details-marker{display:none}
+  details.task summary .id{font-weight:700;color:#fff;min-width:64px}
+  details.task summary .t{flex:1}
+  details.task[open]{background:#141925}
+  .body{margin-top:10px;padding-top:10px;border-top:1px dashed var(--line)}
+  .check{display:flex;gap:8px;align-items:flex-start;padding:6px 0;color:var(--ink2)}
+  .check input{margin-top:3px}
+  /* Decisions */
+  .dec{background:var(--panel);border:1px solid var(--line);border-radius:var(--r);padding:14px}
+  .dec h4{margin-bottom:6px;color:#fff;font-size:14px;text-transform:none;letter-spacing:0}
+  .dec .opts{display:grid;gap:6px;margin-top:8px}
+  .dec .opt{display:flex;gap:8px;align-items:flex-start}
+  .dec .why{color:var(--mute);font-size:12px;margin-top:6px}
+  /* Architecture diagram */
+  svg.diag{display:block;width:100%;height:auto;background:#0c0f16;border:1px solid var(--line);border-radius:var(--r)}
+  .legend{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
+  .legend span{display:inline-flex;align-items:center;gap:6px;padding:3px 8px;border-radius:999px;background:#0f131c;border:1px solid var(--line);color:var(--ink2);font-size:12px}
+  .legend i{display:inline-block;width:8px;height:8px;border-radius:2px}
+  /* Tables */
+  table{width:100%;border-collapse:collapse;background:var(--panel);border:1px solid var(--line);border-radius:var(--r);overflow:hidden}
+  th,td{padding:9px 12px;text-align:left;border-bottom:1px solid var(--line);font-size:13px;vertical-align:top}
+  th{color:var(--ink2);font-weight:600;background:#0f131c}
+  tr:last-child td{border-bottom:0}
+  .muted{color:var(--mute)}
+  .right{text-align:right}
+  /* Print */
+  @media print{
+    aside{display:none}
+    .layout{grid-template-columns:1fr}
+    main{padding:0;max-width:100%}
+    .card,.ms,details.task,.dec{break-inside:avoid}
+    body{background:#fff;color:#111}
+    h1,h2,h3,h4{color:#111}
+    .pill{color:#444;background:#fff}
+    a{color:#0050b3}
+  }
+  /* helpers */
+  .hint{color:var(--mute);font-size:12px}
+  .flex{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+  .badge{display:inline-block;padding:2px 6px;border-radius:6px;font-size:11px;background:#1a1f2d;color:#cbd1df;border:1px solid var(--line)}
+  .toc{display:grid;gap:8px}
+  .toc a{display:block;padding:8px 10px;border-radius:8px;background:#0f131c;border:1px solid var(--line);color:var(--ink)}
+  .toc a:hover{border-color:#2a3245;text-decoration:none}
+  .check-pill{display:inline-flex;align-items:center;gap:6px;padding:2px 8px;border-radius:999px;font-size:11px;background:#0f131c;border:1px solid var(--line);color:var(--ink2)}
+  .check-pill.ok{color:#86efac;border-color:#143b22}
+  .progress{height:6px;background:#0f131c;border:1px solid var(--line);border-radius:999px;overflow:hidden}
+  .progress > i{display:block;height:100%;background:linear-gradient(90deg,var(--accent),var(--accent2))}
+  .footer{color:var(--mute);font-size:12px;margin-top:18px}
+  .agent-card{display:grid;grid-template-columns:36px 1fr;gap:12px;align-items:flex-start}
+  .agent-card .av{width:36px;height:36px;border-radius:8px;display:grid;place-items:center;font-weight:800;color:#fff;background:#7c5cff}
+  .av.architect{background:#7c5cff}.av.editor{background:#22d3ee;color:#02212a}
+  .av.pose{background:#f472b6}.av.scene{background:#34d399;color:#0b2e22}
+  .av.layout{background:#a78bfa}.av.admin{background:#60a5fa;color:#0a1f3d}
+  .av.pdf{background:#fb923c;color:#311706}.av.ui{background:#facc15;color:#3a2a05}
+  .av.qa{background:#ef4444}.av.bridge{background:#94a3b8;color:#1f2937}.av.orch{background:#fff;color:#111}
+</style>
+</head>
+<body>
+<div class="layout">
+
+<aside>
+  <div class="brand">
+    <div class="dot" aria-hidden="true"></div>
+    <div><b>StoryWork</b><small>개발 계획 대시보드 v1</small></div>
+  </div>
+  <nav>
+    <div class="group">전체</div>
+    <a href="#overview" class="active">개요</a>
+    <a href="#decisions-now">지금 결정해야 할 것</a>
+    <a href="#roadmap">개발 로드맵 (M0–M9)</a>
+    <a href="#tasks">태스크 보드</a>
+    <div class="group">설계</div>
+    <a href="#features">기능 정의</a>
+    <a href="#architecture">시스템 아키텍처</a>
+    <a href="#modules">모듈 구성도</a>
+    <a href="#data">데이터 모델</a>
+    <a href="#editor-anatomy">편집기 해부도</a>
+    <a href="#pipeline">AI 자동 배치 파이프라인</a>
+    <a href="#agents">에이전트 협업</a>
+    <div class="group">운영</div>
+    <a href="#nfr">성능·접근성·보안</a>
+    <a href="#risks">리스크 & 완화</a>
+    <a href="#kickoff">착수 절차</a>
+  </nav>
+  <div class="footer">© StoryWork · 인쇄용 권장: <kbd>Cmd/Ctrl + P</kbd></div>
+</aside>
+
+<main>
+
+<section id="overview">
+  <h1>StoryWork 개발 계획 대시보드</h1>
+  <p class="lead">1,000+개의 <b>PNG 포즈 라이브러리</b>(향후 SVG 병행), 관리자 등록 리소스, AI 대본 분석을 결합해 <b>fabric.js 기반 캔바급 온라인 스토리보드 편집기</b>를 만들고, 완성 페이지를 <b>POD PDF</b>로 출판하는 서비스. 본 문서는 첫 라인을 짜기 전 보아야 할 단일 진실 원천(SSOT) 시각화입니다.</p>
+  <div class="card" style="margin-top:10px;border-left:3px solid var(--pose)">
+    <h4>📌 자산 현황 & 정책 (확정)</h4>
+    <ul style="color:var(--ink2);margin:6px 0 0 18px">
+      <li><b>보유</b>: PNG 1,058개 — 750×750(96%), 알파 채널 100%, 매직바이트 위장 0건</li>
+      <li><b>라이선스</b>: <code>data/poses/raw/LICENSE.json</code> 1개 폴더 디폴트. <code>holder=StoryWork</code>, <code>terms=all-rights</code>, 상업 사용 OK</li>
+      <li><b>키포인트</b>: 사이드카 0건 → 최소 3점(head/mouth/center) 자동 추정. 손/발은 검수로 보강</li>
+      <li><b>저해상도</b>: 750px 자산은 <code>lowDpi</code> 태그 → 자동 배치 시 페이지 1/2 이하 슬롯에만 사용</li>
+      <li><b>SVG</b>: 동일 파이프라인의 어댑터로 M10+ 입점 (<a href="architecture/decisions.md">ADR-0011</a>)</li>
+    </ul>
+  </div>
+  <div class="grid g4" style="margin-top:14px">
+    <div class="card"><h3>👥 사용자</h3><p>일반 / 크리에이터(구독) / 관리자 / 커뮤니티</p></div>
+    <div class="card"><h3>🧱 핵심 도메인 7</h3><p>관리자 · 편집기 · AI · PDF · 크리에이터 · 소셜 · (확장)</p></div>
+    <div class="card"><h3>🧰 스택</h3><p>Next.js 15 · TS · fabric.js v6 · Supabase · Prisma · Inngest · Claude/nano-banana 2</p></div>
+    <div class="card"><h3>⏱ 기간</h3><p>M0–M9 ≈ <b>약 19주</b> (단독 1.5인 기준, 병렬화 시 단축)</p></div>
+  </div>
+
+  <div class="grid g3" style="margin-top:14px">
+    <div class="card">
+      <h4>핵심 NFR</h4>
+      <ul style="margin:6px 0 0 18px;padding:0;color:var(--ink2)">
+        <li>편집기 인터랙티브 ≤ 2.5s (P75 / 4G)</li>
+        <li>200객체 60fps(데스크톱) / 30fps(모바일)</li>
+        <li>16p PDF 변환 ≤ 6s</li>
+        <li>WCAG 2.1 AA · 키보드 단독 편집</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>품질 게이트</h4>
+      <ul style="margin:6px 0 0 18px;padding:0;color:var(--ink2)">
+        <li>새 모듈 ≥ 70% 라인 커버리지</li>
+        <li>핵심 흐름 5개 E2E 통과</li>
+        <li>SVG XSS / 업로드 / SSRF 0 위반</li>
+        <li>schema 변경 시 마이그레이터 동반</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>휴먼 게이트(반드시 승인)</h4>
+      <ul style="margin:6px 0 0 18px;padding:0;color:var(--ink2)">
+        <li>결제/플랜 변경, 가격</li>
+        <li>DB 마이그레이션 실행</li>
+        <li>외부 API 키 발급/회전</li>
+        <li>프로덕션 배포</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<section id="decisions-now">
+  <h2>① 지금 결정해야 할 것 — 의사결정 체크리스트</h2>
+  <p class="lead">개발을 시작하기 전 다음 9개를 확정해야 합니다. 기본값(권장)은 <span class="pill acc">★</span> 표시. 결정이 끝나면 체크박스를 표시한 채 PR/이슈에 첨부하세요.</p>
+
+  <div class="grid g2" style="margin-top:12px">
+    <div class="dec">
+      <h4>D1. 운영 형태 / 도메인</h4>
+      <p class="hint">사용자/관리자 도메인 분리 여부, 결제·법인 명의</p>
+      <div class="opts">
+        <label class="opt"><input type="checkbox"> <span><b>분리</b> <span class="pill acc">★</span> — <code>app.storywork.io</code> + <code>admin.storywork.io</code></span></label>
+        <label class="opt"><input type="checkbox"> <span>단일 도메인 + 경로 분리</span></label>
+      </div>
+      <p class="why">분리는 보안(2FA·세션·CSP) + 빌드 최적화 이점.</p>
+    </div>
+
+    <div class="dec">
+      <h4>D2. 인증/계정</h4>
+      <div class="opts">
+        <label class="opt"><input type="checkbox"> <span><b>Supabase Auth</b> <span class="pill acc">★</span> — Email + 소셜(Google/Kakao)</span></label>
+        <label class="opt"><input type="checkbox"> <span>Clerk</span></label>
+        <label class="opt"><input type="checkbox"> <span>NextAuth + 자체 사용자</span></label>
+      </div>
+      <p class="why">RLS 통합·운영 단순. 필수 소셜 1개 + 이메일 OTP 권장.</p>
+    </div>
+
+    <div class="dec">
+      <h4>D3. 결제·구독</h4>
+      <div class="opts">
+        <label class="opt"><input type="checkbox"> <span><b>Stripe</b> <span class="pill acc">★</span> + 한국 카드 어댑터(추후)</span></label>
+        <label class="opt"><input type="checkbox"> <span>토스페이먼츠 + 별도 구독 게이트</span></label>
+      </div>
+      <p class="why">초기엔 Stripe Checkout으로 빠르게. 한국 결제는 M7~M8 사이 추가.</p>
+    </div>
+
+    <div class="dec">
+      <h4>D4. 가격 정책 / 플랜 라인업</h4>
+      <div class="opts">
+        <label class="opt"><input type="checkbox"> <span><b>Free / Creator(₩) / Pro(₩)</b> <span class="pill acc">★</span> — 업로드 한도·페이지 수·PDF 다운 횟수 차등</span></label>
+        <label class="opt"><input type="checkbox"> <span>Free + Single Pay-per-PDF</span></label>
+      </div>
+      <p class="why">"마이데이터" 구독 핵심 가치 → 월 정기 권장. 가격 숫자 확정 필요.</p>
+    </div>
+
+    <div class="dec">
+      <h4>D5. 인쇄 사양 (POD)</h4>
+      <div class="opts">
+        <label class="opt"><input type="checkbox"> <span><b>B5(182×257) + A5(148×210)</b> <span class="pill acc">★</span> — 출시 프리셋</span></label>
+        <label class="opt"><input type="checkbox"> <span>+ 정사각(190×190) / 세로형 만화 컷</span></label>
+        <label class="opt"><input type="checkbox"> <span>제휴 인쇄소 1곳 우선 사양 채택</span></label>
+      </div>
+      <p class="why">제휴 인쇄소가 없다면 B5/A5 표준+3mm bleed로 시작.</p>
+    </div>
+
+    <div class="dec">
+      <h4>D6. AI 비용 한도 / 모델</h4>
+      <div class="opts">
+        <label class="opt"><input type="checkbox"> <span><b>Claude Sonnet 4.6 + prompt cache</b> <span class="pill acc">★</span></span></label>
+        <label class="opt"><input type="checkbox"> <span>Free 사용자 일 5회 / Creator 50회 / Pro 무제한(상한)</span></label>
+        <label class="opt"><input type="checkbox"> <span>nano-banana 2: 배경/OG 한정</span></label>
+      </div>
+      <p class="why">한도 = 비용 폭주 방지. 사용량은 PostHog로 가시화.</p>
+    </div>
+
+    <div class="dec">
+      <h4>D7. 호스팅</h4>
+      <div class="opts">
+        <label class="opt"><input type="checkbox"> <span><b>Vercel(web/admin) + Supabase + Inngest</b> <span class="pill acc">★</span></span></label>
+        <label class="opt"><input type="checkbox"> <span>전 구간 셀프호스팅(Fly.io / Render)</span></label>
+      </div>
+      <p class="why">속도 우선 → Vercel. 비용 폭주 우려가 명백해지면 워커만 분리.</p>
+    </div>
+
+    <div class="dec" style="border-color:#143b22;background:#0e1c14">
+      <h4>D8. 포즈 자산 정책 <span class="pill ok">확정</span></h4>
+      <div class="opts">
+        <label class="opt"><input type="checkbox" checked> <span><b>라이선스</b>: <code>LICENSE.json</code> 1개 폴더 디폴트 (holder=StoryWork, terms=all-rights, 상업 사용 OK)</span></label>
+        <label class="opt"><input type="checkbox" checked> <span><b>사이드카</b>: 보유 0건 → 최소 3점(head/mouth/center) 자동 추정으로 인입</span></label>
+        <label class="opt"><input type="checkbox" checked> <span><b>해상도</b>: 750px 자산도 적재 + <code>lowDpi</code> 태그 → 페이지 1/2 이하 슬롯에만 자동 배치</span></label>
+      </div>
+      <p class="why">자산 1,058개 인입 준비 완료. 인입 후 검수 큐에서 키포인트 점진 보강.</p>
+    </div>
+
+    <div class="dec">
+      <h4>D9. 협업/오토파일럿 강도</h4>
+      <div class="opts">
+        <label class="opt"><input type="checkbox"> <span><b>휴먼 승인 게이트 ON</b> <span class="pill acc">★</span> — 모든 PR draft 후 검토</span></label>
+        <label class="opt"><input type="checkbox"> <span>코어 외 자동 머지 허용 (테스트 통과 시)</span></label>
+      </div>
+      <p class="why">초기엔 ON 권장. 신뢰도 쌓이면 점진적으로 풉니다.</p>
+    </div>
+  </div>
+</section>
+
+<section id="roadmap">
+  <h2>② 개발 로드맵 — M0~M9 (약 19주)</h2>
+  <p class="lead">각 마일스톤은 <b>데모 가능한 vertical slice</b>로 끝납니다. 가로 레이어를 한꺼번에 쌓지 않습니다.</p>
+
+  <div class="timeline">
+    <div class="ms"><div class="id">M0</div><div><div class="title"><b>Bootstrap</b> — 모노레포·CI·Supabase·디자인 토큰</div><div class="hint">DoD: <code>pnpm dev</code> 한 번에 web/admin 동시 부팅</div></div><div class="meta">1주<br><span class="pill">@architect</span></div></div>
+    <div class="ms"><div class="id">M1</div><div><div class="title"><b>Editor Core MVP</b> — fabric 어댑터·레이어·히스토리·PNG/JSON 라운드트립</div><div class="hint">DoD: 포즈 5 + 배경 1 라운드트립 통과, undo 100스텝</div></div><div class="meta">3주<br><span class="pill cyan">@editor-engineer</span></div></div>
+    <div class="ms" data-tone="curate"><div class="id">M2</div><div><div class="title"><b>Pose Library</b> — PNG 1,000개 인입(매직바이트·EXIF strip·재인코딩)·사이드카 매칭·태깅·임베딩·검색</div><div class="hint">DoD: "놀란 여자 측면" 검색 → 상위 10개 시각 검수</div></div><div class="meta">1.5주<br><span class="pill">@pose-curator</span></div></div>
+    <div class="ms" data-tone="admin"><div class="id">M3</div><div><div class="title"><b>Admin Console</b> — 판형/템플릿/리소스 CRUD + 검수 큐</div><div class="hint">DoD: 새 판형 등록 → 사용자 옵션 즉시 반영</div></div><div class="meta">2주<br><span class="pill acc">@admin-builder</span></div></div>
+    <div class="ms" data-tone="ai"><div class="id">M4</div><div><div class="title"><b>AI 대본 분석 + 자동 배치</b> — 장면 분리·추천·compose()</div><div class="hint">DoD: 800자 대본 → 6페이지 자동 배치 70% 만족</div></div><div class="meta">3주<br><span class="pill cyan">@scene-analyzer @layout-composer</span></div></div>
+    <div class="ms"><div class="id">M5</div><div><div class="title"><b>텍스트·말풍선·워드효과·템플릿</b></div><div class="hint">DoD: 한글 줄바꿈/금칙어, 꼬리 화자 추적</div></div><div class="meta">2주<br><span class="pill cyan">@editor-engineer</span></div></div>
+    <div class="ms" data-tone="pdf"><div class="id">M6</div><div><div class="title"><b>POD PDF</b> — 벡터 빌더·표지·프리플라이트</div><div class="hint">DoD: 인쇄소 3사 프리플라이트 통과</div></div><div class="meta">2주<br><span class="pill warn">@pdf-publisher</span></div></div>
+    <div class="ms"><div class="id">M7</div><div><div class="title"><b>Creator 모드 + 결제 + 마이데이터</b> 🚦</div><div class="hint">DoD: 결제 → 한도 상향 → 편집기 드래그 인서트</div></div><div class="meta">2주<br><span class="pill">@architect @admin-builder</span></div></div>
+    <div class="ms" data-tone="social"><div class="id">M8</div><div><div class="title"><b>SNS / 공모전 / 뽐내기</b></div><div class="hint">DoD: OG 카드, 공모전 마감 자동 동결</div></div><div class="meta">1.5주<br><span class="pill ok">@ui-designer @admin-builder</span></div></div>
+    <div class="ms" data-tone="ops"><div class="id">M9</div><div><div class="title"><b>안정화</b> — 성능/접근성/보안</div><div class="hint">DoD: Lighthouse 90+, 키보드 시나리오 5종 통과</div></div><div class="meta">1주<br><span class="pill warn">@qa-tester</span></div></div>
+  </div>
+
+  <h3 style="margin-top:22px">간트 (상대 길이)</h3>
+  <div class="card" style="padding:18px">
+    <!-- 19 weeks total scale; widths sum to schedule -->
+    <div class="gantt"><div class="lab">M0 Bootstrap</div><div class="track"><div class="bar"             style="left:0%;width:5.3%"></div></div></div>
+    <div class="gantt"><div class="lab">M1 Editor Core</div><div class="track"><div class="bar"           style="left:5.3%;width:15.8%"></div></div></div>
+    <div class="gantt"><div class="lab">M2 Pose Library</div><div class="track"><div class="bar t-curate" style="left:21.1%;width:7.9%"></div></div></div>
+    <div class="gantt"><div class="lab">M3 Admin</div><div class="track"><div class="bar t-admin"        style="left:29.0%;width:10.5%"></div></div></div>
+    <div class="gantt"><div class="lab">M4 AI Pipeline</div><div class="track"><div class="bar t-ai"     style="left:39.5%;width:15.8%"></div></div></div>
+    <div class="gantt"><div class="lab">M5 Text/FX/Template</div><div class="track"><div class="bar"     style="left:55.3%;width:10.5%"></div></div></div>
+    <div class="gantt"><div class="lab">M6 PDF</div><div class="track"><div class="bar t-pdf"            style="left:65.8%;width:10.5%"></div></div></div>
+    <div class="gantt"><div class="lab">M7 Creator/Billing</div><div class="track"><div class="bar"      style="left:76.3%;width:10.5%"></div></div></div>
+    <div class="gantt"><div class="lab">M8 Social</div><div class="track"><div class="bar t-social"      style="left:86.8%;width:7.9%"></div></div></div>
+    <div class="gantt"><div class="lab">M9 Stabilize</div><div class="track"><div class="bar t-ops"      style="left:94.7%;width:5.3%"></div></div></div>
+    <div class="hint" style="margin-top:8px">전체 19주 기준 상대 비율. 병렬화(Editor+Pose, AI+Admin)로 13~15주까지 단축 가능.</div>
+  </div>
+</section>
+
+<section id="tasks">
+  <h2>③ 태스크 보드 — 순서대로 진행</h2>
+  <p class="lead">각 태스크는 <b>의사결정 → 산출물 → 완료조건(DoD) → 리스크</b> 순. 체크하며 진행하세요.</p>
+
+  <h3 style="margin-top:14px">M0 · Bootstrap</h3>
+  <details class="task" open>
+    <summary><span class="id">M0-01</span><span class="t">pnpm + Turborepo 모노레포 초기화</span><span class="pill">@architect</span><span class="pill ok">1d</span></summary>
+    <div class="body">
+      <div class="kv">
+        <b>의사결정</b><span>패키지 매니저(pnpm 권장 / npm / yarn berry)</span>
+        <b>산출물</b><span><code>pnpm-workspace.yaml</code>, <code>turbo.json</code>, <code>apps/web</code>, <code>apps/admin</code>, <code>packages/*</code> 스텁</span>
+        <b>DoD</b><span><code>pnpm i &amp;&amp; pnpm build</code> 무오류</span>
+        <b>리스크</b><span>패키지 경계 미정의 → ESLint <code>import/no-restricted-paths</code> 룰 즉시 적용</span>
+      </div>
+      <div class="check"><input type="checkbox"> <span>workspace + turbo + base tsconfig</span></div>
+      <div class="check"><input type="checkbox"> <span>ESLint 패키지 의존 룰</span></div>
+      <div class="check"><input type="checkbox"> <span>Husky + lint-staged</span></div>
+    </div>
+  </details>
+
+  <details class="task">
+    <summary><span class="id">M0-02</span><span class="t">Supabase 로컬 + Prisma schema v1</span><span class="pill">@architect</span><span class="pill ok">1d</span></summary>
+    <div class="body">
+      <div class="kv">
+        <b>의사결정</b><span>RLS 베이스라인 적용 시점(가능한 빨리). pgvector 확장 활성화.</span>
+        <b>산출물</b><span><code>prisma/schema.prisma</code>, <code>packages/shared-schema</code></span>
+        <b>DoD</b><span><code>prisma migrate dev</code> 통과 + RLS 미설정 테이블 0건</span>
+      </div>
+      <div class="check"><input type="checkbox"> <span>Format/Resource/Project/Page/SceneDoc/Scene/Line 모델</span></div>
+      <div class="check"><input type="checkbox"> <span>pgvector 확장 + 임베딩 컬럼</span></div>
+      <div class="check"><input type="checkbox"> <span>RLS 정책 베이스라인 SQL</span></div>
+    </div>
+  </details>
+
+  <details class="task">
+    <summary><span class="id">M0-03</span><span class="t">디자인 토큰 + shadcn/ui + Storybook</span><span class="pill">@ui-designer</span><span class="pill ok">2d</span></summary>
+    <div class="body">
+      <div class="kv">
+        <b>의사결정</b><span>테마(다크 우선/라이트 우선), 폰트(Pretendard/Apple SD)</span>
+        <b>DoD</b><span>토큰 + Button/Input/Sheet 가시화 + 다크/라이트</span>
+      </div>
+    </div>
+  </details>
+
+  <details class="task">
+    <summary><span class="id">M0-04</span><span class="t">CI(GitHub Actions) + Sentry/PostHog</span><span class="pill">@architect</span><span class="pill ok">1d</span></summary>
+    <div class="body">
+      <div class="kv">
+        <b>DoD</b><span>main 브랜치 보호 + lint/typecheck/test/build 5잡 green</span>
+      </div>
+    </div>
+  </details>
+
+  <h3 style="margin-top:18px">M1 · Editor Core MVP</h3>
+  <details class="task">
+    <summary><span class="id">M1-01</span><span class="t"><code>editor-core</code> + fabric v6 어댑터</span><span class="pill cyan">@editor-engineer</span></summary>
+    <div class="body">
+      <div class="kv">
+        <b>의사결정</b><span>좌표 기준(권장: 내부 mm), 헤드리스 테스트 환경(jsdom + node-canvas)</span>
+        <b>산출물</b><span><code>StoryCanvas</code> 클래스 + 이벤트 버스</span>
+        <b>DoD</b><span>헤드리스에서 단위 테스트 통과</span>
+      </div>
+    </div>
+  </details>
+  <details class="task">
+    <summary><span class="id">M1-02</span><span class="t">Schema v1 + JSON ↔ fabric 라운드트립</span><span class="pill cyan">@editor-engineer</span></summary>
+    <div class="body">
+      <div class="kv">
+        <b>DoD</b><span>골든 파일 5개 라운드트립 통과(픽셀 차이 0)</span>
+      </div>
+    </div>
+  </details>
+  <details class="task">
+    <summary><span class="id">M1-03</span><span class="t"><code>editor-layers</code> · 트리/잠금/그룹</span><span class="pill cyan">@editor-engineer</span></summary>
+    <div class="body"><div class="kv"><b>DoD</b><span>Storybook 인터랙션 + 레이어 패널 a11y</span></div></div>
+  </details>
+  <details class="task">
+    <summary><span class="id">M1-04</span><span class="t"><code>editor-history</code> · Command + zundo</span><span class="pill cyan">@editor-engineer</span></summary>
+    <div class="body"><div class="kv"><b>DoD</b><span>100스텝 undo/redo 라운드트립</span></div></div>
+  </details>
+  <details class="task">
+    <summary><span class="id">M1-05</span><span class="t"><code>editor-export</code> PNG/JSON</span><span class="pill cyan">@editor-engineer</span></summary>
+    <div class="body"><div class="kv"><b>DoD</b><span>비주얼 회귀 5장 합격</span></div></div>
+  </details>
+  <details class="task">
+    <summary><span class="id">M1-06</span><span class="t">apps/web 빈 페이지 편집기 셸</span><span class="pill cyan">@editor-engineer</span> <span class="pill warn">@ui-designer</span></summary>
+    <div class="body"><div class="kv"><b>DoD</b><span>포즈 1 + 배경 1 → 저장/복원</span></div></div>
+  </details>
+  <details class="task">
+    <summary><span class="id">M1-07</span><span class="t">모바일 인스펙터(BottomSheet)</span><span class="pill warn">@ui-designer</span></summary>
+    <div class="body"><div class="kv"><b>DoD</b><span>핀치 줌 / 44px 타겟 / 키보드 동작</span></div></div>
+  </details>
+
+  <h3 style="margin-top:18px">M2 · Pose Library (PNG 1,058개 적재 — 정책 확정)</h3>
+  <details class="task" open>
+    <summary><span class="id">M2-01</span><span class="t"><code>scripts/ingest-poses.ts</code> PNG 파이프라인 + LICENSE.json 폴더 디폴트 로딩</span><span class="pill">@pose-curator</span></summary>
+    <div class="body">
+      <div class="kv">
+        <b>입력</b><span><code>data/poses/raw/LICENSE.json</code>(폴더 디폴트) + 1,058개 PNG</span>
+        <b>처리</b><span>LICENSE.json 로드 → 매직바이트 검증 → EXIF strip → <b>sharp 재인코딩</b>(악성 페이로드 차단) → WebP/AVIF 파생본 + 256 썸네일</span>
+        <b>호환</b><span>SVG 자동 분기(<code>--format auto</code>) — 향후 SVG 입력 시 sanitize 단계만 SVG profile</span>
+        <b>DoD</b><span>적재 성공률 ≥ 95% · 모든 자산에 라이선스 상속 · variants 채워짐</span>
+      </div>
+    </div>
+  </details>
+  <details class="task">
+    <summary><span class="id">M2-02</span><span class="t">키포인트 <b>3점 자동 추정</b>(head/mouth/center)</span><span class="pill">@pose-curator</span></summary>
+    <div class="body">
+      <div class="kv">
+        <b>정책</b><span>ADR-0011b — 사이드카 미보유 자산은 3점만 추정. 손/발 등 22점은 비워두고 의존 기능 자산별 비활성</span>
+        <b>방법</b><span>알파 채널 분석 + bbox 중심 + (선택) 얼굴 검출. 신뢰도 < 0.5 → 검수 큐</span>
+        <b>DoD</b><span>전 자산 3점 추정 완료, 신뢰도 분포 리포트, 검수 큐 진입 비율 보고</span>
+      </div>
+    </div>
+  </details>
+  <details class="task">
+    <summary><span class="id">M2-03a</span><span class="t"><b>파일명 키워드 사전</b> 1차 무료 태깅</span><span class="pill">@pose-curator</span></summary>
+    <div class="body">
+      <div class="kv">
+        <b>대상</b><span>Fight 100, sit 97, Love 89, stand 65, walk 35, lie 34, hand 32, jump 17, magic 10, 야구 11, 서기 150, 앉기, 얼굴표정 24, 한쪽무릎, 팔짱, 책상, 의자 등</span>
+        <b>산출물</b><span><code>packages/ai-recommend/data/filename-action-dict.ko.json</code></span>
+        <b>DoD</b><span>매칭률 ≥ 70%, 매칭된 자산 confidence=0.6 으로 1차 태깅</span>
+      </div>
+    </div>
+  </details>
+  <details class="task">
+    <summary><span class="id">M2-03b</span><span class="t">미매칭 자산만 Claude API 2차 태깅(캐시) + 비전 임베딩</span><span class="pill">@pose-curator</span> <span class="pill cyan">@scene-analyzer</span></summary>
+    <div class="body"><div class="kv">
+      <b>비용 영향</b><span>1차 사전 적용으로 API 호출 ~30% 수준으로 감소 예상</span>
+      <b>DoD</b><span>종합 태깅 정확도 ≥ 85%</span>
+    </div></div>
+  </details>
+  <details class="task">
+    <summary><span class="id">M2-04</span><span class="t">pgvector 인덱스(시각+텍스트 결합) + 시맨틱 검색 API</span><span class="pill">@pose-curator</span> <span class="pill">@architect</span></summary>
+    <div class="body"><div class="kv"><b>DoD</b><span>골든셋 50쿼리 top-10 정확도 ≥ 0.7</span></div></div>
+  </details>
+  <details class="task">
+    <summary><span class="id">M2-05</span><span class="t">검색 UI(필터: bodyType/view/action/mood, format, lowDpi 토글)</span><span class="pill warn">@ui-designer</span></summary>
+    <div class="body"><div class="kv"><b>DoD</b><span>키보드만으로 검색→선택 가능</span></div></div>
+  </details>
+  <details class="task">
+    <summary><span class="id">M2-06</span><span class="t"><b>slug 정규화</b> — 한글/공백/괄호 → URL-safe</span><span class="pill">@pose-curator</span></summary>
+    <div class="body"><div class="kv">
+      <b>예시</b><span><code>12_비스듬히 팔은 정면_1.png</code> → <code>12-bisdeumhi-pareun-jeongmyeon-1</code></span>
+      <b>DB</b><span><code>slug</code>(unique) + <code>originalFilename</code>(보존)</span>
+      <b>DoD</b><span>특수문자 포함 61건 충돌 없이 정규화, Storage 키도 slug</span>
+    </div></div>
+  </details>
+  <details class="task">
+    <summary><span class="id">M2-07</span><span class="t"><b>lowDpi 슬롯 제약</b> — ai-layout 가 750px 자산을 페이지 1/2 이하 슬롯에만</span><span class="pill">@layout-composer</span></summary>
+    <div class="body"><div class="kv">
+      <b>정책</b><span>ADR-0011a — <code>effectiveDpi = assetMinSide / slotMaxSideMm * 25.4</code> &lt; 200 warn, &lt; 150 거부</span>
+      <b>DoD</b><span>1,058개 중 96%(750px) 자산이 풀샷 단독 슬롯에 배치되지 않음</span>
+    </div></div>
+  </details>
+  <details class="task">
+    <summary><span class="id">M2-08</span><span class="t">키포인트 검수 편집기(관리자) — 클릭으로 누락 점 보강</span><span class="pill acc">@admin-builder</span> <span class="pill cyan">@editor-engineer</span></summary>
+    <div class="body"><div class="kv">
+      <b>흐름</b><span>검수 큐 항목 클릭 → 25점 키포인트 캔버스 → 누락 점 드래그 추가 → 저장</span>
+      <b>DoD</b><span>50개 자산 보강 후 손 의존 기능(소품 부착) 활성</span>
+    </div></div>
+  </details>
+  <details class="task">
+    <summary><span class="id">M2-09</span><span class="t">PNG 색상 변경 보조 — <code>tintMaskUrl</code> 기반 BlendColor</span><span class="pill cyan">@editor-engineer</span></summary>
+    <div class="body"><div class="kv">
+      <b>의사결정</b><span>마스크 미보유 자산은 색상 변경 UI 비활성. 본격적인 컬러 슬롯이 필요한 자산은 SVG 어댑터 입점(M10+)</span>
+      <b>DoD</b><span>마스크 보유 자산에서 머리/의상 색상 변경 데모</span>
+    </div></div>
+  </details>
+
+  <h3 style="margin-top:18px">M3 · Admin Console</h3>
+  <details class="task">
+    <summary><span class="id">M3-01</span><span class="t">apps/admin 부트스트랩 + 2FA</span><span class="pill acc">@admin-builder</span> <span class="pill">@architect</span></summary>
+    <div class="body">
+      <div class="kv">
+        <b>의사결정</b><span>도메인 분리 확정(D1) + 2FA 강제(TOTP)</span>
+        <b>DoD</b><span>일반 사용자 우회 차단 시나리오 통과</span>
+      </div>
+    </div>
+  </details>
+  <details class="task">
+    <summary><span class="id">M3-02</span><span class="t">DataTable / EntityForm / ReviewQueue 공용 컴포넌트</span><span class="pill acc">@admin-builder</span> <span class="pill warn">@ui-designer</span></summary>
+    <div class="body"><div class="kv"><b>DoD</b><span>Storybook 등재 + a11y 0 위반</span></div></div>
+  </details>
+  <details class="task">
+    <summary><span class="id">M3-03</span><span class="t">Format CRUD (B5/A5 프리셋)</span><span class="pill acc">@admin-builder</span></summary>
+    <div class="body"><div class="kv"><b>DoD</b><span>편집기에 즉시 반영(웹훅/캐시)</span></div></div>
+  </details>
+  <details class="task">
+    <summary><span class="id">M3-04</span><span class="t">Resource CRUD + 검수 큐 + 일괄</span><span class="pill acc">@admin-builder</span></summary>
+    <div class="body"><div class="kv"><b>DoD</b><span>1,000개 ZIP 업로드 &lt; 60초</span></div></div>
+  </details>
+  <details class="task">
+    <summary><span class="id">M3-05</span><span class="t">Template/TemplateSet 빌더 (슬롯 정의)</span><span class="pill acc">@admin-builder</span> <span class="pill cyan">@editor-engineer</span></summary>
+    <div class="body"><div class="kv"><b>DoD</b><span>슬롯에 후보 매핑 시뮬레이션 통과</span></div></div>
+  </details>
+  <details class="task">
+    <summary><span class="id">M3-06</span><span class="t">Audit Log 패널</span><span class="pill acc">@admin-builder</span></summary>
+    <div class="body"><div class="kv"><b>DoD</b><span>모든 상태 전환 기록 + 검색</span></div></div>
+  </details>
+
+  <h3 style="margin-top:18px">M4 · AI 대본 분석 + 자동 배치</h3>
+  <details class="task">
+    <summary><span class="id">M4-01</span><span class="t"><code>ai-script</code> 분석기 + 골든셋 20</span><span class="pill cyan">@scene-analyzer</span></summary>
+    <div class="body"><div class="kv"><b>DoD</b><span>장면 분할 F1 ≥ 0.8</span></div></div>
+  </details>
+  <details class="task">
+    <summary><span class="id">M4-02</span><span class="t"><code>ai-recommend</code> — 포즈/배경/말풍선 추천</span><span class="pill cyan">@scene-analyzer</span></summary>
+    <div class="body"><div class="kv"><b>DoD</b><span>인간 평가 만족도 ≥ 70%</span></div></div>
+  </details>
+  <details class="task">
+    <summary><span class="id">M4-03</span><span class="t"><code>ai-layout.compose()</code> + 결정론 시드</span><span class="pill">@layout-composer</span></summary>
+    <div class="body"><div class="kv"><b>DoD</b><span>충돌 0, safe area 침범 0</span></div></div>
+  </details>
+  <details class="task">
+    <summary><span class="id">M4-04</span><span class="t">사용자 흐름: 대본 → 페이지 N개</span><span class="pill">@layout-composer</span> <span class="pill cyan">@editor-engineer</span></summary>
+    <div class="body"><div class="kv"><b>DoD</b><span>E2E 통과(800자 → 6페이지)</span></div></div>
+  </details>
+  <details class="task">
+    <summary><span class="id">M4-05</span><span class="t">alternatives UI(한 클릭 교체)</span><span class="pill warn">@ui-designer</span></summary>
+    <div class="body"><div class="kv"><b>DoD</b><span>모바일에서도 동작</span></div></div>
+  </details>
+
+  <h3 style="margin-top:18px">M5 · 텍스트·말풍선·워드효과·템플릿</h3>
+  <details class="task">
+    <summary><span class="id">M5-01</span><span class="t"><code>editor-text</code> 한글 줄바꿈/금칙어</span><span class="pill cyan">@editor-engineer</span></summary>
+    <div class="body"><div class="kv"><b>DoD</b><span>시각 회귀 통과</span></div></div>
+  </details>
+  <details class="task">
+    <summary><span class="id">M5-02</span><span class="t">말풍선 꼬리 자동 화자 추적</span><span class="pill cyan">@editor-engineer</span> <span class="pill">@layout-composer</span></summary>
+    <div class="body"><div class="kv"><b>DoD</b><span>입 키포인트 추적 + 충돌 회피</span></div></div>
+  </details>
+  <details class="task">
+    <summary><span class="id">M5-03</span><span class="t"><code>editor-effects</code> 워드효과 50종</span><span class="pill cyan">@editor-engineer</span></summary>
+    <div class="body"><div class="kv"><b>DoD</b><span>모바일 30fps 유지</span></div></div>
+  </details>
+  <details class="task">
+    <summary><span class="id">M5-04</span><span class="t"><code>editor-template</code> 적용/저장</span><span class="pill cyan">@editor-engineer</span></summary>
+    <div class="body"><div class="kv"><b>DoD</b><span>슬롯 매핑 100% 일치</span></div></div>
+  </details>
+
+  <h3 style="margin-top:18px">M6 · POD PDF</h3>
+  <details class="task">
+    <summary><span class="id">M6-01</span><span class="t"><code>pdf-engine</code> 벡터 빌더 + 표지</span><span class="pill warn">@pdf-publisher</span></summary>
+    <div class="body"><div class="kv"><b>DoD</b><span>결정론 출력(동일 입력 → 동일 해시)</span></div></div>
+  </details>
+  <details class="task">
+    <summary><span class="id">M6-02</span><span class="t">apps/workers Inngest 잡 + 진행% 푸시</span><span class="pill warn">@pdf-publisher</span> <span class="pill">@architect</span></summary>
+    <div class="body"><div class="kv"><b>DoD</b><span>16p ≤ 6초</span></div></div>
+  </details>
+  <details class="task">
+    <summary><span class="id">M6-03</span><span class="t">preflight 검증기</span><span class="pill warn">@pdf-publisher</span> <span class="pill err">@qa-tester</span></summary>
+    <div class="body"><div class="kv"><b>DoD</b><span>인쇄소 3사 통과</span></div></div>
+  </details>
+  <details class="task">
+    <summary><span class="id">M6-04</span><span class="t">인쇄소 사양 프리셋 등록 UI</span><span class="pill acc">@admin-builder</span> <span class="pill warn">@pdf-publisher</span></summary>
+    <div class="body"><div class="kv"><b>DoD</b><span>관리자가 새 인쇄소 추가 가능</span></div></div>
+  </details>
+
+  <h3 style="margin-top:18px">M7 · Creator Mode + Billing 🚦</h3>
+  <details class="task">
+    <summary><span class="id">M7-01</span><span class="t">Stripe 연결 + Webhook 멱등</span><span class="pill">@architect</span></summary>
+    <div class="body">
+      <div class="kv">
+        <b>의사결정</b><span>가격(D4) 확정 후 진행</span>
+        <b>DoD</b><span>재처리 멱등 테스트 통과</span>
+      </div>
+    </div>
+  </details>
+  <details class="task">
+    <summary><span class="id">M7-02</span><span class="t">구독 게이트(업로드 한도/공유)</span><span class="pill">@architect</span></summary>
+    <div class="body"><div class="kv"><b>DoD</b><span>RLS + 미들웨어 이중 방어</span></div></div>
+  </details>
+  <details class="task">
+    <summary><span class="id">M7-03</span><span class="t">마이데이터 패널 + 편집기 드래그</span><span class="pill acc">@admin-builder</span> <span class="pill cyan">@editor-engineer</span></summary>
+    <div class="body"><div class="kv"><b>DoD</b><span>구매 → 한도 상향 → 사용 흐름</span></div></div>
+  </details>
+  <details class="task">
+    <summary><span class="id">M7-04</span><span class="t">결제/요금 페이지(반응형)</span><span class="pill warn">@ui-designer</span></summary>
+    <div class="body"><div class="kv"><b>DoD</b><span>모바일 결제 완주율 측정</span></div></div>
+  </details>
+
+  <h3 style="margin-top:18px">M8 · Social</h3>
+  <details class="task">
+    <summary><span class="id">M8-01</span><span class="t">OG 이미지 자동 생성(nano-banana 2)</span><span class="pill warn">@ui-designer</span></summary>
+    <div class="body"><div class="kv"><b>DoD</b><span>Lighthouse SEO 100</span></div></div>
+  </details>
+  <details class="task">
+    <summary><span class="id">M8-02</span><span class="t">공모전 시즌 + 자동 동결(pg_cron)</span><span class="pill acc">@admin-builder</span></summary>
+    <div class="body"><div class="kv"><b>DoD</b><span>마감 시간 진입 시 출품 잠금</span></div></div>
+  </details>
+  <details class="task">
+    <summary><span class="id">M8-03</span><span class="t">뽐내기 갤러리 + 좋아요/댓글</span><span class="pill warn">@ui-designer</span> <span class="pill acc">@admin-builder</span></summary>
+    <div class="body"><div class="kv"><b>DoD</b><span>모바일 무한 스크롤</span></div></div>
+  </details>
+  <details class="task">
+    <summary><span class="id">M8-04</span><span class="t">SNS 공유 카드(카카오/X/페북)</span><span class="pill warn">@ui-designer</span></summary>
+    <div class="body"><div class="kv"><b>DoD</b><span>3종 카드 검증</span></div></div>
+  </details>
+
+  <h3 style="margin-top:18px">M9 · Stabilization</h3>
+  <details class="task">
+    <summary><span class="id">M9-01</span><span class="t">Lighthouse 90+ 핵심 페이지</span><span class="pill err">@qa-tester</span></summary>
+    <div class="body"><div class="kv"><b>DoD</b><span>회귀 게이트 등록</span></div></div>
+  </details>
+  <details class="task">
+    <summary><span class="id">M9-02</span><span class="t">키보드 시나리오 5개 통과</span><span class="pill err">@qa-tester</span></summary>
+    <div class="body"><div class="kv"><b>DoD</b><span>0 위반</span></div></div>
+  </details>
+  <details class="task">
+    <summary><span class="id">M9-03</span><span class="t">보안 점검(SVG XSS / SSRF / 업로드)</span><span class="pill err">@qa-tester</span></summary>
+    <div class="body"><div class="kv"><b>DoD</b><span>0 위반 또는 사유 + 후속 이슈</span></div></div>
+  </details>
+  <details class="task">
+    <summary><span class="id">M9-04</span><span class="t">부하/벤치 — 동시 편집 100</span><span class="pill err">@qa-tester</span> <span class="pill">@architect</span></summary>
+    <div class="body"><div class="kv"><b>DoD</b><span>p95 응답 ≤ 500ms</span></div></div>
+  </details>
+</section>
+
+<section id="features">
+  <h2>④ 기능 정의 (Feature Catalog)</h2>
+  <p class="lead">7개 도메인 × 핵심 기능. 각 기능은 1개 이상 모듈에 매핑됩니다.</p>
+  <table>
+    <thead><tr><th>도메인</th><th>기능</th><th>핵심 모듈</th><th>마일스톤</th></tr></thead>
+    <tbody>
+      <tr><td rowspan="5">관리자</td><td>판형 CRUD (B5/A5/세로형)</td><td>apps/admin · shared-schema</td><td>M3</td></tr>
+      <tr><td>템플릿/템플릿셋 빌더 (슬롯 정의)</td><td>apps/admin · editor-template</td><td>M3, M5</td></tr>
+      <tr><td>리소스 등록·검수·일괄 업로드 (PNG ZIP + 사이드카 페어 검증, SVG 향후)</td><td>apps/admin · pose-curator pipeline</td><td>M2, M3</td></tr>
+      <tr><td>Audit Log / 권한(Role)</td><td>apps/admin · prisma · middleware</td><td>M3</td></tr>
+      <tr><td>인쇄소 사양 프리셋 등록</td><td>apps/admin · pdf-engine</td><td>M6</td></tr>
+      <tr><td rowspan="6">편집기</td><td>레이어/그룹/잠금/숨김</td><td>editor-core · editor-layers</td><td>M1</td></tr>
+      <tr><td>스냅 그리드 / 가이드 / 스마트 정렬</td><td>editor-template</td><td>M1, M5</td></tr>
+      <tr><td>포즈 키포인트 핸들(사이드카 JSON) / 좌우 반전 / 색 변경(PNG: tintMask + BlendColor, SVG: fill 변경)</td><td>editor-pose</td><td>M2, M5</td></tr>
+      <tr><td>텍스트 / 말풍선(꼬리 추적) / 한글 금칙어</td><td>editor-text</td><td>M5</td></tr>
+      <tr><td>워드효과 50종 + 필터</td><td>editor-effects</td><td>M5</td></tr>
+      <tr><td>Undo 100스텝 · 자동저장 · PNG/JSON 내보내기</td><td>editor-history · editor-export</td><td>M1</td></tr>
+      <tr><td rowspan="3">AI</td><td>대본 → SceneDoc(장면/대사/감정/시점) 분리</td><td>ai-script</td><td>M4</td></tr>
+      <tr><td>포즈/배경/말풍선 추천(임베딩+룰)</td><td>ai-recommend</td><td>M4</td></tr>
+      <tr><td>자동 페이지 컴포지션(결정론)</td><td>ai-layout</td><td>M4</td></tr>
+      <tr><td rowspan="2">출판</td><td>POD 벡터 PDF + 표지/북마크</td><td>pdf-engine · workers</td><td>M6</td></tr>
+      <tr><td>프리플라이트(bleed/safe/dpi/폰트)</td><td>pdf-engine · qa-tester</td><td>M6</td></tr>
+      <tr><td rowspan="3">크리에이터</td><td>Stripe 구독 / 게이트</td><td>shared-schema · middleware</td><td>M7</td></tr>
+      <tr><td>마이데이터 업로드/관리/공유 토글</td><td>apps/admin(작가 콘솔) · storage</td><td>M7</td></tr>
+      <tr><td>편집기 드래그 인서트</td><td>editor-ui</td><td>M7</td></tr>
+      <tr><td rowspan="3">소셜</td><td>SNS 공유 카드(카카오/X/페북)</td><td>shared-ui · ai-image(OG)</td><td>M8</td></tr>
+      <tr><td>공모전 시즌 / 자동 동결 / 결과</td><td>apps/admin · pg_cron</td><td>M8</td></tr>
+      <tr><td>뽐내기 갤러리 / 좋아요/댓글</td><td>apps/web</td><td>M8</td></tr>
+      <tr><td rowspan="2">확장(parking)</td><td>AI 자동 더빙(TTS+감정)</td><td>새 패키지 ai-dubbing</td><td>M10+</td></tr>
+      <tr><td>AI 영상 생성(컷→모션)</td><td>새 패키지 ai-video</td><td>M10+</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<section id="architecture">
+  <h2>⑤ 시스템 아키텍처</h2>
+  <svg class="diag" viewBox="0 0 1100 520" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="시스템 아키텍처">
+    <defs>
+      <linearGradient id="gA" x1="0" x2="1"><stop offset="0" stop-color="#7c5cff"/><stop offset="1" stop-color="#22d3ee"/></linearGradient>
+      <marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#9aa3b8"/></marker>
+      <style>
+        .b{fill:#11141b;stroke:#28304a;rx:10}
+        .b2{fill:#0f131c;stroke:#243049}
+        .t{fill:#e6e9ef;font:13px -apple-system,system-ui,sans-serif}
+        .s{fill:#a9b0c0;font:11.5px -apple-system,system-ui,sans-serif}
+        .h{fill:#fff;font:600 13.5px -apple-system,system-ui,sans-serif}
+        .ln{stroke:#3a445e;stroke-width:1.4;fill:none}
+      </style>
+    </defs>
+    <!-- Clients -->
+    <rect class="b" x="20" y="20" width="220" height="110"/>
+    <text class="h" x="36" y="42">Clients</text>
+    <rect class="b2" x="36" y="56" width="86" height="58"/>
+    <text class="t" x="58" y="78">Web</text><text class="s" x="44" y="98">사용자 편집기</text>
+    <rect class="b2" x="132" y="56" width="92" height="58"/>
+    <text class="t" x="150" y="78">Admin</text><text class="s" x="142" y="98">별도 도메인</text>
+
+    <!-- Edge -->
+    <rect class="b" x="280" y="20" width="240" height="110"/>
+    <text class="h" x="296" y="42">Next.js 15 (RSC + Server Actions)</text>
+    <rect class="b2" x="296" y="56" width="98" height="58"/>
+    <text class="t" x="318" y="78">Routes</text><text class="s" x="304" y="98">/api · /(app)</text>
+    <rect class="b2" x="404" y="56" width="100" height="58"/>
+    <text class="t" x="430" y="78">Middleware</text><text class="s" x="416" y="98">authz / i18n</text>
+
+    <!-- Core services -->
+    <rect class="b" x="560" y="20" width="520" height="220"/>
+    <text class="h" x="576" y="42">Domain Services (packages)</text>
+    <rect class="b2" x="576" y="58" width="150" height="56"/><text class="t" x="606" y="80">editor-*</text><text class="s" x="586" y="100">core/layers/history…</text>
+    <rect class="b2" x="736" y="58" width="150" height="56"/><text class="t" x="772" y="80">ai-*</text><text class="s" x="746" y="100">script/recommend/layout</text>
+    <rect class="b2" x="896" y="58" width="170" height="56"/><text class="t" x="940" y="80">pdf-engine</text><text class="s" x="912" y="100">vector + preflight</text>
+
+    <rect class="b2" x="576" y="124" width="150" height="56"/><text class="t" x="592" y="146">shared-schema</text><text class="s" x="586" y="166">Prisma + Zod + v1</text>
+    <rect class="b2" x="736" y="124" width="150" height="56"/><text class="t" x="780" y="146">shared-ui</text><text class="s" x="754" y="166">tokens + a11y</text>
+    <rect class="b2" x="896" y="124" width="170" height="56"/><text class="t" x="942" y="146">shared-utils</text><text class="s" x="926" y="166">retry/log/i18n</text>
+
+    <rect class="b2" x="576" y="190" width="490" height="40"/>
+    <text class="t" x="596" y="215">apps/workers — Inngest 잡: PDF / AI / 임베딩 / 썸네일</text>
+
+    <!-- Data -->
+    <rect class="b" x="20" y="170" width="500" height="160"/>
+    <text class="h" x="36" y="192">Data Plane (Supabase)</text>
+    <rect class="b2" x="36" y="206" width="148" height="48"/><text class="t" x="62" y="232">Postgres</text><text class="s" x="44" y="248">tables + RLS</text>
+    <rect class="b2" x="194" y="206" width="148" height="48"/><text class="t" x="220" y="232">pgvector</text><text class="s" x="206" y="248">시맨틱 검색</text>
+    <rect class="b2" x="352" y="206" width="148" height="48"/><text class="t" x="384" y="232">Storage</text><text class="s" x="362" y="248">PNG · WebP · (SVG)</text>
+    <rect class="b2" x="36" y="262" width="306" height="56"/><text class="t" x="56" y="284">Auth (Supabase) + Stripe Webhooks</text><text class="s" x="56" y="304">RLS · Subscriptions</text>
+    <rect class="b2" x="352" y="262" width="148" height="56"/><text class="t" x="386" y="284">CDN</text><text class="s" x="380" y="304">서명 URL</text>
+
+    <!-- External -->
+    <rect class="b" x="20" y="360" width="500" height="140"/>
+    <text class="h" x="36" y="382">External AI</text>
+    <rect class="b2" x="36" y="396" width="220" height="48"/><text class="t" x="62" y="424">Anthropic Claude (cache)</text>
+    <rect class="b2" x="266" y="396" width="234" height="48"/><text class="t" x="300" y="424">nano-banana 2 (이미지)</text>
+    <rect class="b2" x="36" y="452" width="464" height="38"/><text class="t" x="56" y="476">Sentry · PostHog · OpenTelemetry</text>
+
+    <!-- Edge to Services arrows -->
+    <path class="ln" d="M520,75 H560" marker-end="url(#arr)"/>
+    <path class="ln" d="M520,210 H560" marker-end="url(#arr)"/>
+    <path class="ln" d="M820,240 V300 H520" marker-end="url(#arr)"/>
+    <path class="ln" d="M820,500 V480 H1000 V240" marker-end="url(#arr)"/>
+    <path class="ln" d="M240,75 H280" marker-end="url(#arr)"/>
+  </svg>
+  <div class="legend">
+    <span><i style="background:#7c5cff"></i> 앱/엣지</span>
+    <span><i style="background:#22d3ee"></i> 도메인 패키지</span>
+    <span><i style="background:#34d399"></i> 데이터</span>
+    <span><i style="background:#facc15"></i> 외부 AI</span>
+  </div>
+</section>
+
+<section id="modules">
+  <h2>⑥ 모듈 구성도 (16 packages)</h2>
+  <p class="lead"><code>editor-*</code>는 React/DOM 의존 금지(<code>editor-ui</code> 제외). 모든 의존은 단방향.</p>
+  <svg class="diag" viewBox="0 0 1100 480" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="모듈 의존 구성도">
+    <defs>
+      <marker id="arr2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#576176"/></marker>
+      <style>
+        .m{stroke:#28304a;rx:10}
+        .lab{fill:#fff;font:600 12.5px -apple-system,system-ui,sans-serif}
+        .sub{fill:#cfd5e3;font:11px -apple-system,system-ui,sans-serif}
+        .dep{stroke:#3a445e;stroke-width:1.2;fill:none}
+      </style>
+    </defs>
+
+    <!-- Apps -->
+    <rect class="m" x="20" y="20" width="160" height="58" fill="#1a1330"/>
+    <text class="lab" x="40" y="44">apps/web</text><text class="sub" x="40" y="62">사용자 편집기</text>
+    <rect class="m" x="200" y="20" width="160" height="58" fill="#1a1330"/>
+    <text class="lab" x="220" y="44">apps/admin</text><text class="sub" x="220" y="62">관리자 콘솔</text>
+    <rect class="m" x="380" y="20" width="160" height="58" fill="#1a1330"/>
+    <text class="lab" x="400" y="44">apps/workers</text><text class="sub" x="400" y="62">Inngest 잡</text>
+
+    <!-- editor-ui -->
+    <rect class="m" x="20" y="110" width="180" height="56" fill="#0e2c33"/>
+    <text class="lab" x="40" y="134">editor-ui</text><text class="sub" x="40" y="152">유일 React 의존</text>
+
+    <!-- editor cores -->
+    <rect class="m" x="220" y="110" width="170" height="56" fill="#10243d"/>
+    <text class="lab" x="240" y="134">editor-core</text><text class="sub" x="240" y="152">fabric 어댑터</text>
+    <rect class="m" x="410" y="110" width="170" height="56" fill="#10243d"/>
+    <text class="lab" x="430" y="134">editor-layers</text><text class="sub" x="430" y="152">트리/그룹</text>
+    <rect class="m" x="600" y="110" width="170" height="56" fill="#10243d"/>
+    <text class="lab" x="620" y="134">editor-history</text><text class="sub" x="620" y="152">Command + zundo</text>
+    <rect class="m" x="790" y="110" width="170" height="56" fill="#10243d"/>
+    <text class="lab" x="810" y="134">editor-template</text><text class="sub" x="810" y="152">슬롯/스냅</text>
+
+    <rect class="m" x="220" y="186" width="170" height="56" fill="#10243d"/>
+    <text class="lab" x="240" y="210">editor-pose</text><text class="sub" x="240" y="228">키포인트</text>
+    <rect class="m" x="410" y="186" width="170" height="56" fill="#10243d"/>
+    <text class="lab" x="430" y="210">editor-text</text><text class="sub" x="430" y="228">한글/말풍선</text>
+    <rect class="m" x="600" y="186" width="170" height="56" fill="#10243d"/>
+    <text class="lab" x="620" y="210">editor-effects</text><text class="sub" x="620" y="228">워드효과 50</text>
+    <rect class="m" x="790" y="186" width="170" height="56" fill="#10243d"/>
+    <text class="lab" x="810" y="210">editor-export</text><text class="sub" x="810" y="228">PNG/JSON/PDF</text>
+
+    <!-- AI -->
+    <rect class="m" x="220" y="262" width="170" height="56" fill="#0a2a36"/>
+    <text class="lab" x="240" y="286">ai-script</text><text class="sub" x="240" y="304">대본→Scene</text>
+    <rect class="m" x="410" y="262" width="170" height="56" fill="#0a2a36"/>
+    <text class="lab" x="430" y="286">ai-recommend</text><text class="sub" x="430" y="304">포즈/배경/말풍선</text>
+    <rect class="m" x="600" y="262" width="170" height="56" fill="#0a2a36"/>
+    <text class="lab" x="620" y="286">ai-layout</text><text class="sub" x="620" y="304">결정론 compose()</text>
+    <rect class="m" x="790" y="262" width="170" height="56" fill="#3a1d0c"/>
+    <text class="lab" x="810" y="286">pdf-engine</text><text class="sub" x="810" y="304">벡터+preflight</text>
+
+    <!-- shared -->
+    <rect class="m" x="220" y="338" width="240" height="56" fill="#1d1b3a"/>
+    <text class="lab" x="240" y="362">shared-schema</text><text class="sub" x="240" y="380">Prisma+Zod+v1</text>
+    <rect class="m" x="480" y="338" width="220" height="56" fill="#1d1b3a"/>
+    <text class="lab" x="500" y="362">shared-ui</text><text class="sub" x="500" y="380">디자인 시스템</text>
+    <rect class="m" x="720" y="338" width="240" height="56" fill="#1d1b3a"/>
+    <text class="lab" x="740" y="362">shared-utils</text><text class="sub" x="740" y="380">공통 유틸</text>
+
+    <!-- Arrows: apps -> editor-ui & all editor-* -->
+    <path class="dep" d="M100,80 V110" marker-end="url(#arr2)"/>
+    <path class="dep" d="M280,80 V110" marker-end="url(#arr2)"/>
+    <path class="dep" d="M460,80 V110" marker-end="url(#arr2)"/>
+    <!-- editor-ui depends on cores -->
+    <path class="dep" d="M200,138 H220" marker-end="url(#arr2)"/>
+    <!-- editor-core base -->
+    <path class="dep" d="M305,166 V186" marker-end="url(#arr2)"/>
+    <path class="dep" d="M495,166 V186" marker-end="url(#arr2)"/>
+    <path class="dep" d="M685,166 V186" marker-end="url(#arr2)"/>
+    <!-- ai/pdf depend on shared-schema -->
+    <path class="dep" d="M305,318 V338" marker-end="url(#arr2)"/>
+    <path class="dep" d="M495,318 V338" marker-end="url(#arr2)"/>
+    <path class="dep" d="M685,318 V338" marker-end="url(#arr2)"/>
+    <path class="dep" d="M875,318 V338" marker-end="url(#arr2)"/>
+    <!-- pdf depends on editor cores (headless) -->
+    <path class="dep" d="M875,262 V242" marker-end="url(#arr2)"/>
+    <!-- workers consume ai/pdf -->
+    <path class="dep" d="M460,78 V90 H700 V262" marker-end="url(#arr2)"/>
+  </svg>
+
+  <div class="legend">
+    <span><i style="background:#1a1330"></i> apps</span>
+    <span><i style="background:#0e2c33"></i> editor-ui (React 허용)</span>
+    <span><i style="background:#10243d"></i> editor-* (헤드리스)</span>
+    <span><i style="background:#0a2a36"></i> ai-*</span>
+    <span><i style="background:#3a1d0c"></i> pdf-engine</span>
+    <span><i style="background:#1d1b3a"></i> shared-*</span>
+  </div>
+</section>
+
+<section id="data">
+  <h2>⑦ 데이터 모델 — ERD 요약</h2>
+  <p class="lead">상세 Prisma 스키마는 <code>docs/data-schema/erd.md</code>. 핵심 관계만 시각화.</p>
+  <svg class="diag" viewBox="0 0 1100 460" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="ERD 요약">
+    <defs>
+      <marker id="arr3" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#7d8aa8"/></marker>
+      <style>
+        .e{fill:#11141b;stroke:#2a3650;rx:10}
+        .et{fill:#fff;font:600 13px -apple-system,system-ui,sans-serif}
+        .ef{fill:#a9b0c0;font:11.5px -apple-system,system-ui,sans-serif}
+        .rel{stroke:#4d5a78;stroke-width:1.4;fill:none}
+        .lbl{fill:#7d8aa8;font:10.5px -apple-system,system-ui,sans-serif}
+      </style>
+    </defs>
+
+    <!-- User -->
+    <rect class="e" x="20" y="20" width="180" height="120"/>
+    <text class="et" x="36" y="42">User</text>
+    <text class="ef" x="36" y="64">id, email, role</text>
+    <text class="ef" x="36" y="84">stripeId, createdAt</text>
+
+    <!-- Subscription -->
+    <rect class="e" x="20" y="170" width="180" height="100"/>
+    <text class="et" x="36" y="192">Subscription</text>
+    <text class="ef" x="36" y="214">plan, status</text>
+    <text class="ef" x="36" y="234">uploadQuotaMb</text>
+
+    <!-- Project -->
+    <rect class="e" x="240" y="20" width="220" height="140"/>
+    <text class="et" x="256" y="42">Project</text>
+    <text class="ef" x="256" y="64">id, ownerId → User</text>
+    <text class="ef" x="256" y="84">formatId → Format</text>
+    <text class="ef" x="256" y="104">title, status</text>
+
+    <!-- Page -->
+    <rect class="e" x="500" y="20" width="200" height="140"/>
+    <text class="et" x="516" y="42">Page</text>
+    <text class="ef" x="516" y="64">projectId → Project</text>
+    <text class="ef" x="516" y="84">index, templateId?</text>
+    <text class="ef" x="516" y="104">fabricJson (v1)</text>
+    <text class="ef" x="516" y="124">thumbnail</text>
+
+    <!-- SceneDoc/Scene/Line -->
+    <rect class="e" x="240" y="180" width="220" height="100"/>
+    <text class="et" x="256" y="202">SceneDoc</text>
+    <text class="ef" x="256" y="224">projectId → Project (1:1)</text>
+    <text class="ef" x="256" y="244">scriptRaw</text>
+
+    <rect class="e" x="500" y="180" width="200" height="100"/>
+    <text class="et" x="516" y="202">Scene</text>
+    <text class="ef" x="516" y="224">sceneDocId → SceneDoc</text>
+    <text class="ef" x="516" y="244">index, slug, summary, emotion</text>
+
+    <rect class="e" x="740" y="180" width="200" height="100"/>
+    <text class="et" x="756" y="202">Line</text>
+    <text class="ef" x="756" y="224">sceneId → Scene</text>
+    <text class="ef" x="756" y="244">speaker, text, bubbleId?</text>
+
+    <!-- Format -->
+    <rect class="e" x="20" y="300" width="220" height="100"/>
+    <text class="et" x="36" y="322">Format</text>
+    <text class="ef" x="36" y="344">widthMm, heightMm, dpi</text>
+    <text class="ef" x="36" y="364">bleedMm, safeMm, gridDef</text>
+
+    <!-- Template/Set -->
+    <rect class="e" x="260" y="300" width="200" height="100"/>
+    <text class="et" x="276" y="322">Template</text>
+    <text class="ef" x="276" y="344">formatId → Format</text>
+    <text class="ef" x="276" y="364">slots[], fabricJson</text>
+
+    <rect class="e" x="480" y="300" width="200" height="100"/>
+    <text class="et" x="496" y="322">TemplateSet</text>
+    <text class="ef" x="496" y="344">templates[]</text>
+
+    <!-- Resource -->
+    <rect class="e" x="700" y="300" width="240" height="140"/>
+    <text class="et" x="716" y="322">Resource</text>
+    <text class="ef" x="716" y="344">kind: pose|bg|prop|bubble|fx|deco</text>
+    <text class="ef" x="716" y="364">format: png(1차) | svg(향후)</text>
+    <text class="ef" x="716" y="384">variants{webp1x/2x}, masterDpi</text>
+    <text class="ef" x="716" y="404">tintMaskUrl?, embedding(pgvector)</text>
+
+    <!-- PublishJob/Showcase -->
+    <rect class="e" x="740" y="20" width="200" height="100"/>
+    <text class="et" x="756" y="42">PublishJob</text>
+    <text class="ef" x="756" y="64">projectId, kind:pdf</text>
+    <text class="ef" x="756" y="84">status, pdfUrl, preflight</text>
+
+    <rect class="e" x="960" y="20" width="120" height="100"/>
+    <text class="et" x="976" y="42">Showcase</text>
+    <text class="ef" x="976" y="64">mode</text>
+    <text class="ef" x="976" y="84">contestId?</text>
+
+    <!-- Relations -->
+    <path class="rel" d="M200,80 H240" marker-end="url(#arr3)"/><text class="lbl" x="208" y="74">1:N</text>
+    <path class="rel" d="M460,80 H500" marker-end="url(#arr3)"/><text class="lbl" x="466" y="74">1:N</text>
+    <path class="rel" d="M460,210 H500" marker-end="url(#arr3)"/><text class="lbl" x="466" y="204">1:N</text>
+    <path class="rel" d="M700,210 H740" marker-end="url(#arr3)"/><text class="lbl" x="706" y="204">1:N</text>
+    <path class="rel" d="M350,160 V180" marker-end="url(#arr3)"/>
+    <path class="rel" d="M240,350 H260" marker-end="url(#arr3)"/>
+    <path class="rel" d="M460,350 H480" marker-end="url(#arr3)"/>
+    <path class="rel" d="M700,80 H740" marker-end="url(#arr3)"/>
+    <path class="rel" d="M940,80 H960" marker-end="url(#arr3)"/>
+    <path class="rel" d="M110,140 V170" marker-end="url(#arr3)"/>
+  </svg>
+</section>
+
+<section id="editor-anatomy">
+  <h2>⑧ 편집기 해부도 (UI 모듈)</h2>
+  <svg class="diag" viewBox="0 0 1100 540" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="편집기 UI 해부도">
+    <defs>
+      <style>
+        .area{fill:#11141b;stroke:#28304a;stroke-dasharray:4 3;rx:8}
+        .lab{fill:#fff;font:600 13px -apple-system,system-ui,sans-serif}
+        .sub{fill:#a9b0c0;font:11.5px -apple-system,system-ui,sans-serif}
+        .canvas{fill:#0e1729;stroke:#1f3258;rx:8}
+      </style>
+    </defs>
+    <!-- Top bar -->
+    <rect class="area" x="20" y="20" width="1060" height="48"/>
+    <text class="lab" x="36" y="48">Top Bar — 파일/저장/공유/내보내기/사용자</text>
+
+    <!-- Left tools -->
+    <rect class="area" x="20" y="80" width="160" height="420"/>
+    <text class="lab" x="36" y="106">Tools</text>
+    <text class="sub" x="36" y="126">선택 / 텍스트</text>
+    <text class="sub" x="36" y="144">포즈 / 배경</text>
+    <text class="sub" x="36" y="162">소품 / 미장센</text>
+    <text class="sub" x="36" y="180">말풍선 / 워드효과</text>
+    <text class="sub" x="36" y="198">꾸미기 / 도형</text>
+    <text class="sub" x="36" y="216">템플릿셋</text>
+    <text class="sub" x="36" y="244">검색(/) — 시맨틱</text>
+
+    <!-- Canvas -->
+    <rect class="canvas" x="200" y="80" width="620" height="420"/>
+    <text class="lab" x="220" y="106">Canvas (fabric.js)</text>
+    <text class="sub" x="220" y="126">mm 좌표계 · 그리드/가이드 · 스냅</text>
+    <text class="sub" x="220" y="146">멀티 선택 · 키포인트 핸들 · 화자 꼬리 추적</text>
+    <text class="sub" x="220" y="166">200객체 60fps(데스크톱) / 30fps(모바일)</text>
+
+    <!-- Right inspector -->
+    <rect class="area" x="840" y="80" width="240" height="260"/>
+    <text class="lab" x="856" y="106">Inspector</text>
+    <text class="sub" x="856" y="126">위치 / 크기 / 각도</text>
+    <text class="sub" x="856" y="144">스타일 / 팔레트 / 효과</text>
+    <text class="sub" x="856" y="162">대안 K개(자동 배치)</text>
+
+    <rect class="area" x="840" y="350" width="240" height="150"/>
+    <text class="lab" x="856" y="376">Layers</text>
+    <text class="sub" x="856" y="394">트리 / 그룹 / 잠금 / 숨김</text>
+
+    <!-- Bottom (mobile) -->
+    <rect class="area" x="20" y="510" width="1060" height="20" fill="#0f131c"/>
+    <text class="sub" x="36" y="525">Mobile: BottomSheet 로 Tools/Inspector 토글, 핀치 줌, 멀티터치</text>
+  </svg>
+</section>
+
+<section id="pipeline">
+  <h2>⑨ AI 자동 배치 파이프라인</h2>
+  <svg class="diag" viewBox="0 0 1100 320" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="AI 파이프라인">
+    <defs>
+      <marker id="arr4" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#9aa3b8"/></marker>
+      <style>
+        .step{fill:#11141b;stroke:#28304a;rx:10}
+        .stepai{fill:#0a2a36;stroke:#155368;rx:10}
+        .stepout{fill:#10243d;stroke:#1f4477;rx:10}
+        .lab{fill:#fff;font:600 13px -apple-system,system-ui,sans-serif}
+        .sub{fill:#a9b0c0;font:11.5px -apple-system,system-ui,sans-serif}
+        .ln{stroke:#3a445e;stroke-width:1.4;fill:none}
+      </style>
+    </defs>
+    <rect class="step" x="20" y="60" width="160" height="80"/>
+    <text class="lab" x="36" y="90">대본 입력</text>
+    <text class="sub" x="36" y="110">자유 형식 텍스트</text>
+
+    <rect class="stepai" x="220" y="60" width="180" height="80"/>
+    <text class="lab" x="236" y="90">ai-script.analyze()</text>
+    <text class="sub" x="236" y="110">장면/대사/감정/시점</text>
+
+    <rect class="stepai" x="440" y="60" width="200" height="80"/>
+    <text class="lab" x="456" y="90">ai-recommend.*</text>
+    <text class="sub" x="456" y="110">포즈·배경·말풍선 후보 K</text>
+
+    <rect class="stepai" x="680" y="60" width="200" height="80"/>
+    <text class="lab" x="696" y="90">ai-layout.compose()</text>
+    <text class="sub" x="696" y="110">슬롯+충돌해소 (시드)</text>
+
+    <rect class="stepout" x="920" y="60" width="160" height="80"/>
+    <text class="lab" x="940" y="90">fabricJson (v1)</text>
+    <text class="sub" x="940" y="110">+ alternatives</text>
+
+    <path class="ln" d="M180,100 H220" marker-end="url(#arr4)"/>
+    <path class="ln" d="M400,100 H440" marker-end="url(#arr4)"/>
+    <path class="ln" d="M640,100 H680" marker-end="url(#arr4)"/>
+    <path class="ln" d="M880,100 H920" marker-end="url(#arr4)"/>
+
+    <rect class="step" x="220" y="200" width="660" height="60"/>
+    <text class="lab" x="236" y="226">결정론 시드 + Claude prompt cache + Zod 검증 (모든 단계 회귀 가능)</text>
+    <text class="sub" x="236" y="248">자산 포맷 무관(PNG 1차/SVG 향후) — 사이드카 키포인트로 동일하게 동작 · 실패/저신뢰는 alternatives</text>
+  </svg>
+</section>
+
+<section id="agents">
+  <h2>⑩ 에이전트 협업 (오토파일럿)</h2>
+  <p class="lead">Claude Code(코드) + Claude(시안/카피) + Cursor(휴먼 인라인) + nano-banana 2(이미지). 11개 서브에이전트가 역할을 나누어 진행.</p>
+
+  <div class="grid g3" style="margin-top:10px">
+    <div class="card agent-card"><div class="av orch">O</div><div><b>orchestrator</b><div class="hint">roadmap 다음 작업 픽 + 위임</div></div></div>
+    <div class="card agent-card"><div class="av architect">A</div><div><b>architect</b><div class="hint">모노레포·Prisma·CI·결제</div></div></div>
+    <div class="card agent-card"><div class="av editor">E</div><div><b>editor-engineer</b><div class="hint">fabric 코어/레이어/히스토리</div></div></div>
+    <div class="card agent-card"><div class="av pose">P</div><div><b>pose-curator</b><div class="hint">PNG 인입·사이드카·임베딩 (SVG 어댑터 향후)</div></div></div>
+    <div class="card agent-card"><div class="av scene">S</div><div><b>scene-analyzer</b><div class="hint">대본 NLP + 추천</div></div></div>
+    <div class="card agent-card"><div class="av layout">L</div><div><b>layout-composer</b><div class="hint">자동 페이지 컴포지션</div></div></div>
+    <div class="card agent-card"><div class="av admin">M</div><div><b>admin-builder</b><div class="hint">관리자/검수/일괄</div></div></div>
+    <div class="card agent-card"><div class="av pdf">D</div><div><b>pdf-publisher</b><div class="hint">POD PDF/프리플라이트</div></div></div>
+    <div class="card agent-card"><div class="av ui">U</div><div><b>ui-designer</b><div class="hint">반응형/디자인 시스템/OG</div></div></div>
+    <div class="card agent-card"><div class="av qa">Q</div><div><b>qa-tester</b><div class="hint">테스트/보안/접근성</div></div></div>
+    <div class="card agent-card"><div class="av bridge">B</div><div><b>integration-bridge</b><div class="hint">Cursor/Claude 시안 흡수</div></div></div>
+  </div>
+
+  <h3 style="margin-top:18px">표준 흐름 (자동 배치 기능 신규 개발 예시)</h3>
+  <ol style="color:var(--ink2);max-width:820px">
+    <li>휴먼: <code>/sw-next</code> 호출</li>
+    <li>orchestrator: <code>roadmap.md</code>에서 다음 작업 1건 픽 (예: M4-03)</li>
+    <li>orchestrator → layout-composer: 자기완결 프롬프트로 위임</li>
+    <li>layout-composer: 알고리즘 + 단위 테스트</li>
+    <li>layout-composer → qa-tester: 골든셋 확장</li>
+    <li>qa-tester: simplify + security-review 자동 실행</li>
+    <li>orchestrator: PR(draft) + roadmap 체크 갱신</li>
+    <li>휴먼: 리뷰 → 머지 → 다음 호출 대기</li>
+  </ol>
+</section>
+
+<section id="nfr">
+  <h2>⑪ 성능·접근성·보안 게이트</h2>
+  <div class="grid g3">
+    <div class="card">
+      <h4>성능</h4>
+      <ul style="margin:6px 0 0 18px;color:var(--ink2)">
+        <li>편집기 TTI ≤ 2.5s (P75 4G)</li>
+        <li>200 객체 60/30 fps</li>
+        <li>PDF 16p ≤ 6s</li>
+        <li>API p95 ≤ 500ms</li>
+        <li>모듈 bench 회귀 ±10% 이내</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>접근성</h4>
+      <ul style="margin:6px 0 0 18px;color:var(--ink2)">
+        <li>WCAG 2.1 AA</li>
+        <li>키보드 단독 편집 가능</li>
+        <li>대비 4.5:1 / 아이콘 3:1</li>
+        <li>ARIA Live 로 캔버스 변경 안내</li>
+        <li>prefers-reduced-motion 존중</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>보안</h4>
+      <ul style="margin:6px 0 0 18px;color:var(--ink2)">
+        <li>SVG sanitize (script/외부 ref/foreignObject)</li>
+        <li>업로드 MIME 화이트리스트 + ClamAV</li>
+        <li>RLS 우회 0 (서버 액션 검증)</li>
+        <li>SSRF 가드(외부 fetch 화이트리스트)</li>
+        <li>관리자 2FA 강제</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<section id="risks">
+  <h2>⑫ 리스크 & 완화</h2>
+  <table>
+    <thead><tr><th>리스크</th><th>영향</th><th>완화</th><th>지표/모니터</th></tr></thead>
+    <tbody>
+      <tr><td>모바일 캔버스 200객체 끊김</td><td>편집 불가</td><td>가상 레이어 · dirty 영역 redraw · static/upper 분리</td><td>fps 트레이스</td></tr>
+      <tr><td>AI 자동 배치 만족도 부족</td><td>핵심 가치 훼손</td><td>K개 후보 + 한 클릭 교체 + 사용자 피드백 학습</td><td>인간 평가 50샘플</td></tr>
+      <tr><td>POD 인쇄소별 사양 차이</td><td>인쇄 사고</td><td>판형 프리셋 + 인쇄소 프리플라이트 프로필</td><td>preflight 위반 0</td></tr>
+      <tr><td>PNG 마스터 해상도 부족(인쇄 흐림)</td><td>인쇄 품질 저하</td><td>masterDpi 자동 계산 + B5 1500px 미만 검수 큐 + preflight 재검</td><td>lowDpi 비율</td></tr>
+      <tr><td>업로드 PNG 위장/악성 페이로드</td><td>서버 측 RCE</td><td>매직바이트 검증 + EXIF strip + sharp 재인코딩 + MIME 화이트리스트</td><td>업로드 거부율</td></tr>
+      <tr><td>SVG XSS (향후 대응)</td><td>계정 탈취</td><td>DOMPurify SVG profile + CSP 강화</td><td>Sentry 차단 알림</td></tr>
+      <tr><td>PNG 색상 변경 불가능(SVG 와의 차이)</td><td>일관된 룩 어려움</td><td>tintMaskUrl + BlendColor 보조. 컬러 슬롯 핵심 자산은 SVG 어댑터 입점</td><td>색상 변경 사용률</td></tr>
+      <tr><td>1,000 포즈 라이선스/사이드카 누락</td><td>법적 리스크</td><td>사이드카 license 필드 강제, 누락 시 적재 거부</td><td>적재 거부율</td></tr>
+      <tr><td>AI 호출 비용 폭주</td><td>현금 소진</td><td>플랜별 일/월 한도 + 캐시 + 다운그레이드 폴백</td><td>PostHog 사용량</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<section id="kickoff">
+  <h2>⑬ 착수 절차 — 다음에 할 일</h2>
+  <ol>
+    <li>본 문서의 <a href="#decisions-now">D1~D9 의사결정</a> 중 D8(포즈 자산) <span class="pill ok">확정</span>. 나머지(D1~D7, D9) 검토.</li>
+    <li><b>완료</b>: <code>data/poses/raw/</code> 에 PNG 1,058개 + <code>LICENSE.json</code>(폴더 디폴트) 배치 완료.</li>
+    <li>Claude Code 슬래시 커맨드 <code>/sw-next</code> 호출 → orchestrator 가 <b>M0-01 (모노레포 부트스트랩)</b> 시작.</li>
+    <li>M0 완료 후 <code>/sw-pose-ingest --dry-run</code> 으로 인입 시뮬레이션 (적재 성공률 / lowDpi 분포 / 키워드 사전 매칭률 리포트 확인).</li>
+    <li>M2 완료 시 검수 패널에서 키포인트 점진 보강(필요한 자산만).</li>
+    <li>M1 완료(편집기 셸) 시점에 첫 외부 시연.</li>
+  </ol>
+
+  <div class="grid g2" style="margin-top:14px">
+    <div class="card">
+      <h4>지금 사용 가능한 슬래시 커맨드</h4>
+      <ul style="margin:6px 0 0 18px;color:var(--ink2)">
+        <li><code>/sw-next</code> — 다음 작업 1건 진행</li>
+        <li><code>/sw-pose-ingest</code> — 포즈 인입 파이프라인</li>
+        <li><code>/sw-compose &lt;projectId&gt;</code> — 자동 배치</li>
+        <li><code>/sw-pdf &lt;projectId&gt;</code> — POD PDF</li>
+        <li><code>/sw-review</code> — 변경 셀프 리뷰</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>저장된 핵심 문서</h4>
+      <ul style="margin:6px 0 0 18px;color:var(--ink2)">
+        <li><a href="../CLAUDE.md">CLAUDE.md</a> — 마스터 사양</li>
+        <li><a href="../SKILLS.md">SKILLS.md</a> — 스킬 카탈로그</li>
+        <li><a href="architecture/decisions.md">ADR</a></li>
+        <li><a href="architecture/roadmap.md">Roadmap (큐)</a></li>
+        <li><a href="modules/index.md">Module Spec</a></li>
+        <li><a href="data-schema/erd.md">ERD</a></li>
+        <li><a href="agents/orchestration.md">Agent Orchestration</a></li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="card" style="margin-top:14px">
+    <h4>Definition of Ready (각 태스크 진입 전 충족)</h4>
+    <div class="check"><input type="checkbox"> <span>요구사항이 한 줄로 표현됨</span></div>
+    <div class="check"><input type="checkbox"> <span>관련 모듈/계약/API 가 명시됨</span></div>
+    <div class="check"><input type="checkbox"> <span>DoD 가 측정 가능(숫자/통과 조건)</span></div>
+    <div class="check"><input type="checkbox"> <span>휴먼 게이트 여부 표기</span></div>
+    <div class="check"><input type="checkbox"> <span>리스크/회귀 영향 식별</span></div>
+  </div>
+</section>
+
+</main>
+</div>
+
+<script>
+  // 사이드바 활성화
+  const links = document.querySelectorAll('aside nav a');
+  const sections = [...document.querySelectorAll('section[id]')];
+  const onScroll = () => {
+    const y = window.scrollY + 120;
+    let cur = sections[0]?.id;
+    for(const s of sections){ if(s.offsetTop <= y) cur = s.id; }
+    links.forEach(a => a.classList.toggle('active', a.getAttribute('href') === '#' + cur));
+  };
+  document.addEventListener('scroll', onScroll, { passive:true });
+  onScroll();
+
+  // 진행률(체크박스 기준)
+  // 단순 카운터 콘솔 출력만
+  const total = document.querySelectorAll('.check input').length;
+  console.info('체크 가능한 항목 총', total, '개');
+</script>
+</body>
+</html>

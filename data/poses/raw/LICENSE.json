@@ -1,0 +1,30 @@
+{
+  "$schema": "../../../packages/shared-schema/zod/folder-license.schema.json",
+  "v": 1,
+  "scope": "folder-default",
+  "appliesTo": ["**/*.png"],
+  "license": {
+    "id": "storywork-internal-2026",
+    "holder": "StoryWork",
+    "terms": "all-rights",
+    "source": "self-produced-or-purchased",
+    "commercialUse": true,
+    "redistribution": "embedded-in-user-works",
+    "attributionRequired": false,
+    "note": "본 폴더의 모든 PNG 자산은 StoryWork 가 자체 제작 또는 구매로 권리를 보유한다. 사용자 작품에 임베드되어 PDF/POD/SNS 로 배포되는 것을 허용한다."
+  },
+  "asset": {
+    "kind": "pose",
+    "format": "png",
+    "ownerType": "system",
+    "defaultStatus": "draft",
+    "tagsBootstrap": [
+      "from-filename"
+    ]
+  },
+  "_comment": [
+    "이 파일은 폴더 디폴트 라이선스입니다. 동일 폴더의 모든 PNG 자산이 이 라이선스를 상속합니다.",
+    "개별 자산이 다른 라이선스를 가져야 한다면 같은 디렉토리에 <id>.kp.json 사이드카를 두고 license 필드를 덮어쓰세요.",
+    "수정 시 ADR-0011 을 함께 갱신하고, 변경 이력을 git log 로 추적하세요."
+  ]
+}
