@@ -1,0 +1,22 @@
+// StoryWork — Prisma Schema v1 (스텁)
+// 전체 ERD: docs/data-schema/erd.md
+// 모델은 M0 완료 후 M1~M2 에서 순차 추가 예정
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+// 스텁 모델 — 향후 Format, Template, Resource 등으로 교체
+// in-place 수정 금지; 변경은 반드시 migrate dev 로 버전 관리
+model _Placeholder {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+
+  @@map("_placeholder")
+}
