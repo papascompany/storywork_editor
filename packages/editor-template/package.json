@@ -1,0 +1,37 @@
+{
+  "name": "@storywork/editor-template",
+  "version": "0.0.0",
+  "description": "슬롯 정의/스냅 그리드/템플릿 인스턴싱",
+  "main": "./dist/index.js",
+  "module": "./dist/index.mjs",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.mjs",
+      "require": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsc -p tsconfig.build.json",
+    "dev": "tsc -p tsconfig.build.json --watch",
+    "lint": "eslint src --ext .ts",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "clean": "rimraf dist *.tsbuildinfo"
+  },
+  "dependencies": {
+    "@storywork/editor-core": "workspace:*",
+    "@storywork/editor-layers": "workspace:*",
+    "@storywork/editor-history": "workspace:*",
+    "@storywork/schema": "workspace:*",
+    "@storywork/utils": "workspace:*"
+  },
+  "devDependencies": {
+    "typescript": "^5.6.0",
+    "vitest": "^2.0.0"
+  }
+}

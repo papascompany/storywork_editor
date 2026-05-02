@@ -1,0 +1,43 @@
+{
+  "name": "@storywork/editor-ui",
+  "version": "0.0.0",
+  "description": "도구 패널, 인스펙터, 레이어 패널, 단축키 매핑 (React 의존 허용)",
+  "main": "./dist/index.js",
+  "module": "./dist/index.mjs",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.mjs",
+      "require": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsc -p tsconfig.build.json",
+    "dev": "tsc -p tsconfig.build.json --watch",
+    "lint": "eslint src --ext .ts",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "clean": "rimraf dist *.tsbuildinfo"
+  },
+  "dependencies": {
+    "@storywork/editor-core": "workspace:*",
+    "@storywork/editor-layers": "workspace:*",
+    "@storywork/editor-history": "workspace:*",
+    "@storywork/editor-template": "workspace:*",
+    "@storywork/editor-pose": "workspace:*",
+    "@storywork/editor-text": "workspace:*",
+    "@storywork/editor-effects": "workspace:*",
+    "@storywork/editor-export": "workspace:*",
+    "@storywork/schema": "workspace:*",
+    "@storywork/ui": "workspace:*",
+    "@storywork/utils": "workspace:*"
+  },
+  "devDependencies": {
+    "typescript": "^5.6.0",
+    "vitest": "^2.0.0"
+  }
+}
