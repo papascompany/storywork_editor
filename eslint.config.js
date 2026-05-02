@@ -287,8 +287,9 @@ export default [
       import: importPlugin,
     },
     rules: {
-      // TypeScript가 타입 체크를 담당하므로 ESLint no-undef 는 TS 파일에서 비활성화
+      // TypeScript가 타입 체크를 담당하므로 기본 JS 룰 비활성화 (TS 전용 룰로 대체)
       'no-undef': 'off',
+      'no-unused-vars': 'off', // @typescript-eslint/no-unused-vars 로 대체
 
       // TypeScript strict 규칙
       '@typescript-eslint/no-explicit-any': 'error',
