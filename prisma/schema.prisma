@@ -1,22 +1,370 @@
-// StoryWork — Prisma Schema v1 (스텁)
-// 전체 ERD: docs/data-schema/erd.md
-// 모델은 M0 완료 후 M1~M2 에서 순차 추가 예정
+// StoryWork — Prisma Schema v1
+// 단일 진실 원천: docs/data-schema/erd.md
+// 변경은 반드시 prisma migrate dev 로 버전 관리 (in-place 수정 금지)
 
 generator client {
-  provider = "prisma-client-js"
+  provider        = "prisma-client-js"
+  previewFeatures = ["postgresqlExtensions", "fullTextSearchPostgres"]
 }
 
 datasource db {
-  provider  = "postgresql"
-  url       = env("DATABASE_URL")
-  directUrl = env("DIRECT_URL")
+  provider   = "postgresql"
+  url        = env("DATABASE_URL")
+  directUrl  = env("DIRECT_URL")
+  extensions = [vector]
 }
 
-// 스텁 모델 — 향후 Format, Template, Resource 등으로 교체
-// in-place 수정 금지; 변경은 반드시 migrate dev 로 버전 관리
-model _Placeholder {
-  id        String   @id @default(cuid())
-  createdAt DateTime @default(now())
+// ─────────────────────────────────────────────
+// Enums
+// ─────────────────────────────────────────────
 
-  @@map("_placeholder")
+enum Role {
+  user
+  creator
+  curator
+  superadmin
+  readonly
+}
+
+enum ResourceKind {
+  pose
+  background
+  mise_en_scene
+  prop
+  speech_bubble
+  word_fx
+  decoration
+}
+
+/// 자산 포맷 — 1차: png. 향후 svg 병행 (ADR-0011)
+enum ResourceFormat {
+  png
+  svg
+  webp
+}
+
+enum OwnerType {
+  system
+  creator
+}
+
+enum ResourceStatus {
+  draft
+  review
+  published
+  rejected
+}
+
+enum ProjectStatus {
+  drafting
+  composing
+  editing
+  publishing
+  archived
+}
+
+enum JobStatus {
+  queued
+  running
+  succeeded
+  failed
+}
+
+enum ShowcaseMode {
+  contest
+  gallery
+}
+
+// ─────────────────────────────────────────────
+// Models
+// ─────────────────────────────────────────────
+
+model User {
+  id            String         @id @default(cuid())
+  email         String         @unique
+  role          Role           @default(user)
+  stripeId      String?        @unique
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+  projects      Project[]
+  resources     Resource[]     @relation("CreatorResources")
+  showcases     Showcase[]
+  subscriptions Subscription[]
+}
+
+model Subscription {
+  id               String   @id @default(cuid())
+  userId           String
+  user             User     @relation(fields: [userId], references: [id])
+  plan             String
+  status           String
+  currentPeriodEnd DateTime
+  uploadQuotaMb    Int      @default(100)
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  @@index([userId])
+}
+
+/// 인쇄 판형 — 폭/높이/dpi/여백 규격
+model Format {
+  id        String     @id @default(cuid())
+  name      String     @unique
+  widthMm   Float
+  heightMm  Float
+  dpi       Int        @default(300)
+  bleedMm   Float      @default(3)
+  safeMm    Float      @default(5)
+  gridDef   Json?
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+  templates Template[]
+  projects  Project[]
+}
+
+/// 페이지 단위 레이아웃 템플릿
+model Template {
+  id         String       @id @default(cuid())
+  formatId   String
+  format     Format       @relation(fields: [formatId], references: [id])
+  name       String
+  thumbnail  String?
+  fabricJson Json
+  slots      Json // Slot[]
+  setId      String?
+  set        TemplateSet? @relation(fields: [setId], references: [id])
+  createdAt  DateTime     @default(now())
+  updatedAt  DateTime     @updatedAt
+
+  @@index([formatId])
+  @@index([setId])
+}
+
+/// 여러 템플릿을 묶는 세트 (한 작품용 통합 레이아웃)
+model TemplateSet {
+  id        String     @id @default(cuid())
+  name      String
+  coverIdx  Int        @default(0)
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+  templates Template[]
+}
+
+/// 관리자 등록 리소스 (포즈/배경/소품 등 모두)
+model Resource {
+  id               String                       @id @default(cuid())
+  /// URL-safe 식별자 (한글/공백/괄호 정규화)
+  slug             String                       @unique
+  /// 원본 파일명 보존 (검색·디버그용)
+  originalFilename String
+  kind             ResourceKind
+  /// 1차: png. 향후 svg 병행 (ADR-0011)
+  format           ResourceFormat               @default(png)
+  ownerType        OwnerType
+  ownerId          String?
+  owner            User?                        @relation("CreatorResources", fields: [ownerId], references: [id])
+  /// 마스터 파일 URL (PNG/SVG)
+  fileUrl          String
+  thumbUrl         String?
+  /// PNG 파생본 { webp1x, webp2x, avif?, thumb }
+  variants         Json?
+  /// 마스터 픽셀 너비
+  width            Int?
+  /// 마스터 픽셀 높이
+  height           Int?
+  /// PNG 한정 인쇄 환산 dpi. SVG=null
+  masterDpi        Int?
+  /// ai-layout 슬롯 제약 트리거 — true 면 페이지 1/2 이하 슬롯만 허용 (ADR-0011a)
+  lowDpi           Boolean                      @default(false)
+  /// PNG 색상 변경용 알파 마스크 URL (선택)
+  tintMaskUrl      String?
+  /// kind별 다형 메타 (PoseMeta 등)
+  meta             Json
+  tags             String[]
+  /// 파일명 키워드로 자동 추출된 태그 (감사용)
+  tagsBootstrap    String[]
+  /// 라이선스 정보 { id, holder, terms, source, commercialUse, ... }
+  license          Json
+  /// 'folder-default' | 'sidecar' | 'override'
+  licenseSource    String
+  status           ResourceStatus               @default(draft)
+  reviewer         String?
+  reviewNote       String?
+  /// 결합 임베딩 (텍스트+시각 결합 또는 아래 두 컬럼 사용)
+  embedding        Unsupported("vector(1024)")?
+  /// 텍스트(태그) 임베딩
+  embeddingText    Unsupported("vector(1024)")?
+  /// 시각(이미지) 임베딩
+  embeddingVis     Unsupported("vector(1024)")?
+  createdAt        DateTime                     @default(now())
+  updatedAt        DateTime                     @updatedAt
+
+  @@index([kind, status])
+  @@index([kind, format, status])
+  @@index([kind, lowDpi, status])
+  @@index([ownerType, ownerId])
+}
+
+/// 사용자 스토리보드 작품
+model Project {
+  id        String        @id @default(cuid())
+  ownerId   String
+  owner     User          @relation(fields: [ownerId], references: [id])
+  formatId  String
+  format    Format        @relation(fields: [formatId], references: [id])
+  title     String
+  status    ProjectStatus @default(drafting)
+  settings  Json          @default("{}")
+  createdAt DateTime      @default(now())
+  updatedAt DateTime      @updatedAt
+  pages     Page[]
+  sceneDoc  SceneDoc?
+  publishes PublishJob[]
+  showcases Showcase[]
+
+  @@index([ownerId])
+  @@index([ownerId, status])
+}
+
+/// 작품의 단일 페이지 — fabricJson = PageJsonV1
+model Page {
+  id         String   @id @default(cuid())
+  projectId  String
+  project    Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  index      Int
+  templateId String?
+  /// PageJsonV1 — packages/shared-schema/src/editor/v1.ts 스키마 준수
+  fabricJson Json
+  thumbnail  String?
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@unique([projectId, index])
+  @@index([projectId])
+}
+
+/// AI 대본 분석 결과 — Project 1:1
+model SceneDoc {
+  id        String   @id @default(cuid())
+  projectId String   @unique
+  project   Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  scriptRaw String
+  meta      Json
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  scenes    Scene[]
+}
+
+/// 장면 단위 분석 결과
+model Scene {
+  id         String   @id @default(cuid())
+  sceneDocId String
+  sceneDoc   SceneDoc @relation(fields: [sceneDocId], references: [id], onDelete: Cascade)
+  index      Int
+  slug       String
+  summary    String
+  emotion    String?
+  view       String?
+  pageId     String?
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+  lines      Line[]
+
+  @@unique([sceneDocId, index])
+  @@index([sceneDocId])
+}
+
+/// 장면 내 대사 한 줄
+model Line {
+  id        String   @id @default(cuid())
+  sceneId   String
+  scene     Scene    @relation(fields: [sceneId], references: [id], onDelete: Cascade)
+  index     Int
+  speaker   String?
+  text      String
+  bubbleId  String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([sceneId, index])
+  @@index([sceneId])
+}
+
+/// PDF/출판 잡 레코드
+model PublishJob {
+  id        String    @id @default(cuid())
+  projectId String
+  project   Project   @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  /// 현재는 'pdf'만 사용
+  kind      String
+  status    JobStatus @default(queued)
+  pdfUrl    String?
+  spec      Json
+  preflight Json?
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+
+  @@index([projectId])
+  @@index([status])
+}
+
+/// 공개 쇼케이스 (공모전/갤러리)
+model Showcase {
+  id        String         @id @default(cuid())
+  projectId String
+  project   Project        @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  ownerId   String
+  owner     User           @relation(fields: [ownerId], references: [id])
+  mode      ShowcaseMode
+  contestId String?
+  contest   ContestSeason? @relation(fields: [contestId], references: [id])
+  likes     Int            @default(0)
+  createdAt DateTime       @default(now())
+  updatedAt DateTime       @updatedAt
+  reactions Reaction[]
+
+  @@index([ownerId])
+  @@index([mode, contestId])
+}
+
+/// 쇼케이스 리액션 (좋아요 등)
+model Reaction {
+  id         String   @id @default(cuid())
+  showcaseId String
+  showcase   Showcase @relation(fields: [showcaseId], references: [id], onDelete: Cascade)
+  userId     String
+  /// 'like' | 'heart' | 'wow'
+  kind       String
+  createdAt  DateTime @default(now())
+
+  @@unique([showcaseId, userId, kind])
+  @@index([showcaseId])
+}
+
+/// 공모전 시즌
+model ContestSeason {
+  id        String     @id @default(cuid())
+  name      String
+  opensAt   DateTime
+  closesAt  DateTime
+  resultsAt DateTime?
+  rules     String
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+  entries   Showcase[]
+}
+
+/// 관리자 액션 감사 로그
+model AuditLog {
+  id      String   @id @default(cuid())
+  actorId String
+  action  String
+  /// 'entity:id' 형식
+  target  String
+  payload Json
+  at      DateTime @default(now())
+
+  @@index([actorId])
+  @@index([target])
+  @@index([at])
 }
