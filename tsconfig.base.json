@@ -9,6 +9,8 @@
 
     "verbatimModuleSyntax": true,
 
+    "skipLibCheck": true,
+
     "strict": true,
     "noUncheckedIndexedAccess": true,
     "noImplicitOverride": true,

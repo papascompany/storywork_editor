@@ -4,7 +4,7 @@
   "tasks": {
     "build": {
       "dependsOn": ["^build"],
-      "outputs": ["dist/**", ".next/**", "!.next/cache/**"],
+      "outputs": ["dist/**", ".next/**", "!.next/cache/**", "storybook-static/**"],
       "cache": true
     },
     "dev": {
@@ -30,6 +30,15 @@
       "dependsOn": ["^build"],
       "outputs": ["playwright-report/**", "test-results/**"],
       "cache": false
+    },
+    "storybook": {
+      "cache": false,
+      "persistent": true
+    },
+    "build-storybook": {
+      "dependsOn": ["^build"],
+      "outputs": ["storybook-static/**"],
+      "cache": true
     },
     "clean": {
       "cache": false
