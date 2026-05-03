@@ -2,8 +2,8 @@
 # 로컬 Supabase 스택 설정
 # Phase A (Docker 준비 후): supabase start
 
-[project]
-id = "storywork"
+# Project identifier (최상위 — TOML table 아님)
+project_id = "storywork"
 
 [api]
 enabled = true
@@ -27,9 +27,9 @@ pool_mode = "transaction"
 default_pool_size = 20
 max_client_conn = 100
 
-# pgvector 확장 활성화 — embedding 컬럼에 필요
-[db.extensions]
-vector = { schema = "extensions" }
+# pgvector 확장은 supabase CLI 2.x config 에서 직접 활성화 키가 없으므로
+# supabase/migrations/20260426000000_init.sql 의 CREATE EXTENSION IF NOT EXISTS vector 로 활성화함
+# (Supabase 의 내장 extensions 스키마에 이미 vector 가 사용 가능)
 
 [realtime]
 enabled = true

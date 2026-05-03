@@ -9,9 +9,9 @@
 
 - [x] [M0-01] pnpm + Turborepo 모노레포 초기화 — `pnpm i && pnpm build` 무오류 — @architect ✅ 2026-04-26 (커밋 ed7c2db..7c9d4e4)
 - [x] [M0-02] tsconfig.base + ESLint(import/no-restricted-paths) — 패키지 역참조 시 lint 실패 — @architect ✅ M0-01 에 포함됨 (※ eslint-import-resolver-typescript 추가 권고 → 후속 이슈)
-- [~] [M0-03] Supabase 로컬 + Prisma schema v1 — Phase B 코드 완료, Phase A(Docker) 대기 — @architect
-  - [x] Phase B (코드): Prisma v1(16 모델·8 enum·pgvector) + Zod 19파일 + RLS 정책 26개 + ivfflat 3개 + 앱 env.ts 3개 + LICENSE.json 파싱. 45 tests pass. ✅ 2026-04-26 (커밋 f055038..053b60b)
-  - [ ] Phase A (실행): Docker Desktop 설치 → `pnpm supabase:start` → `pnpm db:migrate:dev` 검증 — 진행 중
+- [x] [M0-03] Supabase 로컬 + Prisma schema v1 — RLS 베이스라인 + pgvector + 마이그레이션 적용 검증 — @architect ✅ 2026-05-04
+  - [x] Phase B (코드): Prisma v1(16 모델·8 enum·pgvector) + Zod 19파일 + RLS 정책 + ivfflat 3개 + 앱 env.ts 3개 + LICENSE.json 파싱. 45 tests pass. (커밋 f055038..053b60b)
+  - [x] Phase A (실행): OrbStack(Docker 대안) 설치 → `supabase start` 11 컨테이너 healthy → `db reset` 으로 init 마이그레이션 적용 → 16 테이블 + 8 enum + pgvector 0.8.0 + ivfflat 3 + RLS 활성 11 + 정책 15 + updated_at 트리거 15 검증 → Prisma introspect 16 모델 인식 → .env.local 자동 생성
 - [x] [M0-04] 디자인 토큰 + shadcn 베이스 + Storybook — 토큰/기본 컴포넌트 가시화 — @ui-designer ✅ 2026-04-26 (커밋 030e466..0292375). 토큰 8종 + 컴포넌트 5개(Button/Input/Card/Dialog/Sheet) + Storybook 5스토리 + ThemeProvider, axe a11y 0 위반
 - [ ] [M0-05] CI(lint/typecheck/test/build) GitHub Actions — main 브랜치 보호 + 5개 잡 green — @architect
 - [ ] [M0-06] Sentry/PostHog 부트스트랩 — 두 앱에서 테스트 이벤트 수신 — @architect
