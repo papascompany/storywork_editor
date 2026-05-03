@@ -43,6 +43,9 @@
       "@storywork/ai-layout": ["./packages/ai-layout/src/index.ts"],
       "@storywork/pdf-engine": ["./packages/pdf-engine/src/index.ts"],
       "@storywork/schema": ["./packages/shared-schema/src/index.ts"],
+      "@storywork/schema/prisma": ["./packages/shared-schema/src/prisma.ts"],
+      "@storywork/schema/editor": ["./packages/shared-schema/src/editor/v1.ts"],
+      "@storywork/schema/license": ["./packages/shared-schema/src/license/index.ts"],
       "@storywork/ui": ["./packages/shared-ui/src/index.ts"],
       "@storywork/utils": ["./packages/shared-utils/src/index.ts"]
     }
