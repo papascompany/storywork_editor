@@ -1,16 +1,6 @@
-@import 'tailwindcss';
-
-:root {
-  --background: #ffffff;
-  --foreground: #0a0a0a;
-}
-
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family:
-    system-ui,
-    -apple-system,
-    sans-serif;
-  -webkit-font-smoothing: antialiased;
-}
+/**
+ * StoryWork Admin — 전역 CSS
+ *
+ * shared-ui 의 디자인 토큰 + 기본 스타일을 가져옵니다.
+ */
+@import '../../../packages/shared-ui/src/styles/globals.css';

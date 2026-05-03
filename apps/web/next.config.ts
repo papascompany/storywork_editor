@@ -31,6 +31,15 @@ const nextConfig: NextConfig = {
       allowedOrigins: ['localhost:3000'],
     },
   },
+  webpack: (config) => {
+    // .js import 를 .ts/.tsx 로 resolve (ESM TypeScript 소스 직접 컴파일 지원)
+    config.resolve = config.resolve ?? {}
+    config.resolve.extensionAlias = {
+      '.js': ['.ts', '.tsx', '.js'],
+      '.jsx': ['.tsx', '.jsx'],
+    }
+    return config
+  },
 }
 
 export default nextConfig
