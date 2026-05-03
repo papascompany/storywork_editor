@@ -346,4 +346,41 @@ export default [
       '@typescript-eslint/no-explicit-any': 'off',
     },
   },
+
+  // 클라이언트 코드 — @storywork/schema/prisma 서버 전용 모듈 import 금지
+  // Next.js page.tsx / layout.tsx / components 등에서 PrismaClient 직접 접근 차단
+  // 서버 컴포넌트라도 prisma 는 별도 server action / route handler 에서만 사용
+  {
+    files: [
+      'apps/web/app/**/*.tsx',
+      'apps/web/app/**/*.ts',
+      'apps/web/src/**/*.tsx',
+      'apps/web/src/**/*.ts',
+      'apps/admin/app/**/*.tsx',
+      'apps/admin/app/**/*.ts',
+      'apps/admin/src/**/*.tsx',
+      'apps/admin/src/**/*.ts',
+    ],
+    rules: {
+      'no-restricted-imports': [
+        'error',
+        {
+          paths: [
+            {
+              name: '@storywork/schema/prisma',
+              message:
+                '@storywork/schema/prisma 는 서버 전용 모듈입니다. app/ 의 page/layout/component 에서 직접 import 하지 마세요. server action 또는 route handler 를 통해 접근하세요.',
+            },
+          ],
+          patterns: [
+            {
+              group: ['@storywork/schema/prisma*'],
+              message:
+                '@storywork/schema/prisma 는 서버 전용 모듈입니다. 클라이언트 코드에서 import 금지.',
+            },
+          ],
+        },
+      ],
+    },
+  },
 ]
