@@ -20,7 +20,7 @@
 
 - [x] [M1-01] `editor-core` 패키지 스캐폴드 + fabric v6 어댑터 — 헤드리스 단위 테스트 통과 — @editor-engineer ✅ 2026-05-05 (커밋 f3e5c83..02e3fb6) — 67 tests pass, 100객체 라운드트립 157ms (<200ms 임계), 5 골든 라운드트립 100%
 - [x] [M1-02] Schema v1 + 라운드트립(JSON ↔ fabric) — 골든 파일 5개 통과 — @editor-engineer ✅ M1-01 에 포함됨 (5 골든: empty/single-pose/pose-with-bg/grouped/locked)
-- [ ] [M1-03] `editor-layers` — 레이어 트리/잠금/그룹 — Storybook 인터랙션 — @editor-engineer
+- [x] [M1-03] `editor-layers` — 레이어 트리/잠금/그룹 — @editor-engineer ✅ 2026-05-05 (커밋 ed8091c) — 85 tests pass, 골든 3개 라운드트립, fabric 양방향 동기화, lock/hidden propagation
 - [ ] [M1-04] `editor-history` Command + zundo — 100스텝 라운드트립 — @editor-engineer
 - [ ] [M1-05] `editor-export` PNG/JSON — 비주얼 회귀 5장 — @editor-engineer
 - [ ] [M1-06] `apps/web` 빈 페이지 편집기 셸 — 포즈 1 + 배경 1 올리고 저장/복원 — @editor-engineer + @ui-designer
