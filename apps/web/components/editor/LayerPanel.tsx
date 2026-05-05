@@ -8,12 +8,14 @@ import type { StoryCanvas } from '@storywork/editor-core'
 import type { LayerNode, LayerTree } from '@storywork/editor-layers'
 import { cn } from '@storywork/ui'
 import { Eye, EyeOff, Lock, LockOpen, Trash2 } from 'lucide-react'
-import { useCallback, useEffect, useState } from 'react'
+import React, { useCallback, useEffect, useState } from 'react'
 
 type LayerPanelProps = {
   layerTree: LayerTree | null
   canvas: StoryCanvas | null
   selectedIds: string[]
+  /** 모바일 BottomSheet 안에서 사용될 때 true — aside 컨테이너 없이 콘텐츠만 */
+  isMobile?: boolean
 }
 
 const KIND_LABEL: Record<string, string> = {
@@ -131,7 +133,7 @@ function LayerRow({
  * - 잠금/숨김 토글 → LayerTree 상태 변경 → fabric 동기화
  * - 삭제 → canvas.removeObject
  */
-export function LayerPanel({ layerTree, canvas, selectedIds }: LayerPanelProps) {
+export function LayerPanel({ layerTree, canvas, selectedIds, isMobile = false }: LayerPanelProps) {
   const [nodes, setNodes] = useState<LayerNode[]>([])
 
   useEffect(() => {
@@ -187,16 +189,8 @@ export function LayerPanel({ layerTree, canvas, selectedIds }: LayerPanelProps) 
     [canvas],
   )
 
-  return (
-    <aside
-      aria-label="레이어 패널"
-      className={cn(
-        'hidden md:flex md:flex-col',
-        'h-[200px] shrink-0 border-t border-[var(--color-border)]',
-        'bg-[var(--color-surface)]',
-        'overflow-hidden',
-      )}
-    >
+  const innerContent = (
+    <>
       {/* 헤더 */}
       <div className="flex h-9 shrink-0 items-center justify-between border-b border-[var(--color-border)] px-4">
         <h2 className="text-xs font-semibold uppercase tracking-wider text-[var(--color-text-muted)]">
@@ -231,6 +225,24 @@ export function LayerPanel({ layerTree, canvas, selectedIds }: LayerPanelProps) 
           ))
         )}
       </div>
+    </>
+  )
+
+  if (isMobile) {
+    return <div className="flex h-full flex-col">{innerContent}</div>
+  }
+
+  return (
+    <aside
+      aria-label="레이어 패널"
+      className={cn(
+        'hidden md:flex md:flex-col',
+        'h-[200px] shrink-0 border-t border-[var(--color-border)]',
+        'bg-[var(--color-surface)]',
+        'overflow-hidden',
+      )}
+    >
+      {innerContent}
     </aside>
   )
 }

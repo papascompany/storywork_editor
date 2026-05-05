@@ -29,6 +29,7 @@ import type { EditorRefs } from './hooks/useStoryCanvas'
 import { useStoryCanvas } from './hooks/useStoryCanvas'
 import { Inspector } from './Inspector'
 import { LayerPanel } from './LayerPanel'
+import { MobileBottomSheet } from './MobileBottomSheet'
 import { ToolPalette } from './ToolPalette'
 import type { ToolId } from './ToolPalette'
 import { TopBar } from './TopBar'
@@ -81,6 +82,17 @@ export function EditorShell() {
 
   // ── 도구/선택/히스토리/자동저장 ──────────────────────
   const [activeTool, setActiveTool] = useState<ToolId>('select')
+
+  /**
+   * 모바일 BottomSheet closeRequest 카운터.
+   * 포즈/배경 추가 후 1씩 올리면 MobileBottomSheet 가 peek 로 복귀한다.
+   * 숫자 자체는 의미 없고 변화만 의미가 있다.
+   */
+  const [mobileCloseRequest, setMobileCloseRequest] = useState(0)
+
+  const requestMobileClose = useCallback(() => {
+    setMobileCloseRequest((n) => n + 1)
+  }, [])
 
   // H5: ref.current 를 직접 훅에 전달 — 인스턴스 동일성 보장
   const {
@@ -149,7 +161,9 @@ export function EditorShell() {
     }
 
     setActiveTool('select')
-  }, [])
+    // 모바일: 시트를 peek 로 복귀 (캔버스 노출)
+    requestMobileClose()
+  }, [requestMobileClose])
 
   // ── 배경 추가 ─────────────────────────────────────────
   const handleAddBackground = useCallback(() => {
@@ -186,7 +200,9 @@ export function EditorShell() {
     }
 
     setActiveTool('select')
-  }, [])
+    // 모바일: 시트를 peek 로 복귀 (캔버스 노출)
+    requestMobileClose()
+  }, [requestMobileClose])
 
   // ── Context 값 (메모이즈 없음 — readyTick 변경 시 자연스럽게 새 객체) ──
   const ctxValue = {
@@ -203,7 +219,7 @@ export function EditorShell() {
         role="application"
         aria-label="StoryWork 편집기"
       >
-        {/* TopBar */}
+        {/* TopBar — 모바일/데스크톱 공통, 모바일 48px */}
         <TopBar
           fileName="제목 없음"
           saveStatus={saveStatus}
@@ -216,7 +232,7 @@ export function EditorShell() {
 
         {/* 중앙 영역: ToolPalette | Canvas | Inspector */}
         <div className="flex flex-1 overflow-hidden">
-          {/* ToolPalette (데스크톱 only) */}
+          {/* ToolPalette — 데스크톱(md+) only. 모바일은 MobileBottomSheet 의 Tools 탭 */}
           <ToolPalette
             activeTool={activeTool}
             onToolChange={setActiveTool}
@@ -224,7 +240,7 @@ export function EditorShell() {
             onAddBackground={handleAddBackground}
           />
 
-          {/* Canvas */}
+          {/* Canvas — 모바일/데스크톱 공통 */}
           <EditorCanvas
             containerRef={containerRef}
             canvas={canvasRef.current}
@@ -233,16 +249,37 @@ export function EditorShell() {
             onClearSelection={clearSelection}
           />
 
-          {/* Inspector (데스크톱 only) */}
-          <Inspector props={selectionProps} onUpdate={updateProps} />
+          {/* Inspector — 데스크톱(md+) only. DOM 자체 미렌더로 cost 0 */}
+          <div className="hidden md:contents">
+            <Inspector props={selectionProps} onUpdate={updateProps} />
+          </div>
         </div>
 
-        {/* LayerPanel (데스크톱/태블릿) */}
-        <LayerPanel
-          layerTree={layerTreeRef.current}
-          canvas={canvasRef.current}
-          selectedIds={selectedIds}
-        />
+        {/* LayerPanel — 데스크톱(md+) only */}
+        <div className="hidden md:contents">
+          <LayerPanel
+            layerTree={layerTreeRef.current}
+            canvas={canvasRef.current}
+            selectedIds={selectedIds}
+          />
+        </div>
+
+        {/* MobileBottomSheet — 모바일(md 미만) only */}
+        <div className="md:hidden">
+          <MobileBottomSheet
+            activeTool={activeTool}
+            onToolChange={setActiveTool}
+            onAddPose={handleAddPose}
+            onAddBackground={handleAddBackground}
+            selectionProps={selectionProps}
+            onUpdateProps={updateProps}
+            layerTree={layerTreeRef.current}
+            canvas={canvasRef.current}
+            history={historyRef.current}
+            selectedIds={selectedIds}
+            closeRequest={mobileCloseRequest}
+          />
+        </div>
       </div>
     </EditorContext.Provider>
   )

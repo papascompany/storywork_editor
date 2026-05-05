@@ -5,13 +5,15 @@
 // ─────────────────────────────────────────────
 
 import { cn, Input } from '@storywork/ui'
-import { useCallback } from 'react'
+import React, { useCallback } from 'react'
 
 import type { ObjectProps } from './hooks/useSelection'
 
 type InspectorProps = {
   props: ObjectProps | null
   onUpdate: (patch: Partial<Omit<ObjectProps, 'id'>>) => void
+  /** 모바일 BottomSheet 안에서 사용될 때 true — inputMode, 패딩 조정 */
+  isMobile?: boolean
 }
 
 type NumberInputProps = {
@@ -20,10 +22,20 @@ type NumberInputProps = {
   value: number
   onCommit: (v: number) => void
   step?: number
+  /** 모바일 키패드 최적화 — decimal 키패드로 소수점 입력 허용 */
+  isMobile?: boolean
   'aria-label'?: string
 }
 
-function NumberInput({ label, unit = 'mm', value, onCommit, step = 1, ...rest }: NumberInputProps) {
+function NumberInput({
+  label,
+  unit = 'mm',
+  value,
+  onCommit,
+  step = 1,
+  isMobile = false,
+  ...rest
+}: NumberInputProps) {
   const handleBlur = useCallback(
     (e: React.FocusEvent<HTMLInputElement>) => {
       const v = parseFloat(e.target.value)
@@ -55,6 +67,8 @@ function NumberInput({ label, unit = 'mm', value, onCommit, step = 1, ...rest }:
           onKeyDown={handleKeyDown}
           aria-label={rest['aria-label'] ?? label}
           className="h-8 w-full pr-8 text-sm"
+          // 모바일: decimal 키패드로 소수점 허용 (키패드 최소화)
+          inputMode={isMobile ? 'decimal' : undefined}
         />
         {unit && (
           <span className="pointer-events-none absolute right-2 text-xs text-[var(--color-text-muted)]">
@@ -66,20 +80,15 @@ function NumberInput({ label, unit = 'mm', value, onCommit, step = 1, ...rest }:
   )
 }
 
-export function Inspector({ props, onUpdate }: InspectorProps) {
-  return (
-    <aside
-      aria-label="속성 패널"
-      className={cn(
-        'hidden md:flex',
-        'w-[280px] shrink-0 flex-col gap-0 border-l border-[var(--color-border)]',
-        'bg-[var(--color-surface)]',
-        'overflow-y-auto',
+export function Inspector({ props, onUpdate, isMobile = false }: InspectorProps) {
+  // 모바일 BottomSheet 안에서는 aside 컨테이너를 감싸지 않고 콘텐츠만 반환
+  const content = (
+    <>
+      {!isMobile && (
+        <div className="border-b border-[var(--color-border)] px-4 py-3">
+          <h2 className="text-sm font-semibold text-[var(--color-text)]">속성</h2>
+        </div>
       )}
-    >
-      <div className="border-b border-[var(--color-border)] px-4 py-3">
-        <h2 className="text-sm font-semibold text-[var(--color-text)]">속성</h2>
-      </div>
 
       {props === null ? (
         <div className="flex flex-1 items-center justify-center p-6 text-center text-sm text-[var(--color-text-muted)]">
@@ -98,12 +107,14 @@ export function Inspector({ props, onUpdate }: InspectorProps) {
                 value={props.x}
                 onCommit={(v) => onUpdate({ x: v })}
                 aria-label="X 위치 (mm)"
+                isMobile={isMobile}
               />
               <NumberInput
                 label="Y"
                 value={props.y}
                 onCommit={(v) => onUpdate({ y: v })}
                 aria-label="Y 위치 (mm)"
+                isMobile={isMobile}
               />
             </div>
           </section>
@@ -119,12 +130,14 @@ export function Inspector({ props, onUpdate }: InspectorProps) {
                 value={props.width}
                 onCommit={(v) => onUpdate({ width: v })}
                 aria-label="너비 (mm)"
+                isMobile={isMobile}
               />
               <NumberInput
                 label="높이"
                 value={props.height}
                 onCommit={(v) => onUpdate({ height: v })}
                 aria-label="높이 (mm)"
+                isMobile={isMobile}
               />
             </div>
           </section>
@@ -141,10 +154,30 @@ export function Inspector({ props, onUpdate }: InspectorProps) {
               value={props.angle}
               onCommit={(v) => onUpdate({ angle: v })}
               aria-label="회전 각도 (도)"
+              isMobile={isMobile}
             />
           </section>
         </div>
       )}
+    </>
+  )
+
+  if (isMobile) {
+    // 모바일: 순수 콘텐츠만 (BottomSheet 가 aside 역할)
+    return <div className="flex flex-col">{content}</div>
+  }
+
+  return (
+    <aside
+      aria-label="속성 패널"
+      className={cn(
+        'hidden md:flex',
+        'w-[280px] shrink-0 flex-col gap-0 border-l border-[var(--color-border)]',
+        'bg-[var(--color-surface)]',
+        'overflow-y-auto',
+      )}
+    >
+      {content}
     </aside>
   )
 }
