@@ -22,7 +22,7 @@
 - [x] [M1-02] Schema v1 + 라운드트립(JSON ↔ fabric) — 골든 파일 5개 통과 — @editor-engineer ✅ M1-01 에 포함됨 (5 골든: empty/single-pose/pose-with-bg/grouped/locked)
 - [x] [M1-03] `editor-layers` — 레이어 트리/잠금/그룹 — @editor-engineer ✅ 2026-05-05 (커밋 ed8091c) — 85 tests pass, 골든 3개 라운드트립, fabric 양방향 동기화, lock/hidden propagation
 - [x] [M1-04] `editor-history` Command + 100스텝 라운드트립 — @editor-engineer ✅ 2026-05-05 (커밋 a44dcd5) — 63 tests, 100-step random sequence undo/redo OK, coalesce 5→1, OT slot, recursive lock/hidden undo
-- [ ] [M1-05] `editor-export` PNG/JSON — 비주얼 회귀 5장 — @editor-engineer
+- [x] [M1-05] `editor-export` PNG/JSON — 비주얼 회귀 5장 — @editor-engineer ✅ 2026-05-05 (커밋 4468324) — 43 tests pass, 5 golden PNG visual regression (pixelmatch diff=0), DirtyTracker debounce autosave, PDF mock interface
 - [ ] [M1-06] `apps/web` 빈 페이지 편집기 셸 — 포즈 1 + 배경 1 올리고 저장/복원 — @editor-engineer + @ui-designer
 - [ ] [M1-07] 모바일 인스펙터 BottomSheet — 핀치 줌, 44px 타겟 — @ui-designer
 
