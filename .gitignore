@@ -77,3 +77,8 @@ supabase/.temp
 # macOS Finder 가 만드는 중복 (예: foo 2.tsx)
 **/* 2.*
 .vercel
+
+# 빌드 산출물이 src 안에 잘못 emit 되었을 때 (tsc rootDir 미스 방어)
+packages/*/src/**/*.d.ts
+packages/*/src/**/*.d.ts.map
+packages/*/src/**/*.js.map
