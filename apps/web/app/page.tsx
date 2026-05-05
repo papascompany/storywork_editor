@@ -1,8 +1,8 @@
 'use client'
 
-import { useTheme } from '@storywork/ui'
-import { Button, Card, CardDescription, CardHeader, CardTitle } from '@storywork/ui'
-import { Moon, Sun, Sparkles, FileText, Palette } from 'lucide-react'
+import { Button, Card, CardDescription, CardHeader, CardTitle, useTheme } from '@storywork/ui'
+import { FileText, Moon, Palette, Sparkles, Sun } from 'lucide-react'
+import Link from 'next/link'
 
 export default function HomePage() {
   const { resolvedTheme, toggleTheme } = useTheme()
@@ -39,7 +39,9 @@ export default function HomePage() {
         </p>
 
         <div className="flex flex-wrap justify-center gap-3 pt-2">
-          <Button size="md">편집기 시작하기</Button>
+          <Button size="md" asChild>
+            <Link href="/editor">편집기 시작하기</Link>
+          </Button>
           <Button variant="outline" size="md">
             더 알아보기
           </Button>

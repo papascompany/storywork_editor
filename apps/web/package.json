@@ -14,7 +14,13 @@
     "clean": "rimraf .next out"
   },
   "dependencies": {
+    "@storywork/editor-core": "workspace:*",
+    "@storywork/editor-layers": "workspace:*",
+    "@storywork/editor-history": "workspace:*",
+    "@storywork/editor-export": "workspace:*",
     "@storywork/ui": "workspace:^",
+    "fabric": "^6.9.1",
+    "lucide-react": "^0.513.0",
     "next": "^15.3.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
@@ -22,9 +28,14 @@
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4.0.0",
+    "@testing-library/jest-dom": "^6.0.0",
+    "@testing-library/react": "^16.0.0",
+    "@testing-library/user-event": "^14.0.0",
     "@types/node": "^22.0.0",
     "@types/react": "^19.0.0",
     "@types/react-dom": "^19.0.0",
+    "@vitejs/plugin-react": "^4.0.0",
+    "canvas": "^3.0.0",
     "eslint": "^9.0.0",
     "eslint-config-next": "^15.3.0",
     "rimraf": "^6.0.0",
