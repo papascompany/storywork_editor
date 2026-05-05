@@ -348,13 +348,19 @@ importers:
       '@storywork/editor-core':
         specifier: workspace:*
         version: link:../editor-core
-      '@storywork/schema':
+      '@storywork/editor-layers':
         specifier: workspace:*
-        version: link:../shared-schema
-      '@storywork/utils':
-        specifier: workspace:*
-        version: link:../shared-utils
+        version: link:../editor-layers
     devDependencies:
+      '@types/node':
+        specifier: ^22.0.0
+        version: 22.19.17
+      canvas:
+        specifier: ^3.0.0
+        version: 3.2.3
+      fabric:
+        specifier: ^6.9.1
+        version: 6.9.1
       typescript:
         specifier: ^5.6.0
         version: 5.9.3
