@@ -183,8 +183,8 @@ describe('MobileBottomSheet — 탭 전환', () => {
     })
 
     expect(inspectorTab).toHaveAttribute('aria-selected', 'true')
-    // 선택 없을 때 안내 텍스트
-    expect(screen.getByText('객체를 선택하면 속성이 표시됩니다')).toBeInTheDocument()
+    // 선택 없을 때 안내 텍스트 (M1-08d: ControlBar 빈 상태 메시지)
+    expect(screen.getByText('객체를 선택하면 속성이 여기에 표시됩니다')).toBeInTheDocument()
   })
 
   it('7. 탭 클릭 시 peek → half 자동 전환', async () => {
