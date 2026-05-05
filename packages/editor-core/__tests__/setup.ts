@@ -20,6 +20,7 @@ if (typeof globalThis.cancelAnimationFrame === 'undefined') {
 // HTMLCanvasElement.getContext mock — jsdom 은 canvas API 를 완전 지원하지 않는다
 // fabric 내부에서 getContext('2d') 호출 시 최소한의 stub 을 반환한다
 const OriginalGetContext = HTMLCanvasElement.prototype.getContext
+// @ts-expect-error 오버라이드 시그니처가 원본보다 넓음 — 테스트 환경에서만 사용
 HTMLCanvasElement.prototype.getContext = function (
   contextId: string,
   ...args: unknown[]

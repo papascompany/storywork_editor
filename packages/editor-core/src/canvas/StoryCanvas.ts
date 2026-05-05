@@ -1,5 +1,5 @@
 import type { PageJsonV1 } from '@storywork/schema/editor'
-import type { Canvas, FabricObject } from 'fabric'
+import type { Canvas, FabricObject, ModifiedEvent } from 'fabric'
 
 import { createObjectData, extractObjectData } from '../data/object-meta.js'
 import { createEditorBus } from '../events/bus.js'
@@ -16,6 +16,17 @@ export type StoryCanvasOptions = {
   container?: HTMLElement | OffscreenCanvas
   backgroundColor?: string
 }
+
+// fabric v6 CollectionEvents 에서 추출한 payload 타입
+type ObjectAddedPayload = { target: FabricObject }
+type ObjectRemovedPayload = { target: FabricObject }
+type SelectionCreatedPayload = Partial<{ e: Event }> & { selected: FabricObject[] }
+type SelectionUpdatedPayload = Partial<{ e: Event }> & {
+  selected: FabricObject[]
+  deselected: FabricObject[]
+}
+type SelectionClearedPayload = Partial<{ e: Event }> & { deselected: FabricObject[] }
+type AfterRenderPayload = { ctx: CanvasRenderingContext2D }
 
 /**
  * StoryCanvas — @storywork/editor-core 의 핵심 클래스.
@@ -37,6 +48,75 @@ export class StoryCanvas {
   /** id → fabric 객체 매핑 */
   private readonly _objectMap: Map<string, FabricObject> = new Map()
 
+  /**
+   * dispose 완료 여부.
+   * H2: 모든 fabric 이벤트 핸들러 첫 줄에서 이 플래그를 확인한다.
+   */
+  private _disposed = false
+
+  // ─────────────────────────────────────────────
+  // H1: 바운드 멤버 핸들러 (익명 화살표 → 멤버)
+  // off() 시 동일 참조가 필요하므로 반드시 멤버로 고정한다.
+  // ─────────────────────────────────────────────
+
+  private readonly _onObjectAdded = (e: ObjectAddedPayload): void => {
+    // H2: dispose 가드
+    if (this._disposed) return
+    const obj = e.target
+    if (!obj) return
+    const data = extractObjectData(obj as { data?: unknown })
+    if (!data) return
+    this._bus.emit('object:added', { id: data.id, data })
+  }
+
+  private readonly _onObjectModified = (e: ModifiedEvent): void => {
+    if (this._disposed) return
+    const obj = e.target
+    if (!obj) return
+    const data = extractObjectData(obj as { data?: unknown })
+    if (!data) return
+    this._bus.emit('object:changed', { id: data.id, data })
+  }
+
+  private readonly _onObjectRemoved = (e: ObjectRemovedPayload): void => {
+    if (this._disposed) return
+    const obj = e.target
+    if (!obj) return
+    const data = extractObjectData(obj as { data?: unknown })
+    if (!data) return
+    // objectMap 에서도 제거 (외부 remove 가 아닌 fabric 직접 제거 대응)
+    this._objectMap.delete(data.id)
+    this._bus.emit('object:removed', { id: data.id })
+  }
+
+  private readonly _onSelectionCreated = (e: SelectionCreatedPayload): void => {
+    if (this._disposed) return
+    const selected = e.selected ?? []
+    const ids = selected
+      .map((o: FabricObject) => extractObjectData(o as { data?: unknown })?.id)
+      .filter((id: string | undefined): id is string => id !== undefined)
+    this._bus.emit('selection:changed', { ids })
+  }
+
+  private readonly _onSelectionUpdated = (e: SelectionUpdatedPayload): void => {
+    if (this._disposed) return
+    const selected = e.selected ?? []
+    const ids = selected
+      .map((o: FabricObject) => extractObjectData(o as { data?: unknown })?.id)
+      .filter((id: string | undefined): id is string => id !== undefined)
+    this._bus.emit('selection:changed', { ids })
+  }
+
+  private readonly _onSelectionCleared = (_e: SelectionClearedPayload): void => {
+    if (this._disposed) return
+    this._bus.emit('selection:changed', { ids: [] })
+  }
+
+  private readonly _onAfterRender = (_e: AfterRenderPayload): void => {
+    if (this._disposed) return
+    this._bus.emit('render:after', undefined as unknown as void)
+  }
+
   constructor(opts: StoryCanvasOptions) {
     this._format = opts.format
     this._bus = createEditorBus()
@@ -55,12 +135,19 @@ export class StoryCanvas {
 
   /**
    * PageJsonV1 을 로드한다. 기존 캔버스 내용은 모두 지워진다.
+   * H2: dispose 후 호출 및 비동기 완료 시점에도 dispose 가드를 적용한다.
    */
   async loadJson(json: PageJsonV1): Promise<void> {
+    // H2: dispose 직후 호출 시 early return (fabric.clear() 도 호출하지 않음)
+    if (this._disposed) return
+
     this._fabric.clear()
     this._objectMap.clear()
 
     const { objects } = await deserializeFromJson(json, this._format.dpi)
+    // H2: 이미지 로드 등 비동기 완료 후 dispose 됐을 경우 silent return
+    if (this._disposed) return
+
     for (const obj of objects) {
       this._addFabricObject(obj)
     }
@@ -146,7 +233,14 @@ export class StoryCanvas {
   // 수명
   // ─────────────────────────────────────────────
 
+  /**
+   * H1+H2: 모든 바운드 핸들러를 off() 로 해제한 뒤 _disposed 플래그를 set 한다.
+   * 이후 비동기 콜백에서 이 플래그를 확인해 silent return 한다.
+   */
   dispose(): void {
+    if (this._disposed) return
+    this._disposed = true
+    this._unbindFabricEvents()
     this._fabric.dispose()
     this._objectMap.clear()
   }
@@ -164,6 +258,11 @@ export class StoryCanvas {
     return this._format
   }
 
+  /** @internal dispose 상태 확인 (테스트용) */
+  get isDisposed(): boolean {
+    return this._disposed
+  }
+
   // ─────────────────────────────────────────────
   // 내부 구현
   // ─────────────────────────────────────────────
@@ -178,56 +277,31 @@ export class StoryCanvas {
     this._fabric.add(obj)
   }
 
+  /**
+   * H1: 바운드 멤버 핸들러를 fabric 이벤트에 등록한다.
+   * 핸들러가 멤버 참조이므로 _unbindFabricEvents 에서 정확히 해제할 수 있다.
+   */
   private _bindFabricEvents(): void {
-    // fabric → EditorEvent 정규화
-    this._fabric.on('object:added', (e) => {
-      const obj = e.target
-      if (!obj) return
-      const data = extractObjectData(obj as { data?: unknown })
-      if (!data) return
-      this._bus.emit('object:added', { id: data.id, data })
-    })
+    this._fabric.on('object:added', this._onObjectAdded)
+    this._fabric.on('object:modified', this._onObjectModified)
+    this._fabric.on('object:removed', this._onObjectRemoved)
+    this._fabric.on('selection:created', this._onSelectionCreated)
+    this._fabric.on('selection:updated', this._onSelectionUpdated)
+    this._fabric.on('selection:cleared', this._onSelectionCleared)
+    this._fabric.on('after:render', this._onAfterRender)
+  }
 
-    this._fabric.on('object:modified', (e) => {
-      const obj = e.target
-      if (!obj) return
-      const data = extractObjectData(obj as { data?: unknown })
-      if (!data) return
-      this._bus.emit('object:changed', { id: data.id, data })
-    })
-
-    this._fabric.on('object:removed', (e) => {
-      const obj = e.target
-      if (!obj) return
-      const data = extractObjectData(obj as { data?: unknown })
-      if (!data) return
-      // objectMap 에서도 제거 (외부 remove 가 아닌 fabric 직접 제거 대응)
-      this._objectMap.delete(data.id)
-      this._bus.emit('object:removed', { id: data.id })
-    })
-
-    this._fabric.on('selection:created', (e) => {
-      const selected = e.selected ?? []
-      const ids = selected
-        .map((o) => extractObjectData(o as { data?: unknown })?.id)
-        .filter((id): id is string => id !== undefined)
-      this._bus.emit('selection:changed', { ids })
-    })
-
-    this._fabric.on('selection:updated', (e) => {
-      const selected = e.selected ?? []
-      const ids = selected
-        .map((o) => extractObjectData(o as { data?: unknown })?.id)
-        .filter((id): id is string => id !== undefined)
-      this._bus.emit('selection:changed', { ids })
-    })
-
-    this._fabric.on('selection:cleared', () => {
-      this._bus.emit('selection:changed', { ids: [] })
-    })
-
-    this._fabric.on('after:render', () => {
-      this._bus.emit('render:after', undefined as unknown as void)
-    })
+  /**
+   * H1: dispose 시 모든 핸들러를 정확히 제거한다.
+   * 익명 함수가 아니므로 off() 에 동일 참조를 전달할 수 있다.
+   */
+  private _unbindFabricEvents(): void {
+    this._fabric.off('object:added', this._onObjectAdded)
+    this._fabric.off('object:modified', this._onObjectModified)
+    this._fabric.off('object:removed', this._onObjectRemoved)
+    this._fabric.off('selection:created', this._onSelectionCreated)
+    this._fabric.off('selection:updated', this._onSelectionUpdated)
+    this._fabric.off('selection:cleared', this._onSelectionCleared)
+    this._fabric.off('after:render', this._onAfterRender)
   }
 }

@@ -27,3 +27,6 @@ export { CURRENT_SCHEMA_VERSION, detectSchemaVersion } from './serialize/schemaV
 // 이벤트 버스 (다른 editor-* 패키지에서 독립 버스 생성 시 사용)
 export { createEditorBus } from './events/bus.js'
 export type { EditorBus } from './events/bus.js'
+
+// 장치 유틸
+export { isCoarsePointer } from './utils/coarse.js'
