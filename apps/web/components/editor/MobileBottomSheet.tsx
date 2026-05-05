@@ -23,10 +23,10 @@ import { cn } from '@storywork/ui'
 import { ImageIcon, Layers, MousePointer2, RectangleHorizontal, Settings2 } from 'lucide-react'
 import React, { useCallback, useEffect, useRef, useState } from 'react'
 
+import { ControlBar } from './ControlBar'
 import type { ObjectProps } from './hooks/useSelection'
-import { Inspector } from './Inspector'
 import { LayerPanel } from './LayerPanel'
-import type { ToolId } from './ToolPalette'
+import type { ToolId } from './store/useToolStore'
 
 // ── 타입 ─────────────────────────────────────
 export type SheetSnap = 'peek' | 'half' | 'full'
@@ -39,9 +39,10 @@ type MobileBottomSheetProps = {
   onToolChange: (tool: ToolId) => void
   onAddPose: () => void
   onAddBackground: () => void
-  // Inspector 연동
+  // ControlBar 연동 (M1-08d: Inspector → ControlBar 교체)
   selectionProps: ObjectProps | null
-  onUpdateProps: (patch: Partial<Omit<ObjectProps, 'id'>>) => void
+  /** @deprecated ControlBar 로 교체됨, 하위 호환 유지 */
+  onUpdateProps?: (patch: Partial<Omit<ObjectProps, 'id'>>) => void
   // LayerPanel 연동
   layerTree: LayerTree | null
   canvas: StoryCanvas | null
@@ -182,7 +183,7 @@ export function MobileBottomSheet({
   onAddPose,
   onAddBackground,
   selectionProps,
-  onUpdateProps,
+  onUpdateProps: _onUpdateProps,
   layerTree,
   canvas,
   selectedIds,
@@ -374,13 +375,24 @@ export function MobileBottomSheet({
               />
             )}
             {activeTab === 'inspector' && (
-              // Inspector 숫자 입력 — inputmode="decimal" 로 키패드 최소화
+              // ControlBar — 모바일에서도 동일한 속성 패널 사용 (M1-08d)
               <div className="p-0">
-                <Inspector props={selectionProps} onUpdate={onUpdateProps} isMobile />
+                <ControlBar
+                  props={selectionProps}
+                  canvas={canvas}
+                  layerTree={layerTree}
+                  history={history}
+                />
               </div>
             )}
             {activeTab === 'layers' && (
-              <LayerPanel layerTree={layerTree} canvas={canvas} selectedIds={selectedIds} />
+              <LayerPanel
+                layerTree={layerTree}
+                canvas={canvas}
+                history={history}
+                selectedIds={selectedIds}
+                isMobile
+              />
             )}
           </div>
         )}

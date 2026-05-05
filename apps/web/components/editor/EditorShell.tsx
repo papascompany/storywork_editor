@@ -4,11 +4,11 @@
 // EditorShell — 편집기 최상위 레이아웃 + 조립
 //
 // M1-08c: ToolBar 11종 + FeatureSidebar 슬라이드 패널 통합
+// M1-08d: RightPanel (ControlBar + LayerPanel 통합) 교체
 //
 // 레이아웃 (데스크톱 md+):
-//   [TopBar                                    ]
-//   [ToolBar(72px) | FeatureSidebar(0~290px) | Canvas | Inspector]
-//   [LayerPanel                                ]
+//   [TopBar                                          ]
+//   [ToolBar(72px) | FeatureSidebar(0~290px) | Canvas | RightPanel(280px)]
 //
 // 모바일(md 미만): TopBar + Canvas + MobileBottomSheet
 //
@@ -44,14 +44,13 @@ import { useHistory } from './hooks/useHistory'
 import { useSelection } from './hooks/useSelection'
 import type { EditorRefs } from './hooks/useStoryCanvas'
 import { useStoryCanvas } from './hooks/useStoryCanvas'
-import { Inspector } from './Inspector'
-import { LayerPanel } from './LayerPanel'
 import { MobileBottomSheet } from './MobileBottomSheet'
+import { RightPanel } from './RightPanel'
 import { useToolStore } from './store/useToolStore'
 import { ToolBar } from './ToolBar'
 import { TopBar } from './TopBar'
 
-// MobileBottomSheet 는 기존 ToolId 타입 의존 (레거시 호환용 로컬 타입)
+// MobileBottomSheet 는 useToolStore 의 ToolId 를 직접 사용 (M1-08d: ToolPalette 제거)
 type LegacyToolId = 'select' | 'pose' | 'background'
 
 /**
@@ -231,7 +230,7 @@ export function EditorShell() {
           layerTree={layerTreeRef.current}
         />
 
-        {/* 중앙 영역: ToolBar | FeatureSidebar | Canvas | Inspector */}
+        {/* 중앙 영역: ToolBar | FeatureSidebar | Canvas | RightPanel */}
         <div className="flex flex-1 overflow-hidden">
           {/* ToolBar — 데스크톱(md+) only. 모바일은 MobileBottomSheet 의 Tools 탭 */}
           <ToolBar />
@@ -252,17 +251,12 @@ export function EditorShell() {
             onClearSelection={clearSelection}
           />
 
-          {/* Inspector — 데스크톱(md+) only */}
-          <div className="hidden md:contents">
-            <Inspector props={selectionProps} onUpdate={updateProps} />
-          </div>
-        </div>
-
-        {/* LayerPanel — 데스크톱(md+) only */}
-        <div className="hidden md:contents">
-          <LayerPanel
-            layerTree={layerTreeRef.current}
+          {/* RightPanel (Inspector + LayerPanel 통합) — 데스크톱(md+) only */}
+          <RightPanel
+            props={selectionProps}
             canvas={canvasRef.current}
+            layerTree={layerTreeRef.current}
+            history={historyRef.current}
             selectedIds={selectedIds}
           />
         </div>
