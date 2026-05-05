@@ -4,6 +4,5 @@
   "installCommand": "cd ../.. && pnpm install --frozen-lockfile",
   "buildCommand": "cd ../.. && pnpm turbo build --filter=@storywork/web",
   "outputDirectory": ".next",
-  "ignoreCommand": "cd ../.. && npx turbo-ignore @storywork/web --fallback=HEAD~1",
-  "_trigger": "first-deploy-2026-05-05"
+  "ignoreCommand": "cd ../.. && npx turbo-ignore @storywork/web --fallback=HEAD~1"
 }
