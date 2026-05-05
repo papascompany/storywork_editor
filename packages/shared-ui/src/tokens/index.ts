@@ -47,3 +47,12 @@ export type { Motion } from './motion.js'
 
 export { breakpoints } from './breakpoints.js'
 export type { BreakpointKey, Breakpoints } from './breakpoints.js'
+
+export { editorTokens } from './semantic.js'
+export type { EditorTokens } from './semantic.js'
+
+export { elevation } from './elevation.js'
+export type { Elevation } from './elevation.js'
+
+export { zIndex } from './zindex.js'
+export type { ZIndexKey, ZIndex } from './zindex.js'

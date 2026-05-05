@@ -135,6 +135,40 @@
   --easing-in: cubic-bezier(0.4, 0, 1, 1);
   --easing-out: cubic-bezier(0, 0, 0.2, 1);
   --easing-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+
+  /* ── 편집기 시맨틱 토큰 (라이트) ─────────────────────────────────────────── */
+  --editor-workspace: hsl(220 13% 95%);
+  --editor-workspace-dark: hsl(220 13% 12%);
+  --editor-panel: hsl(0 0% 100%);
+  --editor-panel-hover: hsl(220 13% 97%);
+  --editor-text: hsl(220 9% 20%);
+  --editor-text-muted: hsl(220 9% 46%);
+  --editor-accent: hsl(238 84% 67%);
+  --editor-border: hsl(220 13% 90%);
+  --editor-border-strong: hsl(220 13% 80%);
+  --editor-hover: hsl(220 13% 93%);
+  --editor-active: hsl(238 84% 95%);
+
+  /* ── 엘리베이션 (그림자) ─────────────────────────────────────────────────── */
+  --elevation-e0: none;
+  --elevation-e1: 0 1px 2px rgba(0, 0, 0, 0.05);
+  --elevation-e2: 0 2px 8px rgba(0, 0, 0, 0.08);
+  --elevation-e3: 0 4px 16px rgba(0, 0, 0, 0.12);
+  --elevation-e4: 0 8px 32px rgba(0, 0, 0, 0.16);
+  --elevation-e5: 0 16px 48px rgba(0, 0, 0, 0.2);
+
+  /* ── z-index 계층 ─────────────────────────────────────────────────────────── */
+  --z-base: 0;
+  --z-canvas: 1;
+  --z-floating-control: 10;
+  --z-panel: 20;
+  --z-dropdown: 30;
+  --z-modal: 40;
+  --z-toast: 50;
+  --z-bottom-sheet: 60;
+  --z-loading-overlay: 70;
+  --z-cmd-palette: 80;
+  --z-tooltip: 90;
 }
 
 /* ── 다크 모드 CSS 변수 (html.dark 전략) ─────────────────────────────────── */
@@ -155,6 +189,19 @@
 
   /* 다크 포커스 링 */
   --shadow-focus: 0 0 0 2px var(--color-surface), 0 0 0 4px var(--color-brand-500);
+
+  /* ── 편집기 시맨틱 토큰 (다크) ──────────────────────────────────────────── */
+  --editor-workspace: hsl(220 13% 12%);
+  --editor-workspace-dark: hsl(220 13% 8%);
+  --editor-panel: hsl(220 13% 16%);
+  --editor-panel-hover: hsl(220 13% 20%);
+  --editor-text: hsl(220 9% 90%);
+  --editor-text-muted: hsl(220 9% 60%);
+  --editor-accent: hsl(238 84% 72%);
+  --editor-border: hsl(220 13% 26%);
+  --editor-border-strong: hsl(220 13% 38%);
+  --editor-hover: hsl(220 13% 22%);
+  --editor-active: hsl(238 84% 22%);
 }
 
 /* ── 기본 리셋 ────────────────────────────────────────────────────────────── */

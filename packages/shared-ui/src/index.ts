@@ -34,4 +34,7 @@ export {
   duration,
   easing,
   breakpoints,
+  editorTokens,
+  elevation,
+  zIndex,
 } from './tokens/index.js'
