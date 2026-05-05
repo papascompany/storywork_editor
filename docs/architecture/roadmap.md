@@ -23,8 +23,8 @@
 - [x] [M1-03] `editor-layers` — 레이어 트리/잠금/그룹 — @editor-engineer ✅ 2026-05-05 (커밋 ed8091c) — 85 tests pass, 골든 3개 라운드트립, fabric 양방향 동기화, lock/hidden propagation
 - [x] [M1-04] `editor-history` Command + 100스텝 라운드트립 — @editor-engineer ✅ 2026-05-05 (커밋 a44dcd5) — 63 tests, 100-step random sequence undo/redo OK, coalesce 5→1, OT slot, recursive lock/hidden undo
 - [x] [M1-05] `editor-export` PNG/JSON — 비주얼 회귀 5장 — @editor-engineer ✅ 2026-05-05 (커밋 4468324) — 43 tests pass, 5 golden PNG visual regression (pixelmatch diff=0), DirtyTracker debounce autosave, PDF mock interface
-- [ ] [M1-06] `apps/web` 빈 페이지 편집기 셸 — 포즈 1 + 배경 1 올리고 저장/복원 — @editor-engineer + @ui-designer
-- [ ] [M1-07] 모바일 인스펙터 BottomSheet — 핀치 줌, 44px 타겟 — @ui-designer
+- [x] [M1-06] `apps/web` 빈 페이지 편집기 셸 — @editor-engineer + @ui-designer ✅ 2026-05-05 (커밋 b437198) — TopBar/ToolPalette/Inspector/LayerPanel/ExportMenu, undo 단축키, autosave (localStorage)
+- [x] [M1-07] 모바일 인스펙터 BottomSheet — @ui-designer ✅ 2026-05-05 (커밋 df9f164..d2a5f16) — 3-snap (peek/half/full) + 3 탭(Tools/Inspector/Layers), ResizeObserver 3중 가드(BUG-013), getEventPoint(BUG-014), visualViewport 키패드 동기화, 44px 타겟, SELECT-1 함정 회피
 
 ## M2 — Pose Library (PNG 1차, 1,058개 적재)
 
@@ -108,7 +108,7 @@
 - [ ] [FOLLOWUP-13] Vercel preview 환경변수 — main 이 production branch 라 같은 이름의 preview env 등록 불가. PR 워크플로우 시작 시 별도 preview branch 명 정해서 추가 — @architect
 - [ ] [FOLLOWUP-14] env.ts 빌드 시점 검증 강제 — 현재 page module import 시점에야 `validateEnv()` 호출되어 정적 page 면 build 통과. 첫 빌드 단계에서 강제 검증되도록 `next.config.ts` 또는 `instrumentation.ts` 에 import — @architect
 - [ ] [FOLLOWUP-15] Vercel web 프로젝트 deploy 'ERROR' (build READY 인데 promotion 실패) — M1 결과물 push 시 재검증. 안되면 Vercel UI 의 deployment log 직접 확인 — @architect
-- [ ] **[FOLLOWUP-16] Storige 가이드 P0 핫픽스 8건 (M1-07 진입 전 권장) — @editor-engineer**
+- [x] **[FOLLOWUP-16] Storige 가이드 P0 핫픽스 8건** ✅ 2026-05-05 (커밋 0234fd1..b4e0f93) — bound 핸들러 7건 / dispose 가드 / 모바일 factory 분기 / History capacity 모바일 / useRef+EditorContext / touch-action / user-scalable=no / unhandledrejection. 14 신규 단위 테스트, 회귀 0. **부가**: node_modules 의 macOS Finder 중복(` 2.js`) 220 건 발견 → 클린 재설치로 해결 (clean install 후 0건). — @editor-engineer
   근거: [docs/reference/STORIGE_GUIDE_REVIEW.md](../reference/STORIGE_GUIDE_REVIEW.md) §3, §9
   - StoryCanvas 익명 이벤트 핸들러 7건 → bound member + dispose() off (BUG-002 류)
   - StoryCanvas 모든 핸들러 첫 줄 `if (!_canvas?.getContext()) return` 가드
@@ -118,7 +118,7 @@
   - apps/web `globals.css` 에 `touch-action:none` + `body { overscroll-behavior:none }`
   - Next.js metadata.viewport 에 `user-scalable=no, viewport-fit=cover`
   - `window.addEventListener('unhandledrejection')` 글로벌 핸들러 (BUG-015 React freeze 방지)
-- [ ] [FOLLOWUP-17] M1-07 진입 시 ResizeObserver 3중 가드 + TouchEvent getEventPoint + ControlBar `position:fixed` 적용 (BUG-013 iOS 크래시 차단) — @ui-designer + @editor-engineer
+- [x] [FOLLOWUP-17] ResizeObserver 3중 가드 + getEventPoint + ControlBar fixed (BUG-013/014/SELECT-1) ✅ 2026-05-05 (M1-07 에 통합 — 커밋 615b695, df9f164, 0a3f47e)
 - [ ] [FOLLOWUP-18] extendFabricOption 화이트리스트 정의 — Schema v1 의 fabric 내부 커스텀 속성(styles/charSpacing/cmykFill 등) 보존 강제 — @editor-engineer (M5 텍스트 작업 직전)
 
 ## ☁️ Vercel 배포 상태 (M0 종료 시점)
