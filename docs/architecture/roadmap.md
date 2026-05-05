@@ -108,6 +108,18 @@
 - [ ] [FOLLOWUP-13] Vercel preview 환경변수 — main 이 production branch 라 같은 이름의 preview env 등록 불가. PR 워크플로우 시작 시 별도 preview branch 명 정해서 추가 — @architect
 - [ ] [FOLLOWUP-14] env.ts 빌드 시점 검증 강제 — 현재 page module import 시점에야 `validateEnv()` 호출되어 정적 page 면 build 통과. 첫 빌드 단계에서 강제 검증되도록 `next.config.ts` 또는 `instrumentation.ts` 에 import — @architect
 - [ ] [FOLLOWUP-15] Vercel web 프로젝트 deploy 'ERROR' (build READY 인데 promotion 실패) — M1 결과물 push 시 재검증. 안되면 Vercel UI 의 deployment log 직접 확인 — @architect
+- [ ] **[FOLLOWUP-16] Storige 가이드 P0 핫픽스 8건 (M1-07 진입 전 권장) — @editor-engineer**
+  근거: [docs/reference/STORIGE_GUIDE_REVIEW.md](../reference/STORIGE_GUIDE_REVIEW.md) §3, §9
+  - StoryCanvas 익명 이벤트 핸들러 7건 → bound member + dispose() off (BUG-002 류)
+  - StoryCanvas 모든 핸들러 첫 줄 `if (!_canvas?.getContext()) return` 가드
+  - StoryCanvas factory 에 `isCoarsePointer()` 분기 (`enableRetinaScaling`, `cornerSize`, `touchCornerSize`, `padding`, `renderOnAddRemove:false`) — BUG-006 류 모바일 메모리
+  - editor-history `History` capacity 모바일 자동 분기 (15/200)
+  - apps/web `EditorShell` 의 `useState<StoryCanvas>` → `useRef + Context` (가이드 §25 ❌ 위반)
+  - apps/web `globals.css` 에 `touch-action:none` + `body { overscroll-behavior:none }`
+  - Next.js metadata.viewport 에 `user-scalable=no, viewport-fit=cover`
+  - `window.addEventListener('unhandledrejection')` 글로벌 핸들러 (BUG-015 React freeze 방지)
+- [ ] [FOLLOWUP-17] M1-07 진입 시 ResizeObserver 3중 가드 + TouchEvent getEventPoint + ControlBar `position:fixed` 적용 (BUG-013 iOS 크래시 차단) — @ui-designer + @editor-engineer
+- [ ] [FOLLOWUP-18] extendFabricOption 화이트리스트 정의 — Schema v1 의 fabric 내부 커스텀 속성(styles/charSpacing/cmykFill 등) 보존 강제 — @editor-engineer (M5 텍스트 작업 직전)
 
 ## ☁️ Vercel 배포 상태 (M0 종료 시점)
 - **admin**: https://storywork-editor-admin.vercel.app ✅ 200 — env 16, root `apps/admin`, vercel.json (turbo build)
