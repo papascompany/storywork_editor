@@ -105,6 +105,13 @@
 - [ ] [FOLLOWUP-10] GitHub Actions Node 20 → Node 24 업그레이드 (`actions/checkout@v5`, `actions/setup-node@v5`, `pnpm/action-setup@v5`) — 2026-09-16 까지 — @architect
 - [x] [FOLLOWUP-11] DB 비밀번호 입력 ✅ 2026-05-05 — username `yohan` + 11자 password 로 prisma db pull 16 모델 인식 + prisma generate 성공
 - [ ] [FOLLOWUP-12] PgBouncer prepared statement 비호환 — `prisma db execute --stdin` hang 발생. 실제 앱 코드는 `pgbouncer=true` 로 회피되지만, 마이그레이션/raw SQL 직접 실행은 `DIRECT_URL`(5432) 명시 사용 — `pnpm db:exec` 등 helper script 추가 권고 — @architect
+- [ ] [FOLLOWUP-13] Vercel preview 환경변수 — main 이 production branch 라 같은 이름의 preview env 등록 불가. PR 워크플로우 시작 시 별도 preview branch 명 정해서 추가 — @architect
+- [ ] [FOLLOWUP-14] env.ts 빌드 시점 검증 강제 — 현재 page module import 시점에야 `validateEnv()` 호출되어 정적 page 면 build 통과. 첫 빌드 단계에서 강제 검증되도록 `next.config.ts` 또는 `instrumentation.ts` 에 import — @architect
+- [ ] [FOLLOWUP-15] Vercel web 프로젝트 deploy 'ERROR' (build READY 인데 promotion 실패) — M1 결과물 push 시 재검증. 안되면 Vercel UI 의 deployment log 직접 확인 — @architect
+
+## ☁️ Vercel 배포 상태 (M0 종료 시점)
+- **admin**: https://storywork-editor-admin.vercel.app ✅ 200 — env 16, root `apps/admin`, vercel.json (turbo build)
+- **web**: https://storywork-editor-web.vercel.app ⚠️ 404 — build READY 후 promotion ERROR. FOLLOWUP-15 로 추적, M1 결과물로 재검증 예정
 
 ## M10+ (Parking)
 
