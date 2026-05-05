@@ -1,4 +1,4 @@
-import { ThemeProvider } from '@storywork/ui'
+import { ThemeProvider, ToastProvider } from '@storywork/ui'
 import type { Metadata, Viewport } from 'next'
 
 import './globals.css'
@@ -28,7 +28,7 @@ export default function RootLayout({
       </head>
       <body>
         <ThemeProvider defaultTheme="system" storageKey="sw-ui-theme">
-          {children}
+          <ToastProvider>{children}</ToastProvider>
         </ThemeProvider>
       </body>
     </html>

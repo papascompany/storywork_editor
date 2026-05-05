@@ -9,6 +9,7 @@ import { AddObjectCommand } from '@storywork/editor-history'
 import type { History } from '@storywork/editor-history'
 import type { LayerNodeJson, LayerTree } from '@storywork/editor-layers'
 import type { PageJsonV1 } from '@storywork/schema/editor'
+import { useToast } from '@storywork/ui'
 import { FabricImage, Rect } from 'fabric'
 import { useCallback, useEffect, useRef, useState } from 'react'
 
@@ -81,6 +82,7 @@ export function EditorShell() {
   useStoryCanvas(containerRef, DEFAULT_FORMAT, onReady)
 
   // ── 도구/선택/히스토리/자동저장 ──────────────────────
+  const { show: showToast } = useToast()
   const [activeTool, setActiveTool] = useState<ToolId>('select')
 
   /**
@@ -158,6 +160,7 @@ export function EditorShell() {
       history.push(cmd)
     } catch (err) {
       console.error('[EditorShell] 포즈 추가 실패:', err)
+      showToast({ message: '포즈 추가에 실패했습니다.', variant: 'error' })
     }
 
     setActiveTool('select')

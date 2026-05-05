@@ -1,4 +1,4 @@
-import { ThemeProvider } from '@storywork/ui'
+import { ThemeProvider, ToastProvider } from '@storywork/ui'
 import type { Metadata, Viewport } from 'next'
 
 import './globals.css'
@@ -27,7 +27,7 @@ export default function AdminLayout({
       </head>
       <body>
         <ThemeProvider defaultTheme="system" storageKey="sw-admin-theme">
-          {children}
+          <ToastProvider>{children}</ToastProvider>
         </ThemeProvider>
       </body>
     </html>
