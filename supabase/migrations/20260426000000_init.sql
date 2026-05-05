@@ -9,6 +9,10 @@
 
 CREATE EXTENSION IF NOT EXISTS "vector" WITH SCHEMA extensions;
 
+-- vector 타입을 public 스키마의 테이블 컬럼으로 사용하기 위해 세션 search_path 확장
+-- (Supabase Cloud 의 기본 search_path 는 public 만 포함됨)
+SET search_path TO public, extensions;
+
 -- ─────────────────────────────────────────────
 -- 2. Prisma 생성 DDL (from migrate diff)
 -- ─────────────────────────────────────────────
