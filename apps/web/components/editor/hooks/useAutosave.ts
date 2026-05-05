@@ -14,6 +14,17 @@ import { AUTOSAVE_STORAGE_KEY } from '../../../lib/editor/seed'
 
 const AUTOSAVE_DEBOUNCE_MS = 5000
 
+/**
+ * SaveStatus — 자동 저장 상태
+ * - clean: 변경 없음 (초기 또는 저장 직후 안정 상태)
+ * - dirty: 미저장 변경 있음
+ * - saving: 저장 진행 중
+ * - saved: 저장 완료 (3초 후 clean 복귀)
+ *
+ * AutoSaveIndicator 의 5상태(idle/saving/saved/failed/offline) 와의 매핑:
+ *   clean → idle, dirty → idle, saving → saving, saved → saved
+ *   failed / offline 은 useAutosave 가 추가 상태 필드로 노출
+ */
 export type SaveStatus = 'clean' | 'dirty' | 'saving' | 'saved'
 
 /**
@@ -23,15 +34,27 @@ export type SaveStatus = 'clean' | 'dirty' | 'saving' | 'saved'
  * - autosave:tick 시 exportJson → localStorage 저장
  * - isDirty 상태를 TopBar 의 저장 인디케이터에 노출
  */
+export type AutosaveFailReason = 'saveFailed' | 'offline' | null
+
 export function useAutosave(
   canvas: StoryCanvas | null,
   layerTree: LayerTree | null,
   history: History | null,
 ) {
   const [saveStatus, setSaveStatus] = useState<SaveStatus>('clean')
+  const [lastSavedAt, setLastSavedAt] = useState<Date | null>(null)
+  const [failReason, setFailReason] = useState<AutosaveFailReason>(null)
 
   useEffect(() => {
     if (!canvas || !history) return
+
+    // 오프라인 감지
+    const handleOffline = () => setFailReason('offline')
+    const handleOnline = () => {
+      if (failReason === 'offline') setFailReason(null)
+    }
+    window.addEventListener('offline', handleOffline)
+    window.addEventListener('online', handleOnline)
 
     const tracker = new DirtyTracker({ history, debounceMs: AUTOSAVE_DEBOUNCE_MS })
 
@@ -40,17 +63,24 @@ export function useAutosave(
     })
 
     const unsubTick = tracker.on('autosave:tick', () => {
+      if (!navigator.onLine) {
+        setFailReason('offline')
+        return
+      }
       try {
         setSaveStatus('saving')
+        setFailReason(null)
         const result = exportJson(canvas, layerTree ?? undefined)
         localStorage.setItem(AUTOSAVE_STORAGE_KEY, JSON.stringify(result))
         tracker.markClean()
+        setLastSavedAt(new Date())
         setSaveStatus('saved')
         // 3초 후 'clean' 으로 복귀
         setTimeout(() => setSaveStatus('clean'), 3000)
       } catch (err) {
         console.error('[useAutosave] autosave 실패:', err)
         setSaveStatus('dirty')
+        setFailReason('saveFailed')
       }
     })
 
@@ -58,8 +88,10 @@ export function useAutosave(
       unsubDirty()
       unsubTick()
       tracker.dispose()
+      window.removeEventListener('offline', handleOffline)
+      window.removeEventListener('online', handleOnline)
     }
   }, [canvas, layerTree, history])
 
-  return { saveStatus }
+  return { saveStatus, lastSavedAt, failReason }
 }

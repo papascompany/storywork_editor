@@ -22,7 +22,6 @@ import {
 
 import { EditorCanvas } from './EditorCanvas'
 import { EditorContext } from './EditorContext'
-import { ExportMenu } from './ExportMenu'
 import { useAutosave } from './hooks/useAutosave'
 import { useHistory } from './hooks/useHistory'
 import { useSelection } from './hooks/useSelection'
@@ -104,7 +103,12 @@ export function EditorShell() {
     clearSelection,
   } = useSelection(canvasRef.current)
   const { canUndo, canRedo, undo, redo } = useHistory(historyRef.current)
-  const { saveStatus } = useAutosave(canvasRef.current, layerTreeRef.current, historyRef.current)
+  const { saveStatus, lastSavedAt, failReason } = useAutosave(
+    canvasRef.current,
+    layerTreeRef.current,
+    historyRef.current,
+  )
+  const [fileName, setFileName] = useState('제목 없음')
 
   // ── H6: body[data-route="editor"] 설정 (/editor 전용 CSS 트리거) ──
   useEffect(() => {
@@ -224,13 +228,17 @@ export function EditorShell() {
       >
         {/* TopBar — 모바일/데스크톱 공통, 모바일 48px */}
         <TopBar
-          fileName="제목 없음"
+          fileName={fileName}
+          onFileNameChange={setFileName}
           saveStatus={saveStatus}
+          lastSavedAt={lastSavedAt}
+          failReason={failReason}
           canUndo={canUndo}
           canRedo={canRedo}
           onUndo={undo}
           onRedo={redo}
-          exportMenu={<ExportMenu canvas={canvasRef.current} layerTree={layerTreeRef.current} />}
+          canvas={canvasRef.current}
+          layerTree={layerTreeRef.current}
         />
 
         {/* 중앙 영역: ToolPalette | Canvas | Inspector */}
