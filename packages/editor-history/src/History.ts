@@ -2,10 +2,17 @@
 // History — Command 스택 + undo/redo + OT 슬롯
 // ─────────────────────────────────────────────
 
+import { isCoarsePointer } from '@storywork/editor-core'
+
 import type { Command, HistoryEvent, HistoryEventMap, OTAdapter } from './types.js'
 
 export type HistoryOptions = {
-  /** 최대 유지 스텝 수. 초과 시 가장 오래된 명령 drop. 기본값 200 */
+  /**
+   * 최대 유지 스텝 수. 초과 시 가장 오래된 명령 drop.
+   * H4: 명시하지 않으면 장치에 따라 자동 분기:
+   *   - coarse pointer(모바일/태블릿): 15
+   *   - fine pointer(데스크톱): 50
+   */
   capacity?: number
   /** Coalesce 창 (ms). 이 시간 이내 동일 종류/대상 명령은 합쳐진다. 기본값 300 */
   coalesceWindowMs?: number
@@ -39,7 +46,8 @@ export class History {
   private _disposed = false
 
   constructor(opts: HistoryOptions = {}) {
-    this._capacity = opts.capacity ?? 200
+    // H4: capacity 미지정 시 장치 분기 — 모바일은 메모리 절감을 위해 15스텝
+    this._capacity = opts.capacity ?? (isCoarsePointer() ? 15 : 50)
     this._coalesceWindowMs = opts.coalesceWindowMs ?? 300
   }
 
