@@ -1,0 +1,77 @@
+{
+  "v": 1,
+  "format": {
+    "id": "a4-portrait",
+    "widthMm": 210,
+    "heightMm": 297,
+    "dpi": 96
+  },
+  "layers": [
+    {
+      "id": "rect-a",
+      "kind": "decoration",
+      "data": {
+        "locked": false,
+        "visible": true
+      },
+      "fabric": {
+        "type": "Rect",
+        "left": 5,
+        "top": 5,
+        "width": 30,
+        "height": 30,
+        "leftMm": 5,
+        "topMm": 5,
+        "widthMm": 30,
+        "heightMm": 30,
+        "fill": "#0000ff",
+        "stroke": "",
+        "strokeWidth": 0,
+        "scaleX": 1,
+        "scaleY": 1,
+        "angle": 0,
+        "opacity": 1,
+        "flipX": false,
+        "flipY": false,
+        "visible": true,
+        "data": {
+          "id": "rect-a",
+          "kind": "decoration"
+        }
+      }
+    },
+    {
+      "id": "rect-b",
+      "kind": "decoration",
+      "data": {
+        "locked": false,
+        "visible": true
+      },
+      "fabric": {
+        "type": "Rect",
+        "left": 40,
+        "top": 40,
+        "width": 30,
+        "height": 30,
+        "leftMm": 40,
+        "topMm": 40,
+        "widthMm": 30,
+        "heightMm": 30,
+        "fill": "#00ff00",
+        "stroke": "",
+        "strokeWidth": 0,
+        "scaleX": 1,
+        "scaleY": 1,
+        "angle": 0,
+        "opacity": 1,
+        "flipX": false,
+        "flipY": false,
+        "visible": true,
+        "data": {
+          "id": "rect-b",
+          "kind": "decoration"
+        }
+      }
+    }
+  ]
+}

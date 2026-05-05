@@ -1,0 +1,44 @@
+{
+  "v": 1,
+  "format": {
+    "id": "a4-portrait",
+    "widthMm": 210,
+    "heightMm": 297,
+    "dpi": 96
+  },
+  "layers": [
+    {
+      "id": "rect-001",
+      "kind": "decoration",
+      "data": {
+        "locked": false,
+        "visible": true
+      },
+      "fabric": {
+        "type": "Rect",
+        "left": 10,
+        "top": 10,
+        "width": 50,
+        "height": 50,
+        "leftMm": 10,
+        "topMm": 10,
+        "widthMm": 50,
+        "heightMm": 50,
+        "fill": "#ff0000",
+        "stroke": "",
+        "strokeWidth": 0,
+        "scaleX": 1,
+        "scaleY": 1,
+        "angle": 0,
+        "opacity": 1,
+        "flipX": false,
+        "flipY": false,
+        "visible": true,
+        "data": {
+          "id": "rect-001",
+          "kind": "decoration"
+        }
+      }
+    }
+  ]
+}

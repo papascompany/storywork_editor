@@ -1,0 +1,110 @@
+{
+  "v": 1,
+  "format": {
+    "id": "a4-portrait",
+    "widthMm": 210,
+    "heightMm": 297,
+    "dpi": 96
+  },
+  "layers": [
+    {
+      "id": "color-red",
+      "kind": "decoration",
+      "data": {
+        "locked": false,
+        "visible": true
+      },
+      "fabric": {
+        "type": "Rect",
+        "left": 10,
+        "top": 10,
+        "width": 40,
+        "height": 40,
+        "leftMm": 10,
+        "topMm": 10,
+        "widthMm": 40,
+        "heightMm": 40,
+        "fill": "#ff0000",
+        "stroke": "",
+        "strokeWidth": 0,
+        "scaleX": 1,
+        "scaleY": 1,
+        "angle": 0,
+        "opacity": 1,
+        "flipX": false,
+        "flipY": false,
+        "visible": true,
+        "data": {
+          "id": "color-red",
+          "kind": "decoration"
+        }
+      }
+    },
+    {
+      "id": "color-green",
+      "kind": "decoration",
+      "data": {
+        "locked": false,
+        "visible": true
+      },
+      "fabric": {
+        "type": "Rect",
+        "left": 60,
+        "top": 10,
+        "width": 40,
+        "height": 40,
+        "leftMm": 60,
+        "topMm": 10,
+        "widthMm": 40,
+        "heightMm": 40,
+        "fill": "#00ff00",
+        "stroke": "",
+        "strokeWidth": 0,
+        "scaleX": 1,
+        "scaleY": 1,
+        "angle": 0,
+        "opacity": 1,
+        "flipX": false,
+        "flipY": false,
+        "visible": true,
+        "data": {
+          "id": "color-green",
+          "kind": "decoration"
+        }
+      }
+    },
+    {
+      "id": "color-blue",
+      "kind": "decoration",
+      "data": {
+        "locked": false,
+        "visible": true
+      },
+      "fabric": {
+        "type": "Rect",
+        "left": 110,
+        "top": 10,
+        "width": 40,
+        "height": 40,
+        "leftMm": 110,
+        "topMm": 10,
+        "widthMm": 40,
+        "heightMm": 40,
+        "fill": "#0000ff",
+        "stroke": "",
+        "strokeWidth": 0,
+        "scaleX": 1,
+        "scaleY": 1,
+        "angle": 0,
+        "opacity": 1,
+        "flipX": false,
+        "flipY": false,
+        "visible": true,
+        "data": {
+          "id": "color-blue",
+          "kind": "decoration"
+        }
+      }
+    }
+  ]
+}
