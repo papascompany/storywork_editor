@@ -2,6 +2,22 @@
 
 // ─────────────────────────────────────────────
 // EditorShell — 편집기 최상위 레이아웃 + 조립
+//
+// M1-08c: ToolBar 11종 + FeatureSidebar 슬라이드 패널 통합
+//
+// 레이아웃 (데스크톱 md+):
+//   [TopBar                                    ]
+//   [ToolBar(72px) | FeatureSidebar(0~290px) | Canvas | Inspector]
+//   [LayerPanel                                ]
+//
+// 모바일(md 미만): TopBar + Canvas + MobileBottomSheet
+//
+// H5: canvas / layerTree / history 인스턴스는 useRef 로 보유.
+// React state 에 넣으면 fabric 내부 상태 변경마다 리렌더가 발생하고
+// React StrictMode 이중 마운트 시 이중 dispose 위험이 있다.
+// 자식 컴포넌트로는 EditorContext + readyTick 으로 필요한 시점에만 전달한다.
+//
+// H8: window.unhandledrejection 글로벌 핸들러를 /editor 진입 시점에만 활성화.
 // ─────────────────────────────────────────────
 
 import type { StoryCanvas } from '@storywork/editor-core'
@@ -22,6 +38,7 @@ import {
 
 import { EditorCanvas } from './EditorCanvas'
 import { EditorContext } from './EditorContext'
+import { FeatureSidebar } from './FeatureSidebar'
 import { useAutosave } from './hooks/useAutosave'
 import { useHistory } from './hooks/useHistory'
 import { useSelection } from './hooks/useSelection'
@@ -30,28 +47,17 @@ import { useStoryCanvas } from './hooks/useStoryCanvas'
 import { Inspector } from './Inspector'
 import { LayerPanel } from './LayerPanel'
 import { MobileBottomSheet } from './MobileBottomSheet'
-import { ToolPalette } from './ToolPalette'
-import type { ToolId } from './ToolPalette'
+import { useToolStore } from './store/useToolStore'
+import { ToolBar } from './ToolBar'
 import { TopBar } from './TopBar'
+
+// MobileBottomSheet 는 기존 ToolId 타입 의존 (레거시 호환용 로컬 타입)
+type LegacyToolId = 'select' | 'pose' | 'background'
 
 /**
  * EditorShell
  *
- * M1-06 편집기 셸: 헤드리스 패키지 4개를 React UI 로 조립.
- *
- * 레이아웃:
- *   [TopBar                          ]
- *   [ToolPalette | Canvas | Inspector]
- *   [LayerPanel                      ]
- *
- * 모바일(md 이하): TopBar + Canvas 만 — 다른 패널은 M1-07 에서 BottomSheet
- *
- * H5: canvas / layerTree / history 인스턴스는 useRef 로 보유.
- * React state 에 넣으면 fabric 내부 상태 변경마다 리렌더가 발생하고
- * React StrictMode 이중 마운트 시 이중 dispose 위험이 있다.
- * 자식 컴포넌트로는 EditorContext + readyTick 으로 필요한 시점에만 전달한다.
- *
- * H8: window.unhandledrejection 글로벌 핸들러를 /editor 진입 시점에만 활성화.
+ * M1-08c: ToolBar + FeatureSidebar 통합
  */
 export function EditorShell() {
   const containerRef = useRef<HTMLDivElement>(null)
@@ -61,10 +67,6 @@ export function EditorShell() {
   const layerTreeRef = useRef<LayerTree | null>(null)
   const historyRef = useRef<History | null>(null)
 
-  /**
-   * H5: 인스턴스 준비 완료 신호. 숫자 자체는 의미 없고 바뀌면 자식이 리렌더된다.
-   * canvas 인스턴스 자체를 state 에 넣는 대신 이 숫자를 올린다.
-   */
   const [readyTick, setReadyTick] = useState(0)
 
   const onReady = useCallback((refs: EditorRefs) => {
@@ -72,9 +74,7 @@ export function EditorShell() {
     canvasRef.current = refs.canvas
     layerTreeRef.current = refs.layerTree
     historyRef.current = refs.history
-    // 로컬 저장 데이터 복원 시도
     restoreFromLocalStorage(refs.canvas, refs.layerTree)
-    // 자식에게 준비 완료 알림 (tick 증가 → 리렌더)
     setReadyTick((t) => t + 1)
   }, [])
 
@@ -82,20 +82,18 @@ export function EditorShell() {
 
   // ── 도구/선택/히스토리/자동저장 ──────────────────────
   const { show: showToast } = useToast()
-  const [activeTool, setActiveTool] = useState<ToolId>('select')
 
-  /**
-   * 모바일 BottomSheet closeRequest 카운터.
-   * 포즈/배경 추가 후 1씩 올리면 MobileBottomSheet 가 peek 로 복귀한다.
-   * 숫자 자체는 의미 없고 변화만 의미가 있다.
-   */
+  // useToolStore 에서 활성 도구 동기화 (MobileBottomSheet 레거시 호환용)
+  const { active: activeTool } = useToolStore()
+  const legacyActiveTool: LegacyToolId =
+    activeTool === 'pose' || activeTool === 'background' ? activeTool : 'select'
+
   const [mobileCloseRequest, setMobileCloseRequest] = useState(0)
 
   const requestMobileClose = useCallback(() => {
     setMobileCloseRequest((n) => n + 1)
   }, [])
 
-  // H5: ref.current 를 직접 훅에 전달 — 인스턴스 동일성 보장
   const {
     selectedIds,
     props: selectionProps,
@@ -110,7 +108,7 @@ export function EditorShell() {
   )
   const [fileName, setFileName] = useState('제목 없음')
 
-  // ── H6: body[data-route="editor"] 설정 (/editor 전용 CSS 트리거) ──
+  // ── H6: body[data-route="editor"] ──────────────────────────────
   useEffect(() => {
     document.body.dataset.route = 'editor'
     return () => {
@@ -118,12 +116,10 @@ export function EditorShell() {
     }
   }, [])
 
-  // ── H8: unhandledrejection 글로벌 핸들러 (/editor 전용) ──────────
+  // ── H8: unhandledrejection 글로벌 핸들러 ─────────────────────
   useEffect(() => {
     const onReject = (e: PromiseRejectionEvent): void => {
       console.error('[unhandled]', e.reason)
-      // M9 에서 Sentry 연결 예정. 현재는 콘솔만.
-      // e.preventDefault() 로 React 트리 freeze 방지
       e.preventDefault()
     }
     window.addEventListener('unhandledrejection', onReject)
@@ -132,7 +128,7 @@ export function EditorShell() {
     }
   }, [])
 
-  // ── 포즈 추가 ─────────────────────────────────────────
+  // ── 포즈 추가 (MobileBottomSheet 레거시 핸들러) ───────────────
   const handleAddPose = useCallback(async () => {
     const canvas = canvasRef.current
     const history = historyRef.current
@@ -143,10 +139,9 @@ export function EditorShell() {
         crossOrigin: 'anonymous',
       })
 
-      // 캔버스 중앙 배치 (mm → px 변환)
       const centerXPx = canvas.mmToPx(DEFAULT_FORMAT.widthMm / 2)
       const centerYPx = canvas.mmToPx(DEFAULT_FORMAT.heightMm / 3)
-      const widthPx = canvas.mmToPx(40) // 40mm
+      const widthPx = canvas.mmToPx(40)
       const heightPx = canvas.mmToPx(40)
 
       img.set({
@@ -167,12 +162,10 @@ export function EditorShell() {
       showToast({ message: '포즈 추가에 실패했습니다.', variant: 'error' })
     }
 
-    setActiveTool('select')
-    // 모바일: 시트를 peek 로 복귀 (캔버스 노출)
     requestMobileClose()
-  }, [requestMobileClose])
+  }, [requestMobileClose, showToast])
 
-  // ── 배경 추가 ─────────────────────────────────────────
+  // ── 배경 추가 (MobileBottomSheet 레거시 핸들러) ───────────────
   const handleAddBackground = useCallback(() => {
     const canvas = canvasRef.current
     const history = historyRef.current
@@ -198,7 +191,6 @@ export function EditorShell() {
     })
     history.push(cmd)
 
-    // 배경은 맨 뒤로 이동
     if (layerTree) {
       const id = cmd.assignedId
       if (id) {
@@ -206,12 +198,10 @@ export function EditorShell() {
       }
     }
 
-    setActiveTool('select')
-    // 모바일: 시트를 peek 로 복귀 (캔버스 노출)
     requestMobileClose()
   }, [requestMobileClose])
 
-  // ── Context 값 (메모이즈 없음 — readyTick 변경 시 자연스럽게 새 객체) ──
+  // ── Context 값 ────────────────────────────────────────────────
   const ctxValue = {
     canvas: canvasRef.current,
     layerTree: layerTreeRef.current,
@@ -241,14 +231,16 @@ export function EditorShell() {
           layerTree={layerTreeRef.current}
         />
 
-        {/* 중앙 영역: ToolPalette | Canvas | Inspector */}
+        {/* 중앙 영역: ToolBar | FeatureSidebar | Canvas | Inspector */}
         <div className="flex flex-1 overflow-hidden">
-          {/* ToolPalette — 데스크톱(md+) only. 모바일은 MobileBottomSheet 의 Tools 탭 */}
-          <ToolPalette
-            activeTool={activeTool}
-            onToolChange={setActiveTool}
-            onAddPose={handleAddPose}
-            onAddBackground={handleAddBackground}
+          {/* ToolBar — 데스크톱(md+) only. 모바일은 MobileBottomSheet 의 Tools 탭 */}
+          <ToolBar />
+
+          {/* FeatureSidebar — 데스크톱(md+) only */}
+          <FeatureSidebar
+            canvas={canvasRef.current}
+            history={historyRef.current}
+            layerTree={layerTreeRef.current}
           />
 
           {/* Canvas — 모바일/데스크톱 공통 */}
@@ -260,7 +252,7 @@ export function EditorShell() {
             onClearSelection={clearSelection}
           />
 
-          {/* Inspector — 데스크톱(md+) only. DOM 자체 미렌더로 cost 0 */}
+          {/* Inspector — 데스크톱(md+) only */}
           <div className="hidden md:contents">
             <Inspector props={selectionProps} onUpdate={updateProps} />
           </div>
@@ -278,8 +270,10 @@ export function EditorShell() {
         {/* MobileBottomSheet — 모바일(md 미만) only */}
         <div className="md:hidden">
           <MobileBottomSheet
-            activeTool={activeTool}
-            onToolChange={setActiveTool}
+            activeTool={legacyActiveTool}
+            onToolChange={() => {
+              /* ToolStore 에서 관리 */
+            }}
             onAddPose={handleAddPose}
             onAddBackground={handleAddBackground}
             selectionProps={selectionProps}
@@ -312,15 +306,12 @@ function restoreFromLocalStorage(canvas: StoryCanvas, layerTree: LayerTree): voi
     const data = JSON.parse(raw) as SavedData
     if (!data?.page) return
 
-    // 비동기 loadJson 는 async 이므로 await 없이 fire-and-forget
-    // 에러는 각자 catch 에서 처리
     canvas
       .loadJson(data.page)
       .then(() => {
         if (data.layers?.length) {
           layerTree.loadJson(data.layers)
         }
-        // 복원 완료
       })
       .catch((err) => {
         console.warn('[EditorShell] 로컬 저장 데이터 복원 실패:', err)
