@@ -1,0 +1,124 @@
+{
+  "v": 1,
+  "format": {
+    "id": "b5-standard",
+    "widthMm": 182,
+    "heightMm": 257,
+    "dpi": 150
+  },
+  "layers": [
+    {
+      "id": "group-001",
+      "kind": "group",
+      "data": {
+        "locked": false,
+        "visible": true,
+        "meta": {
+          "groupLabel": "캐릭터 + 말풍선"
+        }
+      },
+      "fabric": {
+        "type": "Group",
+        "left": 20,
+        "top": 30,
+        "width": 120,
+        "height": 160,
+        "scaleX": 1,
+        "scaleY": 1,
+        "angle": 0,
+        "opacity": 1,
+        "visible": true,
+        "leftMm": 20,
+        "topMm": 30,
+        "widthMm": 120,
+        "heightMm": 160,
+        "data": {
+          "id": "group-001",
+          "kind": "group",
+          "locked": false,
+          "meta": {
+            "groupLabel": "캐릭터 + 말풍선"
+          }
+        }
+      },
+      "children": [
+        {
+          "id": "pose-in-group",
+          "kind": "pose",
+          "data": {
+            "resourceId": "resource-pose-111",
+            "locked": false,
+            "visible": true
+          },
+          "fabric": {
+            "type": "Rect",
+            "left": 0,
+            "top": 0,
+            "width": 80,
+            "height": 130,
+            "scaleX": 1,
+            "scaleY": 1,
+            "angle": 0,
+            "opacity": 1,
+            "flipX": false,
+            "flipY": false,
+            "visible": true,
+            "fill": "transparent",
+            "stroke": "",
+            "strokeWidth": 0,
+            "leftMm": 0,
+            "topMm": 0,
+            "widthMm": 80,
+            "heightMm": 130,
+            "data": {
+              "id": "pose-in-group",
+              "kind": "pose",
+              "resourceId": "resource-pose-111",
+              "locked": false
+            }
+          }
+        },
+        {
+          "id": "bubble-in-group",
+          "kind": "bubble",
+          "data": {
+            "locked": false,
+            "visible": true,
+            "meta": {
+              "text": "안녕하세요!"
+            }
+          },
+          "fabric": {
+            "type": "Rect",
+            "left": 60,
+            "top": 10,
+            "width": 50,
+            "height": 30,
+            "scaleX": 1,
+            "scaleY": 1,
+            "angle": 0,
+            "opacity": 1,
+            "flipX": false,
+            "flipY": false,
+            "visible": true,
+            "fill": "white",
+            "stroke": "#000000",
+            "strokeWidth": 1,
+            "leftMm": 60,
+            "topMm": 10,
+            "widthMm": 50,
+            "heightMm": 30,
+            "data": {
+              "id": "bubble-in-group",
+              "kind": "speech-bubble",
+              "locked": false,
+              "meta": {
+                "text": "안녕하세요!"
+              }
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

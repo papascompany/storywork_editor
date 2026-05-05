@@ -1,0 +1,57 @@
+{
+  "v": 1,
+  "format": {
+    "id": "b5-standard",
+    "widthMm": 182,
+    "heightMm": 257,
+    "dpi": 150
+  },
+  "layers": [
+    {
+      "id": "pose-001",
+      "kind": "pose",
+      "data": {
+        "resourceId": "resource-abc-123",
+        "slotId": "slot-main",
+        "locked": false,
+        "visible": true,
+        "meta": {
+          "action": "standing",
+          "bodyType": "F"
+        }
+      },
+      "fabric": {
+        "type": "Rect",
+        "left": 50,
+        "top": 80,
+        "width": 100,
+        "height": 150,
+        "scaleX": 1,
+        "scaleY": 1,
+        "angle": 0,
+        "opacity": 1,
+        "flipX": false,
+        "flipY": false,
+        "visible": true,
+        "fill": "transparent",
+        "stroke": "",
+        "strokeWidth": 0,
+        "leftMm": 50,
+        "topMm": 80,
+        "widthMm": 100,
+        "heightMm": 150,
+        "data": {
+          "id": "pose-001",
+          "kind": "pose",
+          "resourceId": "resource-abc-123",
+          "slotId": "slot-main",
+          "locked": false,
+          "meta": {
+            "action": "standing",
+            "bodyType": "F"
+          }
+        }
+      }
+    }
+  ]
+}

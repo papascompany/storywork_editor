@@ -1,0 +1,91 @@
+{
+  "v": 1,
+  "format": {
+    "id": "b5-standard",
+    "widthMm": 182,
+    "heightMm": 257,
+    "dpi": 150
+  },
+  "layers": [
+    {
+      "id": "bg-001",
+      "kind": "bg",
+      "data": {
+        "resourceId": "resource-bg-456",
+        "locked": false,
+        "visible": true
+      },
+      "fabric": {
+        "type": "Rect",
+        "left": 0,
+        "top": 0,
+        "width": 182,
+        "height": 257,
+        "scaleX": 1,
+        "scaleY": 1,
+        "angle": 0,
+        "opacity": 1,
+        "flipX": false,
+        "flipY": false,
+        "visible": true,
+        "fill": "#87CEEB",
+        "stroke": "",
+        "strokeWidth": 0,
+        "leftMm": 0,
+        "topMm": 0,
+        "widthMm": 182,
+        "heightMm": 257,
+        "data": {
+          "id": "bg-001",
+          "kind": "background",
+          "resourceId": "resource-bg-456",
+          "locked": false
+        }
+      }
+    },
+    {
+      "id": "pose-002",
+      "kind": "pose",
+      "data": {
+        "resourceId": "resource-pose-789",
+        "locked": false,
+        "visible": true,
+        "meta": {
+          "action": "walking",
+          "bodyType": "M"
+        }
+      },
+      "fabric": {
+        "type": "Rect",
+        "left": 40,
+        "top": 60,
+        "width": 80,
+        "height": 140,
+        "scaleX": 1,
+        "scaleY": 1,
+        "angle": 0,
+        "opacity": 1,
+        "flipX": false,
+        "flipY": false,
+        "visible": true,
+        "fill": "transparent",
+        "stroke": "",
+        "strokeWidth": 0,
+        "leftMm": 40,
+        "topMm": 60,
+        "widthMm": 80,
+        "heightMm": 140,
+        "data": {
+          "id": "pose-002",
+          "kind": "pose",
+          "resourceId": "resource-pose-789",
+          "locked": false,
+          "meta": {
+            "action": "walking",
+            "bodyType": "M"
+          }
+        }
+      }
+    }
+  ]
+}
