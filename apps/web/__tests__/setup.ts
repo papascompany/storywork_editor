@@ -118,6 +118,23 @@ HTMLCanvasElement.prototype.getContext = function (contextId: string, ...args: u
   return OriginalGetContext.call(this, contextId, ...(args as any[]))
 }
 
+// window.matchMedia mock — jsdom 미지원 환경 대응
+if (typeof window !== 'undefined' && typeof window.matchMedia === 'undefined') {
+  Object.defineProperty(window, 'matchMedia', {
+    writable: true,
+    value: (query: string): MediaQueryList => ({
+      matches: false,
+      media: query,
+      onchange: null,
+      addListener: () => {},
+      removeListener: () => {},
+      addEventListener: () => {},
+      removeEventListener: () => {},
+      dispatchEvent: () => false,
+    }),
+  })
+}
+
 // localStorage mock — jsdom 에서 localStorage 지원
 if (typeof globalThis.localStorage === 'undefined') {
   const store: Record<string, string> = {}

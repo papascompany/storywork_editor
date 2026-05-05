@@ -1,14 +1,28 @@
 'use client'
 
 // ─────────────────────────────────────────────
-// EditorCanvas — StoryCanvas 마운트 + 키보드 단축키
+// EditorCanvas — StoryCanvas 마운트 + 키보드 단축키 + 드래그앤드롭
+//
+// M1-08e 추가:
+//   - EmptyCanvasHint: 사용자 객체 0개 시 가이드 오버레이
+//   - useImageDrop: 이미지 파일 드래그앤드롭
+//   - FloatingObjectBar: 선택 객체 위 액션 바
+//   - CanvasContextMenu: 우클릭 컨텍스트 메뉴
+//   - 줌 키보드 단축키: Cmd+= / Cmd+− / Cmd+0 / F
 // ─────────────────────────────────────────────
 
 import type { StoryCanvas } from '@storywork/editor-core'
 import { RemoveObjectCommand } from '@storywork/editor-history'
+import type { LayerTree } from '@storywork/editor-layers'
 import { cn } from '@storywork/ui'
 import { useCallback, useEffect, useRef } from 'react'
 
+import { CanvasContextMenu } from './CanvasContextMenu'
+import { EmptyCanvasHint } from './EmptyCanvasHint'
+import { FloatingObjectBar } from './FloatingObjectBar'
+import { applyZoom, fitToViewport, getZoomPercent, MAX_ZOOM, MIN_ZOOM } from './Footer'
+import { useImageDrop } from './hooks/useImageDrop'
+import { useToolStore } from './store/useToolStore'
 import type { HistoryRef as History } from './types'
 
 // ─────────────────────────────────────────────
@@ -65,6 +79,7 @@ type EditorCanvasProps = {
   containerRef: React.RefObject<HTMLDivElement | null>
   canvas: StoryCanvas | null
   history: History | null
+  layerTree: LayerTree | null
   /** 선택된 객체 ids (키보드 삭제에 사용) */
   selectedIds: string[]
   onClearSelection: () => void
@@ -78,12 +93,19 @@ type EditorCanvasProps = {
  *   - Esc: 선택 해제
  *   - Delete/Backspace: 선택 삭제 (RemoveObjectCommand → history)
  *   - Arrow: 1mm 이동 / Shift+Arrow: 10mm 이동
- *   - F: 전체 보기 (fit to viewport — 향후 구현, 현재 no-op)
+ *   - F: 전체 보기 (fit to viewport)
+ *   - Cmd+= / Cmd+−: 줌인/아웃
+ *   - Cmd+0: 100% 줌
+ * - EmptyCanvasHint: 사용자 객체 없을 때 오버레이
+ * - useImageDrop: 이미지 파일 드래그앤드롭
+ * - FloatingObjectBar: 선택 객체 위 액션 바
+ * - CanvasContextMenu: 우클릭 메뉴
  */
 export function EditorCanvas({
   containerRef,
   canvas,
   history,
+  layerTree,
   selectedIds,
   onClearSelection,
 }: EditorCanvasProps) {
@@ -92,9 +114,23 @@ export function EditorCanvas({
   // C-1: ResizeObserver 3중 가드 적용
   useResizeObserverGuard(wrapRef, canvas)
 
+  // 포즈 도구 활성화 (EmptyCanvasHint 칩에서 호출)
+  const { setActive } = useToolStore()
+  const handleActivatePoseTool = useCallback(() => {
+    setActive('pose')
+  }, [setActive])
+
+  // 이미지 드래그앤드롭
+  const { isDragging, onDragEnter, onDragLeave, onDragOver, onDrop } = useImageDrop({
+    canvas,
+    history,
+  })
+
   const handleKeyDown = useCallback(
     (e: React.KeyboardEvent<HTMLDivElement>) => {
       if (!canvas) return
+
+      const isCmd = e.metaKey || e.ctrlKey
 
       // Esc — 선택 해제
       if (e.key === 'Escape') {
@@ -150,10 +186,34 @@ export function EditorCanvas({
         return
       }
 
-      // F — 전체 보기 (M1-07 에서 구현 예정)
-      if (e.key === 'f' || e.key === 'F') {
+      // F — 페이지 맞춤 (fit to viewport)
+      if ((e.key === 'f' || e.key === 'F') && !isCmd) {
         e.preventDefault()
-        // TODO M1-07: fit to viewport
+        fitToViewport(canvas)
+        return
+      }
+
+      // Cmd/Ctrl + = / + — 줌인
+      if (isCmd && (e.key === '=' || e.key === '+')) {
+        e.preventDefault()
+        const curr = getZoomPercent(canvas)
+        applyZoom(canvas, Math.min(MAX_ZOOM, curr + 10))
+        return
+      }
+
+      // Cmd/Ctrl + - / − — 줌아웃
+      if (isCmd && e.key === '-') {
+        e.preventDefault()
+        const curr = getZoomPercent(canvas)
+        applyZoom(canvas, Math.max(MIN_ZOOM, curr - 10))
+        return
+      }
+
+      // Cmd/Ctrl + 0 — 100% 줌
+      if (isCmd && e.key === '0') {
+        e.preventDefault()
+        applyZoom(canvas, 100)
+        return
       }
     },
     [canvas, history, selectedIds, onClearSelection],
@@ -169,6 +229,23 @@ export function EditorCanvas({
     return () => wrapper.removeEventListener('click', onClick)
   }, [])
 
+  // 휠 줌 (Overlay 깜빡임 방지를 위해 passive:false 사용)
+  useEffect(() => {
+    const wrapper = wrapRef.current
+    if (!wrapper) return
+
+    const onWheel = (e: WheelEvent) => {
+      if (!canvas || !e.ctrlKey) return
+      e.preventDefault()
+      const curr = getZoomPercent(canvas)
+      const delta = e.deltaY > 0 ? -5 : 5
+      applyZoom(canvas, Math.max(MIN_ZOOM, Math.min(MAX_ZOOM, curr + delta)))
+    }
+
+    wrapper.addEventListener('wheel', onWheel, { passive: false })
+    return () => wrapper.removeEventListener('wheel', onWheel)
+  }, [canvas])
+
   return (
     <div
       ref={wrapRef}
@@ -176,13 +253,44 @@ export function EditorCanvas({
       aria-label="편집 캔버스"
       tabIndex={0}
       onKeyDown={handleKeyDown}
+      onDragEnter={onDragEnter}
+      onDragLeave={onDragLeave}
+      onDragOver={onDragOver}
+      onDrop={onDrop}
       className={cn(
         'relative flex flex-1 items-center justify-center overflow-auto',
         'bg-[var(--color-surface-muted)]',
         // 포커스 링
         'outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[var(--color-brand-500)]',
+        // 드래그 활성 시 보라색 dashed outline
+        isDragging && 'ring-2 ring-inset ring-[var(--color-brand-500)] ring-dashed',
       )}
     >
+      {/* 드래그 활성 시 중앙 뱃지 */}
+      {isDragging && (
+        <div
+          role="status"
+          aria-live="polite"
+          className={cn(
+            'pointer-events-none absolute inset-0 z-[30]',
+            'flex items-center justify-center',
+          )}
+        >
+          <div
+            className={cn(
+              'rounded-xl border-2 border-dashed border-[var(--color-brand-500)]',
+              'bg-[var(--color-brand-500)]/10 px-8 py-5',
+              'text-sm font-semibold text-[var(--color-brand-500)]',
+            )}
+          >
+            이미지를 놓으면 캔버스에 추가됩니다
+          </div>
+        </div>
+      )}
+
+      {/* 빈 캔버스 힌트 */}
+      <EmptyCanvasHint canvas={canvas} onActivatePoseTool={handleActivatePoseTool} />
+
       {/* 흰색 페이지 + 그림자 */}
       <div
         className="relative"
@@ -193,6 +301,25 @@ export function EditorCanvas({
       >
         <div ref={containerRef} aria-label="fabric 캔버스 마운트" />
       </div>
+
+      {/* 선택 객체 위 Floating 액션 바 */}
+      {selectedIds.length > 0 && (
+        <FloatingObjectBar
+          canvas={canvas}
+          history={history}
+          layerTree={layerTree}
+          selectedIds={selectedIds}
+          canvasWrapperRef={wrapRef}
+        />
+      )}
+
+      {/* 우클릭 컨텍스트 메뉴 */}
+      <CanvasContextMenu
+        canvas={canvas}
+        history={history}
+        layerTree={layerTree}
+        canvasWrapperRef={wrapRef}
+      />
     </div>
   )
 }

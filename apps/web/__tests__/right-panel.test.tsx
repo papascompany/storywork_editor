@@ -48,8 +48,8 @@ vi.mock('@storywork/ui', async (importOriginal) => {
         <div data-testid="tabs" data-active={currentTab}>
           {React.Children.map(children, (child) => {
             if (!React.isValidElement(child)) return child
-            // @ts-expect-error — children 타입 조작
-            return React.cloneElement(child, {
+
+            return React.cloneElement(child as React.ReactElement<any>, {
               _activeTab: currentTab,
               _onTabChange: (v: string) => {
                 setActive(v)

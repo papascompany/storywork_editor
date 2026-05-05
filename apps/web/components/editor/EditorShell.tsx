@@ -39,6 +39,7 @@ import {
 import { EditorCanvas } from './EditorCanvas'
 import { EditorContext } from './EditorContext'
 import { FeatureSidebar } from './FeatureSidebar'
+import { Footer } from './Footer'
 import { useAutosave } from './hooks/useAutosave'
 import { useHistory } from './hooks/useHistory'
 import { useSelection } from './hooks/useSelection'
@@ -244,13 +245,18 @@ export function EditorShell() {
           />
 
           {/* Canvas — 모바일/데스크톱 공통 */}
-          <EditorCanvas
-            containerRef={containerRef}
-            canvas={canvasRef.current}
-            history={historyRef.current as any}
-            selectedIds={selectedIds}
-            onClearSelection={clearSelection}
-          />
+          <div className="relative flex flex-1 flex-col overflow-hidden">
+            <EditorCanvas
+              containerRef={containerRef}
+              canvas={canvasRef.current}
+              history={historyRef.current as any}
+              layerTree={layerTreeRef.current}
+              selectedIds={selectedIds}
+              onClearSelection={clearSelection}
+            />
+            {/* Footer — 데스크톱(md+) 전용 */}
+            <Footer canvas={canvasRef.current} />
+          </div>
 
           {/* RightPanel (Inspector + LayerPanel 통합) — 데스크톱(md+) only */}
           <RightPanel
