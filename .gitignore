@@ -55,8 +55,8 @@ prisma/migrations/dev/
 # === StoryWork specific ===
 
 # 포즈 자산 마스터 — Git LFS 또는 Storage 업로드로 관리, 레포에 직접 커밋하지 않음
-data/poses/raw/*.png
-data/poses/raw/*.svg
+data/poses/raw/**/*.png
+data/poses/raw/**/*.svg
 data/poses/_failed/
 
 # 메타 파일은 커밋 (라이선스 정책 + 사이드카는 SSOT)
@@ -69,3 +69,10 @@ data/poses/processed/
 # Supabase 로컬
 supabase/.branches
 supabase/.temp
+
+# Local backups (절대 커밋 금지)
+*.bak
+.env.local.*
+
+# macOS Finder 가 만드는 중복 (예: foo 2.tsx)
+**/* 2.*
