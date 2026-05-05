@@ -16,6 +16,17 @@
 - [ ] [M0-05] CI(lint/typecheck/test/build) GitHub Actions — main 브랜치 보호 + 5개 잡 green — @architect
 - [ ] [M0-06] Sentry/PostHog 부트스트랩 — 두 앱에서 테스트 이벤트 수신 — @architect
 
+## M1-08 — UI/UX 대대적 개선 (Canva + Storige 기준) ✅ 2026-05-06
+
+- [x] [M1-08a] 디자인 토큰 + Toast + LoadingOverlay + Tooltip — @ui-designer ✅ (커밋 3a169dd, 3be6c33)
+- [x] [M1-08b] TopBar 재설계 (FilenameInline / PageIndicator / AutoSaveIndicator / DownloadMenu) — @ui-designer ✅ (커밋 3a8cdd4, 443e74c)
+- [x] [M1-08c] ToolBar 11종 + FeatureSidebar 슬라이드 패널 + Background/Shape 활성 — @ui-designer ✅ (커밋 b95951d)
+- [x] [M1-08d] RightPanel(Properties/Layers 탭) + ControlBar(타입별 가변) + LayerPanel 재작성 — @editor-engineer ✅ (커밋 bedf71c..149b47b)
+- [x] [M1-08e] EmptyCanvasHint + Drag&Drop 이미지 + Footer(페이지/줌) + FloatingObjectBar + CanvasContextMenu — @editor-engineer ✅ (커밋 3e9026a)
+- [x] [M1-08f] Command Palette ⌘K + 단축키 모달 ? + 모바일 BottomSheet 11종 그리드 통합 — @ui-designer ✅ (커밋 89f3005)
+
+누적 통계: 신규 컴포넌트 15개 + 훅 5개 + 타입/스토어 3개. 142 tests pass. /editor First Load 398kB.
+
 ## M1 — Editor Core MVP
 
 - [x] [M1-01] `editor-core` 패키지 스캐폴드 + fabric v6 어댑터 — 헤드리스 단위 테스트 통과 — @editor-engineer ✅ 2026-05-05 (커밋 f3e5c83..02e3fb6) — 67 tests pass, 100객체 라운드트립 157ms (<200ms 임계), 5 골든 라운드트립 100%
