@@ -1,4 +1,5 @@
 'use client'
+/* eslint-disable @typescript-eslint/no-explicit-any */
 
 // ─────────────────────────────────────────────
 // EditorShell — 편집기 최상위 레이아웃 + 조립
@@ -22,7 +23,6 @@
 
 import type { StoryCanvas } from '@storywork/editor-core'
 import { AddObjectCommand } from '@storywork/editor-history'
-import type { History } from '@storywork/editor-history'
 import type { LayerNodeJson, LayerTree } from '@storywork/editor-layers'
 import type { PageJsonV1 } from '@storywork/schema/editor'
 import { useToast } from '@storywork/ui'
@@ -49,6 +49,7 @@ import { RightPanel } from './RightPanel'
 import { useToolStore } from './store/useToolStore'
 import { ToolBar } from './ToolBar'
 import { TopBar } from './TopBar'
+import type { HistoryRef as History } from './types'
 
 // MobileBottomSheet 는 useToolStore 의 ToolId 를 직접 사용 (M1-08d: ToolPalette 제거)
 type LegacyToolId = 'select' | 'pose' | 'background'
@@ -238,7 +239,7 @@ export function EditorShell() {
           {/* FeatureSidebar — 데스크톱(md+) only */}
           <FeatureSidebar
             canvas={canvasRef.current}
-            history={historyRef.current}
+            history={historyRef.current as any}
             layerTree={layerTreeRef.current}
           />
 
@@ -246,7 +247,7 @@ export function EditorShell() {
           <EditorCanvas
             containerRef={containerRef}
             canvas={canvasRef.current}
-            history={historyRef.current}
+            history={historyRef.current as any}
             selectedIds={selectedIds}
             onClearSelection={clearSelection}
           />
@@ -256,7 +257,7 @@ export function EditorShell() {
             props={selectionProps}
             canvas={canvasRef.current}
             layerTree={layerTreeRef.current}
-            history={historyRef.current}
+            history={historyRef.current as any}
             selectedIds={selectedIds}
           />
         </div>
@@ -274,7 +275,7 @@ export function EditorShell() {
             onUpdateProps={updateProps}
             layerTree={layerTreeRef.current}
             canvas={canvasRef.current}
-            history={historyRef.current}
+            history={historyRef.current as any}
             selectedIds={selectedIds}
             closeRequest={mobileCloseRequest}
           />

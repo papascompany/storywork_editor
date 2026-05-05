@@ -10,10 +10,12 @@ import { attachAutoPush, History } from '@storywork/editor-history'
 import { LayerTree } from '@storywork/editor-layers'
 import { useEffect, useRef } from 'react'
 
+import type { HistoryRef } from '../types'
+
 export type EditorRefs = {
   canvas: StoryCanvas | null
   layerTree: LayerTree | null
-  history: History | null
+  history: HistoryRef | null
 }
 
 /**

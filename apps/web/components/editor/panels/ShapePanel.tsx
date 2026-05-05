@@ -9,7 +9,6 @@
 
 import type { StoryCanvas } from '@storywork/editor-core'
 import { AddObjectCommand } from '@storywork/editor-history'
-import type { History } from '@storywork/editor-history'
 import { cn, showToast } from '@storywork/ui'
 import {
   Circle as FabricCircle,
@@ -20,6 +19,8 @@ import {
 } from 'fabric'
 import { Circle, Minus, Square, Triangle } from 'lucide-react'
 import React, { useCallback } from 'react'
+
+import type { HistoryRef as History } from '../types'
 
 type ShapePanelProps = {
   canvas: StoryCanvas | null

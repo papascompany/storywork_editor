@@ -1,4 +1,5 @@
 'use client'
+/* eslint-disable @typescript-eslint/no-explicit-any */
 
 // ─────────────────────────────────────────────
 // RightPanel — 통합 우측 패널
@@ -17,7 +18,6 @@
 // ─────────────────────────────────────────────
 
 import type { StoryCanvas } from '@storywork/editor-core'
-import type { History } from '@storywork/editor-history'
 import type { LayerTree } from '@storywork/editor-layers'
 import { Tabs, TabsContent, TabsList, TabsTrigger, cn } from '@storywork/ui'
 import { Layers, Settings2 } from 'lucide-react'
@@ -26,6 +26,7 @@ import React, { useEffect, useRef, useState } from 'react'
 import { ControlBar } from './ControlBar'
 import type { ObjectProps } from './hooks/useSelection'
 import { LayerPanel } from './LayerPanel'
+import type { HistoryRef as History } from './types'
 
 // ─── 타입 ─────────────────────────────────────────────────────────────────────
 
@@ -124,7 +125,13 @@ export function RightPanel({ props, canvas, layerTree, history, selectedIds }: R
           value="properties"
           className="overflow-y-auto data-[state=active]:flex data-[state=active]:flex-col"
         >
-          <ControlBar props={props} canvas={canvas} layerTree={layerTree} history={history} />
+          <ControlBar
+            props={props}
+            canvas={canvas}
+            layerTree={layerTree}
+            history={history as any}
+          />{' '}
+          // eslint-disable-line @typescript-eslint/no-explicit-any
         </TabsContent>
 
         {/* Layers 탭 */}
@@ -135,7 +142,7 @@ export function RightPanel({ props, canvas, layerTree, history, selectedIds }: R
           <LayerPanel
             layerTree={layerTree}
             canvas={canvas}
-            history={history}
+            history={history as any}
             selectedIds={selectedIds}
           />
         </TabsContent>

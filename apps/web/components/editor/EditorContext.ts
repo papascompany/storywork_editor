@@ -10,9 +10,10 @@
 // ─────────────────────────────────────────────
 
 import type { StoryCanvas } from '@storywork/editor-core'
-import type { History } from '@storywork/editor-history'
 import type { LayerTree } from '@storywork/editor-layers'
 import { createContext } from 'react'
+
+import type { HistoryRef as History } from './types'
 
 export type EditorContextValue = {
   /** StoryCanvas 인스턴스 (ref.current). dispose 후에는 null. */

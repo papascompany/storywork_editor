@@ -6,11 +6,11 @@
 
 import type { StoryCanvas } from '@storywork/editor-core'
 import { DirtyTracker, exportJson } from '@storywork/editor-export'
-import type { History } from '@storywork/editor-history'
 import type { LayerTree } from '@storywork/editor-layers'
 import { useEffect, useState } from 'react'
 
 import { AUTOSAVE_STORAGE_KEY } from '../../../lib/editor/seed'
+import type { HistoryRef as History } from '../types'
 
 const AUTOSAVE_DEBOUNCE_MS = 5000
 
@@ -56,7 +56,13 @@ export function useAutosave(
     window.addEventListener('offline', handleOffline)
     window.addEventListener('online', handleOnline)
 
-    const tracker = new DirtyTracker({ history, debounceMs: AUTOSAVE_DEBOUNCE_MS })
+    // History 클래스와 HistoryRef 의 dist/src 충돌 회피용 cast
+    // (실제 인스턴스는 동일하지만 Next.js webpack 이 다른 모듈로 인식)
+    const tracker = new DirtyTracker({
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      history: history as any,
+      debounceMs: AUTOSAVE_DEBOUNCE_MS,
+    })
 
     const unsubDirty = tracker.on('dirty:changed', (dirty) => {
       setSaveStatus(dirty ? 'dirty' : 'clean')

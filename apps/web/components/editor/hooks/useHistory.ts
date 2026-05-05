@@ -4,8 +4,9 @@
 // useHistory — Undo/Redo 상태 + 키보드 단축키 훅
 // ─────────────────────────────────────────────
 
-import type { History } from '@storywork/editor-history'
 import { useCallback, useEffect, useState } from 'react'
+
+import type { HistoryRef as History } from '../types'
 
 export function useHistory(history: History | null) {
   const [canUndo, setCanUndo] = useState(false)

@@ -22,7 +22,6 @@ import {
   collectHiddenPrevStates,
   collectLockPrevStates,
 } from '@storywork/editor-history'
-import type { History } from '@storywork/editor-history'
 import type { LayerNode, LayerTree } from '@storywork/editor-layers'
 import {
   DropdownMenu,
@@ -57,6 +56,8 @@ import {
   UserSquare2,
 } from 'lucide-react'
 import React, { useCallback, useEffect, useRef, useState } from 'react'
+
+import type { HistoryRef as History } from './types'
 
 // ─── 타입 ─────────────────────────────────────────────────────────────────────
 
@@ -401,7 +402,6 @@ export function LayerPanel({
   const handleSelect = useCallback(
     (id: string) => {
       if (!canvas) return
-      // @ts-expect-error — getObject 반환 타입 unknown
       const obj = canvas.getObject(id) as FabricObject | undefined
       if (!obj) return
       canvas._fabricCanvas.setActiveObject(obj)
@@ -436,8 +436,11 @@ export function LayerPanel({
   const handleDelete = useCallback(
     (id: string) => {
       if (!canvas || !history) return
+      const fabricObj = canvas.getObject(id) as FabricObject | undefined
+      const objectData = canvas.getObjectData(id)
+      if (!fabricObj || !objectData) return
       canvas._fabricCanvas.discardActiveObject()
-      const cmd = new RemoveObjectCommand({ canvas, id })
+      const cmd = new RemoveObjectCommand({ canvas, id, fabricObj, objectData })
       history.push(cmd)
     },
     [canvas, history],

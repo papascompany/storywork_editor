@@ -1,4 +1,5 @@
 'use client'
+/* eslint-disable @typescript-eslint/no-explicit-any */
 
 // ─────────────────────────────────────────────
 // FeatureSidebar — 도구 클릭 시 슬라이드 패널 (290px)
@@ -17,7 +18,6 @@
 // ─────────────────────────────────────────────
 
 import type { StoryCanvas } from '@storywork/editor-core'
-import type { History } from '@storywork/editor-history'
 import type { LayerTree } from '@storywork/editor-layers'
 import { cn } from '@storywork/ui'
 import {
@@ -43,6 +43,7 @@ import { PosePanel } from './panels/PosePanel'
 import { ShapePanel } from './panels/ShapePanel'
 import type { ToolId } from './store/useToolStore'
 import { useToolStore } from './store/useToolStore'
+import type { HistoryRef as History } from './types'
 
 // ─── 도구별 메타 ─────────────────────────────────────────────────────────────
 
@@ -162,9 +163,9 @@ type PanelContentProps = {
 function PanelContent({ tool, canvas, history, layerTree }: PanelContentProps) {
   switch (tool) {
     case 'background':
-      return <BackgroundPanel canvas={canvas} history={history} layerTree={layerTree} />
+      return <BackgroundPanel canvas={canvas} history={history as any} layerTree={layerTree} />
     case 'shape':
-      return <ShapePanel canvas={canvas} history={history} />
+      return <ShapePanel canvas={canvas} history={history as any} />
     case 'pose':
       return <PosePanel />
     default: {
@@ -295,7 +296,12 @@ export function FeatureSidebar({ canvas, history, layerTree }: FeatureSidebarPro
         {/* 패널 콘텐츠 */}
         <div className="flex-1 overflow-y-auto overscroll-contain">
           {isVisible && (
-            <PanelContent tool={active} canvas={canvas} history={history} layerTree={layerTree} />
+            <PanelContent
+              tool={active}
+              canvas={canvas}
+              history={history as any}
+              layerTree={layerTree}
+            />
           )}
         </div>
       </div>

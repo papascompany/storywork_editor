@@ -5,10 +5,11 @@
 // ─────────────────────────────────────────────
 
 import type { StoryCanvas } from '@storywork/editor-core'
-import type { History } from '@storywork/editor-history'
 import { RemoveObjectCommand } from '@storywork/editor-history'
 import { cn } from '@storywork/ui'
 import { useCallback, useEffect, useRef } from 'react'
+
+import type { HistoryRef as History } from './types'
 
 // ─────────────────────────────────────────────
 // C-1: ResizeObserver 3중 가드 (BUG-013 — iOS 크래시 차단)

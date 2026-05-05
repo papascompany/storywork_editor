@@ -8,11 +8,12 @@
 
 import type { StoryCanvas } from '@storywork/editor-core'
 import { AddObjectCommand } from '@storywork/editor-history'
-import type { History } from '@storywork/editor-history'
 import type { LayerTree } from '@storywork/editor-layers'
 import { cn, showToast } from '@storywork/ui'
 import { Rect } from 'fabric'
 import React, { useCallback } from 'react'
+
+import type { HistoryRef as History } from '../types'
 
 type BackgroundPanelProps = {
   canvas: StoryCanvas | null

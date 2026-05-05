@@ -246,17 +246,15 @@ vi.mock('@storywork/editor-history', async () => ({
   RemoveObjectCommand: vi.fn().mockImplementation((opts) => ({ name: 'canvas:remove', ...opts })),
   RenameLayerCommand: vi.fn().mockImplementation((opts) => ({ name: 'layers:rename', ...opts })),
   ZOrderCommand: vi.fn().mockImplementation((opts) => ({ name: 'layers:zorder', ...opts })),
-  snapshotFromFabricObject: vi
-    .fn()
-    .mockReturnValue({
-      left: 0,
-      top: 0,
-      scaleX: 1,
-      scaleY: 1,
-      angle: 0,
-      flipX: false,
-      flipY: false,
-    }),
+  snapshotFromFabricObject: vi.fn().mockReturnValue({
+    left: 0,
+    top: 0,
+    scaleX: 1,
+    scaleY: 1,
+    angle: 0,
+    flipX: false,
+    flipY: false,
+  }),
   collectLockPrevStates: vi.fn().mockReturnValue(new Map()),
   collectHiddenPrevStates: vi.fn().mockReturnValue(new Map()),
 }))
@@ -283,6 +281,7 @@ function makeCanvasMock(kind = 'background') {
   }
   return {
     getObject: vi.fn().mockReturnValue(obj),
+    getObjectData: vi.fn().mockReturnValue({ kind, id: 'obj-1' }),
     mmToPx: vi.fn((v: number) => v * 4),
     pxToMm: vi.fn((v: number) => v / 4),
     _fabricCanvas: {

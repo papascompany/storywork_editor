@@ -1,4 +1,5 @@
 'use client'
+/* eslint-disable @typescript-eslint/no-explicit-any */
 
 // ─────────────────────────────────────────────
 // MobileBottomSheet — 모바일 편집기 하단 시트
@@ -17,7 +18,6 @@
 // ─────────────────────────────────────────────
 
 import type { StoryCanvas } from '@storywork/editor-core'
-import type { History } from '@storywork/editor-history'
 import type { LayerTree } from '@storywork/editor-layers'
 import { cn } from '@storywork/ui'
 import { ImageIcon, Layers, MousePointer2, RectangleHorizontal, Settings2 } from 'lucide-react'
@@ -27,6 +27,7 @@ import { ControlBar } from './ControlBar'
 import type { ObjectProps } from './hooks/useSelection'
 import { LayerPanel } from './LayerPanel'
 import type { ToolId } from './store/useToolStore'
+import type { HistoryRef as History } from './types'
 
 // ── 타입 ─────────────────────────────────────
 export type SheetSnap = 'peek' | 'half' | 'full'
@@ -186,6 +187,7 @@ export function MobileBottomSheet({
   onUpdateProps: _onUpdateProps,
   layerTree,
   canvas,
+  history,
   selectedIds,
   closeRequest,
 }: MobileBottomSheetProps) {
@@ -381,7 +383,7 @@ export function MobileBottomSheet({
                   props={selectionProps}
                   canvas={canvas}
                   layerTree={layerTree}
-                  history={history}
+                  history={history as any}
                 />
               </div>
             )}
@@ -389,7 +391,7 @@ export function MobileBottomSheet({
               <LayerPanel
                 layerTree={layerTree}
                 canvas={canvas}
-                history={history}
+                history={history as any}
                 selectedIds={selectedIds}
                 isMobile
               />

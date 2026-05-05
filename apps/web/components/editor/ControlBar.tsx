@@ -25,7 +25,6 @@ import {
   collectLockPrevStates,
   snapshotFromFabricObject,
 } from '@storywork/editor-history'
-import type { History } from '@storywork/editor-history'
 import type { LayerTree } from '@storywork/editor-layers'
 import { ColorPicker, Input, Slider, cn, showToast } from '@storywork/ui'
 import type { FabricObject } from 'fabric'
@@ -33,6 +32,7 @@ import { Eye, EyeOff, Link, Link2Off, Lock, LockOpen, Trash2 } from 'lucide-reac
 import React, { useCallback, useRef, useState } from 'react'
 
 import type { ObjectProps } from './hooks/useSelection'
+import type { HistoryRef as History } from './types'
 
 // ─── 타입 ─────────────────────────────────────────────────────────────────────
 
@@ -155,7 +155,6 @@ function PositionSizeSection({ props, canvas, history }: PositionSizeSectionProp
   const ratioRef = useRef(props.width / props.height)
 
   const getObj = (): FabricObject | undefined => {
-    // @ts-expect-error — getObject 반환 타입은 unknown
     return canvas.getObject(props.id) as FabricObject | undefined
   }
 
@@ -318,7 +317,6 @@ type OpacitySectionProps = {
 
 function OpacitySection({ props, canvas, history }: OpacitySectionProps) {
   const getObj = (): FabricObject | undefined => {
-    // @ts-expect-error — getObject 반환 타입 unknown
     return canvas.getObject(props.id) as FabricObject | undefined
   }
 
@@ -404,7 +402,10 @@ function StateSection({ props, canvas, layerTree, history }: StateSectionProps) 
   }
 
   const handleDelete = () => {
-    const cmd = new RemoveObjectCommand({ canvas, id: props.id })
+    const fabricObj = canvas.getObject(props.id) as FabricObject | undefined
+    const objectData = canvas.getObjectData(props.id)
+    if (!fabricObj || !objectData) return
+    const cmd = new RemoveObjectCommand({ canvas, id: props.id, fabricObj, objectData })
     canvas._fabricCanvas.discardActiveObject()
     history.push(cmd)
   }
@@ -543,7 +544,6 @@ type BackgroundFillSectionProps = {
 
 function BackgroundFillSection({ props, canvas, history }: BackgroundFillSectionProps) {
   const getObj = (): FabricObject | undefined => {
-    // @ts-expect-error — getObject 반환 타입 unknown
     return canvas.getObject(props.id) as FabricObject | undefined
   }
 
@@ -581,7 +581,6 @@ type ShapeDetailSectionProps = {
 
 function ShapeDetailSection({ props, canvas, history }: ShapeDetailSectionProps) {
   const getObj = (): FabricObject | undefined => {
-    // @ts-expect-error — getObject 반환 타입 unknown
     return canvas.getObject(props.id) as FabricObject | undefined
   }
 
@@ -589,8 +588,7 @@ function ShapeDetailSection({ props, canvas, history }: ShapeDetailSectionProps)
   const currentFill = typeof obj?.fill === 'string' ? obj.fill : '#6366f1'
   const currentStroke = typeof obj?.stroke === 'string' ? obj.stroke : '#000000'
   const currentStrokeWidth = obj?.strokeWidth ?? 0
-  // @ts-expect-error — rx 는 Rect 전용 프로퍼티
-  const currentRx = (obj?.rx as number | undefined) ?? 0
+  const currentRx = (obj as unknown as { rx?: number })?.rx ?? 0
 
   const applyAndCommit = (patch: Record<string, unknown>) => {
     const target = getObj()
@@ -694,7 +692,6 @@ export function ControlBar({ props, canvas, layerTree, history }: ControlBarProp
   }
 
   const kind = (() => {
-    // @ts-expect-error — getObject 반환 타입 unknown
     const obj = canvas.getObject(props.id) as
       | (FabricObject & { data?: { kind?: string } })
       | undefined
