@@ -41,6 +41,15 @@ export type { LoadingOverlayProps } from './LoadingOverlay.js'
 export { Tooltip, TooltipProvider } from './Tooltip.js'
 export type { TooltipProps } from './Tooltip.js'
 
+export { Tabs, TabsList, TabsTrigger, TabsContent } from './Tabs.js'
+export type { TabsListProps, TabsTriggerProps, TabsContentProps } from './Tabs.js'
+
+export { Slider } from './Slider.js'
+export type { SliderProps } from './Slider.js'
+
+export { ColorPicker, DEFAULT_PALETTE } from './ColorPicker.js'
+export type { ColorPickerProps, ColorEntry } from './ColorPicker.js'
+
 export {
   DropdownMenu,
   DropdownMenuTrigger,
