@@ -39,7 +39,8 @@ export function useStoryCanvas(
     // 인스턴스 생성
     const canvas = new StoryCanvas({ format, container, backgroundColor: '#ffffff' })
     const layerTree = new LayerTree({ canvas })
-    const history = new History({ capacity: 200 })
+    // H4: capacity 미지정 → History 내부에서 모바일/데스크톱 자동 분기
+    const history = new History()
 
     // transform 자동 push
     const detachAutoPush = attachAutoPush({ history, canvas, layerTree })

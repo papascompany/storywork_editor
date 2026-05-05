@@ -10,7 +10,7 @@ import type { History } from '@storywork/editor-history'
 import type { LayerNodeJson, LayerTree } from '@storywork/editor-layers'
 import type { PageJsonV1 } from '@storywork/schema/editor'
 import { FabricImage, Rect } from 'fabric'
-import { useCallback, useRef, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 
 import {
   AUTOSAVE_STORAGE_KEY,
@@ -20,6 +20,7 @@ import {
 } from '../../lib/editor/seed'
 
 import { EditorCanvas } from './EditorCanvas'
+import { EditorContext } from './EditorContext'
 import { ExportMenu } from './ExportMenu'
 import { useAutosave } from './hooks/useAutosave'
 import { useHistory } from './hooks/useHistory'
@@ -43,34 +44,80 @@ import { TopBar } from './TopBar'
  *   [LayerPanel                      ]
  *
  * 모바일(md 이하): TopBar + Canvas 만 — 다른 패널은 M1-07 에서 BottomSheet
+ *
+ * H5: canvas / layerTree / history 인스턴스는 useRef 로 보유.
+ * React state 에 넣으면 fabric 내부 상태 변경마다 리렌더가 발생하고
+ * React StrictMode 이중 마운트 시 이중 dispose 위험이 있다.
+ * 자식 컴포넌트로는 EditorContext + readyTick 으로 필요한 시점에만 전달한다.
+ *
+ * H8: window.unhandledrejection 글로벌 핸들러를 /editor 진입 시점에만 활성화.
  */
 export function EditorShell() {
   const containerRef = useRef<HTMLDivElement>(null)
 
-  // ── 에디터 인스턴스 ───────────────────────────────────
-  const [canvas, setCanvas] = useState<StoryCanvas | null>(null)
-  const [layerTree, setLayerTree] = useState<LayerTree | null>(null)
-  const [history, setHistory] = useState<History | null>(null)
+  // ── H5: 인스턴스는 ref 로 유지 (리렌더 트리거 X) ────────────────
+  const canvasRef = useRef<StoryCanvas | null>(null)
+  const layerTreeRef = useRef<LayerTree | null>(null)
+  const historyRef = useRef<History | null>(null)
+
+  /**
+   * H5: 인스턴스 준비 완료 신호. 숫자 자체는 의미 없고 바뀌면 자식이 리렌더된다.
+   * canvas 인스턴스 자체를 state 에 넣는 대신 이 숫자를 올린다.
+   */
+  const [readyTick, setReadyTick] = useState(0)
 
   const onReady = useCallback((refs: EditorRefs) => {
     if (!refs.canvas || !refs.layerTree || !refs.history) return
-    setCanvas(refs.canvas)
-    setLayerTree(refs.layerTree)
-    setHistory(refs.history)
+    canvasRef.current = refs.canvas
+    layerTreeRef.current = refs.layerTree
+    historyRef.current = refs.history
     // 로컬 저장 데이터 복원 시도
     restoreFromLocalStorage(refs.canvas, refs.layerTree)
+    // 자식에게 준비 완료 알림 (tick 증가 → 리렌더)
+    setReadyTick((t) => t + 1)
   }, [])
 
   useStoryCanvas(containerRef, DEFAULT_FORMAT, onReady)
 
   // ── 도구/선택/히스토리/자동저장 ──────────────────────
   const [activeTool, setActiveTool] = useState<ToolId>('select')
-  const { selectedIds, props: selectionProps, updateProps, clearSelection } = useSelection(canvas)
-  const { canUndo, canRedo, undo, redo } = useHistory(history)
-  const { saveStatus } = useAutosave(canvas, layerTree, history)
+
+  // H5: ref.current 를 직접 훅에 전달 — 인스턴스 동일성 보장
+  const {
+    selectedIds,
+    props: selectionProps,
+    updateProps,
+    clearSelection,
+  } = useSelection(canvasRef.current)
+  const { canUndo, canRedo, undo, redo } = useHistory(historyRef.current)
+  const { saveStatus } = useAutosave(canvasRef.current, layerTreeRef.current, historyRef.current)
+
+  // ── H6: body[data-route="editor"] 설정 (/editor 전용 CSS 트리거) ──
+  useEffect(() => {
+    document.body.dataset.route = 'editor'
+    return () => {
+      delete document.body.dataset.route
+    }
+  }, [])
+
+  // ── H8: unhandledrejection 글로벌 핸들러 (/editor 전용) ──────────
+  useEffect(() => {
+    const onReject = (e: PromiseRejectionEvent): void => {
+      console.error('[unhandled]', e.reason)
+      // M9 에서 Sentry 연결 예정. 현재는 콘솔만.
+      // e.preventDefault() 로 React 트리 freeze 방지
+      e.preventDefault()
+    }
+    window.addEventListener('unhandledrejection', onReject)
+    return () => {
+      window.removeEventListener('unhandledrejection', onReject)
+    }
+  }, [])
 
   // ── 포즈 추가 ─────────────────────────────────────────
   const handleAddPose = useCallback(async () => {
+    const canvas = canvasRef.current
+    const history = historyRef.current
     if (!canvas || !history) return
 
     try {
@@ -102,10 +149,13 @@ export function EditorShell() {
     }
 
     setActiveTool('select')
-  }, [canvas, history])
+  }, [])
 
   // ── 배경 추가 ─────────────────────────────────────────
   const handleAddBackground = useCallback(() => {
+    const canvas = canvasRef.current
+    const history = historyRef.current
+    const layerTree = layerTreeRef.current
     if (!canvas || !history) return
 
     const widthPx = canvas.mmToPx(DEFAULT_FORMAT.widthMm)
@@ -136,51 +186,65 @@ export function EditorShell() {
     }
 
     setActiveTool('select')
-  }, [canvas, history, layerTree])
+  }, [])
+
+  // ── Context 값 (메모이즈 없음 — readyTick 변경 시 자연스럽게 새 객체) ──
+  const ctxValue = {
+    canvas: canvasRef.current,
+    layerTree: layerTreeRef.current,
+    history: historyRef.current,
+    readyTick,
+  }
 
   return (
-    <div
-      className="flex h-dvh flex-col overflow-hidden bg-[var(--color-surface)]"
-      role="application"
-      aria-label="StoryWork 편집기"
-    >
-      {/* TopBar */}
-      <TopBar
-        fileName="제목 없음"
-        saveStatus={saveStatus}
-        canUndo={canUndo}
-        canRedo={canRedo}
-        onUndo={undo}
-        onRedo={redo}
-        exportMenu={<ExportMenu canvas={canvas} layerTree={layerTree} />}
-      />
-
-      {/* 중앙 영역: ToolPalette | Canvas | Inspector */}
-      <div className="flex flex-1 overflow-hidden">
-        {/* ToolPalette (데스크톱 only) */}
-        <ToolPalette
-          activeTool={activeTool}
-          onToolChange={setActiveTool}
-          onAddPose={handleAddPose}
-          onAddBackground={handleAddBackground}
+    <EditorContext.Provider value={ctxValue}>
+      <div
+        className="flex h-dvh flex-col overflow-hidden bg-[var(--color-surface)]"
+        role="application"
+        aria-label="StoryWork 편집기"
+      >
+        {/* TopBar */}
+        <TopBar
+          fileName="제목 없음"
+          saveStatus={saveStatus}
+          canUndo={canUndo}
+          canRedo={canRedo}
+          onUndo={undo}
+          onRedo={redo}
+          exportMenu={<ExportMenu canvas={canvasRef.current} layerTree={layerTreeRef.current} />}
         />
 
-        {/* Canvas */}
-        <EditorCanvas
-          containerRef={containerRef}
-          canvas={canvas}
-          history={history}
+        {/* 중앙 영역: ToolPalette | Canvas | Inspector */}
+        <div className="flex flex-1 overflow-hidden">
+          {/* ToolPalette (데스크톱 only) */}
+          <ToolPalette
+            activeTool={activeTool}
+            onToolChange={setActiveTool}
+            onAddPose={handleAddPose}
+            onAddBackground={handleAddBackground}
+          />
+
+          {/* Canvas */}
+          <EditorCanvas
+            containerRef={containerRef}
+            canvas={canvasRef.current}
+            history={historyRef.current}
+            selectedIds={selectedIds}
+            onClearSelection={clearSelection}
+          />
+
+          {/* Inspector (데스크톱 only) */}
+          <Inspector props={selectionProps} onUpdate={updateProps} />
+        </div>
+
+        {/* LayerPanel (데스크톱/태블릿) */}
+        <LayerPanel
+          layerTree={layerTreeRef.current}
+          canvas={canvasRef.current}
           selectedIds={selectedIds}
-          onClearSelection={clearSelection}
         />
-
-        {/* Inspector (데스크톱 only) */}
-        <Inspector props={selectionProps} onUpdate={updateProps} />
       </div>
-
-      {/* LayerPanel (데스크톱/태블릿) */}
-      <LayerPanel layerTree={layerTree} canvas={canvas} selectedIds={selectedIds} />
-    </div>
+    </EditorContext.Provider>
   )
 }
 
