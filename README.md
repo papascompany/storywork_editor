@@ -43,29 +43,39 @@ pnpm i
 pnpm dev   # web + admin 동시 부팅
 ```
 
-## DB 연동
+## DB 연동 (Supabase Cloud)
+
+본 프로젝트는 **Supabase Cloud** 를 1차로 사용합니다 (로컬 Docker 불필요).
 
 ```bash
-# 1. 환경 변수 설정
-cp .env.example .env.local
-# .env.local 에서 DATABASE_URL, SUPABASE_* 값 채우기
+# 1. 환경 변수 (이미 생성되어 있음, .env.local — gitignore 됨)
+#    Supabase 대시보드 → Settings → Database 에서 DB 비밀번호 확인 후
+#    DATABASE_URL / DIRECT_URL 의 [YOUR-DB-PASSWORD] 자리에 입력
 
-# 2. Prisma client 생성 (Docker 불필요)
+# 2. Prisma client 생성
 pnpm db:generate
 
-# 3. DB 마이그레이션 (Docker + supabase start 필요 — Phase A)
-pnpm db:migrate:dev
-
-# 4. Supabase 로컬 스택 시작 (Docker 필요 — Phase A)
-pnpm supabase:start
+# 3. 마이그레이션 적용 (이미 적용 완료)
+supabase db push --linked
 ```
 
-> Phase A (Docker 준비 후) 에서 진행할 것:
->
-> - `docker desktop` 실행 후 `pnpm supabase:start`
-> - Supabase studio: http://localhost:54323
-> - `pnpm db:migrate:dev` 로 `supabase/migrations/20260426000000_init.sql` 적용
-> - `supabase start` 출력의 `anon key` / `service_role key` 를 `.env.local` 에 기입
+### Cloud 프로젝트 정보
+
+- **Project ref**: `wjpyeqckuxyfeytuzgon`
+- **URL**: https://wjpyeqckuxyfeytuzgon.supabase.co
+- **Studio**: https://supabase.com/dashboard/project/wjpyeqckuxyfeytuzgon
+- **Region**: Northeast Asia (Seoul)
+- **Plan**: Free
+
+### 로컬 개발 (선택)
+
+Docker (OrbStack) 가 설치된 경우 로컬 스택도 사용 가능:
+
+```bash
+pnpm supabase:start   # 11개 컨테이너 부팅 (Studio: http://localhost:54323)
+supabase db reset --no-seed   # 마이그레이션 재적용
+pnpm supabase:stop
+```
 
 ## 🛠 도구 협업
 

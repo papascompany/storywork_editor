@@ -101,7 +101,9 @@
 - [ ] [FOLLOWUP-06] ESLint no-raw-color 커스텀 룰 — 직접 hex 사용 자동 감지 — @architect
 - [ ] [FOLLOWUP-07] Storybook visual regression (Chromatic 또는 Playwright snapshot) — M9 안정화에서 — @qa-tester
 - [ ] [FOLLOWUP-08] `packages/shared-schema/package.json` 에 `"type": "module"` 추가 — node 의 ESM/CJS 추론 경고 제거 — @architect
-- [ ] [FOLLOWUP-09] pgvector `search_path` — 마이그레이션 SQL 에 `SET search_path = public, extensions;` 추가 (현재 vector 타입 접근에 이슈 발생 시) — @architect
+- [x] [FOLLOWUP-09] pgvector `search_path` — 마이그레이션 SQL 에 `SET search_path = public, extensions;` 추가 ✅ 2026-05-05 (커밋 f008321) — Cloud 전환 시 실제 발생, 즉시 해결
+- [ ] [FOLLOWUP-10] GitHub Actions Node 20 → Node 24 업그레이드 (`actions/checkout@v5`, `actions/setup-node@v5`, `pnpm/action-setup@v5`) — 2026-09-16 까지 — @architect
+- [ ] [FOLLOWUP-11] DB 비밀번호 입력 — `.env.local` 의 `DATABASE_URL`/`DIRECT_URL` 의 `[YOUR-DB-PASSWORD]` 자리. Supabase 대시보드 → Settings → Database → Connection string 에서 확인 또는 Reset DB Password — 사용자 액션
 
 ## M10+ (Parking)
 
