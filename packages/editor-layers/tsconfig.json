@@ -1,8 +1,20 @@
 {
   "extends": "../../tsconfig.base.json",
   "compilerOptions": {
-    "tsBuildInfoFile": ".tsbuildinfo"
+    "tsBuildInfoFile": ".tsbuildinfo",
+    "moduleResolution": "Bundler",
+    "module": "ESNext",
+    "target": "ES2022",
+    "lib": ["ES2022", "DOM", "DOM.Iterable"],
+    "verbatimModuleSyntax": false,
+    "esModuleInterop": true,
+    "paths": {
+      "@storywork/editor-core": ["../editor-core/src/index.ts"],
+      "@storywork/schema": ["../shared-schema/src/index.ts"],
+      "@storywork/schema/editor": ["../shared-schema/src/editor/v1.ts"],
+      "@storywork/utils": ["../shared-utils/src/index.ts"]
+    }
   },
-  "include": ["src/**/*.ts"],
-  "exclude": ["node_modules", "dist", "__tests__"]
+  "include": ["src/**/*.ts", "__tests__/**/*.ts"],
+  "exclude": ["node_modules", "dist"]
 }

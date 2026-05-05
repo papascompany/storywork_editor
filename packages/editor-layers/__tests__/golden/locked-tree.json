@@ -1,0 +1,43 @@
+[
+  {
+    "v": 1,
+    "id": "layer-bg-001",
+    "kind": "background",
+    "locked": true,
+    "name": "배경 (잠금)"
+  },
+  {
+    "v": 1,
+    "id": "group-locked-001",
+    "kind": "group",
+    "locked": true,
+    "name": "잠긴 그룹",
+    "children": [
+      {
+        "v": 1,
+        "id": "layer-pose-001",
+        "kind": "pose",
+        "locked": true
+      },
+      {
+        "v": 1,
+        "id": "layer-prop-001",
+        "kind": "prop",
+        "locked": true
+      }
+    ]
+  },
+  {
+    "v": 1,
+    "id": "layer-pose-002",
+    "kind": "pose",
+    "hidden": true,
+    "name": "숨김 포즈"
+  },
+  {
+    "v": 1,
+    "id": "layer-bubble-001",
+    "kind": "speech-bubble",
+    "name": "말풍선 (정상)"
+  }
+]

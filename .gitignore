@@ -76,3 +76,4 @@ supabase/.temp
 
 # macOS Finder 가 만드는 중복 (예: foo 2.tsx)
 **/* 2.*
+.vercel

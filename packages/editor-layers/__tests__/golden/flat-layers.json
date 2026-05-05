@@ -1,0 +1,29 @@
+[
+  {
+    "v": 1,
+    "id": "layer-bg-001",
+    "kind": "background"
+  },
+  {
+    "v": 1,
+    "id": "layer-pose-001",
+    "kind": "pose"
+  },
+  {
+    "v": 1,
+    "id": "layer-prop-001",
+    "kind": "prop"
+  },
+  {
+    "v": 1,
+    "id": "layer-bubble-001",
+    "kind": "speech-bubble",
+    "name": "주인공 대사"
+  },
+  {
+    "v": 1,
+    "id": "layer-deco-001",
+    "kind": "decoration",
+    "locked": true
+  }
+]

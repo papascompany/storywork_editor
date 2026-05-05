@@ -1,0 +1,46 @@
+[
+  {
+    "v": 1,
+    "id": "layer-bg-001",
+    "kind": "background"
+  },
+  {
+    "v": 1,
+    "id": "group-outer-001",
+    "kind": "group",
+    "name": "장면 그룹",
+    "children": [
+      {
+        "v": 1,
+        "id": "group-inner-001",
+        "kind": "group",
+        "name": "캐릭터 묶음",
+        "children": [
+          {
+            "v": 1,
+            "id": "layer-pose-001",
+            "kind": "pose",
+            "name": "주인공"
+          },
+          {
+            "v": 1,
+            "id": "layer-pose-002",
+            "kind": "pose",
+            "name": "조연"
+          }
+        ]
+      },
+      {
+        "v": 1,
+        "id": "layer-prop-001",
+        "kind": "prop",
+        "name": "소품"
+      }
+    ]
+  },
+  {
+    "v": 1,
+    "id": "layer-bubble-001",
+    "kind": "speech-bubble"
+  }
+]

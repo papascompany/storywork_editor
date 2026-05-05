@@ -1,14 +1,15 @@
 {
   "name": "@storywork/editor-layers",
   "version": "0.0.0",
+  "type": "module",
   "description": "레이어 트리, z-order, 그룹/잠금/숨김",
   "main": "./dist/index.js",
-  "module": "./dist/index.mjs",
+  "module": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
-      "import": "./dist/index.mjs",
+      "import": "./dist/index.js",
       "require": "./dist/index.js"
     }
   },
@@ -26,9 +27,14 @@
   "dependencies": {
     "@storywork/editor-core": "workspace:*",
     "@storywork/schema": "workspace:*",
-    "@storywork/utils": "workspace:*"
+    "@storywork/utils": "workspace:*",
+    "mitt": "^3.0.1",
+    "nanoid": "^5.1.11"
   },
   "devDependencies": {
+    "@types/node": "^22.0.0",
+    "canvas": "^3.0.0",
+    "fabric": "^6.9.1",
     "typescript": "^5.6.0",
     "vitest": "^2.0.0"
   }
