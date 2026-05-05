@@ -30,3 +30,7 @@ export type { EditorBus } from './events/bus.js'
 
 // 장치 유틸
 export { isCoarsePointer } from './utils/coarse.js'
+
+// 이벤트 좌표 헬퍼 (STORIGE_GUIDE BUG-014)
+export { getEventPoint } from './utils/event-point.js'
+export type { EventPoint } from './utils/event-point.js'
