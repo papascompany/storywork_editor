@@ -6,7 +6,12 @@
     "declaration": true,
     "declarationMap": true,
     "sourceMap": true,
-    "jsx": "react-jsx"
+    "jsx": "react-jsx",
+    "tsBuildInfoFile": "./dist/.tsbuildinfo",
+    "composite": false,
+    "rootDir": "./src",
+    "paths": {},
+    "skipLibCheck": true
   },
   "include": ["src/**/*.ts", "src/**/*.tsx"],
   "exclude": ["node_modules", "dist", "__tests__"]
