@@ -135,6 +135,11 @@ if (typeof window !== 'undefined' && typeof window.matchMedia === 'undefined') {
   })
 }
 
+// scrollIntoView mock — jsdom 미지원 환경 대응
+if (typeof Element !== 'undefined' && !Element.prototype.scrollIntoView) {
+  Element.prototype.scrollIntoView = () => {}
+}
+
 // localStorage mock — jsdom 에서 localStorage 지원
 if (typeof globalThis.localStorage === 'undefined') {
   const store: Record<string, string> = {}

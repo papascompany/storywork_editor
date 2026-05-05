@@ -30,7 +30,17 @@ import {
   showToast,
   useTheme,
 } from '@storywork/ui'
-import { Eye, Moon, MoreVertical, Redo2, Share2, Sparkles, Sun, Undo2 } from 'lucide-react'
+import {
+  Eye,
+  HelpCircle,
+  Moon,
+  MoreVertical,
+  Redo2,
+  Share2,
+  Sparkles,
+  Sun,
+  Undo2,
+} from 'lucide-react'
 import React, { useState } from 'react'
 
 import { AutoSaveIndicator } from './AutoSaveIndicator'
@@ -66,6 +76,10 @@ export type TopBarProps = {
   totalPages?: number
   onPrevPage?: () => void
   onNextPage?: () => void
+
+  // M1-08f: 명령 팔레트 / 단축키 모달 트리거
+  onOpenCommandPalette?: () => void
+  onOpenShortcuts?: () => void
 }
 
 // ─── TopBar ──────────────────────────────────────────────────────────────────
@@ -87,6 +101,8 @@ export function TopBar({
   totalPages = 1,
   onPrevPage,
   onNextPage,
+  onOpenCommandPalette,
+  onOpenShortcuts,
 }: TopBarProps) {
   const { resolvedTheme, toggleTheme } = useTheme()
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
@@ -181,8 +197,25 @@ export function TopBar({
         </Button>
       </Tooltip>
 
-      {/* ⌘K 힌트 (데스크톱만) — M1-08f 명령 팔레트 연결 예정 */}
-      <kbd
+      {/* 도움 버튼 (?) */}
+      <Tooltip content="단축키 도움말 (?)" side="bottom">
+        <Button
+          variant="ghost"
+          size="icon"
+          onClick={onOpenShortcuts}
+          aria-label="단축키 도움말"
+          className="size-9 [&_svg]:size-4"
+          data-testid="topbar-shortcuts"
+        >
+          <HelpCircle aria-hidden="true" />
+        </Button>
+      </Tooltip>
+
+      {/* ⌘K 힌트 버튼 (데스크톱만) — 클릭 시 CommandPalette 열기 */}
+      <button
+        type="button"
+        onClick={onOpenCommandPalette}
+        aria-label="명령 팔레트 열기 (⌘K)"
         className={cn(
           'hidden xl:inline-flex items-center',
           'rounded-[var(--radius-sm)]',
@@ -191,13 +224,14 @@ export function TopBar({
           'px-1.5 py-0.5',
           'text-[10px] font-mono leading-none',
           'text-[var(--color-text-muted)]',
-          'cursor-default select-none',
+          'cursor-pointer select-none',
+          'hover:bg-[var(--color-surface)] hover:text-[var(--color-text)]',
+          'transition-colors',
+          'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-brand-500)]',
         )}
-        aria-label="명령 팔레트 단축키 (M1-08f에서 활성화)"
-        title="명령 팔레트 (준비 중)"
       >
         ⌘K
-      </kbd>
+      </button>
     </>
   )
 

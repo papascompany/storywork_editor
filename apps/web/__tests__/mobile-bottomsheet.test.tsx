@@ -1,5 +1,5 @@
 /**
- * mobile-bottomsheet.test.tsx — M1-07 모바일 BottomSheet 단위 테스트
+ * mobile-bottomsheet.test.tsx — M1-07/M1-08f 모바일 BottomSheet 단위 테스트
  *
  * 검증 항목:
  * 1. 시트 마운트 (peek 초기 상태)
@@ -11,6 +11,12 @@
  * 7. 탭 클릭 시 peek → half 자동 전환
  * 8. closeRequest 증가 → peek 복귀
  * 9. 아이템 없을 때 빈 상태 안내 (Inspector)
+ *
+ * M1-08f 추가:
+ * 13. 도구 탭에서 11종 그리드 노출
+ * 14. 도구 클릭(배경) → 패널 전환
+ * 15. "뒤로" 버튼 → 그리드로 복귀
+ * 16. peek 상태에서 줌 컨트롤 노출
  *
  * ResizeObserver 가드 (C-1) 테스트:
  * 10. 1px 미만 변동 → setDimensions 호출 안 함
@@ -408,5 +414,99 @@ describe('getEventPoint (C-2)', () => {
     const pt = getEventPoint(e)
     expect(pt.x).toBe(30)
     expect(pt.y).toBe(60)
+  })
+})
+
+// ── M1-08f: 11종 도구 그리드 + 패널 전환 ────────────────────────────────────
+
+describe('MobileBottomSheet — M1-08f 11종 도구 그리드', () => {
+  it('13. 도구 탭에서 11종 도구 그리드 노출', async () => {
+    render(<MobileBottomSheet {...defaultProps} />)
+    const handle = screen.getByRole('button', { name: /패널 열기|패널 닫기/ })
+    await act(async () => {
+      fireEvent.click(handle)
+    }) // half 열기
+
+    // "도구" 탭은 기본 활성
+    const toolsTabpanel = document.getElementById('mobile-sheet-panel-tools')
+    expect(toolsTabpanel).toBeInTheDocument()
+
+    // 11종 그리드 아이템
+    const toolButtons = screen
+      .getAllByRole('button', {
+        // aria-pressed 속성 있는 도구 버튼
+      })
+      .filter((btn) => btn.hasAttribute('aria-pressed'))
+
+    // 11개 도구 버튼이 있어야 함 (select + 10개)
+    expect(toolButtons.length).toBe(11)
+  })
+
+  it('13b. 도구 이름 확인 — 선택/배경/도형/AI 포함', async () => {
+    render(<MobileBottomSheet {...defaultProps} />)
+    const handle = screen.getByRole('button', { name: /패널 열기|패널 닫기/ })
+    await act(async () => {
+      fireEvent.click(handle)
+    })
+    expect(screen.getByLabelText(/선택/)).toBeInTheDocument()
+    expect(screen.getByLabelText(/배경/)).toBeInTheDocument()
+    expect(screen.getByLabelText(/도형/)).toBeInTheDocument()
+    expect(screen.getByLabelText(/AI/)).toBeInTheDocument()
+  })
+
+  it('14. 배경 도구 클릭 → 배경 패널 + 뒤로 버튼 노출', async () => {
+    render(<MobileBottomSheet {...defaultProps} activeTool="background" />)
+    const handle = screen.getByRole('button', { name: /패널 열기|패널 닫기/ })
+    await act(async () => {
+      fireEvent.click(handle)
+    })
+
+    // activeTool='background' → ACTIVE_TOOLS 에 포함 → 패널 직접 노출
+    // "도구 목록" 뒤로 버튼이 있어야 함
+    expect(screen.getByTestId('mobile-tools-back')).toBeInTheDocument()
+  })
+
+  it('15. 뒤로 버튼 클릭 → tapTool("select") 호출로 그리드로 복귀', async () => {
+    // activeTool=background → 패널 노출 상태
+    // 뒤로 버튼 클릭 시 tapTool('select') 호출 → zustand store가 select로 변경
+    // useToolStore 는 실제 zustand 를 사용하므로 import 후 초기화
+    const { useToolStore } = await import('../components/editor/store/useToolStore')
+
+    // 테스트 전 store 초기화
+    useToolStore.setState({ active: 'background', sidebarOpen: true })
+
+    const { rerender } = render(<MobileBottomSheet {...defaultProps} activeTool="background" />)
+    const handle = screen.getByRole('button', { name: /패널 열기|패널 닫기/ })
+    await act(async () => {
+      fireEvent.click(handle)
+    })
+
+    // 뒤로 버튼 노출 확인
+    expect(screen.getByTestId('mobile-tools-back')).toBeInTheDocument()
+
+    // 뒤로 버튼 클릭
+    await act(async () => {
+      fireEvent.click(screen.getByTestId('mobile-tools-back'))
+    })
+
+    // store 상태 확인 — select 로 변경됨
+    expect(useToolStore.getState().active).toBe('select')
+
+    // activeTool을 select로 업데이트하여 그리드 노출 확인
+    await act(async () => {
+      rerender(<MobileBottomSheet {...defaultProps} activeTool="select" />)
+    })
+
+    // 뒤로 버튼이 사라지고 그리드 표시
+    expect(screen.queryByTestId('mobile-tools-back')).not.toBeInTheDocument()
+  })
+
+  it('16. peek 상태에서 줌 컨트롤 노출', () => {
+    render(<MobileBottomSheet {...defaultProps} />)
+    const sheet = screen.getByTestId('mobile-bottom-sheet')
+    // peek 상태 확인
+    expect(sheet.dataset.snap).toBe('peek')
+    // 줌 그룹 있어야 함
+    expect(screen.getByRole('group', { name: '줌 컨트롤' })).toBeInTheDocument()
   })
 })

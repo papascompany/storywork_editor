@@ -6,6 +6,7 @@
 //
 // M1-08c: ToolBar 11종 + FeatureSidebar 슬라이드 패널 통합
 // M1-08d: RightPanel (ControlBar + LayerPanel 통합) 교체
+// M1-08f: CommandPalette(⌘K) + KeyboardShortcutsModal(?) + 글로벌 단축키
 //
 // 레이아웃 (데스크톱 md+):
 //   [TopBar                                          ]
@@ -13,19 +14,19 @@
 //
 // 모바일(md 미만): TopBar + Canvas + MobileBottomSheet
 //
-// H5: canvas / layerTree / history 인스턴스는 useRef 로 보유.
-// React state 에 넣으면 fabric 내부 상태 변경마다 리렌더가 발생하고
-// React StrictMode 이중 마운트 시 이중 dispose 위험이 있다.
-// 자식 컴포넌트로는 EditorContext + readyTick 으로 필요한 시점에만 전달한다.
-//
-// H8: window.unhandledrejection 글로벌 핸들러를 /editor 진입 시점에만 활성화.
+// 글로벌 keydown 핸들러:
+//   ⌘K          → CommandPalette 열기
+//   ?           → KeyboardShortcutsModal 열기 (input focus 아닐 때)
+//   V/T/P/B/Q/W/D/S/X/U/I → setActiveTool
+//   storywork:open-shortcuts  → Custom Event (builtins.ts 에서 dispatch)
+//   storywork:toggle-theme    → Custom Event
 // ─────────────────────────────────────────────
 
 import type { StoryCanvas } from '@storywork/editor-core'
 import { AddObjectCommand } from '@storywork/editor-history'
 import type { LayerNodeJson, LayerTree } from '@storywork/editor-layers'
 import type { PageJsonV1 } from '@storywork/schema/editor'
-import { useToast } from '@storywork/ui'
+import { useTheme, useToast } from '@storywork/ui'
 import { FabricImage, Rect } from 'fabric'
 import { useCallback, useEffect, useRef, useState } from 'react'
 
@@ -36,6 +37,7 @@ import {
   SEED_POSE_PNG_DATA_URL,
 } from '../../lib/editor/seed'
 
+import { CommandPalette } from './CommandPalette'
 import { EditorCanvas } from './EditorCanvas'
 import { EditorContext } from './EditorContext'
 import { FeatureSidebar } from './FeatureSidebar'
@@ -45,20 +47,33 @@ import { useHistory } from './hooks/useHistory'
 import { useSelection } from './hooks/useSelection'
 import type { EditorRefs } from './hooks/useStoryCanvas'
 import { useStoryCanvas } from './hooks/useStoryCanvas'
+import { KeyboardShortcutsModal } from './KeyboardShortcutsModal'
 import { MobileBottomSheet } from './MobileBottomSheet'
 import { RightPanel } from './RightPanel'
-import { useToolStore } from './store/useToolStore'
+import { type ToolId, useToolStore } from './store/useToolStore'
 import { ToolBar } from './ToolBar'
 import { TopBar } from './TopBar'
 import type { HistoryRef as History } from './types'
 
-// MobileBottomSheet 는 useToolStore 의 ToolId 를 직접 사용 (M1-08d: ToolPalette 제거)
-type LegacyToolId = 'select' | 'pose' | 'background'
+// 도구 단축키 맵
+const TOOL_SHORTCUTS: Record<string, ToolId> = {
+  v: 'select',
+  t: 'template',
+  p: 'pose',
+  b: 'background',
+  q: 'bubble',
+  w: 'wordfx',
+  d: 'decoration',
+  s: 'shape',
+  x: 'text',
+  u: 'upload',
+  i: 'ai',
+}
 
 /**
  * EditorShell
  *
- * M1-08c: ToolBar + FeatureSidebar 통합
+ * M1-08f: CommandPalette + KeyboardShortcutsModal + 글로벌 단축키 통합
  */
 export function EditorShell() {
   const containerRef = useRef<HTMLDivElement>(null)
@@ -82,12 +97,17 @@ export function EditorShell() {
   useStoryCanvas(containerRef, DEFAULT_FORMAT, onReady)
 
   // ── 도구/선택/히스토리/자동저장 ──────────────────────
-  const { show: showToast } = useToast()
+  const { show: showToastFn } = useToast()
+  const { toggleTheme } = useTheme()
 
-  // useToolStore 에서 활성 도구 동기화 (MobileBottomSheet 레거시 호환용)
-  const { active: activeTool } = useToolStore()
-  const legacyActiveTool: LegacyToolId =
-    activeTool === 'pose' || activeTool === 'background' ? activeTool : 'select'
+  const showToast = useCallback(
+    (msg: string, variant?: 'success' | 'warning' | 'error' | 'info') => {
+      showToastFn({ message: msg, variant: variant ?? 'info' })
+    },
+    [showToastFn],
+  )
+
+  const { active: activeTool, setActive: setActiveTool, tapTool } = useToolStore()
 
   const [mobileCloseRequest, setMobileCloseRequest] = useState(0)
 
@@ -109,6 +129,10 @@ export function EditorShell() {
   )
   const [fileName, setFileName] = useState('제목 없음')
 
+  // ── 모달 상태 ────────────────────────────────────────────────────
+  const [commandPaletteOpen, setCommandPaletteOpen] = useState(false)
+  const [shortcutsModalOpen, setShortcutsModalOpen] = useState(false)
+
   // ── H6: body[data-route="editor"] ──────────────────────────────
   useEffect(() => {
     document.body.dataset.route = 'editor'
@@ -128,6 +152,126 @@ export function EditorShell() {
       window.removeEventListener('unhandledrejection', onReject)
     }
   }, [])
+
+  // ── 글로벌 키보드 단축키 ─────────────────────────────────────
+  useEffect(() => {
+    const onKeyDown = (e: KeyboardEvent) => {
+      const target = e.target as HTMLElement
+      const isInput =
+        target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.isContentEditable
+
+      // ⌘K / Ctrl+K → CommandPalette
+      if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+        e.preventDefault()
+        setCommandPaletteOpen((v) => !v)
+        return
+      }
+
+      // 모달이 열려있으면 하위 단축키 무시
+      if (commandPaletteOpen || shortcutsModalOpen) return
+
+      // ? → ShortcutsModal (input 아닐 때)
+      if (!isInput && e.key === '?') {
+        e.preventDefault()
+        setShortcutsModalOpen(true)
+        return
+      }
+
+      // input focus 중이면 나머지 무시
+      if (isInput) return
+
+      // 도구 단축키 (V/T/P/B/Q/W/D/S/X/U/I)
+      const toolId = TOOL_SHORTCUTS[e.key.toLowerCase()]
+      if (toolId && !e.metaKey && !e.ctrlKey && !e.altKey) {
+        e.preventDefault()
+        tapTool(toolId)
+        return
+      }
+
+      // ⌘Z / Ctrl+Z → Undo
+      if ((e.metaKey || e.ctrlKey) && e.key === 'z' && !e.shiftKey) {
+        e.preventDefault()
+        if (historyRef.current?.canUndo()) historyRef.current.undo()
+        return
+      }
+
+      // ⌘⇧Z / Ctrl+⇧Z → Redo
+      if ((e.metaKey || e.ctrlKey) && e.key === 'z' && e.shiftKey) {
+        e.preventDefault()
+        if (historyRef.current?.canRedo()) historyRef.current.redo()
+        return
+      }
+
+      // Del → 선택 객체 삭제
+      if (e.key === 'Delete' || e.key === 'Backspace') {
+        const fc = canvasRef.current?._fabricCanvas
+        if (fc) {
+          const active = fc.getActiveObject()
+          if (active) {
+            e.preventDefault()
+            fc.remove(active)
+            fc.discardActiveObject()
+            fc.requestRenderAll()
+          }
+        }
+        return
+      }
+
+      // 레이어 순서 단축키
+      const fc = canvasRef.current?._fabricCanvas
+      if (fc) {
+        const obj = fc.getActiveObject()
+        if (obj && !e.metaKey && !e.ctrlKey) {
+          if (e.key === ']') {
+            fc.bringObjectForward(obj)
+            fc.requestRenderAll()
+          }
+          if (e.key === '[') {
+            fc.sendObjectBackwards(obj)
+            fc.requestRenderAll()
+          }
+        }
+        if (obj && (e.metaKey || e.ctrlKey)) {
+          if (e.key === ']') {
+            e.preventDefault()
+            fc.bringObjectToFront(obj)
+            fc.requestRenderAll()
+          }
+          if (e.key === '[') {
+            e.preventDefault()
+            fc.sendObjectToBack(obj)
+            fc.requestRenderAll()
+          }
+        }
+      }
+
+      // F → Fit to viewport
+      if (e.key === 'f' || e.key === 'F') {
+        const cv = canvasRef.current
+        if (cv) {
+          void import('./Footer').then(({ fitToViewport }) => {
+            fitToViewport(cv)
+          })
+        }
+      }
+    }
+
+    window.addEventListener('keydown', onKeyDown)
+    return () => window.removeEventListener('keydown', onKeyDown)
+  }, [commandPaletteOpen, shortcutsModalOpen, tapTool])
+
+  // ── Custom Events (builtins.ts 에서 dispatch) ────────────────
+  useEffect(() => {
+    const onOpenShortcuts = () => setShortcutsModalOpen(true)
+    const onToggleTheme = () => toggleTheme()
+
+    window.addEventListener('storywork:open-shortcuts', onOpenShortcuts)
+    window.addEventListener('storywork:toggle-theme', onToggleTheme)
+    return () => {
+      window.removeEventListener('storywork:open-shortcuts', onOpenShortcuts)
+      window.removeEventListener('storywork:toggle-theme', onToggleTheme)
+    }
+  }, [toggleTheme])
 
   // ── 포즈 추가 (MobileBottomSheet 레거시 핸들러) ───────────────
   const handleAddPose = useCallback(async () => {
@@ -160,7 +304,7 @@ export function EditorShell() {
       history.push(cmd)
     } catch (err) {
       console.error('[EditorShell] 포즈 추가 실패:', err)
-      showToast({ message: '포즈 추가에 실패했습니다.', variant: 'error' })
+      showToast('포즈 추가에 실패했습니다.', 'error')
     }
 
     requestMobileClose()
@@ -202,6 +346,15 @@ export function EditorShell() {
     requestMobileClose()
   }, [requestMobileClose])
 
+  // ── CommandContext ─────────────────────────────────────────────
+  const commandCtx = {
+    canvas: canvasRef.current,
+    layerTree: layerTreeRef.current,
+    history: historyRef.current,
+    setActiveTool,
+    showToast,
+  }
+
   // ── Context 값 ────────────────────────────────────────────────
   const ctxValue = {
     canvas: canvasRef.current,
@@ -230,11 +383,13 @@ export function EditorShell() {
           onRedo={redo}
           canvas={canvasRef.current}
           layerTree={layerTreeRef.current}
+          onOpenCommandPalette={() => setCommandPaletteOpen(true)}
+          onOpenShortcuts={() => setShortcutsModalOpen(true)}
         />
 
         {/* 중앙 영역: ToolBar | FeatureSidebar | Canvas | RightPanel */}
         <div className="flex flex-1 overflow-hidden">
-          {/* ToolBar — 데스크톱(md+) only. 모바일은 MobileBottomSheet 의 Tools 탭 */}
+          {/* ToolBar — 데스크톱(md+) only */}
           <ToolBar />
 
           {/* FeatureSidebar — 데스크톱(md+) only */}
@@ -271,7 +426,7 @@ export function EditorShell() {
         {/* MobileBottomSheet — 모바일(md 미만) only */}
         <div className="md:hidden">
           <MobileBottomSheet
-            activeTool={legacyActiveTool}
+            activeTool={activeTool}
             onToolChange={() => {
               /* ToolStore 에서 관리 */
             }}
@@ -286,6 +441,19 @@ export function EditorShell() {
             closeRequest={mobileCloseRequest}
           />
         </div>
+
+        {/* CommandPalette — 글로벌 */}
+        <CommandPalette
+          open={commandPaletteOpen}
+          onClose={() => setCommandPaletteOpen(false)}
+          ctx={commandCtx}
+        />
+
+        {/* KeyboardShortcutsModal — 글로벌 */}
+        <KeyboardShortcutsModal
+          open={shortcutsModalOpen}
+          onClose={() => setShortcutsModalOpen(false)}
+        />
       </div>
     </EditorContext.Provider>
   )
