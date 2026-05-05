@@ -10,6 +10,55 @@ import { RemoveObjectCommand } from '@storywork/editor-history'
 import { cn } from '@storywork/ui'
 import { useCallback, useEffect, useRef } from 'react'
 
+// ─────────────────────────────────────────────
+// C-1: ResizeObserver 3중 가드 (BUG-013 — iOS 크래시 차단)
+// 1) RAF 배칭: 한 프레임에 ResizeObserver 알림이 복수여도 resize() 는 1번만
+// 2) 1px 미만 변동 무시: 폰트 스케일링/서브픽셀 정밀도에 의한 루프 차단
+// 3) 동일 크기 setDimensions skip: fabric 불필요 재렌더 방지
+// ─────────────────────────────────────────────
+function useResizeObserverGuard(
+  wrapperRef: React.RefObject<HTMLDivElement | null>,
+  canvas: StoryCanvas | null,
+) {
+  useEffect(() => {
+    const el = wrapperRef.current
+    if (!el || !canvas) return
+
+    let lastW = 0
+    let lastH = 0
+    let rafId: number | null = null
+
+    const resize = () => {
+      rafId = null
+      // 가드 3: fabric 내부 컨텍스트가 살아있는지 확인
+      if (!canvas || !(canvas._fabricCanvas as { getContext?: () => unknown }).getContext?.())
+        return
+      const w = el.offsetWidth
+      const h = el.offsetHeight
+      // 가드 1: 1px 미만 변동 무시
+      if (Math.abs(w - lastW) < 1 && Math.abs(h - lastH) < 1) return
+      // 가드 2: 이미 동일 크기면 setDimensions skip
+      if (canvas._fabricCanvas.getWidth() === w && canvas._fabricCanvas.getHeight() === h) return
+      lastW = w
+      lastH = h
+      canvas._fabricCanvas.setDimensions({ width: w, height: h })
+      canvas._fabricCanvas.requestRenderAll()
+    }
+
+    const ro = new ResizeObserver(() => {
+      // RAF 배칭: 이미 예약된 RAF 가 있으면 중복 등록 안 함
+      if (rafId !== null) return
+      rafId = requestAnimationFrame(resize)
+    })
+    ro.observe(el)
+
+    return () => {
+      ro.disconnect()
+      if (rafId !== null) cancelAnimationFrame(rafId)
+    }
+  }, [canvas, wrapperRef])
+}
+
 type EditorCanvasProps = {
   /** StoryCanvas 의 마운트 포인트 */
   containerRef: React.RefObject<HTMLDivElement | null>
@@ -38,6 +87,9 @@ export function EditorCanvas({
   onClearSelection,
 }: EditorCanvasProps) {
   const wrapRef = useRef<HTMLDivElement>(null)
+
+  // C-1: ResizeObserver 3중 가드 적용
+  useResizeObserverGuard(wrapRef, canvas)
 
   const handleKeyDown = useCallback(
     (e: React.KeyboardEvent<HTMLDivElement>) => {
