@@ -147,16 +147,20 @@ describe('ToolBar — 도구 클릭 동작', () => {
     expect(useToolStore.getState().sidebarOpen).toBe(false)
   })
 
-  it('비활성 도구(포즈) 클릭 → showToast 호출', async () => {
+  it('포즈 도구 클릭 → sidebarOpen=true (M2-05 에서 활성화)', async () => {
     const { ToolBar } = await import('../components/editor/ToolBar')
+    const { useToolStore } = await import('../components/editor/store/useToolStore')
 
     render(<ToolBar />)
 
     const btn = screen.getByRole('button', { name: '포즈' })
     fireEvent.click(btn)
 
-    expect(mockShowToast).toHaveBeenCalledTimes(1)
-    expect(mockShowToast).toHaveBeenCalledWith(expect.stringContaining('M2'), 'info')
+    // M2-05: pose 가 ACTIVE_TOOLS 에 추가됨 → Toast 아닌 사이드바 열림
+    expect(useToolStore.getState().active).toBe('pose')
+    expect(useToolStore.getState().sidebarOpen).toBe(true)
+    // Toast 는 호출되지 않음
+    expect(mockShowToast).not.toHaveBeenCalled()
   })
 
   it('select 클릭 → active=select, sidebarOpen=false', async () => {
@@ -191,8 +195,9 @@ describe('ToolBar — 단축키', () => {
     expect(useToolStore.getState().sidebarOpen).toBe(true)
   })
 
-  it('단축키 P → Toast (비활성)', async () => {
+  it('단축키 P → pose 활성화 (M2-05 에서 활성화)', async () => {
     const { ToolBar } = await import('../components/editor/ToolBar')
+    const { useToolStore } = await import('../components/editor/store/useToolStore')
 
     render(<ToolBar />)
 
@@ -200,7 +205,9 @@ describe('ToolBar — 단축키', () => {
       fireEvent.keyDown(window, { key: 'p' })
     })
 
-    expect(mockShowToast).toHaveBeenCalledWith(expect.stringContaining('M2'), 'info')
+    // M2-05: pose 가 ACTIVE_TOOLS 에 포함됨 → 사이드바 열림
+    expect(useToolStore.getState().active).toBe('pose')
+    expect(useToolStore.getState().sidebarOpen).toBe(true)
   })
 
   it('단축키 V → select, 사이드바 닫힘', async () => {
@@ -296,15 +303,23 @@ describe('FeatureSidebar — 슬라이드 동작', () => {
     expect(useToolStore.getState().sidebarOpen).toBe(false)
   })
 
-  it('pose 패널: M2 안내 텍스트 노출', async () => {
+  it('pose 패널: M2-05 활성화 — 포즈 검색창 노출', async () => {
     const { FeatureSidebar } = await import('../components/editor/FeatureSidebar')
     const { useToolStore } = await import('../components/editor/store/useToolStore')
 
     useToolStore.setState({ active: 'pose', sidebarOpen: true })
 
+    // fetch mock (PosePanel 내부 usePoseSearch 가 마운트 시 호출)
+    global.fetch = vi.fn().mockResolvedValue({
+      ok: true,
+      status: 200,
+      json: async () => ({ results: [], total: 0, took_ms: 5 }),
+    }) as unknown as typeof fetch
+
     render(<FeatureSidebar canvas={null} history={null} layerTree={null} />)
 
-    expect(screen.getByText(/M2 에서 1,260개/)).toBeDefined()
+    // M2-05: PosePanel 활성화 — 검색창 노출
+    expect(screen.getByRole('searchbox', { name: /포즈 검색/ })).toBeInTheDocument()
   })
 })
 

@@ -140,6 +140,15 @@ if (typeof Element !== 'undefined' && !Element.prototype.scrollIntoView) {
   Element.prototype.scrollIntoView = () => {}
 }
 
+// IntersectionObserver mock — jsdom 미지원 환경 대응
+if (typeof globalThis.IntersectionObserver === 'undefined') {
+  globalThis.IntersectionObserver = class MockIntersectionObserver {
+    observe() {}
+    unobserve() {}
+    disconnect() {}
+  } as unknown as typeof IntersectionObserver
+}
+
 // localStorage mock — jsdom 에서 localStorage 지원
 if (typeof globalThis.localStorage === 'undefined') {
   const store: Record<string, string> = {}

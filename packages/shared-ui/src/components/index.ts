@@ -50,6 +50,12 @@ export type { SliderProps } from './Slider.js'
 export { ColorPicker, DEFAULT_PALETTE } from './ColorPicker.js'
 export type { ColorPickerProps, ColorEntry } from './ColorPicker.js'
 
+export { Checkbox } from './Checkbox.js'
+export type { CheckboxProps } from './Checkbox.js'
+
+export { ToggleGroup, ToggleGroupItem } from './ToggleGroup.js'
+export type { ToggleGroupProps, ToggleGroupItemProps } from './ToggleGroup.js'
+
 export {
   DropdownMenu,
   DropdownMenuTrigger,

@@ -17,11 +17,15 @@ import type { LayerTree } from '@storywork/editor-layers'
 import { cn } from '@storywork/ui'
 import { useCallback, useEffect, useRef } from 'react'
 
+import type { ResourceSummary } from '../../app/api/_lib/search-types'
+
 import { CanvasContextMenu } from './CanvasContextMenu'
 import { EmptyCanvasHint } from './EmptyCanvasHint'
 import { FloatingObjectBar } from './FloatingObjectBar'
 import { applyZoom, fitToViewport, getZoomPercent, MAX_ZOOM, MIN_ZOOM } from './Footer'
 import { useImageDrop } from './hooks/useImageDrop'
+import type { PoseDragPayload } from './panels/PoseGridItem'
+import { POSE_DRAG_MIME } from './panels/PoseGridItem'
 import { useToolStore } from './store/useToolStore'
 import type { HistoryRef as History } from './types'
 
@@ -83,6 +87,8 @@ type EditorCanvasProps = {
   /** 선택된 객체 ids (키보드 삭제에 사용) */
   selectedIds: string[]
   onClearSelection: () => void
+  /** PosePanel 드래그앤드롭 → 캔버스 추가 콜백 */
+  onAddPoseToCanvas?: (pose: ResourceSummary) => void
 }
 
 /**
@@ -108,6 +114,7 @@ export function EditorCanvas({
   layerTree,
   selectedIds,
   onClearSelection,
+  onAddPoseToCanvas,
 }: EditorCanvasProps) {
   const wrapRef = useRef<HTMLDivElement>(null)
 
@@ -120,11 +127,52 @@ export function EditorCanvas({
     setActive('pose')
   }, [setActive])
 
-  // 이미지 드래그앤드롭
-  const { isDragging, onDragEnter, onDragLeave, onDragOver, onDrop } = useImageDrop({
+  // 이미지 드래그앤드롭 (파일 기반)
+  const {
+    isDragging,
+    onDragEnter,
+    onDragLeave,
+    onDragOver,
+    onDrop: onImageDrop,
+  } = useImageDrop({
     canvas,
     history,
   })
+
+  // 포즈 패널 드래그앤드롭 처리 (application/x-storywork-pose MIME)
+  const onDrop = useCallback(
+    (e: React.DragEvent) => {
+      const poseJson = e.dataTransfer.getData(POSE_DRAG_MIME)
+      if (poseJson) {
+        e.preventDefault()
+        e.stopPropagation()
+        try {
+          const payload = JSON.parse(poseJson) as PoseDragPayload
+          // ResourceSummary 형태로 변환하여 addPoseFromResource 호출
+          const pose: ResourceSummary = {
+            id: payload.id,
+            slug: payload.slug,
+            thumbUrl: payload.fileUrl,
+            width: null,
+            height: null,
+            masterDpi: payload.masterDpi,
+            lowDpi: payload.lowDpi,
+            meta: payload.meta,
+            tags: [],
+          }
+          if (onAddPoseToCanvas) {
+            onAddPoseToCanvas(pose)
+          }
+        } catch {
+          console.error('[EditorCanvas] 포즈 드롭 파싱 실패')
+        }
+        return
+      }
+      // 일반 이미지 파일 드롭
+      onImageDrop(e)
+    },
+    [onImageDrop, onAddPoseToCanvas],
+  )
 
   const handleKeyDown = useCallback(
     (e: React.KeyboardEvent<HTMLDivElement>) => {

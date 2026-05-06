@@ -30,6 +30,7 @@ import { useTheme, useToast } from '@storywork/ui'
 import { FabricImage, Rect } from 'fabric'
 import { useCallback, useEffect, useRef, useState } from 'react'
 
+import type { ResourceSummary } from '../../app/api/_lib/search-types'
 import {
   AUTOSAVE_STORAGE_KEY,
   DEFAULT_FORMAT,
@@ -273,6 +274,78 @@ export function EditorShell() {
     }
   }, [toggleTheme])
 
+  // ── 포즈 리소스 → 캔버스 추가 (PosePanel + 드래그앤드롭 공통) ─────────────
+  const addPoseFromResource = useCallback(
+    async (pose: ResourceSummary) => {
+      const canvas = canvasRef.current
+      const history = historyRef.current
+      if (!canvas || !history) {
+        showToast('편집기가 준비되지 않았습니다.', 'error')
+        return
+      }
+
+      // thumbUrl 을 우선 사용 (실제 고해상도 fileUrl 은 M3+에서 연결)
+      const url = pose.thumbUrl
+      if (!url) {
+        showToast('포즈 이미지를 불러올 수 없습니다.', 'error')
+        return
+      }
+
+      try {
+        const img = await FabricImage.fromURL(url, { crossOrigin: 'anonymous' })
+
+        const canvasWidthPx = canvas.mmToPx(DEFAULT_FORMAT.widthMm)
+        const canvasHeightPx = canvas.mmToPx(DEFAULT_FORMAT.heightMm)
+
+        // ADR-0011a: lowDpi 자산은 페이지 한 변의 1/2 이하로 자동 크기 조정
+        const maxFraction = pose.lowDpi ? 0.5 : 0.65
+        const naturalW = img.width ?? 1
+        const naturalH = img.height ?? 1
+        const maxW = canvasWidthPx * maxFraction
+        const maxH = canvasHeightPx * maxFraction
+        const scale = Math.min(1, maxW / naturalW, maxH / naturalH)
+        const scaledW = naturalW * scale
+        const scaledH = naturalH * scale
+
+        img.set({
+          left: (canvasWidthPx - scaledW) / 2,
+          top: (canvasHeightPx - scaledH) / 3,
+          scaleX: scale,
+          scaleY: scale,
+        })
+
+        const cmd = new AddObjectCommand({
+          canvas,
+          fabricObj: img,
+          dataOverrides: {
+            kind: 'pose',
+            resourceId: pose.id,
+          } as any,
+        })
+        history.push(cmd)
+
+        // 추가 후 자동 선택
+        const addedId = cmd.assignedId
+        if (addedId) {
+          const fabricObj = canvas.getObject(addedId)
+          if (fabricObj) {
+            canvas._fabricCanvas.setActiveObject(fabricObj)
+            canvas._fabricCanvas.requestRenderAll()
+          }
+        }
+
+        showToast(
+          `${pose.slug.replace(/-/g, ' ')} 추가됨${pose.lowDpi ? ' (저해상도 — 작게 배치됨)' : ''}`,
+          'success',
+        )
+      } catch (err) {
+        console.error('[EditorShell] 포즈 추가 실패:', err)
+        showToast('포즈 추가에 실패했습니다.', 'error')
+      }
+    },
+    [showToast],
+  )
+
   // ── 포즈 추가 (MobileBottomSheet 레거시 핸들러) ───────────────
   const handleAddPose = useCallback(async () => {
     const canvas = canvasRef.current
@@ -397,6 +470,7 @@ export function EditorShell() {
             canvas={canvasRef.current}
             history={historyRef.current as any}
             layerTree={layerTreeRef.current}
+            onAddPoseToCanvas={addPoseFromResource}
           />
 
           {/* Canvas — 모바일/데스크톱 공통 */}
@@ -408,6 +482,7 @@ export function EditorShell() {
               layerTree={layerTreeRef.current}
               selectedIds={selectedIds}
               onClearSelection={clearSelection}
+              onAddPoseToCanvas={addPoseFromResource}
             />
             {/* Footer — 데스크톱(md+) 전용 */}
             <Footer canvas={canvasRef.current} />

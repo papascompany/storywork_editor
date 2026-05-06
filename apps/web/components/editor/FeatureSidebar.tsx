@@ -37,6 +37,8 @@ import {
 } from 'lucide-react'
 import React, { useCallback, useEffect } from 'react'
 
+import type { ResourceSummary } from '../../app/api/_lib/search-types'
+
 import { BackgroundPanel } from './panels/BackgroundPanel'
 import { PlaceholderPanel } from './panels/PlaceholderPanel'
 import { PosePanel } from './panels/PosePanel'
@@ -68,7 +70,7 @@ const TOOL_META: Record<ToolId, ToolMeta> = {
   pose: {
     label: '포즈',
     Icon: UserSquare2,
-    milestone: 'M2',
+    // M2-05 에서 활성화 — milestone 제거
   },
   background: {
     label: '배경',
@@ -158,16 +160,23 @@ type PanelContentProps = {
   canvas: StoryCanvas | null
   history: History | null
   layerTree: LayerTree | null
+  onAddPoseToCanvas?: (pose: ResourceSummary) => void
 }
 
-function PanelContent({ tool, canvas, history, layerTree }: PanelContentProps) {
+function PanelContent({ tool, canvas, history, layerTree, onAddPoseToCanvas }: PanelContentProps) {
   switch (tool) {
     case 'background':
       return <BackgroundPanel canvas={canvas} history={history as any} layerTree={layerTree} />
     case 'shape':
       return <ShapePanel canvas={canvas} history={history as any} />
     case 'pose':
-      return <PosePanel />
+      return (
+        <PosePanel
+          canvas={canvas}
+          history={history as any}
+          onAddToCanvas={onAddPoseToCanvas ?? (() => {})}
+        />
+      )
     default: {
       const meta = TOOL_META[tool]
       return (
@@ -188,9 +197,15 @@ export type FeatureSidebarProps = {
   canvas: StoryCanvas | null
   history: History | null
   layerTree: LayerTree | null
+  onAddPoseToCanvas?: (pose: ResourceSummary) => void
 }
 
-export function FeatureSidebar({ canvas, history, layerTree }: FeatureSidebarProps) {
+export function FeatureSidebar({
+  canvas,
+  history,
+  layerTree,
+  onAddPoseToCanvas,
+}: FeatureSidebarProps) {
   const { active, sidebarOpen, setSidebarOpen } = useToolStore()
 
   // select 도구는 패널 없음 → 항상 닫힘
@@ -218,7 +233,7 @@ export function FeatureSidebar({ canvas, history, layerTree }: FeatureSidebarPro
 
   const meta = TOOL_META[active as ToolId]
   const PanelIcon = meta.Icon
-  const isSearchEnabled = active === 'background' || active === 'shape'
+  const isSearchEnabled = active === 'background' || active === 'shape' || active === 'pose'
 
   return (
     <aside
@@ -290,17 +305,18 @@ export function FeatureSidebar({ canvas, history, layerTree }: FeatureSidebarPro
           </button>
         </div>
 
-        {/* 검색창 */}
-        <PanelSearch label={meta.label} disabled={!isSearchEnabled} />
+        {/* 검색창 — pose 패널은 자체 검색창을 가지므로 숨김 */}
+        {active !== 'pose' && <PanelSearch label={meta.label} disabled={!isSearchEnabled} />}
 
         {/* 패널 콘텐츠 */}
-        <div className="flex-1 overflow-y-auto overscroll-contain">
+        <div className="flex-1 overflow-hidden">
           {isVisible && (
             <PanelContent
               tool={active}
               canvas={canvas}
               history={history as any}
               layerTree={layerTree}
+              onAddPoseToCanvas={onAddPoseToCanvas}
             />
           )}
         </div>
