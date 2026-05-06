@@ -26,6 +26,7 @@ import pc from 'picocolors'
 
 import { tagFromFilename } from '../packages/ai-recommend/src/filename-tagger.js'
 
+import { embedText, embedImage, combine, toVectorLiteral } from './lib/embed.js'
 import { estimateKeypoints } from './lib/estimate-keypoints.js'
 // slugWithSuffix 는 단순 함수이므로 직접 정의
 function slugWithSuffix(slug: string, index: number): string {
@@ -192,6 +193,8 @@ interface IngestOptions {
   noKeypoints: boolean
   /** confidence 임계값 (ADR-0011b 기본 0.5) */
   reviewThreshold: number
+  /** 임베딩 생성 스킵 여부 (--no-embed 플래그 / 테스트용) */
+  noEmbed: boolean
 }
 
 type FailureReason =
@@ -655,6 +658,28 @@ async function processAsset(
     }
   }
 
+  // (k) 임베딩 생성 (--no-embed 미설정 시)
+  let embeddingTextVec: string | null = null
+  let embeddingVisVec: string | null = null
+  let embeddingCombinedVec: string | null = null
+
+  if (!opts.noEmbed) {
+    try {
+      const tagText = `${tags.join(' ')} ${poseMeta.action} ${poseMeta.view} ${poseMeta.bodyType}`
+      const textVec = await embedText(tagText)
+      const visVec = await embedImage(thumbBuf)
+      const combinedVec = combine(textVec, visVec)
+      embeddingTextVec = toVectorLiteral(textVec)
+      embeddingVisVec = toVectorLiteral(visVec)
+      embeddingCombinedVec = toVectorLiteral(combinedVec)
+    } catch (err) {
+      // 임베딩 실패는 치명적이지 않음 — 경고 후 null 유지
+      console.warn(
+        pc.yellow(`  [embed-warn] 임베딩 생성 실패 (${path.basename(filePath)}): ${String(err)}`),
+      )
+    }
+  }
+
   // (j) DB upsert
   try {
     await prisma.resource.upsert({
@@ -702,6 +727,31 @@ async function processAsset(
       status: 'fail',
       reason: 'db-error',
       detail: `DB upsert 실패: ${String(err)}`,
+    }
+  }
+
+  // (k-2) vector 컬럼 raw SQL UPDATE (Prisma Unsupported 타입 — $executeRaw 필요)
+  if (embeddingCombinedVec || embeddingTextVec || embeddingVisVec) {
+    try {
+      // DB에서 id 조회
+      const rec = await prisma.resource.findUnique({ where: { slug }, select: { id: true } })
+      if (rec) {
+        await prisma.$executeRaw`
+          UPDATE "Resource"
+          SET
+            "embedding"     = ${embeddingCombinedVec}::vector,
+            "embeddingText" = ${embeddingTextVec}::vector,
+            "embeddingVis"  = ${embeddingVisVec}::vector
+          WHERE "id" = ${rec.id}
+        `
+      }
+    } catch (err) {
+      // vector 업데이트 실패도 비치명적 — 경고만
+      console.warn(
+        pc.yellow(
+          `  [embed-warn] vector 컬럼 업데이트 실패 (${path.basename(filePath)}): ${String(err)}`,
+        ),
+      )
     }
   }
 
@@ -781,6 +831,7 @@ async function main(): Promise<void> {
     .option('--reupload', '이미 적재된 자산 강제 재업로드', false)
     .option('--concurrency <n>', '동시 처리 수 (default: 5)', (v) => parseInt(v, 10), 5)
     .option('--no-keypoints', '키포인트 자동 추정 스킵 (속도 비교/디버그용)')
+    .option('--no-embed', '임베딩 생성 스킵 (테스트/디버그용)')
     .option(
       '--review-threshold <n>',
       'confidence 임계값 (기본 0.5 / ADR-0011b)',
@@ -797,6 +848,7 @@ async function main(): Promise<void> {
     reupload: boolean
     concurrency: number
     keypoints: boolean // commander: --no-keypoints → keypoints=false
+    embed: boolean // commander: --no-embed → embed=false
     reviewThreshold: number
   }
 
@@ -808,6 +860,7 @@ async function main(): Promise<void> {
     reupload: rawOpts.reupload,
     concurrency: rawOpts.concurrency,
     noKeypoints: rawOpts.keypoints === false,
+    noEmbed: rawOpts.embed === false,
     reviewThreshold: rawOpts.reviewThreshold,
   }
 
