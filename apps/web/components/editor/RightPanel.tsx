@@ -130,8 +130,7 @@ export function RightPanel({ props, canvas, layerTree, history, selectedIds }: R
             canvas={canvas}
             layerTree={layerTree}
             history={history as any}
-          />{' '}
-          // eslint-disable-line @typescript-eslint/no-explicit-any
+          />
         </TabsContent>
 
         {/* Layers 탭 */}
