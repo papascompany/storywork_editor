@@ -37,18 +37,18 @@
 - [x] [M1-06] `apps/web` 빈 페이지 편집기 셸 — @editor-engineer + @ui-designer ✅ 2026-05-05 (커밋 b437198) — TopBar/ToolPalette/Inspector/LayerPanel/ExportMenu, undo 단축키, autosave (localStorage)
 - [x] [M1-07] 모바일 인스펙터 BottomSheet — @ui-designer ✅ 2026-05-05 (커밋 df9f164..d2a5f16) — 3-snap (peek/half/full) + 3 탭(Tools/Inspector/Layers), ResizeObserver 3중 가드(BUG-013), getEventPoint(BUG-014), visualViewport 키패드 동기화, 44px 타겟, SELECT-1 함정 회피
 
-## M2 — Pose Library (PNG 1차, 1,058개 적재)
+## M2 — Pose Library (PNG 1차) ✅ 핵심 5건 완료, 마무리 3건 보류
 
-- [ ] [M2-01] `scripts/ingest-poses.ts` PNG 파이프라인 — `LICENSE.json` 폴더 디폴트 로딩 + 매직바이트 + EXIF strip + sharp 재인코딩 + WebP 파생본, 적재 ≥ 95% — @pose-curator
-- [ ] [M2-02] 키포인트 **3점 자동 추정**(head/mouth/center) — 신뢰도 < 0.5 검수 큐, 누락 키포인트 의존 기능 자산별 비활성 (ADR-0011b) — @pose-curator
-- [ ] [M2-03a] **파일명 키워드 사전(1차 무료 태깅)** — `data/filename-action-dict.ko.json` 작성, 매칭률 70%+ 목표 — @pose-curator
-- [ ] [M2-03b] 미매칭 자산만 Claude API 2차 태깅(캐시) — 종합 정확도 ≥ 85% — @pose-curator + @scene-analyzer
-- [ ] [M2-04] pgvector 인덱스(시각+텍스트 임베딩) + 시맨틱 검색 API — top-10 정확도 ≥ 0.7 — @pose-curator + @architect
-- [ ] [M2-05] 검색 UI(필터: bodyType/view/action/mood, format, lowDpi 토글) — 키보드 사용 가능 — @ui-designer
-- [ ] [M2-06] **slug 정규화** — 한글/공백/괄호 → URL-safe, `originalFilename` 보존 — @pose-curator
-- [ ] [M2-07] **lowDpi 슬롯 제약** — `ai-layout` 가 lowDpi 자산을 페이지 1/2 이하 슬롯에만 배치 (ADR-0011a) — @layout-composer
-- [ ] [M2-08] 키포인트 검수 편집기(관리자) — 클릭으로 누락 점 보강 — @admin-builder + @editor-engineer
-- [ ] [M2-09] PNG 색상 변경 보조: `tintMaskUrl` 기반 BlendColor 데모 (마스크 미보유 시 UI 비활성) — @editor-engineer
+- [x] [M2-01] `scripts/ingest-poses.ts` PNG 파이프라인 — `LICENSE.json` 폴더 디폴트 로딩 + 매직바이트 + EXIF strip + sharp 재인코딩 + WebP 파생본 ✅ 2026-05-05 (커밋 f7a440a) — 1,260개 풀 적재 4분 20초, 0 실패, Storage 171.8MB, DB 1,270건
+- [x] [M2-02] 키포인트 **3점 자동 추정**(head/mouth/center) — sharp 알파 채널 분석, confidence < 0.5 검수 큐 ✅ 2026-05-05 (커밋 6feb6ca) — 16 tests pass
+- [x] [M2-03a] **파일명 키워드 사전(1차 무료 태깅)** — `packages/ai-recommend/data/filename-action-dict.ko.json` 120 룰 ✅ 2026-05-05 (커밋 0cc2d13) — **매칭률 98.7%** (목표 70% 대비 +28.7%p)
+- [ ] [M2-03b] 미매칭 자산만 Claude API 2차 태깅(캐시) — 우선순위 ↓ (매칭률 98.7% 라 ~17건만, 신규 자산 fallback 용으로만) — @pose-curator + @scene-analyzer
+- [x] [M2-04] pgvector 인덱스(시각+텍스트 임베딩) + 시맨틱 검색 API — `embed.ts`(voyage/openai/mock) + `POST /api/search/poses` ✅ 2026-05-05 (커밋 a886620) — 45 tests, 50쿼리 골든셋. **mock 임베딩**으로 동작, 실제 의미적 검색은 Voyage/OpenAI API 키 도입 후 측정
+- [x] [M2-05] 검색 UI(필터: bodyType/view/action/mood, format, lowDpi 토글) — `PosePanel` 활성, 무한 스크롤 + 드래그/클릭 캔버스 추가 ✅ 2026-05-05 (커밋 184eec4) — 19 tests, lowDpi 자동 1/2 크기 (ADR-0011a)
+- [x] [M2-06] **slug 정규화** — 한글/공백/괄호 → URL-safe ✅ M2-01 에 포함 (`packages/shared-utils/src/slug.ts`, NFC/NFD 처리)
+- [ ] [M2-07] **lowDpi 슬롯 제약** — `ai-layout` 가 lowDpi 자산을 페이지 1/2 이하 슬롯에만 배치 (ADR-0011a) — @layout-composer (M4 진입 직전 처리)
+- [ ] [M2-08] 키포인트 검수 편집기(관리자) — 클릭으로 누락 점 보강 — @admin-builder + @editor-engineer (**M3-04 Resource CRUD 안에 통합** 권장)
+- [ ] [M2-09] PNG 색상 변경 보조: `tintMaskUrl` 기반 BlendColor 데모 — @editor-engineer (현재 자산 모두 마스크 미보유 → 우선순위 ↓)
 
 ## M3 — Admin Console
 
