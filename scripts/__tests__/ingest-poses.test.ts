@@ -273,3 +273,136 @@ describe('parseFolderLicense', () => {
     expect(() => parseFolderLicense({ v: 1, scope: 'folder-default' })).toThrow()
   })
 })
+
+// ─────────────────────────────────────────────
+// 7. M2-02 — estimateKeypoints 통합 (ingest-poses 관점)
+// ─────────────────────────────────────────────
+
+describe('estimateKeypoints (M2-02 — ingest-poses 연동)', () => {
+  it('정상 PNG 에서 3점 추정 결과가 head/mouth/center 를 포함한다', async () => {
+    const { estimateKeypoints } = await import('../lib/estimate-keypoints.js')
+    const sharp = (await import('sharp')).default
+
+    // 사람 형태 근사: 세로형 세로 사각형 (30×80 / 100×100 캔버스)
+    const transparent = await sharp({
+      create: { width: 100, height: 100, channels: 4, background: { r: 0, g: 0, b: 0, alpha: 0 } },
+    })
+      .png()
+      .toBuffer()
+    const figure = await sharp({
+      create: {
+        width: 30,
+        height: 80,
+        channels: 4,
+        background: { r: 100, g: 100, b: 100, alpha: 1 },
+      },
+    })
+      .png()
+      .toBuffer()
+    const buf = await sharp(transparent)
+      .composite([{ input: figure, left: 35, top: 10 }])
+      .png()
+      .toBuffer()
+
+    const result = await estimateKeypoints(buf)
+    expect(result).not.toBeNull()
+    if (result === null) return
+    expect(result.head.name).toBe('head')
+    expect(result.mouth.name).toBe('mouth')
+    expect(result.center.name).toBe('center')
+    expect(result.head.inferred).toBe(true)
+    expect(result.mouth.inferred).toBe(true)
+    expect(result.center.inferred).toBe(true)
+  })
+
+  it('완전 투명 PNG → estimateKeypoints null → reviewQueued 처리', async () => {
+    const { estimateKeypoints } = await import('../lib/estimate-keypoints.js')
+    const sharp = (await import('sharp')).default
+
+    const transparentBuf = await sharp({
+      create: { width: 100, height: 100, channels: 4, background: { r: 0, g: 0, b: 0, alpha: 0 } },
+    })
+      .png()
+      .toBuffer()
+
+    // estimateKeypoints 가 null 을 반환해야 함
+    const result = await estimateKeypoints(transparentBuf)
+    expect(result).toBeNull()
+
+    // ingest-poses.ts 의 processAsset 에서 null 반환 시 inferredStatus='review' 로 처리됨
+    // (processAsset 은 export 되지 않으므로 직접 테스트 불가 — 위의 동작을 단언)
+  })
+
+  it('confidenceThreshold 옵션으로 임계값 조정 가능', async () => {
+    const { estimateKeypoints } = await import('../lib/estimate-keypoints.js')
+    const sharp = (await import('sharp')).default
+
+    // 세로형 사각형 (정상 케이스)
+    const transparent = await sharp({
+      create: { width: 100, height: 100, channels: 4, background: { r: 0, g: 0, b: 0, alpha: 0 } },
+    })
+      .png()
+      .toBuffer()
+    const figure = await sharp({
+      create: {
+        width: 30,
+        height: 80,
+        channels: 4,
+        background: { r: 100, g: 100, b: 100, alpha: 1 },
+      },
+    })
+      .png()
+      .toBuffer()
+    const buf = await sharp(transparent)
+      .composite([{ input: figure, left: 35, top: 10 }])
+      .png()
+      .toBuffer()
+
+    // 기본 임계값(0.5) 에서는 통과
+    const result1 = await estimateKeypoints(buf, 0.5)
+    expect(result1).not.toBeNull()
+
+    // 매우 높은 임계값(0.99) 에서는 null 반환
+    const result2 = await estimateKeypoints(buf, 0.99)
+    expect(result2).toBeNull()
+  })
+
+  it('모든 추정 좌표는 0..1 범위', async () => {
+    const { estimateKeypoints } = await import('../lib/estimate-keypoints.js')
+    const sharp = (await import('sharp')).default
+
+    const transparent = await sharp({
+      create: { width: 200, height: 200, channels: 4, background: { r: 0, g: 0, b: 0, alpha: 0 } },
+    })
+      .png()
+      .toBuffer()
+    const figure = await sharp({
+      create: {
+        width: 60,
+        height: 160,
+        channels: 4,
+        background: { r: 200, g: 100, b: 100, alpha: 1 },
+      },
+    })
+      .png()
+      .toBuffer()
+    const buf = await sharp(transparent)
+      .composite([{ input: figure, left: 70, top: 20 }])
+      .png()
+      .toBuffer()
+
+    const result = await estimateKeypoints(buf)
+    if (!result) return // 추정 실패시 스킵
+
+    for (const pt of [result.head, result.mouth, result.center]) {
+      expect(pt.x).toBeGreaterThanOrEqual(0)
+      expect(pt.x).toBeLessThanOrEqual(1)
+      expect(pt.y).toBeGreaterThanOrEqual(0)
+      expect(pt.y).toBeLessThanOrEqual(1)
+    }
+    expect(result.bbox.x).toBeGreaterThanOrEqual(0)
+    expect(result.bbox.y).toBeGreaterThanOrEqual(0)
+    expect(result.bbox.x + result.bbox.w).toBeLessThanOrEqual(1)
+    expect(result.bbox.y + result.bbox.h).toBeLessThanOrEqual(1)
+  })
+})

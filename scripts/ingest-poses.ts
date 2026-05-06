@@ -1,11 +1,14 @@
 /* eslint-disable no-console */
 /**
- * M2-01 — PNG 인입 파이프라인
+ * M2-01/M2-02 — PNG 인입 파이프라인
  *
  * 실행 예:
  *   pnpm tsx scripts/ingest-poses.ts --dry-run
  *   pnpm tsx scripts/ingest-poses.ts --limit 5
  *   pnpm tsx scripts/ingest-poses.ts --reupload
+ *   pnpm tsx scripts/ingest-poses.ts --limit 5 --reupload
+ *   pnpm tsx scripts/ingest-poses.ts --no-keypoints          # 키포인트 추정 스킵
+ *   pnpm tsx scripts/ingest-poses.ts --review-threshold 0.6  # confidence 임계값 조정
  */
 
 import fs from 'node:fs'
@@ -20,6 +23,8 @@ import { createClient, type SupabaseClient } from '@supabase/supabase-js'
 import { Command } from 'commander'
 import pLimit from 'p-limit'
 import pc from 'picocolors'
+
+import { estimateKeypoints } from './lib/estimate-keypoints.js'
 // slugWithSuffix 는 단순 함수이므로 직접 정의
 function slugWithSuffix(slug: string, index: number): string {
   return `${slug}-${index}`
@@ -181,6 +186,10 @@ interface IngestOptions {
   src: string
   reupload: boolean
   concurrency: number
+  /** 키포인트 추정 스킵 여부 (--no-keypoints 플래그) */
+  noKeypoints: boolean
+  /** confidence 임계값 (ADR-0011b 기본 0.5) */
+  reviewThreshold: number
 }
 
 type FailureReason =
@@ -204,6 +213,7 @@ interface IngestResult {
   skipped: number
   lowDpi: number
   withSidecar: number
+  reviewQueued: number
   totalBytes: number
   elapsedMs: number
   failures: FailedAsset[]
@@ -447,6 +457,8 @@ interface ProcessResult {
   lowDpi?: boolean
   hasSidecar?: boolean
   bytesUploaded?: number
+  /** true 이면 confidence 낮아 review 큐로 보내진 자산 */
+  reviewQueued?: boolean
 }
 
 async function processAsset(
@@ -586,17 +598,66 @@ async function processAsset(
   const tags = [...new Set([...categoryTags, ...tagResult.tags])]
   if (lowDpi) tags.push('lowDpi')
 
-  // (i) placeholder PoseMeta (키포인트는 M2-02 에서 보강)
+  // (i) 키포인트 추정 (M2-02 — ADR-0011b)
+  // 사이드카 보유 시 사이드카 키포인트 우선, 없으면 알파 채널 분석으로 3점 자동 추정
+  let kpResult: Awaited<ReturnType<typeof estimateKeypoints>> = null
+  let inferredStatus: 'draft' | 'review' = 'draft'
+
+  if (hasSidecar && sidecar?.keypoints && sidecar.keypoints.length > 0) {
+    // 사이드카 키포인트 사용 — estimateKeypoints 불필요
+    kpResult = null // 사이드카 경로는 아래 poseMeta 에서 직접 사용
+  } else if (!opts.noKeypoints) {
+    kpResult = await estimateKeypoints(masterBuf, opts.reviewThreshold)
+    if (!kpResult) {
+      // confidence < 0.5 또는 추정 실패 → review 큐
+      inferredStatus = 'review'
+      console.warn(
+        pc.yellow(
+          `  [review-queue] 키포인트 추정 실패 (confidence 낮음): ${path.basename(filePath)}`,
+        ),
+      )
+    }
+  }
+
+  // bbox 와 anchorPoint 결정
+  const inferredBbox = kpResult
+    ? kpResult.bbox
+    : hasSidecar && sidecar?.bbox
+      ? sidecar.bbox
+      : { x: 0, y: 0, w: 1, h: 1 }
+
+  const anchorPoint = {
+    x: inferredBbox.x + inferredBbox.w / 2,
+    y: inferredBbox.y + inferredBbox.h * 0.95,
+  }
+
+  // 키포인트 배열 구성
+  type KpEntry = { name: string; x: number; y: number; weight?: number; inferred?: boolean }
+  let keypoints: KpEntry[]
+
+  if (hasSidecar && sidecar?.keypoints && sidecar.keypoints.length > 0) {
+    keypoints = sidecar.keypoints
+  } else if (kpResult) {
+    keypoints = [kpResult.head, kpResult.mouth, kpResult.center]
+  } else {
+    keypoints = []
+  }
+
   const poseMeta = {
     bodyType: tagResult.bodyType ?? 'unknown',
     view: tagResult.view ?? 'front',
     action: tagResult.action ?? 'unknown',
     mood: tagResult.mood,
-    bbox: { x: 0, y: 0, w: 1, h: 1 },
-    anchorPoint: { x: 0.5, y: 1 },
+    bbox: inferredBbox,
+    anchorPoint,
     flippable: sidecar?.flippable ?? true,
-    keypoints: [] as unknown[],
+    keypoints,
     styleVariants: [] as string[],
+  }
+
+  // keypoints 가 없는 경우 review 큐 (사이드카/추정 모두 실패)
+  if (keypoints.length === 0 && !opts.noKeypoints) {
+    inferredStatus = 'review'
   }
 
   // dry-run 이면 여기까지
@@ -607,6 +668,7 @@ async function processAsset(
       lowDpi,
       hasSidecar,
       bytesUploaded: 0,
+      reviewQueued: inferredStatus === 'review',
     }
   }
 
@@ -686,7 +748,7 @@ async function processAsset(
         tagsBootstrap: tagResult.tags,
         license: license as object,
         licenseSource,
-        status: 'draft',
+        status: inferredStatus,
       },
       update: opts.reupload
         ? {
@@ -702,6 +764,7 @@ async function processAsset(
             tagsBootstrap: tagResult.tags,
             license: license as object,
             licenseSource,
+            status: inferredStatus,
           }
         : {},
     })
@@ -721,6 +784,7 @@ async function processAsset(
     lowDpi,
     hasSidecar,
     bytesUploaded,
+    reviewQueued: inferredStatus === 'review',
   }
 }
 
@@ -735,11 +799,12 @@ function printReport(result: IngestResult, opts: IngestOptions): void {
   if (opts.dryRun) console.log(pc.yellow('  [DRY RUN — 실제 적재 없음]'))
   console.log(divider)
 
-  console.log(`  성공:    ${pc.green(String(result.succeeded))}`)
-  console.log(`  실패:    ${pc.red(String(result.failed))}`)
-  console.log(`  스킵:    ${pc.gray(String(result.skipped))}`)
-  console.log(`  lowDpi:  ${pc.yellow(String(result.lowDpi))} 개`)
-  console.log(`  사이드카: ${result.withSidecar} 개`)
+  console.log(`  성공:       ${pc.green(String(result.succeeded))}`)
+  console.log(`  실패:       ${pc.red(String(result.failed))}`)
+  console.log(`  스킵:       ${pc.gray(String(result.skipped))}`)
+  console.log(`  lowDpi:     ${pc.yellow(String(result.lowDpi))} 개`)
+  console.log(`  사이드카:   ${result.withSidecar} 개`)
+  console.log(`  검수큐(review): ${pc.magenta(String(result.reviewQueued))} 개  ← confidence 낮음`)
 
   const mb = (result.totalBytes / 1024 / 1024).toFixed(1)
   console.log(`  업로드:  ${mb} MB`)
@@ -786,6 +851,13 @@ async function main(): Promise<void> {
     .option('--src <path>', '소스 디렉토리', 'data/poses/raw')
     .option('--reupload', '이미 적재된 자산 강제 재업로드', false)
     .option('--concurrency <n>', '동시 처리 수 (default: 5)', (v) => parseInt(v, 10), 5)
+    .option('--no-keypoints', '키포인트 자동 추정 스킵 (속도 비교/디버그용)')
+    .option(
+      '--review-threshold <n>',
+      'confidence 임계값 (기본 0.5 / ADR-0011b)',
+      (v) => parseFloat(v),
+      0.5,
+    )
     .parse(process.argv)
 
   const rawOpts = program.opts() as {
@@ -795,6 +867,8 @@ async function main(): Promise<void> {
     src: string
     reupload: boolean
     concurrency: number
+    keypoints: boolean // commander: --no-keypoints → keypoints=false
+    reviewThreshold: number
   }
 
   const opts: IngestOptions = {
@@ -804,6 +878,8 @@ async function main(): Promise<void> {
     src: rawOpts.src,
     reupload: rawOpts.reupload,
     concurrency: rawOpts.concurrency,
+    noKeypoints: rawOpts.keypoints === false,
+    reviewThreshold: rawOpts.reviewThreshold,
   }
 
   const srcDir = path.resolve(process.cwd(), opts.src)
@@ -881,6 +957,7 @@ async function main(): Promise<void> {
   let skipped = 0
   let lowDpiCount = 0
   let withSidecar = 0
+  let reviewQueuedCount = 0
   let totalBytes = 0
 
   const startMs = Date.now()
@@ -900,6 +977,7 @@ async function main(): Promise<void> {
         succeeded++
         if (res.lowDpi) lowDpiCount++
         if (res.hasSidecar) withSidecar++
+        if (res.reviewQueued) reviewQueuedCount++
         totalBytes += res.bytesUploaded ?? 0
       } else if (res.status === 'skip') {
         skipped++
@@ -925,6 +1003,7 @@ async function main(): Promise<void> {
     skipped,
     lowDpi: lowDpiCount,
     withSidecar,
+    reviewQueued: reviewQueuedCount,
     totalBytes,
     elapsedMs,
     failures,
