@@ -24,6 +24,8 @@ import { Command } from 'commander'
 import pLimit from 'p-limit'
 import pc from 'picocolors'
 
+import { tagFromFilename } from '../packages/ai-recommend/src/filename-tagger.js'
+
 import { estimateKeypoints } from './lib/estimate-keypoints.js'
 // slugWithSuffix 는 단순 함수이므로 직접 정의
 function slugWithSuffix(slug: string, index: number): string {
@@ -219,14 +221,6 @@ interface IngestResult {
   failures: FailedAsset[]
 }
 
-interface TagBootstrap {
-  action?: string
-  bodyType?: string
-  view?: string
-  mood?: string
-  confidence: number
-}
-
 // ─────────────────────────────────────────────
 // 매직바이트 검증
 // ─────────────────────────────────────────────
@@ -259,76 +253,6 @@ export function calcMasterDpi(w: number, h: number): { masterDpi: number; lowDpi
   const minSide = Math.min(w, h)
   const masterDpi = Math.round((minSide / FORMAT_MAX_MM) * 25.4)
   return { masterDpi, lowDpi: masterDpi < LOW_DPI_THRESHOLD }
-}
-
-// ─────────────────────────────────────────────
-// 파일명 키워드 1차 태깅
-// ─────────────────────────────────────────────
-
-type DictEntry = {
-  action?: string
-  bodyType?: string
-  view?: string
-  mood?: string
-  confidence: number
-}
-
-type ActionDict = {
-  _meta?: unknown
-  keywords: Record<string, DictEntry>
-}
-
-let _actionDict: ActionDict | null = null
-
-function loadActionDict(): ActionDict {
-  if (_actionDict) return _actionDict
-  const dictPath = path.resolve(
-    process.cwd(),
-    'packages/ai-recommend/data/filename-action-dict.ko.json',
-  )
-  if (!fs.existsSync(dictPath)) {
-    _actionDict = { keywords: {} }
-    return _actionDict
-  }
-  _actionDict = JSON.parse(fs.readFileSync(dictPath, 'utf-8')) as ActionDict
-  return _actionDict
-}
-
-export function bootstrapTagsFromFilename(filename: string): TagBootstrap & { tags: string[] } {
-  const dict = loadActionDict()
-  const base = path.basename(filename, path.extname(filename)).toLowerCase()
-
-  let bestMatch: DictEntry | null = null
-  let bestKey = ''
-
-  for (const [kw, entry] of Object.entries(dict.keywords)) {
-    const kwLower = kw.toLowerCase().replace(/_$/, '')
-    if (base.includes(kwLower)) {
-      if (!bestMatch || entry.confidence > bestMatch.confidence) {
-        bestMatch = entry
-        bestKey = kw
-      }
-    }
-  }
-
-  const tags: string[] = []
-  if (!bestMatch) return { confidence: 0, tags }
-
-  if (bestMatch.action) tags.push(bestMatch.action)
-  if (bestMatch.bodyType) tags.push(bestMatch.bodyType)
-  if (bestMatch.view) tags.push(bestMatch.view)
-  if (bestMatch.mood) tags.push(bestMatch.mood)
-
-  void bestKey // used for matching, suppress unused warning
-
-  return {
-    action: bestMatch.action,
-    bodyType: bestMatch.bodyType,
-    view: bestMatch.view,
-    mood: bestMatch.mood,
-    confidence: bestMatch.confidence,
-    tags,
-  }
 }
 
 // ─────────────────────────────────────────────
@@ -593,10 +517,15 @@ async function processAsset(
   slug = slugCandidate
   usedSlugs.add(slug)
 
-  // (h) 1차 태깅
-  const tagResult = bootstrapTagsFromFilename(originalFilename)
+  // (h) 1차 태깅 — M2-03a: filename-tagger 본격 사전 사용
+  const tagResult = tagFromFilename(originalFilename, asset.subfolder ?? undefined)
   const tags = [...new Set([...categoryTags, ...tagResult.tags])]
   if (lowDpi) tags.push('lowDpi')
+
+  // M2-03b hook: Claude API 2차 태깅 진입점
+  // tagResult.matched && tagResult.confidence >= 0.7 이면 API skip
+  // → skipClaudeApi = tagResult.matched && tagResult.confidence >= 0.7
+  // M2-03b 에서 이 조건을 확인해 Claude API 호출 분기
 
   // (i) 키포인트 추정 (M2-02 — ADR-0011b)
   // 사이드카 보유 시 사이드카 키포인트 우선, 없으면 알파 채널 분석으로 3점 자동 추정
@@ -652,7 +581,7 @@ async function processAsset(
     anchorPoint,
     flippable: sidecar?.flippable ?? true,
     keypoints,
-    styleVariants: [] as string[],
+    styleVariants: tagResult.styleVariants,
   }
 
   // keypoints 가 없는 경우 review 큐 (사이드카/추정 모두 실패)

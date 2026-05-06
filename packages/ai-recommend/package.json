@@ -2,6 +2,7 @@
   "name": "@storywork/ai-recommend",
   "version": "0.0.0",
   "description": "포즈/배경/말풍선 추천 (임베딩 + 룰)",
+  "type": "module",
   "main": "./dist/index.js",
   "module": "./dist/index.mjs",
   "types": "./dist/index.d.ts",

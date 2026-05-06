@@ -9,13 +9,9 @@ import path from 'node:path'
 import { describe, it, expect, beforeEach } from 'vitest'
 
 // 테스트 대상 (순수 함수만 직접 임포트)
+import { tagFromFilename } from '../../packages/ai-recommend/src/filename-tagger.js'
 import { slugifyFilename } from '../../packages/shared-utils/src/slug.js'
-import {
-  validatePngMagicBytes,
-  calcMasterDpi,
-  bootstrapTagsFromFilename,
-  scanAssets,
-} from '../ingest-poses.js'
+import { validatePngMagicBytes, calcMasterDpi, scanAssets } from '../ingest-poses.js'
 
 // ─────────────────────────────────────────────
 // 헬퍼
@@ -158,32 +154,34 @@ describe('calcMasterDpi', () => {
 })
 
 // ─────────────────────────────────────────────
-// 4. 파일명 키워드 1차 태깅
+// 4. 파일명 키워드 1차 태깅 (M2-03a — tagFromFilename)
 // ─────────────────────────────────────────────
 
-describe('bootstrapTagsFromFilename', () => {
-  it('영어 액션 키워드 매칭', () => {
-    const result = bootstrapTagsFromFilename('Fight-bow_03_1.png')
-    // "fight" 또는 "bow" 중 하나 매칭
+describe('tagFromFilename (M2-03a)', () => {
+  it('영어 액션 키워드 매칭 — Fight-bow → archery', () => {
+    const result = tagFromFilename('Fight-bow_03_1.png')
     expect(result.tags.length).toBeGreaterThanOrEqual(1)
     expect(result.confidence).toBeGreaterThan(0)
+    expect(result.action).toBe('archery')
   })
 
-  it('한글 키워드 매칭', () => {
-    const result = bootstrapTagsFromFilename('01_서기_01.png')
-    expect(result.tags).toContain('stand')
-    expect(result.action).toBe('stand')
+  it('한글 키워드 매칭 — 서기 → standing', () => {
+    const result = tagFromFilename('01_서기_01.png')
+    expect(result.matched).toBe(true)
+    expect(result.action).toBe('standing')
   })
 
-  it('매칭 없으면 confidence=0, tags 빈 배열', () => {
-    const result = bootstrapTagsFromFilename('unknown_xyz_999.png')
+  it('매칭 없으면 confidence=0, matched=false', () => {
+    const result = tagFromFilename('unknown_xyz_999.png')
     expect(result.confidence).toBe(0)
+    expect(result.matched).toBe(false)
     expect(result.tags).toHaveLength(0)
   })
 
-  it('animal 폴더 파일명 → beast bodyType', () => {
-    const result = bootstrapTagsFromFilename('animal-01.png')
+  it('동물 subfolder → beast bodyType', () => {
+    const result = tagFromFilename('animal-01.png', '동물')
     expect(result.bodyType).toBe('beast')
+    expect(result.matched).toBe(true)
   })
 })
 
