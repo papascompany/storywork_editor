@@ -1,0 +1,21 @@
+{
+  "extends": "./tsconfig.base.json",
+  "compilerOptions": {
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext",
+    "target": "ES2023",
+    "noEmit": true,
+    "strict": true,
+    "rootDir": ".",
+    "baseUrl": ".",
+    "verbatimModuleSyntax": false,
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true
+  },
+  "include": [
+    "scripts/**/*.ts",
+    "packages/shared-schema/src/**/*.ts",
+    "packages/shared-utils/src/**/*.ts"
+  ],
+  "exclude": ["node_modules", "**/dist/**"]
+}
