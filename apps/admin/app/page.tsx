@@ -1,104 +1,41 @@
-'use client'
+import { requireRole } from '../src/lib/auth'
 
-import {
-  Button,
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-  Input,
-  useTheme,
-} from '@storywork/ui'
-import { Shield, Moon, Sun } from 'lucide-react'
-import { useState } from 'react'
-
-export default function AdminHomePage() {
-  const { resolvedTheme, toggleTheme } = useTheme()
-  const [email, setEmail] = useState('')
-  const [password, setPassword] = useState('')
-  const [emailError, setEmailError] = useState('')
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault()
-    if (!email.includes('@')) {
-      setEmailError('올바른 이메일 주소를 입력하세요')
-      return
-    }
-    setEmailError('')
-    // M3 에서 실제 인증 구현
-  }
+export default async function DashboardPage() {
+  // 인증 + admin role + 2FA 검증. 실패 시 내부에서 리다이렉트.
+  const user = await requireRole()
 
   return (
     <main className="flex min-h-dvh flex-col items-center justify-center gap-6 px-4 py-16 bg-[var(--color-surface-muted)]">
-      {/* 다크모드 토글 */}
-      <div className="fixed right-4 top-4">
-        <Button
-          variant="ghost"
-          size="icon"
-          onClick={toggleTheme}
-          aria-label={resolvedTheme === 'dark' ? '라이트 모드로 전환' : '다크 모드로 전환'}
-        >
-          {resolvedTheme === 'dark' ? <Sun className="size-5" /> : <Moon className="size-5" />}
-        </Button>
-      </div>
-
-      {/* 로고 */}
-      <div className="flex items-center gap-2">
-        <div className="flex size-10 items-center justify-center rounded-[var(--radius-md)] bg-[var(--color-brand-500)]">
-          <Shield className="size-5 text-white" aria-hidden="true" />
-        </div>
-        <span className="text-xl font-bold text-[var(--color-text)]">
-          StoryWork{' '}
-          <span className="text-[var(--color-text-muted)] font-normal text-base">Admin</span>
-        </span>
-      </div>
-
-      {/* 로그인 카드 */}
-      <Card className="w-full max-w-sm">
-        <CardHeader>
-          <CardTitle>관리자 로그인</CardTitle>
-          <CardDescription>관리자 계정으로 로그인하세요</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <form onSubmit={handleSubmit} className="flex flex-col gap-4" noValidate>
-            <Input
-              label="이메일"
-              type="email"
-              name="email"
-              autoComplete="email"
-              placeholder="admin@storywork.io"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              variant={emailError ? 'error' : 'default'}
-              errorText={emailError}
-            />
-            <Input
-              label="비밀번호"
-              type="password"
-              name="password"
-              autoComplete="current-password"
-              placeholder="비밀번호 입력"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-            />
-            <Button type="submit" size="md" className="w-full">
-              로그인
-            </Button>
-            <p className="text-center text-xs text-[var(--color-text-muted)]">
-              관리자 계정이 없으신가요?{' '}
-              <a
-                href="mailto:yohan73@gmail.com"
-                className="text-[var(--color-brand-500)] underline underline-offset-4 hover:text-[var(--color-brand-600)]"
-              >
-                문의하기
-              </a>
+      <div className="w-full max-w-2xl">
+        {/* 헤더 */}
+        <div className="flex items-center justify-between mb-8">
+          <div>
+            <h1 className="text-2xl font-bold text-[var(--color-text)]">대시보드</h1>
+            <p className="text-sm text-[var(--color-text-muted)] mt-1">
+              {user.email}{' '}
+              <span className="inline-flex items-center rounded-full bg-[var(--color-brand-100)] px-2 py-0.5 text-xs font-medium text-[var(--color-brand-700)]">
+                {user.role}
+              </span>
             </p>
+          </div>
+          <form action="/api/auth/logout" method="post">
+            <button
+              type="submit"
+              className="rounded-[var(--radius-sm)] border border-[var(--color-border)] px-3 py-1.5 text-sm text-[var(--color-text-muted)] hover:bg-[var(--color-surface-hover)] transition-colors"
+            >
+              로그아웃
+            </button>
           </form>
-        </CardContent>
-      </Card>
+        </div>
 
-      <p className="text-xs text-[var(--color-text-disabled)]">M3에서 실제 인증 구현 예정</p>
+        {/* 플레이스홀더 */}
+        <div className="rounded-[var(--radius-lg)] border border-[var(--color-border)] border-dashed bg-[var(--color-surface)] p-12 text-center">
+          <p className="text-[var(--color-text-muted)] font-medium">M3-02부터 채워집니다</p>
+          <p className="text-sm text-[var(--color-text-disabled)] mt-2">
+            DataTable / EntityForm / ReviewQueue 공용 컴포넌트 + 판형·리소스 CRUD
+          </p>
+        </div>
+      </div>
     </main>
   )
 }
