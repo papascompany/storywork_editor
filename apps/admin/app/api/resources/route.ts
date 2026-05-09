@@ -104,17 +104,13 @@ export async function GET(req: NextRequest) {
       // facets: kind 별 카운트 (현재 필터 기반)
       prisma.resource.groupBy({
         by: ['kind'],
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        where: (statusesRaw.length > 0 ? { status: { in: statusesRaw as any[] } } : {}) as AnyWhere,
+        where: (statusesRaw.length > 0 ? { status: { in: statusesRaw } } : {}) as AnyWhere,
         _count: { _all: true },
       }),
       // facets: status 별 카운트
       prisma.resource.groupBy({
         by: ['status'],
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        where: (kindsRaw.length > 0
-          ? { kind: { in: kindsRaw.map(kindToDb) as any[] } }
-          : {}) as AnyWhere,
+        where: (kindsRaw.length > 0 ? { kind: { in: kindsRaw.map(kindToDb) } } : {}) as AnyWhere,
         _count: { _all: true },
       }),
       // facets: ownerType 별 카운트
@@ -126,19 +122,11 @@ export async function GET(req: NextRequest) {
 
   const facets: ResourceListFacets = {
     byKind: Object.fromEntries(
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      allKindCounts.map((r) => [
-        String(r.kind).replace('_', '-'),
-        (r._count as any)._all as number,
-      ]),
+      allKindCounts.map((r) => [String(r.kind).replace('_', '-'), r._count?._all ?? 0]),
     ),
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    byStatus: Object.fromEntries(
-      allStatusCounts.map((r) => [r.status, (r._count as any)._all as number]),
-    ),
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    byStatus: Object.fromEntries(allStatusCounts.map((r) => [r.status, r._count?._all ?? 0])),
     byOwnerType: Object.fromEntries(
-      allOwnerTypeCounts.map((r) => [r.ownerType, (r._count as any)._all as number]),
+      allOwnerTypeCounts.map((r) => [r.ownerType, r._count?._all ?? 0]),
     ),
   }
 
