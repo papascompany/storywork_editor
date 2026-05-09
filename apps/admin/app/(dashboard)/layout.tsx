@@ -9,7 +9,17 @@
  */
 
 import { Button, cn } from '@storywork/ui'
-import { FileText, Layers, LayoutDashboard, List, LogOut, Menu, ScrollText, X } from 'lucide-react'
+import {
+  FileText,
+  Layers,
+  LayoutDashboard,
+  List,
+  LogOut,
+  Menu,
+  ScrollText,
+  Layers2,
+  X,
+} from 'lucide-react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import * as React from 'react'
@@ -21,6 +31,7 @@ const NAV_ITEMS = [
   { href: '/formats', label: '판형', icon: Layers, exact: false },
   { href: '/resources', label: '리소스', icon: FileText, exact: false },
   { href: '/templates', label: '템플릿', icon: List, exact: false },
+  { href: '/template-sets', label: '템플릿 세트', icon: Layers2, exact: false },
   { href: '/audit', label: '감사 로그', icon: ScrollText, exact: false },
 ]
 
