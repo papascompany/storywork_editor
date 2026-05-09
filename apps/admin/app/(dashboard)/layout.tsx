@@ -21,7 +21,7 @@ const NAV_ITEMS = [
   { href: '/formats', label: '판형', icon: Layers, exact: false },
   { href: '/resources', label: '리소스', icon: FileText, exact: false },
   { href: '/templates', label: '템플릿', icon: List, exact: false },
-  { href: '/audit-log', label: '감사 로그', icon: ScrollText, exact: false },
+  { href: '/audit', label: '감사 로그', icon: ScrollText, exact: false },
 ]
 
 // ─── NavItem ─────────────────────────────────────────────────────────────────
