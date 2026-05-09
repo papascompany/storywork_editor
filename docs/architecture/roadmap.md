@@ -50,14 +50,14 @@
 - [ ] [M2-08] 키포인트 검수 편집기(관리자) — 클릭으로 누락 점 보강 — @admin-builder + @editor-engineer (**M3-04 Resource CRUD 안에 통합** 권장)
 - [ ] [M2-09] PNG 색상 변경 보조: `tintMaskUrl` 기반 BlendColor 데모 — @editor-engineer (현재 자산 모두 마스크 미보유 → 우선순위 ↓)
 
-## M3 — Admin Console
+## M3 — Admin Console ✅ (6/6 완료, 2026-05-07)
 
-- [ ] [M3-01] `apps/admin` 부트스트랩 + 별도 도메인 + 2FA — 일반 사용자 우회 차단 — @architect + @admin-builder
-- [ ] [M3-02] DataTable/EntityForm/ReviewQueue 공용 컴포넌트 — Storybook — @admin-builder + @ui-designer
-- [ ] [M3-03] Format CRUD — B5/A5/정사각/세로형 프리셋 — @admin-builder
-- [ ] [M3-04] Resource CRUD + 검수 큐 + 일괄 액션 — 1,000개 PNG ZIP(`<id>.png` + `<id>.kp.json` 페어 검증) < 60초 — @admin-builder
-- [ ] [M3-05] Template/TemplateSet 빌더 — 슬롯 정의 UI — @admin-builder + @editor-engineer
-- [ ] [M3-06] Audit Log 패널 — 모든 상태 전환 기록 — @admin-builder
+- [x] [M3-01] `apps/admin` 부트스트랩 + 별도 도메인 + 2FA — Supabase Auth + TOTP (otplib) + 4 admin role (superadmin/curator/support/readonly) + 12h TOTP 쿠키 — `fc89d44`
+- [x] [M3-02] DataTable/EntityForm/ReviewQueue 공용 컴포넌트 — tanstack-table v8 + RHF+Zod v4 + 카드그리드 키보드 j/k/a/r + BulkActionBar undo토스트 + 11 Storybook — `1b08d71`
+- [x] [M3-03] Format CRUD — B5/A5/정사각/세로형 프리셋 + audit.ts 헬퍼 + prisma 싱글톤 — `c8d2ab8`
+- [x] [M3-04] Resource CRUD + 검수 큐 + 일괄 액션 + 키포인트 보정 + PNG 업로드 (sharp EXIF strip + WebP variants) — `b4d1034`+`e58730c` (M2-08 키포인트 검수 통합 완료)
+- [x] [M3-05] Template + TemplateSet 빌더 — SlotCanvas (SVG 드래그/8핸들 리사이즈/키보드) + TemplateSet 순서 변경 + cover 지정 — `e220aa5`
+- [x] [M3-06] Audit Log 패널 — DataTable + 펼침 JSON diff viewer + 필터 (action/entityType/날짜) + facets — `f615e18`
 
 ## M4 — AI Pipeline
 
