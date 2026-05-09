@@ -4,6 +4,13 @@
     "baseUrl": ".",
     "paths": {}
   },
-  "include": [".storybook/**/*.ts", ".storybook/**/*.tsx", "stories/**/*.ts", "stories/**/*.tsx"],
+  "include": [
+    ".storybook/**/*.ts",
+    ".storybook/**/*.tsx",
+    "stories/**/*.ts",
+    "stories/**/*.tsx",
+    "../admin/src/components/**/*.ts",
+    "../admin/src/components/**/*.tsx"
+  ],
   "exclude": ["node_modules", "storybook-static"]
 }
