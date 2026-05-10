@@ -7,6 +7,7 @@
  * RSC
  */
 
+import Image from 'next/image'
 import * as React from 'react'
 
 import { ColorBlock } from '../../../components/marketing/ColorBlock'
@@ -14,6 +15,7 @@ import { Footer } from '../../../components/marketing/Footer'
 import { Header } from '../../../components/marketing/Header'
 import { PillButton } from '../../../components/marketing/PillButton'
 import { StickyNote } from '../../../components/marketing/StickyNote'
+import { getDerbymanScenes } from '../../../lib/marketing-assets'
 
 /** 제작 과정 단계 컴포넌트 */
 function StepBlock({
@@ -176,8 +178,27 @@ function SceneSplitMock() {
   )
 }
 
-/** 포즈 자동 배치 mockup */
+/** 포즈 자동 배치 mockup — 실 자산 3개 */
 function PoseAutoMock() {
+  // 더비맨 시나리오 장면1 포즈 후보 3개: 엎드리기, 책상작업, 서서 놀람
+  const candidates = [
+    {
+      slug: '10-eohdeurin-1',
+      label: '엎드리기 (92%)',
+      selected: true,
+    },
+    {
+      slug: '04-chaegsajehanjjogparg-1',
+      label: '책상 작업 (78%)',
+      selected: false,
+    },
+    {
+      slug: '13-seogi-ggabjjag-1',
+      label: '놀라기 (61%)',
+      selected: false,
+    },
+  ]
+
   return (
     <div
       style={{ display: 'flex', flexDirection: 'column', gap: 'var(--mkt-space-sm)' }}
@@ -191,13 +212,9 @@ function PoseAutoMock() {
         SCENE 1 — 포즈 후보 K=3
       </span>
       <div style={{ display: 'flex', gap: '10px' }} aria-hidden="true">
-        {[
-          { label: '앉아서 졸기 (92%)', selected: true, bg: 'var(--mkt-block-cream)' },
-          { label: '엎드리기 (78%)', selected: false, bg: 'var(--mkt-block-mint)' },
-          { label: '기지개 (61%)', selected: false, bg: 'var(--mkt-block-lilac)' },
-        ].map((pose) => (
+        {candidates.map((pose) => (
           <div
-            key={pose.label}
+            key={pose.slug}
             style={{
               flex: 1,
               display: 'flex',
@@ -210,11 +227,23 @@ function PoseAutoMock() {
               style={{
                 width: '100%',
                 aspectRatio: '3/4',
-                backgroundColor: pose.bg,
                 borderRadius: '6px',
-                border: pose.selected ? '2px solid var(--mkt-ink)' : '1px solid transparent',
+                border: pose.selected
+                  ? '2px solid var(--mkt-ink)'
+                  : '1px solid var(--mkt-hairline)',
+                overflow: 'hidden',
+                position: 'relative',
+                backgroundColor: 'var(--mkt-surface-soft)',
               }}
-            />
+            >
+              <Image
+                src={`https://wjpyeqckuxyfeytuzgon.supabase.co/storage/v1/object/public/poses/${pose.slug}/thumb.png`}
+                alt={pose.label}
+                fill
+                sizes="80px"
+                style={{ objectFit: 'contain', padding: '4px' }}
+              />
+            </div>
             <span
               style={{
                 fontFamily: 'var(--mkt-font-mono)',
@@ -225,6 +254,7 @@ function PoseAutoMock() {
               }}
             >
               {pose.label}
+              {pose.selected ? ' ✓' : ''}
             </span>
           </div>
         ))}
@@ -320,6 +350,8 @@ function BookMock() {
 }
 
 export default function DerbymanShowcasePage() {
+  const derbyScenes = getDerbymanScenes()
+
   return (
     <div style={{ backgroundColor: 'var(--mkt-canvas)' }}>
       <Header />
@@ -374,35 +406,35 @@ export default function DerbymanShowcasePage() {
             </p>
           </div>
 
-          {/* 캐릭터 placeholder */}
+          {/* 히어로 비주얼 — 실 포즈 자산 (자신감 있게 서 있는 모습) */}
           <div
             style={{
               backgroundColor: 'var(--mkt-surface-soft)',
               borderRadius: 'var(--mkt-rounded-lg)',
               aspectRatio: '3/4',
-              display: 'flex',
-              flexDirection: 'column',
-              alignItems: 'center',
-              justifyContent: 'flex-end',
-              padding: 'var(--mkt-space-xl)',
-              gap: 'var(--mkt-space-sm)',
+              position: 'relative',
+              overflow: 'hidden',
             }}
-            aria-label="더비맨 캐릭터 일러스트"
           >
-            {/* 간단한 캐릭터 실루엣 */}
-            <div
-              style={{
-                width: '100px',
-                height: '180px',
-                backgroundColor: 'var(--mkt-block-navy)',
-                borderRadius: '50px 50px 20px 20px',
-                opacity: 0.15,
-              }}
-              aria-hidden="true"
+            <Image
+              src="https://wjpyeqckuxyfeytuzgon.supabase.co/storage/v1/object/public/poses/01-seogi-01-1/thumb.png"
+              alt="더비맨 캐릭터 — 자신감 있게 서 있는 모습"
+              fill
+              sizes="(max-width: 768px) 80vw, 400px"
+              style={{ objectFit: 'contain', padding: '24px' }}
+              priority
             />
             <p
               className="mkt-caption"
-              style={{ color: 'var(--mkt-ink)', opacity: 0.4, textAlign: 'center' }}
+              style={{
+                position: 'absolute',
+                bottom: '16px',
+                left: 0,
+                right: 0,
+                textAlign: 'center',
+                color: 'var(--mkt-ink)',
+                opacity: 0.4,
+              }}
             >
               더비맨 — 평범한 회사원,
               <br />
@@ -434,7 +466,7 @@ export default function DerbymanShowcasePage() {
                 </h2>
               </div>
 
-              {/* 4컷 그리드 */}
+              {/* 4컷 그리드 — 실 포즈 자산 */}
               <div
                 style={{
                   display: 'grid',
@@ -446,34 +478,30 @@ export default function DerbymanShowcasePage() {
               >
                 <StickyNote
                   number={1}
-                  scene="월요일 아침"
-                  caption="사무실 책상에서 졸고 있는 더비맨"
-                  placeholderColor="rgba(180,160,140,0.3)"
-                  placeholderLabel="포즈: 앉아서 졸기 (sit_36)"
+                  scene={derbyScenes[0]?.hint ?? '월요일 아침'}
+                  caption={derbyScenes[0]?.alt ?? '사무실 책상에서 졸고 있는 더비맨'}
+                  imageUrl={derbyScenes[0]?.thumbUrl}
                   rotation={-1}
                 />
                 <StickyNote
                   number={2}
-                  scene="점심시간"
-                  caption="노트북 열고 몰래 콘티 작업"
-                  placeholderColor="rgba(140,180,160,0.3)"
-                  placeholderLabel="포즈: 앉아서 타이핑 (sit_38)"
+                  scene={derbyScenes[1]?.hint ?? '점심시간'}
+                  caption={derbyScenes[1]?.alt ?? '노트북 열고 몰래 콘티 작업'}
+                  imageUrl={derbyScenes[1]?.thumbUrl}
                   rotation={0.5}
                 />
                 <StickyNote
                   number={3}
-                  scene="퇴근 후 카페"
-                  caption="더비맨: 오늘은 5페이지 쓸 거야!"
-                  placeholderColor="rgba(160,140,200,0.3)"
-                  placeholderLabel="포즈: 카페 앉기 (sit_08)"
+                  scene={derbyScenes[2]?.hint ?? '퇴근 후 카페'}
+                  caption={derbyScenes[2]?.alt ?? '완성된 콘티에 환호'}
+                  imageUrl={derbyScenes[2]?.thumbUrl}
                   rotation={1}
                 />
                 <StickyNote
                   number={4}
-                  scene="주말, 책 도착"
-                  caption="인쇄된 책을 받아들고 환호"
-                  placeholderColor="rgba(200,160,180,0.3)"
-                  placeholderLabel="포즈: 놀람 + 기쁨 (stand_42)"
+                  scene={derbyScenes[3]?.hint ?? '주말, 책 도착'}
+                  caption={derbyScenes[3]?.alt ?? '인쇄된 책을 받아들고 환호'}
+                  imageUrl={derbyScenes[3]?.thumbUrl}
                   rotation={-0.5}
                 />
               </div>
@@ -502,7 +530,7 @@ export default function DerbymanShowcasePage() {
         mockup={<SceneSplitMock />}
       />
 
-      {/* Step 3: 포즈 자동 배치 (coral) */}
+      {/* Step 3: 포즈 자동 배치 (coral) — 실 자산 */}
       <StepBlock
         step={3}
         variant="coral"

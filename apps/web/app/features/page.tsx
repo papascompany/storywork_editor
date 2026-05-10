@@ -7,12 +7,14 @@
  * RSC
  */
 
+import Image from 'next/image'
 import * as React from 'react'
 
 import { ColorBlock } from '../../components/marketing/ColorBlock'
 import { Footer } from '../../components/marketing/Footer'
 import { Header } from '../../components/marketing/Header'
 import { PillButton } from '../../components/marketing/PillButton'
+import { getFeatureShowcase } from '../../lib/marketing-assets'
 
 /** 공통 기능 섹션 래퍼 */
 function FeatureSection({
@@ -270,8 +272,8 @@ function EditorMock() {
   )
 }
 
-/** AI 자동 배치 mockup */
-function AiMock() {
+/** AI 자동 배치 mockup — 실 포즈 자산 3개 */
+function AiMock({ aiDemo }: { aiDemo: ReturnType<typeof getFeatureShowcase>['aiDemo'] }) {
   return (
     <div
       style={{
@@ -329,36 +331,48 @@ function AiMock() {
         </span>
       </div>
 
-      {/* 후보 카드 */}
+      {/* 후보 카드 — 실 자산 */}
       <div style={{ display: 'flex', gap: '8px' }} aria-hidden="true">
-        {['추천 1', '추천 2', '추천 3'].map((label, i) => (
+        {aiDemo.map((pose, i) => (
           <div
-            key={label}
+            key={pose.slug}
             style={{
               flex: 1,
-              aspectRatio: '3/4',
-              backgroundColor:
-                i === 0
-                  ? 'var(--mkt-block-cream)'
-                  : i === 1
-                    ? 'var(--mkt-block-mint)'
-                    : 'var(--mkt-block-lilac)',
-              borderRadius: '6px',
-              border: i === 0 ? '2px solid var(--mkt-ink)' : '1px solid transparent',
               display: 'flex',
-              alignItems: 'flex-end',
-              padding: '6px',
+              flexDirection: 'column',
+              gap: '4px',
+              alignItems: 'center',
             }}
           >
+            <div
+              style={{
+                width: '100%',
+                aspectRatio: '3/4',
+                borderRadius: '6px',
+                border: i === 0 ? '2px solid var(--mkt-ink)' : '1px solid var(--mkt-hairline)',
+                overflow: 'hidden',
+                position: 'relative',
+                backgroundColor: 'var(--mkt-surface-soft)',
+              }}
+            >
+              <Image
+                src={pose.thumbUrl}
+                alt={pose.alt}
+                fill
+                sizes="80px"
+                style={{ objectFit: 'contain', padding: '4px' }}
+              />
+            </div>
             <span
               style={{
                 fontFamily: 'var(--mkt-font-mono)',
                 fontSize: '9px',
                 color: 'var(--mkt-ink)',
                 opacity: 0.5,
+                textAlign: 'center',
               }}
             >
-              {label}
+              {pose.hint}
               {i === 0 ? ' ✓' : ''}
             </span>
           </div>
@@ -368,8 +382,12 @@ function AiMock() {
   )
 }
 
-/** 포즈 라이브러리 mockup */
-function PoseMock() {
+/** 포즈 라이브러리 mockup — 실 포즈 자산 */
+function PoseMock({
+  searchDemo,
+}: {
+  searchDemo: ReturnType<typeof getFeatureShowcase>['searchDemo']
+}) {
   return (
     <div
       style={{
@@ -407,7 +425,7 @@ function PoseMock() {
             opacity: 0.4,
           }}
         >
-          놀란 여자 측면...
+          놀란 표정...
         </div>
       </div>
 
@@ -422,11 +440,11 @@ function PoseMock() {
         }}
         aria-hidden="true"
       >
-        {['여성', '측면', '놀람'].map((tag, i) => (
+        {['surprise', '서있는', '손가락'].map((tag, i) => (
           <span
             key={tag}
             style={{
-              backgroundColor: i < 2 ? 'var(--mkt-block-lime)' : 'var(--mkt-surface-soft)',
+              backgroundColor: i < 1 ? 'var(--mkt-block-lime)' : 'var(--mkt-surface-soft)',
               borderRadius: '4px',
               padding: '2px 8px',
               fontFamily: 'var(--mkt-font-mono)',
@@ -439,26 +457,36 @@ function PoseMock() {
         ))}
       </div>
 
-      {/* 포즈 그리드 */}
+      {/* 포즈 그리드 — 실 자산 */}
       <div
         style={{
           display: 'grid',
-          gridTemplateColumns: 'repeat(4, 1fr)',
+          gridTemplateColumns: 'repeat(3, 1fr)',
           gap: '6px',
           padding: '10px',
         }}
         aria-hidden="true"
       >
-        {Array.from({ length: 8 }).map((_, i) => (
+        {searchDemo.map((pose, i) => (
           <div
-            key={i}
+            key={pose.slug}
             style={{
               aspectRatio: '3/4',
-              backgroundColor: i % 3 === 0 ? 'var(--mkt-block-cream)' : 'var(--mkt-surface-soft)',
               borderRadius: '4px',
-              border: i === 0 ? '2px solid var(--mkt-ink)' : 'none',
+              border: i === 0 ? '2px solid var(--mkt-ink)' : '1px solid var(--mkt-hairline)',
+              overflow: 'hidden',
+              position: 'relative',
+              backgroundColor: 'var(--mkt-surface-soft)',
             }}
-          />
+          >
+            <Image
+              src={pose.thumbUrl}
+              alt={pose.alt}
+              fill
+              sizes="80px"
+              style={{ objectFit: 'contain', padding: '4px' }}
+            />
+          </div>
         ))}
       </div>
     </div>
@@ -602,6 +630,8 @@ function MobileMock() {
 }
 
 export default function FeaturesPage() {
+  const { aiDemo, searchDemo } = getFeatureShowcase()
+
   return (
     <div style={{ backgroundColor: 'var(--mkt-canvas)' }}>
       <Header />
@@ -667,7 +697,7 @@ export default function FeaturesPage() {
             headline={'대본 → 30초 → 페이지'}
             body="대본을 붙여넣으면 AI가 장면을 나누고 포즈·배경을 추천합니다. Confidence 표시와 함께 후보 K개 중 한 클릭으로 교체."
             details={['장면 자동 분할', '포즈 추천', '배경 추천', '한 클릭 교체']}
-            mockup={<AiMock />}
+            mockup={<AiMock aiDemo={aiDemo} />}
             reverse
           />
         </ColorBlock>
@@ -681,7 +711,7 @@ export default function FeaturesPage() {
             headline={'1,270+ 포즈 검색 · 필터 · 드래그'}
             body="몸 타입, 시선, 액션 태그로 필터. 찾은 포즈를 캔버스에 드래그해 바로 배치. 사이드카 키포인트로 정확한 위치 자동 정렬."
             details={['남/여/아이/동물', '감정 태그', '시선 방향', '드래그 배치']}
-            mockup={<PoseMock />}
+            mockup={<PoseMock searchDemo={searchDemo} />}
           />
         </ColorBlock>
       </FeatureSection>

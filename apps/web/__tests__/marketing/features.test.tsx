@@ -36,6 +36,12 @@ vi.mock('@storywork/ui', () => ({
   SheetClose: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
 }))
 
+vi.mock('next/image', () => ({
+  default: ({ src, alt }: { src: string; alt: string; [k: string]: unknown }) => (
+    <img src={src} alt={alt} />
+  ),
+}))
+
 import FeaturesPage from '../../app/features/page'
 
 describe('기능 소개 페이지 (/features)', () => {

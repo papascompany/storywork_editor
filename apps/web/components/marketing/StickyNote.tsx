@@ -1,3 +1,4 @@
+import Image from 'next/image'
 import * as React from 'react'
 
 /**
@@ -7,13 +8,18 @@ import * as React from 'react'
  * - 파스텔 배경, rounded-sm (6px) 모서리
  * - 살짝 기울어진 collage 느낌
  * - figmaMono caption 으로 장면 번호/캡션 표시
+ *
+ * imageUrl 이 제공되면 실 자산(next/image) 을 렌더링한다.
+ * 제공되지 않으면 기존 placeholderColor/placeholderLabel 박스를 사용한다.
  */
 
 interface StickyNoteProps {
   number: number
   scene: string
   caption: string
-  /** 포즈 placeholder — 실 자산 연결 전 색상 박스 */
+  /** 실 포즈 이미지 URL (Supabase Storage thumb.png) */
+  imageUrl?: string
+  /** imageUrl 이 없을 때 쓰는 placeholder 색상 박스 */
   placeholderColor?: string
   placeholderLabel?: string
   rotation?: number
@@ -31,6 +37,7 @@ export function StickyNote({
   number,
   scene,
   caption,
+  imageUrl,
   placeholderColor,
   placeholderLabel,
   rotation = 0,
@@ -57,32 +64,52 @@ export function StickyNote({
         CUT {number}
       </span>
 
-      {/* 포즈 placeholder 영역 */}
+      {/* 포즈 이미지 또는 placeholder 영역 */}
       <div
         style={{
-          backgroundColor: placeholderColor ?? 'var(--mkt-canvas)',
           borderRadius: 'var(--mkt-rounded-md)',
           aspectRatio: '1 / 1',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          opacity: 0.7,
+          overflow: 'hidden',
+          position: 'relative',
+          backgroundColor: placeholderColor ?? 'var(--mkt-canvas)',
         }}
-        aria-hidden="true"
       >
-        {placeholderLabel && (
-          <span
+        {imageUrl ? (
+          <Image
+            src={imageUrl}
+            alt={caption}
+            fill
+            sizes="(max-width: 640px) 40vw, 200px"
+            style={{ objectFit: 'contain', padding: '8px' }}
+            placeholder="empty"
+          />
+        ) : (
+          <div
             style={{
-              fontFamily: 'var(--mkt-font-mono)',
-              fontSize: '11px',
-              color: 'var(--mkt-ink)',
-              opacity: 0.5,
-              textAlign: 'center',
-              padding: '8px',
+              width: '100%',
+              height: '100%',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              opacity: 0.7,
             }}
+            aria-hidden="true"
           >
-            {placeholderLabel}
-          </span>
+            {placeholderLabel && (
+              <span
+                style={{
+                  fontFamily: 'var(--mkt-font-mono)',
+                  fontSize: '11px',
+                  color: 'var(--mkt-ink)',
+                  opacity: 0.5,
+                  textAlign: 'center',
+                  padding: '8px',
+                }}
+              >
+                {placeholderLabel}
+              </span>
+            )}
+          </div>
         )}
       </div>
 

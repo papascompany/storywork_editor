@@ -5,6 +5,7 @@
  * RSC (서버 컴포넌트) — MarqueeStrip 만 client
  */
 
+import Image from 'next/image'
 import Link from 'next/link'
 import * as React from 'react'
 
@@ -13,6 +14,7 @@ import { Footer } from '../components/marketing/Footer'
 import { Header } from '../components/marketing/Header'
 import { MarqueeStrip } from '../components/marketing/MarqueeStrip'
 import { PillButton } from '../components/marketing/PillButton'
+import { getPoseShowcase } from '../lib/marketing-assets'
 
 /* ── 4컷 콘티 미리보기 ────────────────────────────────────────────────────── */
 function MiniStoryboard() {
@@ -217,6 +219,7 @@ function Section({ children, style }: { children: React.ReactNode; style?: React
 
 /* ── 메인 ────────────────────────────────────────────────────────────────── */
 export default function LandingPage() {
+  const poseShowcase = getPoseShowcase()
   const marqueeItems = [
     '1,270+ 포즈 ✦',
     'AI 자동 배치 ✦',
@@ -492,52 +495,43 @@ export default function LandingPage() {
                 </p>
               </div>
 
-              {/* 포즈 그리드 (8개 placeholder) */}
+              {/* 포즈 그리드 — 실 자산 12개 (Supabase Storage thumb.png) */}
               <div
                 style={{
                   display: 'grid',
-                  gridTemplateColumns: 'repeat(8, 1fr)',
+                  gridTemplateColumns: 'repeat(6, 1fr)',
                   gap: 'var(--mkt-space-sm)',
                 }}
                 className="pose-grid"
               >
-                {[
-                  { label: '서있는 여성', opacity: 0.2 },
-                  { label: '앉은 남성', opacity: 0.25 },
-                  { label: '달리는 여성', opacity: 0.2 },
-                  { label: '놀란 남성', opacity: 0.25 },
-                  { label: '슬픈 여성', opacity: 0.2 },
-                  { label: '싸우는 남성', opacity: 0.25 },
-                  { label: '웃는 어린이', opacity: 0.2 },
-                  { label: '점프하는 여성', opacity: 0.25 },
-                ].map((pose) => (
+                {poseShowcase.map((pose) => (
                   <div
-                    key={pose.label}
+                    key={pose.slug}
                     style={{
-                      backgroundColor: `rgba(255,255,255,${pose.opacity})`,
+                      backgroundColor: 'rgba(255,255,255,0.08)',
                       borderRadius: 'var(--mkt-rounded-sm)',
                       aspectRatio: '3/4',
-                      display: 'flex',
-                      alignItems: 'flex-end',
-                      padding: '6px',
+                      overflow: 'hidden',
+                      position: 'relative',
+                      transition: 'transform 150ms ease',
                     }}
-                    aria-label={pose.label}
+                    className="pose-card-hover"
                   >
-                    <span
-                      style={{
-                        fontFamily: 'var(--mkt-font-mono)',
-                        fontSize: '9px',
-                        color: 'rgba(255,255,255,0.5)',
-                        lineHeight: '1.2',
-                      }}
-                    >
-                      {pose.label}
-                    </span>
+                    <Image
+                      src={pose.thumbUrl}
+                      alt={pose.alt}
+                      fill
+                      sizes="(max-width: 640px) 25vw, (max-width: 1024px) 16vw, 120px"
+                      style={{ objectFit: 'contain', padding: '4px' }}
+                    />
                   </div>
                 ))}
               </div>
 
               <style>{`
+                .pose-card-hover:hover {
+                  transform: translateY(-2px);
+                }
                 @media (max-width: 640px) {
                   .pose-grid {
                     grid-template-columns: repeat(4, 1fr) !important;

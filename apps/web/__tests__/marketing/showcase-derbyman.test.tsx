@@ -11,6 +11,12 @@ vi.mock('next/navigation', () => ({
   useRouter: () => ({ push: vi.fn() }),
 }))
 
+vi.mock('next/image', () => ({
+  default: ({ src, alt }: { src: string; alt: string; [k: string]: unknown }) => (
+    <img src={src} alt={alt} />
+  ),
+}))
+
 vi.mock('next/link', () => ({
   default: ({
     href,

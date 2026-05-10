@@ -6,6 +6,17 @@ const nextConfig: NextConfig = {
   // 모노레포 루트를 명시해 lockfile 감지 경고 제거
   outputFileTracingRoot: path.join(__dirname, '../../'),
 
+  // 외부 이미지 도메인 허용 (Supabase Storage)
+  images: {
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: 'wjpyeqckuxyfeytuzgon.supabase.co',
+        pathname: '/storage/v1/object/public/**',
+      },
+    ],
+  },
+
   // Transpile monorepo packages
   transpilePackages: [
     '@storywork/editor-core',

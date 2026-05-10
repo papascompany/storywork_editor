@@ -35,6 +35,13 @@ vi.mock('next/link', () => ({
   ),
 }))
 
+// next/image mock
+vi.mock('next/image', () => ({
+  default: ({ src, alt }: { src: string; alt: string; [k: string]: unknown }) => (
+    <img src={src} alt={alt} />
+  ),
+}))
+
 // shared-ui mock
 vi.mock('@storywork/ui', () => ({
   Sheet: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
