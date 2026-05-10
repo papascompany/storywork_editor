@@ -3,6 +3,8 @@ import type { Preview } from '@storybook/react'
 
 // shared-ui 전역 스타일 import
 import '../../../packages/shared-ui/src/styles/globals.css'
+// 마케팅 토큰 (mkt-* CSS 변수, 유틸리티 클래스) — Marketing 스토리에 필요
+import '../../web/app/globals.css'
 
 const preview: Preview = {
   parameters: {

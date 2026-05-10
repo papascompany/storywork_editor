@@ -9,8 +9,12 @@
     ".storybook/**/*.tsx",
     "stories/**/*.ts",
     "stories/**/*.tsx",
+    "__mocks__/**/*.ts",
+    "__mocks__/**/*.tsx",
     "../admin/src/components/**/*.ts",
-    "../admin/src/components/**/*.tsx"
+    "../admin/src/components/**/*.tsx",
+    "../web/components/marketing/**/*.ts",
+    "../web/components/marketing/**/*.tsx"
   ],
   "exclude": ["node_modules", "storybook-static"]
 }
