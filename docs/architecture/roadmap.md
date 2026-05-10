@@ -136,6 +136,16 @@
 - **admin**: https://storywork-editor-admin.vercel.app ✅ 200 — env 16, root `apps/admin`, vercel.json (turbo build)
 - **web**: https://storywork-editor-web.vercel.app ⚠️ 404 — build READY 후 promotion ERROR. FOLLOWUP-15 로 추적, M1 결과물로 재검증 예정
 
+## 🎨 마케팅 표면 (M3 외, 2026-05-10) ✅
+
+- [x] [MKT-01] 마케팅 4 페이지 (랜딩 / 서비스소개 / 편집기기능 / 더비맨 사례) — `72b57af`
+- [x] [MKT-02] DESIGN.md 디자인 시스템 토큰 명세 (Figma 마케팅 캔버스 기반, 578줄) — `72b57af`
+- [x] [MKT-03] `--mkt-*` CSS 변수 네임스페이스 + 8 공용 컴포넌트 (Header/Footer/Hero/ColorBlock/Marquee/Pill/FeatureCard/StickyNote) — `72b57af`
+- [ ] [MKT-04] 포즈 자산 실 연결 — Supabase Storage thumbnail → 마케팅 placeholder 교체 (FOLLOWUP-30)
+- [ ] [MKT-05] OG 이미지 + 메타데이터 (4 페이지별 동적) (FOLLOWUP-31)
+- [ ] [MKT-06] Storybook 마케팅 컴포넌트 스토리 (FOLLOWUP-32)
+- [ ] [MKT-07] Pretendard webfont 정식 등록 (next/font/local) (FOLLOWUP-33)
+
 ## M10+ (Parking)
 
 - [ ] **SVG 어댑터 입점** — `editor-pose/adapters/svg.ts` + 인입 파이프라인 SVG 분기. 색상 슬롯 풀 지원([ADR-0011](decisions.md#adr-0011--포즈-자산-포맷-png-우선-svg-추후))

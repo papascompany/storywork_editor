@@ -17,8 +17,10 @@
 순서대로 꼭 먼저 읽어주세요. 자기 분량을 넘지 말고 핵심만:
 
 1. **`CLAUDE.md`** — 프로젝트 마스터 사양 (단일 진실 원천 SSOT). 도메인/기술 스택/모듈 규칙
-2. **`docs/handoff/SESSION_HANDOFF_2026-05-07.md`** — 직전 세션 (M3 100% 완료) 의 모든 진행 상황 + 환경 정보
-3. **`docs/handoff/SESSION_HANDOFF_2026-05-06.md`** — 그 이전 세션 (M0~M2 완료, FOLLOWUP-01~18 등록)
+2. **`docs/handoff/SESSION_HANDOFF_2026-05-10.md`** — 직전 세션 (마케팅 표면 4 페이지 + DESIGN.md) 진행 + 환경 + FOLLOWUP-30~33
+3. **`docs/handoff/SESSION_HANDOFF_2026-05-07.md`** — 그 이전 세션 (M3 100% 완료, FOLLOWUP-19~29)
+4. **`docs/handoff/SESSION_HANDOFF_2026-05-06.md`** — 그 이전 세션 (M0~M2 완료, FOLLOWUP-01~18)
+5. **`DESIGN.md`** (루트) — Figma 마케팅 캔버스 디자인 시스템 토큰 명세 (마케팅 페이지 작업 시 필수)
 4. **`docs/architecture/roadmap.md`** — 53건 작업의 체크박스 (위에서 아래로 미완 픽)
 5. **`docs/architecture/decisions.md`** — ADR 11건 (특히 ADR-0011 포즈 자산 정책)
 6. **`.claude/agents/orchestrator.md`** — 본인이 루틴 진행자 역할일 때의 가드레일
@@ -45,18 +47,18 @@ pnpm test && pnpm build
 ```
 
 기대 상태:
-- 마지막 커밋이 `docs(handoff): session 2026-05-07 ...` 류 — 직전 세션 커밋이 모두 push 됨
+- 마지막 커밋이 `docs(handoff): wrap-up 2026-05-10 ...` 또는 `feat(web): 마케팅 ...` 류
 - DB Resource 카운트: **1,270건**
-- admin 테스트 **328 green** + 그 외 패키지 350+ green
-- Vercel admin 마지막 배포 `e220aa5` (M3-05) READY ✅
+- admin 테스트 **328 green** + web 테스트 **231 green** + 그 외 패키지 350+ green
+- Vercel admin `e220aa5` + web `72b57af` 모두 READY ✅
 
 ### 📊 현재 진행 위치 (한 줄 요약)
 
-> **M0(부트스트랩) + M1(편집기 코어 + UI/UX 6단계) + M2(포즈 라이브러리 풀 인입) + M3(관리자 콘솔 6/6) 완료**.
-> Vercel 두 도메인(`https://storywork-editor-web.vercel.app` + `https://storywork-editor-admin.vercel.app`) 배포 완료.
-> Supabase Cloud (`wjpyeqckuxyfeytuzgon`) 에 PNG 1,270 / Storage 171.8MB.
-> admin 콘솔에서 **로그인 + TOTP 2FA + Format/Resource/Template/TemplateSet/AuditLog 풀 CRUD + 검수큐 + 키포인트 보정 + PNG 업로드** 모두 동작.
-> **다음 우선순위: M4 (AI 파이프라인) — 대본 → 자동 페이지 배치**.
+> **M0~M3 완료 (관리자 콘솔 6/6) + 마케팅 표면 4 페이지 풀 리뉴얼**.
+> Vercel 두 도메인 배포 완료. Supabase Cloud 에 PNG 1,270 / Storage 171.8MB.
+> 사용자 web: 랜딩(`/`) + 서비스 소개(`/intro`) + 편집기 기능(`/features`) + 더비맨 사례(`/showcase/derbyman`) + 편집기(`/editor`) 모두 동작.
+> admin 콘솔: 로그인 + TOTP 2FA + Format/Resource/Template/TemplateSet/AuditLog 풀 CRUD + 키포인트 보정 + PNG 업로드 동작.
+> **다음 우선순위 (이번 세션 진행 중)**: 포즈 자산 실 연결 → OG 이미지 → Storybook 마케팅 → **M4 (ANTHROPIC 키 게이트)**.
 
 ### 🎯 권장 다음 작업 (사용자 결정 후 진행)
 
