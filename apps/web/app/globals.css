@@ -5,3 +5,347 @@
  * 직접 hex 컬러나 px 간격을 사용하지 말고 CSS 변수를 사용하십시오.
  */
 @import '../../../packages/shared-ui/src/styles/globals.css';
+
+/**
+ * ── 마케팅 디자인 시스템 토큰 (DESIGN.md 기반) ────────────────────────────────
+ *
+ * Figma 마케팅 캔버스 스타일: 모노크롬 프레임 + 파스텔 컬러블록 섹션.
+ * 이 토큰들은 apps/web/components/marketing/* 에서만 사용합니다.
+ * editor-* 패키지나 admin 에는 영향을 주지 않습니다.
+ */
+:root {
+  /* ── 마케팅 컬러 (DESIGN.md colors) ──────────────────────────────────── */
+  --mkt-primary: #000000;
+  --mkt-on-primary: #ffffff;
+  --mkt-ink: #000000;
+  --mkt-canvas: #ffffff;
+  --mkt-inverse-canvas: #000000;
+  --mkt-inverse-ink: #ffffff;
+  --mkt-on-inverse-soft: #ffffff;
+  --mkt-hairline: #e6e6e6;
+  --mkt-hairline-soft: #f1f1f1;
+  --mkt-surface-soft: #f7f7f5;
+
+  /* 파스텔 컬러블록 */
+  --mkt-block-lime: #dceeb1;
+  --mkt-block-lilac: #c5b0f4;
+  --mkt-block-cream: #f4ecd6;
+  --mkt-block-pink: #efd4d4;
+  --mkt-block-mint: #c8e6cd;
+  --mkt-block-coral: #f3c9b6;
+  --mkt-block-navy: #1f1d3d;
+
+  /* 시맨틱 */
+  --mkt-accent-magenta: #ff3d8b;
+  --mkt-semantic-success: #1ea64a;
+  --mkt-overlay-scrim: #000000;
+
+  /* ── 마케팅 타이포그래피 스케일 ───────────────────────────────────────── */
+  /* Pretendard: 한/영 균형, 가변 폰트. weight 축: 300~700 */
+  --mkt-font-sans:
+    'Pretendard Variable', Pretendard, 'Apple SD Gothic Neo', -apple-system, BlinkMacSystemFont,
+    system-ui, sans-serif;
+  --mkt-font-mono: 'JetBrains Mono', 'SF Mono', Menlo, monospace;
+
+  /* display-xl: 86px weight-340 lh-1.00 ls--1.72px */
+  --mkt-display-xl-size: 86px;
+  --mkt-display-xl-weight: 340;
+  --mkt-display-xl-lh: 1;
+  --mkt-display-xl-ls: -1.72px;
+
+  /* display-lg: 64px weight-340 lh-1.10 ls--0.96px */
+  --mkt-display-lg-size: 64px;
+  --mkt-display-lg-weight: 340;
+  --mkt-display-lg-lh: 1.1;
+  --mkt-display-lg-ls: -0.96px;
+
+  /* headline: 26px weight-540 lh-1.35 ls--0.26px */
+  --mkt-headline-size: 26px;
+  --mkt-headline-weight: 540;
+  --mkt-headline-lh: 1.35;
+  --mkt-headline-ls: -0.26px;
+
+  /* subhead: 26px weight-340 lh-1.35 ls--0.26px */
+  --mkt-subhead-size: 26px;
+  --mkt-subhead-weight: 340;
+  --mkt-subhead-lh: 1.35;
+  --mkt-subhead-ls: -0.26px;
+
+  /* body-lg: 20px weight-330 lh-1.40 ls--0.14px */
+  --mkt-body-lg-size: 20px;
+  --mkt-body-lg-weight: 330;
+  --mkt-body-lg-lh: 1.4;
+  --mkt-body-lg-ls: -0.14px;
+
+  /* body: 18px weight-320 lh-1.45 ls--0.26px */
+  --mkt-body-size: 18px;
+  --mkt-body-weight: 320;
+  --mkt-body-lh: 1.45;
+  --mkt-body-ls: -0.26px;
+
+  /* body-sm: 16px weight-330 lh-1.45 ls--0.14px */
+  --mkt-body-sm-size: 16px;
+  --mkt-body-sm-weight: 330;
+  --mkt-body-sm-lh: 1.45;
+  --mkt-body-sm-ls: -0.14px;
+
+  /* button / link: 20px weight-480 lh-1.40 ls--0.10px */
+  --mkt-button-size: 20px;
+  --mkt-button-weight: 480;
+  --mkt-button-lh: 1.4;
+  --mkt-button-ls: -0.1px;
+
+  /* eyebrow (mono): 18px weight-400 lh-1.30 ls-+0.54px */
+  --mkt-eyebrow-size: 18px;
+  --mkt-eyebrow-weight: 400;
+  --mkt-eyebrow-lh: 1.3;
+  --mkt-eyebrow-ls: 0.54px;
+
+  /* caption (mono): 12px weight-400 lh-1.00 ls-+0.60px */
+  --mkt-caption-size: 12px;
+  --mkt-caption-weight: 400;
+  --mkt-caption-lh: 1;
+  --mkt-caption-ls: 0.6px;
+
+  /* ── 마케팅 간격 토큰 (DESIGN.md spacing) ────────────────────────────── */
+  --mkt-space-hair: 1px;
+  --mkt-space-xxs: 4px;
+  --mkt-space-xs: 8px;
+  --mkt-space-sm: 12px;
+  --mkt-space-md: 16px;
+  --mkt-space-lg: 24px;
+  --mkt-space-xl: 32px;
+  --mkt-space-xxl: 48px;
+  --mkt-space-section: 96px;
+
+  /* ── 마케팅 둥근 모서리 (DESIGN.md rounded) ──────────────────────────── */
+  --mkt-rounded-xs: 2px;
+  --mkt-rounded-sm: 6px;
+  --mkt-rounded-md: 8px;
+  --mkt-rounded-lg: 24px;
+  --mkt-rounded-xl: 32px;
+  --mkt-rounded-pill: 50px;
+  --mkt-rounded-full: 9999px;
+
+  /* ── 마케팅 컴포넌트 치수 ────────────────────────────────────────────── */
+  --mkt-nav-height: 56px;
+  --mkt-marquee-height: 36px;
+  --mkt-max-width: 1280px;
+}
+
+/* ── 마케팅 타이포그래피 유틸리티 클래스 ────────────────────────────────── */
+.mkt-display-xl {
+  font-family: var(--mkt-font-sans);
+  font-size: clamp(48px, 6.7vw, var(--mkt-display-xl-size));
+  font-weight: var(--mkt-display-xl-weight);
+  line-height: var(--mkt-display-xl-lh);
+  letter-spacing: var(--mkt-display-xl-ls);
+  font-feature-settings: 'kern' 1;
+  word-break: keep-all;
+}
+
+.mkt-display-lg {
+  font-family: var(--mkt-font-sans);
+  font-size: clamp(36px, 5vw, var(--mkt-display-lg-size));
+  font-weight: var(--mkt-display-lg-weight);
+  line-height: var(--mkt-display-lg-lh);
+  letter-spacing: var(--mkt-display-lg-ls);
+  font-feature-settings: 'kern' 1;
+  word-break: keep-all;
+}
+
+.mkt-headline {
+  font-family: var(--mkt-font-sans);
+  font-size: var(--mkt-headline-size);
+  font-weight: var(--mkt-headline-weight);
+  line-height: var(--mkt-headline-lh);
+  letter-spacing: var(--mkt-headline-ls);
+  font-feature-settings: 'kern' 1;
+}
+
+.mkt-subhead {
+  font-family: var(--mkt-font-sans);
+  font-size: var(--mkt-subhead-size);
+  font-weight: var(--mkt-subhead-weight);
+  line-height: var(--mkt-subhead-lh);
+  letter-spacing: var(--mkt-subhead-ls);
+  font-feature-settings: 'kern' 1;
+}
+
+.mkt-body-lg {
+  font-family: var(--mkt-font-sans);
+  font-size: var(--mkt-body-lg-size);
+  font-weight: var(--mkt-body-lg-weight);
+  line-height: var(--mkt-body-lg-lh);
+  letter-spacing: var(--mkt-body-lg-ls);
+}
+
+.mkt-body {
+  font-family: var(--mkt-font-sans);
+  font-size: var(--mkt-body-size);
+  font-weight: var(--mkt-body-weight);
+  line-height: var(--mkt-body-lh);
+  letter-spacing: var(--mkt-body-ls);
+}
+
+.mkt-body-sm {
+  font-family: var(--mkt-font-sans);
+  font-size: var(--mkt-body-sm-size);
+  font-weight: var(--mkt-body-sm-weight);
+  line-height: var(--mkt-body-sm-lh);
+  letter-spacing: var(--mkt-body-sm-ls);
+}
+
+.mkt-eyebrow {
+  font-family: var(--mkt-font-mono);
+  font-size: var(--mkt-eyebrow-size);
+  font-weight: var(--mkt-eyebrow-weight);
+  line-height: var(--mkt-eyebrow-lh);
+  letter-spacing: var(--mkt-eyebrow-ls);
+  text-transform: uppercase;
+}
+
+.mkt-caption {
+  font-family: var(--mkt-font-mono);
+  font-size: var(--mkt-caption-size);
+  font-weight: var(--mkt-caption-weight);
+  line-height: var(--mkt-caption-lh);
+  letter-spacing: var(--mkt-caption-ls);
+  text-transform: uppercase;
+}
+
+/* ── 마케팅 버튼 pill ────────────────────────────────────────────────────── */
+.mkt-btn-primary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background-color: var(--mkt-primary);
+  color: var(--mkt-on-primary);
+  font-family: var(--mkt-font-sans);
+  font-size: var(--mkt-button-size);
+  font-weight: var(--mkt-button-weight);
+  line-height: var(--mkt-button-lh);
+  letter-spacing: var(--mkt-button-ls);
+  padding: 10px 28px;
+  border-radius: var(--mkt-rounded-pill);
+  border: 2px solid transparent;
+  cursor: pointer;
+  transition: opacity 150ms ease;
+  min-height: 44px;
+  white-space: nowrap;
+  text-decoration: none;
+}
+
+.mkt-btn-primary:hover {
+  opacity: 0.85;
+}
+
+.mkt-btn-primary:focus-visible {
+  outline: 2px solid var(--mkt-primary);
+  outline-offset: 3px;
+}
+
+.mkt-btn-secondary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background-color: var(--mkt-canvas);
+  color: var(--mkt-ink);
+  font-family: var(--mkt-font-sans);
+  font-size: var(--mkt-button-size);
+  font-weight: var(--mkt-button-weight);
+  line-height: var(--mkt-button-lh);
+  letter-spacing: var(--mkt-button-ls);
+  padding: 8px 26px 10px;
+  border-radius: var(--mkt-rounded-pill);
+  border: 2px solid var(--mkt-ink);
+  cursor: pointer;
+  transition: opacity 150ms ease;
+  min-height: 44px;
+  white-space: nowrap;
+  text-decoration: none;
+}
+
+.mkt-btn-secondary:hover {
+  opacity: 0.75;
+}
+
+.mkt-btn-secondary:focus-visible {
+  outline: 2px solid var(--mkt-primary);
+  outline-offset: 3px;
+}
+
+/* inverse 배경(navy 등)에서 쓰는 secondary */
+.mkt-btn-secondary-inverse {
+  background-color: transparent;
+  color: var(--mkt-inverse-ink);
+  border-color: var(--mkt-inverse-ink);
+}
+
+/* ── 마케팅 컬러블록 섹션 ────────────────────────────────────────────────── */
+.mkt-block {
+  border-radius: var(--mkt-rounded-lg);
+  padding: var(--mkt-space-xxl);
+}
+
+/* 768px 아래: full-bleed (모서리 제거) */
+@media (max-width: 768px) {
+  .mkt-block {
+    border-radius: 0;
+    margin-left: calc(var(--mkt-space-lg) * -1);
+    margin-right: calc(var(--mkt-space-lg) * -1);
+    padding-left: var(--mkt-space-lg);
+    padding-right: var(--mkt-space-lg);
+  }
+}
+
+.mkt-block-lime {
+  background-color: var(--mkt-block-lime);
+  color: var(--mkt-ink);
+}
+.mkt-block-lilac {
+  background-color: var(--mkt-block-lilac);
+  color: var(--mkt-ink);
+}
+.mkt-block-cream {
+  background-color: var(--mkt-block-cream);
+  color: var(--mkt-ink);
+}
+.mkt-block-pink {
+  background-color: var(--mkt-block-pink);
+  color: var(--mkt-ink);
+}
+.mkt-block-mint {
+  background-color: var(--mkt-block-mint);
+  color: var(--mkt-ink);
+}
+.mkt-block-coral {
+  background-color: var(--mkt-block-coral);
+  color: var(--mkt-ink);
+}
+.mkt-block-navy {
+  background-color: var(--mkt-block-navy);
+  color: var(--mkt-inverse-ink);
+}
+
+/* ── 마케팅 marquee 애니메이션 ───────────────────────────────────────────── */
+@keyframes mkt-marquee {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+.mkt-marquee-track {
+  display: flex;
+  width: max-content;
+  animation: mkt-marquee 30s linear infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .mkt-marquee-track {
+    animation: none;
+  }
+}
