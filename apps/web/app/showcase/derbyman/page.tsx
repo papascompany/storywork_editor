@@ -7,8 +7,40 @@
  * RSC
  */
 
+import type { Metadata } from 'next'
 import Image from 'next/image'
 import * as React from 'react'
+
+const BASE_URL = 'https://storywork-editor-web.vercel.app'
+
+export const metadata: Metadata = {
+  title: '더비맨 — 회사원에서 콘티 작가가 되다',
+  description:
+    '주말 취미로 시작한 짧은 만화. 대본 한 페이지가 4컷 콘티가 되기까지 5분. 스토리워크 크리에이터 사례.',
+  alternates: {
+    canonical: `${BASE_URL}/showcase/derbyman`,
+  },
+  openGraph: {
+    title: '더비맨 — 회사원에서 콘티 작가가 되다',
+    description:
+      '주말 취미로 시작한 짧은 만화. 스토리워크로 대본 한 페이지를 4컷 콘티로, 5분 만에.',
+    url: `${BASE_URL}/showcase/derbyman`,
+    images: [
+      {
+        url: `${BASE_URL}/api/og/derbyman`,
+        width: 1200,
+        height: 630,
+        alt: '더비맨 — 회사원에서 콘티 작가가 되다',
+      },
+    ],
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: '더비맨 — 회사원에서 콘티 작가가 되다',
+    description: '주말 취미 → 4컷 콘티 → POD 인쇄. 스토리워크 크리에이터 사례.',
+    images: [`${BASE_URL}/api/og/derbyman`],
+  },
+}
 
 import { ColorBlock } from '../../../components/marketing/ColorBlock'
 import { Footer } from '../../../components/marketing/Footer'

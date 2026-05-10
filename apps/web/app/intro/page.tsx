@@ -5,7 +5,39 @@
  * RSC
  */
 
+import type { Metadata } from 'next'
 import * as React from 'react'
+
+const BASE_URL = 'https://storywork-editor-web.vercel.app'
+
+export const metadata: Metadata = {
+  title: '스토리워크 소개 — 그림을 못 그려도 내 이야기가 있다면',
+  description:
+    '스토리워크를 만든 이유, 누구를 위한 서비스인지, 무엇이 다른지 소개합니다. 1,270+ 포즈 + AI 자동 배치로 누구나 콘티 작가가 됩니다.',
+  alternates: {
+    canonical: `${BASE_URL}/intro`,
+  },
+  openGraph: {
+    title: '스토리워크 소개 — 그림을 못 그려도 내 이야기가 있다면',
+    description:
+      '스토리워크를 만든 이유와 핵심 철학. 1,270+ 포즈 + AI 자동 배치로 누구나 콘티 작가.',
+    url: `${BASE_URL}/intro`,
+    images: [
+      {
+        url: `${BASE_URL}/api/og/intro`,
+        width: 1200,
+        height: 630,
+        alt: '스토리워크 소개 — 그림을 못 그려도 내 이야기가 있다면',
+      },
+    ],
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: '스토리워크 소개 — 그림을 못 그려도 내 이야기가 있다면',
+    description: '스토리워크를 만든 이유. 1,270+ 포즈 + AI로 누구나 콘티 작가.',
+    images: [`${BASE_URL}/api/og/intro`],
+  },
+}
 
 import { ColorBlock } from '../../components/marketing/ColorBlock'
 import { FeatureCard } from '../../components/marketing/FeatureCard'

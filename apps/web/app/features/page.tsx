@@ -7,8 +7,40 @@
  * RSC
  */
 
+import type { Metadata } from 'next'
 import Image from 'next/image'
 import * as React from 'react'
+
+const BASE_URL = 'https://storywork-editor-web.vercel.app'
+
+export const metadata: Metadata = {
+  title: '기능 소개 — 콘티에 필요한 것만, 전부.',
+  description:
+    'AI 자동 배치, 1,270+ 포즈 라이브러리, 인쇄 사양 PDF 출판, 모바일 편집기. 콘티 전용 편집기 스토리워크의 6가지 핵심 기능.',
+  alternates: {
+    canonical: `${BASE_URL}/features`,
+  },
+  openGraph: {
+    title: '기능 소개 — 콘티에 필요한 것만, 전부.',
+    description:
+      'AI 자동 배치, 포즈 라이브러리, PDF 출판, 모바일 편집기. 스토리워크 핵심 기능 6가지.',
+    url: `${BASE_URL}/features`,
+    images: [
+      {
+        url: `${BASE_URL}/api/og/features`,
+        width: 1200,
+        height: 630,
+        alt: '스토리워크 기능 소개 — 콘티에 필요한 것만, 전부.',
+      },
+    ],
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: '기능 소개 — 콘티에 필요한 것만, 전부.',
+    description: 'AI 자동 배치·포즈 라이브러리·PDF 출판·모바일 편집기.',
+    images: [`${BASE_URL}/api/og/features`],
+  },
+}
 
 import { ColorBlock } from '../../components/marketing/ColorBlock'
 import { Footer } from '../../components/marketing/Footer'

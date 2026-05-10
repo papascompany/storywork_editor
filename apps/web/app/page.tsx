@@ -5,9 +5,40 @@
  * RSC (서버 컴포넌트) — MarqueeStrip 만 client
  */
 
+import type { Metadata } from 'next'
 import Image from 'next/image'
 import Link from 'next/link'
 import * as React from 'react'
+
+const BASE_URL = 'https://storywork-editor-web.vercel.app'
+
+export const metadata: Metadata = {
+  title: '스토리워크 — 대본만 쓰세요. AI가 페이지를 그립니다.',
+  description:
+    '1,270+ 포즈 라이브러리와 AI 자동 배치로 콘티 작가급 스토리보드를 5분 만에. POD 출판까지 한 번에.',
+  alternates: {
+    canonical: BASE_URL,
+  },
+  openGraph: {
+    title: '스토리워크 — 대본만 쓰세요. AI가 페이지를 그립니다.',
+    description: '대본 → 자동 페이지 → POD 인쇄. 콘티 작가의 5분.',
+    url: BASE_URL,
+    images: [
+      {
+        url: `${BASE_URL}/api/og/landing`,
+        width: 1200,
+        height: 630,
+        alt: '스토리워크 — 대본만 쓰세요. AI가 페이지를 그립니다.',
+      },
+    ],
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: '스토리워크 — 대본만 쓰세요. AI가 페이지를 그립니다.',
+    description: '대본 → 자동 페이지 → POD 인쇄. 콘티 작가의 5분.',
+    images: [`${BASE_URL}/api/og/landing`],
+  },
+}
 
 import { ColorBlock } from '../components/marketing/ColorBlock'
 import { Footer } from '../components/marketing/Footer'
