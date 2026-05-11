@@ -5,9 +5,10 @@
 // RightPanel — 통합 우측 패널
 //
 // 구조:
-//   [탭바: Properties | Layers]
+//   [탭바: Properties | Layers | Pages]
 //   Properties 탭: ControlBar (선택 객체 타입별 가변)
 //   Layers 탭: LayerPanel (재작성)
+//   Pages 탭: PagePanel (다중 페이지 관리)
 //
 // 동작:
 //   - 객체 선택 → Properties 탭 자동 전환
@@ -20,13 +21,14 @@
 import type { StoryCanvas } from '@storywork/editor-core'
 import type { LayerTree } from '@storywork/editor-layers'
 import { Tabs, TabsContent, TabsList, TabsTrigger, cn } from '@storywork/ui'
-import { Layers, Settings2 } from 'lucide-react'
+import { BookOpen, Layers, Settings2 } from 'lucide-react'
 import React, { useEffect, useRef, useState } from 'react'
 
 import { AlignControlBar } from './AlignControlBar'
 import { ControlBar } from './ControlBar'
 import type { ObjectProps } from './hooks/useSelection'
 import { LayerPanel } from './LayerPanel'
+import { PagePanel } from './page-system/PagePanel'
 import type { HistoryRef as History } from './types'
 
 // ─── 타입 ─────────────────────────────────────────────────────────────────────
@@ -37,9 +39,10 @@ type RightPanelProps = {
   layerTree: LayerTree | null
   history: History | null
   selectedIds: string[]
+  onPageChange?: (index: number) => void
 }
 
-type TabValue = 'properties' | 'layers'
+type TabValue = 'properties' | 'layers' | 'pages'
 
 // ─── RightPanel ───────────────────────────────────────────────────────────────
 
@@ -50,7 +53,14 @@ type TabValue = 'properties' | 'layers'
  * - 이전 선택 상태에서 새 선택이 들어오면 → Properties 탭 전환
  * - 단, 사용자가 이미 Layers 탭을 명시적으로 클릭한 상태라면 유지
  */
-export function RightPanel({ props, canvas, layerTree, history, selectedIds }: RightPanelProps) {
+export function RightPanel({
+  props,
+  canvas,
+  layerTree,
+  history,
+  selectedIds,
+  onPageChange,
+}: RightPanelProps) {
   const [tab, setTab] = useState<TabValue>('properties')
   // 사용자가 수동으로 Layers 탭을 클릭했는지 추적
   const userManualTab = useRef(false)
@@ -84,8 +94,8 @@ export function RightPanel({ props, canvas, layerTree, history, selectedIds }: R
   const handleTabChange = (value: string) => {
     const v = value as TabValue
     setTab(v)
-    // 사용자가 Layers 를 클릭 → 이후 선택에도 Properties 로 강제 전환 안 함
-    if (v === 'layers') {
+    // 사용자가 Layers 또는 Pages 를 클릭 → 이후 선택에도 Properties 로 강제 전환 안 함
+    if (v === 'layers' || v === 'pages') {
       userManualTab.current = true
     } else {
       userManualTab.current = false
@@ -119,6 +129,10 @@ export function RightPanel({ props, canvas, layerTree, history, selectedIds }: R
             <Layers className="size-3.5" aria-hidden="true" />
             <span>레이어</span>
           </TabsTrigger>
+          <TabsTrigger value="pages" className="gap-1.5" data-testid="right-panel-pages-tab">
+            <BookOpen className="size-3.5" aria-hidden="true" />
+            <span>페이지</span>
+          </TabsTrigger>
         </TabsList>
 
         {/* Properties 탭 */}
@@ -149,6 +163,14 @@ export function RightPanel({ props, canvas, layerTree, history, selectedIds }: R
             history={history as any}
             selectedIds={selectedIds}
           />
+        </TabsContent>
+
+        {/* Pages 탭 */}
+        <TabsContent
+          value="pages"
+          className="overflow-hidden data-[state=active]:flex data-[state=active]:flex-col"
+        >
+          <PagePanel onPageChange={onPageChange} />
         </TabsContent>
       </Tabs>
     </aside>

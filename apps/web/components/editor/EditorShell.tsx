@@ -7,6 +7,7 @@
 // M1-08c: ToolBar 11종 + FeatureSidebar 슬라이드 패널 통합
 // M1-08d: RightPanel (ControlBar + LayerPanel 통합) 교체
 // M1-08f: CommandPalette(⌘K) + KeyboardShortcutsModal(?) + 글로벌 단축키
+// Page System: FormatPickerModal + PagePanel + 페이지 전환 + 자동저장 통합
 //
 // 레이아웃 (데스크톱 md+):
 //   [TopBar                                          ]
@@ -18,11 +19,14 @@
 //   ⌘K          → CommandPalette 열기
 //   ?           → KeyboardShortcutsModal 열기 (input focus 아닐 때)
 //   V/T/P/B/Q/W/D/S/X/U/I → setActiveTool
+//   ⌘⇧N        → 새 페이지 추가
+//   ⌘→ / ⌘←   → 다음/이전 페이지
 //   storywork:open-shortcuts  → Custom Event (builtins.ts 에서 dispatch)
 //   storywork:toggle-theme    → Custom Event
 // ─────────────────────────────────────────────
 
 import type { StoryCanvas } from '@storywork/editor-core'
+import { exportJson } from '@storywork/editor-export'
 import { AddObjectCommand } from '@storywork/editor-history'
 import type { LayerNodeJson, LayerTree } from '@storywork/editor-layers'
 import type { PageJsonV1 } from '@storywork/schema/editor'
@@ -31,12 +35,7 @@ import { FabricImage, Rect } from 'fabric'
 import { useCallback, useEffect, useRef, useState } from 'react'
 
 import type { ResourceSummary } from '../../app/api/_lib/search-types'
-import {
-  AUTOSAVE_STORAGE_KEY,
-  DEFAULT_FORMAT,
-  SEED_BACKGROUND_FILL,
-  SEED_POSE_PNG_DATA_URL,
-} from '../../lib/editor/seed'
+import { DEFAULT_FORMAT, SEED_BACKGROUND_FILL, SEED_POSE_PNG_DATA_URL } from '../../lib/editor/seed'
 
 import { CommandPalette } from './CommandPalette'
 import { EditorCanvas } from './EditorCanvas'
@@ -50,7 +49,15 @@ import type { EditorRefs } from './hooks/useStoryCanvas'
 import { useStoryCanvas } from './hooks/useStoryCanvas'
 import { KeyboardShortcutsModal } from './KeyboardShortcutsModal'
 import { MobileBottomSheet } from './MobileBottomSheet'
+import { FormatPickerModal } from './page-system/FormatPickerModal'
+import { captureThumbnail } from './page-system/thumbnail'
 import { RightPanel } from './RightPanel'
+import {
+  createDebouncedSave,
+  loadLatestProject,
+  saveProjectToLocalStorage,
+} from './store/page-persistence'
+import { usePageStore } from './store/usePageStore'
 import { type ToolId, useToolStore } from './store/useToolStore'
 import { ToolBar } from './ToolBar'
 import { TopBar } from './TopBar'
@@ -86,12 +93,24 @@ export function EditorShell() {
 
   const [readyTick, setReadyTick] = useState(0)
 
+  // ── 페이지 시스템 상태 ─────────────────────────────────────────
+  const project = usePageStore((s) => s.project)
+  const { createProject, loadProject, setCurrentPage, updateCurrentPageJson, addPage } =
+    usePageStore()
+  const [formatPickerOpen, setFormatPickerOpen] = useState(false)
+  const [recoveryToastShown, setRecoveryToastShown] = useState(false)
+
+  // 페이지 전환 중 중복 실행 방지 플래그
+  const pageTransitionRef = useRef(false)
+
+  // 자동저장 debounce
+  const debouncedSaveRef = useRef(createDebouncedSave(5000))
+
   const onReady = useCallback((refs: EditorRefs) => {
     if (!refs.canvas || !refs.layerTree || !refs.history) return
     canvasRef.current = refs.canvas
     layerTreeRef.current = refs.layerTree
     historyRef.current = refs.history
-    restoreFromLocalStorage(refs.canvas, refs.layerTree)
     setReadyTick((t) => t + 1)
   }, [])
 
@@ -128,7 +147,9 @@ export function EditorShell() {
     layerTreeRef.current,
     historyRef.current,
   )
-  const [fileName, setFileName] = useState('제목 없음')
+
+  // 프로젝트 이름을 파일명 상태에 동기화
+  const [fileName, setFileName] = useState(project?.title ?? '새 콘티')
 
   // ── 모달 상태 ────────────────────────────────────────────────────
   const [commandPaletteOpen, setCommandPaletteOpen] = useState(false)
@@ -139,6 +160,204 @@ export function EditorShell() {
     document.body.dataset.route = 'editor'
     return () => {
       delete document.body.dataset.route
+    }
+  }, [])
+
+  // ── 페이지 시스템 초기화: 복구 또는 FormatPickerModal 노출 ──────
+  useEffect(() => {
+    if (!readyTick) return // canvas 아직 미준비
+    if (project) return // 이미 프로젝트 있음
+
+    // localStorage 에서 최근 프로젝트 복구 시도
+    const latest = loadLatestProject()
+    if (latest) {
+      loadProject(latest)
+      setFileName(latest.title)
+
+      // 현재 페이지 JSON 복원
+      const currentPage = latest.pages[latest.currentPageIndex]
+      if (currentPage && canvasRef.current) {
+        void canvasRef.current
+          .loadJson(currentPage.fabricJson as PageJsonV1)
+          .then(() => {
+            if (
+              layerTreeRef.current &&
+              Array.isArray((currentPage.fabricJson as { layers?: unknown[] }).layers)
+            ) {
+              layerTreeRef.current.loadJson(
+                (currentPage.fabricJson as { layers?: LayerNodeJson[] }).layers ?? [],
+              )
+            }
+          })
+          .catch((err) => {
+            console.warn('[EditorShell] 페이지 복원 실패:', err)
+          })
+
+        // 복구 토스트 1회만 표시
+        if (!recoveryToastShown) {
+          setRecoveryToastShown(true)
+          showToast(`"${latest.title}" 복구됨`, 'success')
+        }
+      }
+      return
+    }
+
+    // 복구 불가 → FormatPickerModal 표시
+    setFormatPickerOpen(true)
+  }, [readyTick]) // 의도적 의존성 축소: project 변경 시 재실행 방지
+
+  // ── 프로젝트 생성 시 파일명 동기화 ──────────────────────────────
+  useEffect(() => {
+    if (project?.title) {
+      setFileName(project.title)
+    }
+  }, [project?.title])
+
+  // ── 페이지 전환 처리 ────────────────────────────────────────────
+  const prevPageIndexRef = useRef<number | null>(null)
+
+  useEffect(() => {
+    if (!project || !canvasRef.current) return
+    const { currentPageIndex, pages } = project
+    const prev = prevPageIndexRef.current
+
+    if (prev === null) {
+      prevPageIndexRef.current = currentPageIndex
+      return
+    }
+    if (prev === currentPageIndex) return
+    if (pageTransitionRef.current) return
+
+    pageTransitionRef.current = true
+
+    const canvas = canvasRef.current
+
+    // 1. 이전 페이지 JSON 저장 (전환 직전 상태)
+    const prevPage = pages[prev]
+    if (prevPage) {
+      try {
+        const result = exportJson(canvas, layerTreeRef.current ?? undefined)
+        updateCurrentPageJson(result.page as Record<string, unknown>)
+      } catch (e) {
+        console.warn('[EditorShell] 페이지 JSON 저장 실패:', e)
+      }
+    }
+
+    // 2. 새 페이지 JSON 로드
+    const newPage = pages[currentPageIndex]
+    if (newPage) {
+      const fabricJson = newPage.fabricJson
+      const isEmpty = !fabricJson || Object.keys(fabricJson).length === 0
+
+      if (isEmpty) {
+        canvas._fabricCanvas.clear()
+        canvas._fabricCanvas.requestRenderAll()
+        if (historyRef.current) {
+          // 페이지 전환 시 history clear (글로벌 단순화 전략)
+          historyRef.current.clear()
+        }
+        pageTransitionRef.current = false
+        prevPageIndexRef.current = currentPageIndex
+      } else {
+        void canvas
+          .loadJson(fabricJson as PageJsonV1)
+          .then(() => {
+            if (historyRef.current) {
+              historyRef.current.clear()
+            }
+          })
+          .catch((err) => {
+            console.warn('[EditorShell] 페이지 로드 실패:', err)
+          })
+          .finally(() => {
+            pageTransitionRef.current = false
+            prevPageIndexRef.current = currentPageIndex
+          })
+      }
+    } else {
+      pageTransitionRef.current = false
+      prevPageIndexRef.current = currentPageIndex
+    }
+  }, [project?.currentPageIndex]) // 의도적: currentPageIndex 변경 시만 실행
+
+  // ── 페이지 자동 저장 (canvas 변경 감지 → debounce) ─────────────
+  useEffect(() => {
+    if (!canvasRef.current || !project) return
+    const fabricCanvas = canvasRef.current._fabricCanvas
+
+    const handleChange = () => {
+      if (!canvasRef.current || !project) return
+      try {
+        const result = exportJson(canvasRef.current, layerTreeRef.current ?? undefined)
+        updateCurrentPageJson(result.page as Record<string, unknown>)
+        // 썸네일 비동기 캡처
+        void captureThumbnail(canvasRef.current as StoryCanvas).then((thumb) => {
+          if (thumb) {
+            usePageStore.getState().updateCurrentPageThumbnail(thumb)
+          }
+        })
+        // localStorage debounce 저장
+        const updatedProject = usePageStore.getState().project
+        if (updatedProject) {
+          debouncedSaveRef.current.schedule(updatedProject)
+        }
+      } catch (e) {
+        console.warn('[EditorShell] 페이지 자동저장 실패:', e)
+      }
+    }
+
+    fabricCanvas.on('object:added', handleChange)
+    fabricCanvas.on('object:modified', handleChange)
+    fabricCanvas.on('object:removed', handleChange)
+
+    return () => {
+      fabricCanvas.off('object:added', handleChange)
+      fabricCanvas.off('object:modified', handleChange)
+      fabricCanvas.off('object:removed', handleChange)
+    }
+  }, [canvasRef.current, project?.id]) // 의도적: canvas 마운트 또는 프로젝트 변경 시만
+
+  // ── FormatPickerModal: 프로젝트 생성 ────────────────────────────
+  const handleFormatSelect = useCallback(
+    (format: Parameters<typeof createProject>[0], formatId: string, title: string) => {
+      createProject(format, formatId, title)
+      setFormatPickerOpen(false)
+      setFileName(title)
+      // 캔버스 초기화
+      if (canvasRef.current) {
+        canvasRef.current._fabricCanvas.clear()
+        canvasRef.current._fabricCanvas.requestRenderAll()
+      }
+      prevPageIndexRef.current = 0
+    },
+    [createProject],
+  )
+
+  // ── 페이지 네비게이션 헬퍼 ──────────────────────────────────────
+  const handlePrevPage = useCallback(() => {
+    if (!project) return
+    const newIdx = project.currentPageIndex - 1
+    if (newIdx >= 0) setCurrentPage(newIdx)
+  }, [project, setCurrentPage])
+
+  const handleNextPage = useCallback(() => {
+    if (!project) return
+    const newIdx = project.currentPageIndex + 1
+    if (newIdx < project.pages.length) setCurrentPage(newIdx)
+  }, [project, setCurrentPage])
+
+  const handleAddPage = useCallback(() => {
+    if (!project) return
+    addPage({ afterIndex: project.currentPageIndex })
+  }, [project, addPage])
+
+  // ── 파일명 변경 → 프로젝트 이름 동기화 ─────────────────────────
+  const handleFileNameChange = useCallback((name: string) => {
+    setFileName(name)
+    usePageStore.getState().renameProject(name)
+    const updatedProject = usePageStore.getState().project
+    if (updatedProject) {
+      saveProjectToLocalStorage(updatedProject)
     }
   }, [])
 
@@ -165,6 +384,27 @@ export function EditorShell() {
       if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
         e.preventDefault()
         setCommandPaletteOpen((v) => !v)
+        return
+      }
+
+      // ⌘→ / ⌘ArrowRight → 다음 페이지
+      if ((e.metaKey || e.ctrlKey) && e.key === 'ArrowRight') {
+        e.preventDefault()
+        handleNextPage()
+        return
+      }
+
+      // ⌘← / ⌘ArrowLeft → 이전 페이지
+      if ((e.metaKey || e.ctrlKey) && e.key === 'ArrowLeft') {
+        e.preventDefault()
+        handlePrevPage()
+        return
+      }
+
+      // ⌘⇧N → 새 페이지 추가
+      if ((e.metaKey || e.ctrlKey) && e.shiftKey && e.key === 'n') {
+        e.preventDefault()
+        handleAddPage()
         return
       }
 
@@ -474,7 +714,14 @@ export function EditorShell() {
 
     window.addEventListener('keydown', onKeyDown)
     return () => window.removeEventListener('keydown', onKeyDown)
-  }, [commandPaletteOpen, shortcutsModalOpen, tapTool])
+  }, [
+    commandPaletteOpen,
+    shortcutsModalOpen,
+    tapTool,
+    handleNextPage,
+    handlePrevPage,
+    handleAddPage,
+  ])
 
   // ── Custom Events (builtins.ts 에서 dispatch) ────────────────
   useEffect(() => {
@@ -661,7 +908,7 @@ export function EditorShell() {
         {/* TopBar — 모바일/데스크톱 공통, 모바일 48px */}
         <TopBar
           fileName={fileName}
-          onFileNameChange={setFileName}
+          onFileNameChange={handleFileNameChange}
           saveStatus={saveStatus}
           lastSavedAt={lastSavedAt}
           failReason={failReason}
@@ -671,6 +918,10 @@ export function EditorShell() {
           onRedo={redo}
           canvas={canvasRef.current}
           layerTree={layerTreeRef.current}
+          currentPage={project ? project.currentPageIndex + 1 : 1}
+          totalPages={project ? project.pages.length : 1}
+          onPrevPage={handlePrevPage}
+          onNextPage={handleNextPage}
           onOpenCommandPalette={() => setCommandPaletteOpen(true)}
           onOpenShortcuts={() => setShortcutsModalOpen(true)}
         />
@@ -700,16 +951,23 @@ export function EditorShell() {
               onAddPoseToCanvas={addPoseFromResource}
             />
             {/* Footer — 데스크톱(md+) 전용 */}
-            <Footer canvas={canvasRef.current} />
+            <Footer
+              canvas={canvasRef.current}
+              currentPage={project ? project.currentPageIndex + 1 : 1}
+              totalPages={project ? project.pages.length : 1}
+              onPrevPage={handlePrevPage}
+              onNextPage={handleNextPage}
+            />
           </div>
 
-          {/* RightPanel (Inspector + LayerPanel 통합) — 데스크톱(md+) only */}
+          {/* RightPanel (Inspector + LayerPanel + PagePanel 통합) — 데스크톱(md+) only */}
           <RightPanel
             props={selectionProps}
             canvas={canvasRef.current}
             layerTree={layerTreeRef.current}
             history={historyRef.current as any}
             selectedIds={selectedIds}
+            onPageChange={(idx) => setCurrentPage(idx)}
           />
         </div>
 
@@ -744,38 +1002,22 @@ export function EditorShell() {
           open={shortcutsModalOpen}
           onClose={() => setShortcutsModalOpen(false)}
         />
+
+        {/* FormatPickerModal — 첫 진입 또는 새 프로젝트 */}
+        <FormatPickerModal
+          open={formatPickerOpen}
+          dismissable={!!project}
+          onSelect={handleFormatSelect}
+          onClose={() => setFormatPickerOpen(false)}
+        />
       </div>
     </EditorContext.Provider>
   )
 }
 
 // ─────────────────────────────────────────────
-// 로컬 저장 복원 헬퍼
+// 레거시 타입 (로컬 참조용)
 // ─────────────────────────────────────────────
 
-type SavedData = {
-  page: PageJsonV1
-  layers: LayerNodeJson[]
-}
-
-function restoreFromLocalStorage(canvas: StoryCanvas, layerTree: LayerTree): void {
-  try {
-    const raw = localStorage.getItem(AUTOSAVE_STORAGE_KEY)
-    if (!raw) return
-    const data = JSON.parse(raw) as SavedData
-    if (!data?.page) return
-
-    canvas
-      .loadJson(data.page)
-      .then(() => {
-        if (data.layers?.length) {
-          layerTree.loadJson(data.layers)
-        }
-      })
-      .catch((err) => {
-        console.warn('[EditorShell] 로컬 저장 데이터 복원 실패:', err)
-      })
-  } catch {
-    console.warn('[EditorShell] localStorage 파싱 실패 — 초기 빈 캔버스로 시작')
-  }
-}
+// PageJsonV1 및 LayerNodeJson 은 EditorShell 내에서 동적 import 로 처리함
+// (restoreFromLocalStorage 는 page-persistence + usePageStore 로 대체됨)

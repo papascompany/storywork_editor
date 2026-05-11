@@ -80,10 +80,23 @@ function fitToViewport(canvas: StoryCanvas): void {
 
 type FooterProps = {
   canvas: StoryCanvas | null
+  currentPage?: number
+  totalPages?: number
+  onPrevPage?: () => void
+  onNextPage?: () => void
+  onTogglePagePanel?: () => void
   className?: string
 }
 
-export function Footer({ canvas, className }: FooterProps) {
+export function Footer({
+  canvas,
+  currentPage = 1,
+  totalPages = 1,
+  onPrevPage,
+  onNextPage,
+  onTogglePagePanel,
+  className,
+}: FooterProps) {
   const [zoom, setZoom] = useState(100)
   const throttleRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
@@ -169,7 +182,13 @@ export function Footer({ canvas, className }: FooterProps) {
     >
       {/* 좌: 페이지 인디케이터 */}
       <div className="flex min-w-[96px] items-center">
-        <PageIndicator currentPage={1} totalPages={1} />
+        <PageIndicator
+          currentPage={currentPage}
+          totalPages={totalPages}
+          onPrev={onPrevPage}
+          onNext={onNextPage}
+          onTogglePanel={onTogglePagePanel}
+        />
       </div>
 
       {/* 가운데: 캔버스 사이즈 */}
