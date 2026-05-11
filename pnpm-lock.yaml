@@ -350,6 +350,9 @@ importers:
       '@storywork/editor-layers':
         specifier: workspace:*
         version: link:../../packages/editor-layers
+      '@storywork/editor-template':
+        specifier: workspace:*
+        version: link:../../packages/editor-template
       '@storywork/editor-text':
         specifier: workspace:*
         version: link:../../packages/editor-text
@@ -701,15 +704,6 @@ importers:
       '@storywork/editor-history':
         specifier: workspace:*
         version: link:../editor-history
-      '@storywork/editor-layers':
-        specifier: workspace:*
-        version: link:../editor-layers
-      '@storywork/schema':
-        specifier: workspace:*
-        version: link:../shared-schema
-      '@storywork/utils':
-        specifier: workspace:*
-        version: link:../shared-utils
     devDependencies:
       typescript:
         specifier: ^5.6.0
