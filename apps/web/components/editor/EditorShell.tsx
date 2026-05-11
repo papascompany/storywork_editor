@@ -871,11 +871,12 @@ export function EditorShell() {
     })
     history.push(cmd)
 
-    if (layerTree) {
-      const id = cmd.assignedId
-      if (id) {
-        layerTree.sendToBack(id)
-      }
+    // 배경은 맨 뒤로 — fabric API + layerTree 양쪽 동기화
+    const id = cmd.assignedId
+    if (id) {
+      canvas._fabricCanvas.sendObjectToBack(rect)
+      canvas._fabricCanvas.requestRenderAll()
+      if (layerTree) layerTree.sendToBack(id)
     }
 
     requestMobileClose()
@@ -957,6 +958,7 @@ export function EditorShell() {
               totalPages={project ? project.pages.length : 1}
               onPrevPage={handlePrevPage}
               onNextPage={handleNextPage}
+              onGoToPage={(idx) => setCurrentPage(idx)}
             />
           </div>
 

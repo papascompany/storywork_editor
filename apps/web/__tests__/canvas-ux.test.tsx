@@ -500,10 +500,11 @@ describe('Footer', () => {
   it('15. 페이지 인디케이터가 렌더된다', async () => {
     const { Footer } = await import('../components/editor/Footer')
     const canvas = makeCanvasMock()
-    render(<Footer canvas={canvas as never} />)
+    // 5개 이하 → dot 인디케이터, 1페이지 기본값 → page-dot-1
+    render(<Footer canvas={canvas as never} totalPages={1} currentPage={1} />)
 
-    // PageIndicator 의 data-testid
-    expect(screen.getByTestId('page-indicator')).toBeInTheDocument()
+    // dot 인디케이터 (1페이지)
+    expect(screen.getByTestId('page-dot-1')).toBeInTheDocument()
   })
 })
 

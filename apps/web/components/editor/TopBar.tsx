@@ -47,8 +47,7 @@ import React, { useState } from 'react'
 import { AutoSaveIndicator } from './AutoSaveIndicator'
 import { DownloadMenu } from './DownloadMenu'
 import { FilenameInline } from './FilenameInline'
-import { PageIndicator } from './PageIndicator'
-import type { AutosaveFailReason, SaveStatus } from './hooks/useAutosave' // eslint-disable-line import/order
+import type { AutosaveFailReason, SaveStatus } from './hooks/useAutosave'
 
 // ─── Props ───────────────────────────────────────────────────────────────────
 
@@ -98,10 +97,7 @@ export function TopBar({
   onRedo,
   canvas,
   layerTree,
-  currentPage = 1,
-  totalPages = 1,
-  onPrevPage,
-  onNextPage,
+  // currentPage, totalPages, onPrevPage, onNextPage — Footer 에서 단일 표시 (중복 제거)
   onOpenCommandPalette,
   onOpenShortcuts,
 }: TopBarProps) {
@@ -362,18 +358,7 @@ export function TopBar({
 
       {/* ── 가운데 그룹 (데스크톱) ───────────────────────────── */}
       <div className="hidden md:flex flex-1 items-center justify-center gap-2">
-        {/* 페이지 인디케이터 */}
-        <PageIndicator
-          currentPage={currentPage}
-          totalPages={totalPages}
-          onPrev={onPrevPage}
-          onNext={onNextPage}
-        />
-
-        {/* 구분선 */}
-        <div className="h-5 w-px bg-[var(--color-border)]" role="separator" aria-hidden="true" />
-
-        {/* 자동저장 인디케이터 */}
+        {/* 자동저장 인디케이터 — 페이지 네비게이션은 Footer 에서 단일 표시 */}
         <AutoSaveIndicator
           saveStatus={saveStatus}
           lastSavedAt={lastSavedAt}

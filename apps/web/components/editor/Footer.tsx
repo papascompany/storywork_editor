@@ -84,6 +84,7 @@ type FooterProps = {
   totalPages?: number
   onPrevPage?: () => void
   onNextPage?: () => void
+  onGoToPage?: (pageIndex: number) => void
   onTogglePagePanel?: () => void
   className?: string
 }
@@ -94,6 +95,7 @@ export function Footer({
   totalPages = 1,
   onPrevPage,
   onNextPage,
+  onGoToPage,
   onTogglePagePanel,
   className,
 }: FooterProps) {
@@ -187,6 +189,7 @@ export function Footer({
           totalPages={totalPages}
           onPrev={onPrevPage}
           onNext={onNextPage}
+          onGoToPage={onGoToPage}
           onTogglePanel={onTogglePagePanel}
         />
       </div>

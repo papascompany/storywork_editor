@@ -218,25 +218,32 @@ describe('AutoSaveIndicator', () => {
 // ─── 3. PageIndicator ────────────────────────────────────────────────────────
 
 describe('PageIndicator', () => {
-  it('1/1 기본: 양쪽 버튼 disabled', () => {
+  // 5개 이하 → dot 인디케이터, 6개 이상 → 숫자 인디케이터
+  it('1/1 기본(dot): 양쪽 버튼 disabled, dot 1개', () => {
     render(<PageIndicator currentPage={1} totalPages={1} />)
-    expect(screen.getByTestId('page-indicator')).toHaveTextContent('1/1')
-    const buttons = screen.getAllByRole('button')
-    // 이전/다음 2개 모두 disabled
-    buttons.forEach((btn) => {
-      if (
-        btn.hasAttribute('aria-label') &&
-        (btn.getAttribute('aria-label') === '이전 페이지' ||
-          btn.getAttribute('aria-label') === '다음 페이지')
-      ) {
-        expect(btn).toBeDisabled()
-      }
-    })
+    // dot 인디케이터 (5개 이하) — page-dot-1 testId
+    expect(screen.getByTestId('page-dot-1')).toBeInTheDocument()
+    const prevBtn = screen.getByRole('button', { name: '이전 페이지' })
+    const nextBtn = screen.getByRole('button', { name: '다음 페이지' })
+    expect(prevBtn).toBeDisabled()
+    expect(nextBtn).toBeDisabled()
   })
 
-  it('2/5: 이전 활성, 다음 활성', () => {
+  it('2/5(dot): 이전 활성, 다음 활성, dot 5개', () => {
     render(<PageIndicator currentPage={2} totalPages={5} />)
-    expect(screen.getByTestId('page-indicator')).toHaveTextContent('2/5')
+    // dot 인디케이터: page-dot-1 ~ page-dot-5
+    expect(screen.getByTestId('page-dot-1')).toBeInTheDocument()
+    expect(screen.getByTestId('page-dot-5')).toBeInTheDocument()
+    const prevBtn = screen.getByRole('button', { name: '이전 페이지' })
+    const nextBtn = screen.getByRole('button', { name: '다음 페이지' })
+    expect(prevBtn).not.toBeDisabled()
+    expect(nextBtn).not.toBeDisabled()
+  })
+
+  it('2/6(숫자): 숫자 인디케이터 표시', () => {
+    render(<PageIndicator currentPage={2} totalPages={6} />)
+    // 6개 이상 → 숫자 인디케이터
+    expect(screen.getByTestId('page-indicator')).toHaveTextContent('2/6')
     const prevBtn = screen.getByRole('button', { name: '이전 페이지' })
     const nextBtn = screen.getByRole('button', { name: '다음 페이지' })
     expect(prevBtn).not.toBeDisabled()
@@ -251,6 +258,14 @@ describe('PageIndicator', () => {
     await userEvent.click(screen.getByRole('button', { name: '다음 페이지' }))
     expect(onPrev).toHaveBeenCalledOnce()
     expect(onNext).toHaveBeenCalledOnce()
+  })
+
+  it('dot 클릭 → onGoToPage 콜백 호출', async () => {
+    const onGoToPage = vi.fn()
+    render(<PageIndicator currentPage={1} totalPages={3} onGoToPage={onGoToPage} />)
+    // 페이지 3 dot 클릭 (index 2)
+    await userEvent.click(screen.getByTestId('page-dot-3'))
+    expect(onGoToPage).toHaveBeenCalledWith(2)
   })
 })
 

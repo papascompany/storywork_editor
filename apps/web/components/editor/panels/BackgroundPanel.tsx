@@ -66,10 +66,14 @@ export function BackgroundPanel({ canvas, history, layerTree }: BackgroundPanelP
       })
       history.push(cmd)
 
-      // 배경은 맨 뒤로
-      if (layerTree) {
-        const id = cmd.assignedId
-        if (id) layerTree.sendToBack(id)
+      // 배경은 맨 뒤로 — fabric API + layerTree 양쪽 동기화
+      const id = cmd.assignedId
+      if (id) {
+        // fabric 직접 sendToBack (즉시 반영 보장)
+        canvas._fabricCanvas.sendObjectToBack(rect)
+        canvas._fabricCanvas.requestRenderAll()
+        // layerTree 도 동기화 (레이어 패널 반영)
+        if (layerTree) layerTree.sendToBack(id)
       }
 
       showToast(`${label} 배경이 적용됐어요.`, 'success')

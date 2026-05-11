@@ -138,19 +138,24 @@ export function PoseGridItem({ pose, onAddToCanvas }: PoseGridItemProps): React.
         <Plus className="size-6 text-white drop-shadow-sm" aria-hidden="true" />
       </div>
 
-      {/* lowDpi 뱃지 (우상단) */}
+      {/* lowDpi 뱃지 (우하단) — hover 시만 표시, 톤 다운 */}
       {pose.lowDpi && (
         <Tooltip content="저해상도 자산 — 작은 슬롯 권장" side="top">
           <span
             aria-label="저해상도 자산"
             className={cn(
-              'absolute right-1 top-1 z-10',
-              'flex h-5 w-5 items-center justify-center',
-              'rounded-full bg-[var(--color-warning-500,#f59e0b)]',
-              'text-white shadow-sm',
+              'absolute bottom-1 right-1 z-10',
+              'flex h-4 w-4 items-center justify-center',
+              'rounded-full',
+              // hover 시만 표시 (기본 숨김 → group-hover 에서 표시)
+              'opacity-0 group-hover:opacity-100 group-focus-visible:opacity-100',
+              'transition-opacity duration-[var(--duration-fast)]',
+              'motion-reduce:opacity-100',
+              // 옅은 톤 (red → amber-200 배경 + amber-700 텍스트)
+              'bg-amber-100 text-amber-600 border border-amber-300',
             )}
           >
-            <AlertTriangle className="size-3" aria-hidden="true" />
+            <AlertTriangle className="size-2.5" aria-hidden="true" />
           </span>
         </Tooltip>
       )}

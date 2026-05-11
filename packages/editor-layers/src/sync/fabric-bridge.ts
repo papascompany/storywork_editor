@@ -34,35 +34,39 @@ export function applyHiddenToFabricObject(obj: FabricObject, hidden: boolean): v
  *
  * 그룹 안의 객체는 fabric Group 이 내부적으로 관리하므로 여기서는
  * root 레벨 객체만 재정렬한다.
+ *
+ * fabric v6 공식 API(moveObjectTo)를 사용하여 안전하게 재정렬한다.
  */
 export function syncZOrderToFabric(orderedIds: string[], canvas: StoryCanvas): void {
   const fabricCanvas = canvas._fabricCanvas
-  const objects: FabricObject[] = fabricCanvas._objects
 
   // id → fabric 객체 맵 구성
   const idToObj = new Map<string, FabricObject>()
-  for (const obj of objects) {
+  for (const obj of fabricCanvas.getObjects()) {
     const data = (obj as { data?: { id?: string } }).data
     if (data?.id) {
       idToObj.set(data.id, obj)
     }
   }
 
-  // orderedIds 순서대로 새 배열 구성 (없는 id 는 건너뜀)
-  const reordered: FabricObject[] = []
+  // orderedIds 순서대로 목표 배열 구성 (없는 id 는 건너뜀)
+  // orderedIds[0] = 최하위(배경), orderedIds[N-1] = 최상위(전면)
+  const targets: FabricObject[] = []
   for (const id of orderedIds) {
     const obj = idToObj.get(id)
-    if (obj) reordered.push(obj)
+    if (obj) targets.push(obj)
   }
 
-  // orderedIds 에 없는 객체도 보존 (그룹 내부 객체 등)
-  for (const obj of objects) {
-    const data = (obj as { data?: { id?: string } }).data
-    if (!data?.id || !orderedIds.includes(data.id)) {
-      reordered.push(obj)
+  // fabric moveObjectTo 로 각 객체를 목표 인덱스로 이동
+  // targets[0] → index 0 (최하위), targets[N-1] → index N-1 (최상위)
+  for (let i = 0; i < targets.length; i++) {
+    const obj = targets[i]
+    if (!obj) continue
+    const currentIdx = fabricCanvas.getObjects().indexOf(obj)
+    if (currentIdx !== i) {
+      fabricCanvas.moveObjectTo(obj, i)
     }
   }
 
-  fabricCanvas._objects = reordered
   fabricCanvas.requestRenderAll()
 }
