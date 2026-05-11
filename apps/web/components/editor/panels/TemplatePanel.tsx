@@ -24,17 +24,25 @@ import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 
 // ─── API 연동 ─────────────────────────────────────────────────────────────────
 
+type RawTemplate = {
+  id?: unknown
+  name?: unknown
+  formatId?: unknown
+  format?: { widthMm?: unknown; heightMm?: unknown; bleedMm?: unknown; safeMm?: unknown }
+  slots?: unknown
+  thumbnail?: unknown
+  intent?: unknown
+}
+
 async function fetchPublishedTemplates(): Promise<TemplateSpec[]> {
   try {
     const res = await fetch('/api/templates?status=published', { cache: 'no-store' })
     if (!res.ok) return []
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const data = (await res.json()) as { templates?: any[] }
+    const data = (await res.json()) as { templates?: RawTemplate[] }
     if (!Array.isArray(data.templates) || data.templates.length === 0) return []
     // 간단 매핑 (admin Template DB → TemplateSpec)
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     return data.templates.map(
-      (t: any): TemplateSpec => ({
+      (t: RawTemplate): TemplateSpec => ({
         id: String(t.id ?? ''),
         name: String(t.name ?? ''),
         formatId: String(t.formatId ?? ''),
@@ -44,9 +52,9 @@ async function fetchPublishedTemplates(): Promise<TemplateSpec[]> {
           bleedMm: Number(t.format?.bleedMm ?? 3),
           safeMm: Number(t.format?.safeMm ?? 5),
         },
-        slots: Array.isArray(t.slots) ? t.slots : [],
-        thumbnail: t.thumbnail as string | undefined,
-        intent: t.intent as string | undefined,
+        slots: Array.isArray(t.slots) ? (t.slots as TemplateSpec['slots']) : [],
+        thumbnail: typeof t.thumbnail === 'string' ? t.thumbnail : undefined,
+        intent: typeof t.intent === 'string' ? t.intent : undefined,
       }),
     )
   } catch {
