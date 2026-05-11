@@ -44,6 +44,7 @@ import { BubblePanel } from './panels/BubblePanel'
 import { PlaceholderPanel } from './panels/PlaceholderPanel'
 import { PosePanel } from './panels/PosePanel'
 import { ShapePanel } from './panels/ShapePanel'
+import { TemplatePanel } from './panels/TemplatePanel'
 import { TextPanel } from './panels/TextPanel'
 import type { ToolId } from './store/useToolStore'
 import { useToolStore } from './store/useToolStore'
@@ -167,6 +168,8 @@ type PanelContentProps = {
 
 function PanelContent({ tool, canvas, history, layerTree, onAddPoseToCanvas }: PanelContentProps) {
   switch (tool) {
+    case 'template':
+      return <TemplatePanel canvas={canvas} />
     case 'background':
       return <BackgroundPanel canvas={canvas} history={history as any} layerTree={layerTree} />
     case 'shape':
@@ -240,7 +243,7 @@ export function FeatureSidebar({
   const meta = TOOL_META[active as ToolId]
   const PanelIcon = meta.Icon
   const isSearchEnabled = active === 'background' || active === 'shape' || active === 'pose'
-  // text/bubble 패널은 자체 UI 가 있으므로 검색창 숨김
+  // text/bubble/template 패널은 자체 UI 가 있으므로 검색창 숨김
 
   return (
     <aside
@@ -312,8 +315,8 @@ export function FeatureSidebar({
           </button>
         </div>
 
-        {/* 검색창 — pose/text/bubble 패널은 자체 UI 를 가지므로 숨김 */}
-        {active !== 'pose' && active !== 'text' && active !== 'bubble' && (
+        {/* 검색창 — pose/text/bubble/template 패널은 자체 UI 를 가지므로 숨김 */}
+        {active !== 'pose' && active !== 'text' && active !== 'bubble' && active !== 'template' && (
           <PanelSearch label={meta.label} disabled={!isSearchEnabled} />
         )}
 

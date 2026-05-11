@@ -19,6 +19,7 @@
     "@storywork/editor-export": "workspace:*",
     "@storywork/editor-history": "workspace:*",
     "@storywork/editor-layers": "workspace:*",
+    "@storywork/editor-template": "workspace:*",
     "@storywork/editor-text": "workspace:*",
     "@storywork/ui": "workspace:^",
     "fabric": "^6.9.1",

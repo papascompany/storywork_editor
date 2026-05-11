@@ -25,6 +25,7 @@ export type ToolId =
 // 현재 M2/M5 에서 실제 동작하는 도구 집합
 export const ACTIVE_TOOLS = new Set<ToolId>([
   'select',
+  'template', // M5-04 에서 활성화
   'background',
   'shape',
   'pose',
@@ -34,7 +35,7 @@ export const ACTIVE_TOOLS = new Set<ToolId>([
 
 // 비활성 도구별 활성화 예정 마일스톤 (Toast 메시지용)
 export const TOOL_MILESTONE: Partial<Record<ToolId, string>> = {
-  template: 'M3',
+  // template: 'M3',  ← M5-04 에서 활성화됨
   // pose: 'M2',  ← M2-05 에서 활성화됨
   // text: 'M5',  ← M5-01 에서 활성화됨 (Phase 2)
   // bubble: 'M5',  ← M5-02 에서 활성화됨

@@ -201,6 +201,98 @@ export const BUILTIN_COMMANDS: Command[] = [
     action: ({ setActiveTool }) => setActiveTool('ai'),
   },
 
+  // ── 템플릿 빠른 적용 ──────────────────────────────────────────────────────
+  {
+    id: 'template-apply-1on1',
+    category: 'tools',
+    label: '1대1 대화 템플릿 적용',
+    icon: LayoutTemplate,
+    keywords: ['template', '템플릿', '1대1', '대화', '1on1'],
+    action: async ({ canvas, showToast }) => {
+      if (!canvas) {
+        showToast('편집기가 준비되지 않았습니다.', 'error')
+        return
+      }
+      const { applyTemplate, DEFAULT_TEMPLATES } = await import('@storywork/editor-template')
+      const tmpl = DEFAULT_TEMPLATES.find((t) => t.id === 'default-1on1')
+      if (!tmpl) return
+      applyTemplate(canvas, tmpl, { existingObjects: 'preserve-user' })
+      showToast('"1대1 대화" 템플릿 적용됨', 'success')
+    },
+  },
+  {
+    id: 'template-apply-fullshot',
+    category: 'tools',
+    label: '풀샷 단독 템플릿 적용',
+    icon: LayoutTemplate,
+    keywords: ['template', '템플릿', '풀샷', 'fullshot', '전신'],
+    action: async ({ canvas, showToast }) => {
+      if (!canvas) {
+        showToast('편집기가 준비되지 않았습니다.', 'error')
+        return
+      }
+      const { applyTemplate, DEFAULT_TEMPLATES } = await import('@storywork/editor-template')
+      const tmpl = DEFAULT_TEMPLATES.find((t) => t.id === 'default-fullshot')
+      if (!tmpl) return
+      applyTemplate(canvas, tmpl, { existingObjects: 'preserve-user' })
+      showToast('"풀샷 단독" 템플릿 적용됨', 'success')
+    },
+  },
+  {
+    id: 'template-apply-closeup',
+    category: 'tools',
+    label: '클로즈업 템플릿 적용',
+    icon: LayoutTemplate,
+    keywords: ['template', '템플릿', '클로즈업', 'closeup', '얼굴'],
+    action: async ({ canvas, showToast }) => {
+      if (!canvas) {
+        showToast('편집기가 준비되지 않았습니다.', 'error')
+        return
+      }
+      const { applyTemplate, DEFAULT_TEMPLATES } = await import('@storywork/editor-template')
+      const tmpl = DEFAULT_TEMPLATES.find((t) => t.id === 'default-closeup')
+      if (!tmpl) return
+      applyTemplate(canvas, tmpl, { existingObjects: 'preserve-user' })
+      showToast('"클로즈업" 템플릿 적용됨', 'success')
+    },
+  },
+  {
+    id: 'template-apply-landscape',
+    category: 'tools',
+    label: '풍경 단독 템플릿 적용',
+    icon: LayoutTemplate,
+    keywords: ['template', '템플릿', '풍경', 'landscape', '배경'],
+    action: async ({ canvas, showToast }) => {
+      if (!canvas) {
+        showToast('편집기가 준비되지 않았습니다.', 'error')
+        return
+      }
+      const { applyTemplate, DEFAULT_TEMPLATES } = await import('@storywork/editor-template')
+      const tmpl = DEFAULT_TEMPLATES.find((t) => t.id === 'default-landscape')
+      if (!tmpl) return
+      applyTemplate(canvas, tmpl, { existingObjects: 'preserve-user' })
+      showToast('"풍경 단독" 템플릿 적용됨', 'success')
+    },
+  },
+  {
+    id: 'template-apply-3panel',
+    category: 'tools',
+    label: '3분할 컷 템플릿 적용',
+    icon: LayoutTemplate,
+    keywords: ['template', '템플릿', '3분할', '3panel', '컷'],
+    action: async ({ canvas, showToast }) => {
+      if (!canvas) {
+        showToast('편집기가 준비되지 않았습니다.', 'error')
+        return
+      }
+      const { applyTemplate, DEFAULT_TEMPLATES } = await import('@storywork/editor-template')
+      const tmpl = DEFAULT_TEMPLATES.find((t) => t.id === 'default-3panel')
+      if (!tmpl) return
+      applyTemplate(canvas, tmpl, { existingObjects: 'preserve-user' })
+      showToast('"3분할 컷" 템플릿 적용됨', 'success')
+    },
+  },
+
   // ── 편집 ──────────────────────────────────────────────────────────────────
   {
     id: 'edit-undo',
