@@ -15,7 +15,7 @@ import type { StoryCanvas } from '@storywork/editor-core'
 import { RemoveObjectCommand } from '@storywork/editor-history'
 import type { LayerTree } from '@storywork/editor-layers'
 import { cn } from '@storywork/ui'
-import { useCallback, useEffect, useRef } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 
 import type { ResourceSummary } from '../../app/api/_lib/search-types'
 
@@ -30,10 +30,62 @@ import { useToolStore } from './store/useToolStore'
 import type { HistoryRef as History } from './types'
 
 // ─────────────────────────────────────────────
+// B.3: 페이지 경계 오버레이 훅
+// fabric의 viewportTransform 에서 페이지의 실제 화면 위치/크기를 계산하여
+// CSS 박스를 오버레이로 표시한다 (흰 배경 + 그림자 + 경계).
+// ─────────────────────────────────────────────
+function usePageOverlay(canvas: StoryCanvas | null) {
+  const [pageBox, setPageBox] = useState<{
+    left: number
+    top: number
+    width: number
+    height: number
+  } | null>(null)
+
+  useEffect(() => {
+    if (!canvas) {
+      setPageBox(null)
+      return
+    }
+
+    const fc = canvas._fabricCanvas
+
+    const updateBox = () => {
+      const zoom = fc.getZoom()
+      const vt = fc.viewportTransform
+      const format = canvas.format
+      const pageW = canvas.mmToPx(format.widthMm)
+      const pageH = canvas.mmToPx(format.heightMm)
+
+      // viewportTransform: [scaleX, 0, 0, scaleY, offsetX, offsetY]
+      const offsetX = vt[4] ?? 0
+      const offsetY = vt[5] ?? 0
+
+      setPageBox({
+        left: offsetX,
+        top: offsetY,
+        width: pageW * zoom,
+        height: pageH * zoom,
+      })
+    }
+
+    fc.on('after:render', updateBox)
+    updateBox()
+
+    return () => {
+      fc.off('after:render', updateBox)
+    }
+  }, [canvas])
+
+  return pageBox
+}
+
+// ─────────────────────────────────────────────
 // C-1: ResizeObserver 3중 가드 (BUG-013 — iOS 크래시 차단)
 // 1) RAF 배칭: 한 프레임에 ResizeObserver 알림이 복수여도 resize() 는 1번만
 // 2) 1px 미만 변동 무시: 폰트 스케일링/서브픽셀 정밀도에 의한 루프 차단
 // 3) 동일 크기 setDimensions skip: fabric 불필요 재렌더 방지
+// 4) B.4 fix: 최초 마운트 시 setDimensions + fitToViewport 자동 호출
 // ─────────────────────────────────────────────
 function useResizeObserverGuard(
   wrapperRef: React.RefObject<HTMLDivElement | null>,
@@ -46,6 +98,7 @@ function useResizeObserverGuard(
     let lastW = 0
     let lastH = 0
     let rafId: number | null = null
+    let isFirstResize = true
 
     const resize = () => {
       rafId = null
@@ -54,14 +107,32 @@ function useResizeObserverGuard(
         return
       const w = el.offsetWidth
       const h = el.offsetHeight
+      if (w <= 0 || h <= 0) return
       // 가드 1: 1px 미만 변동 무시
       if (Math.abs(w - lastW) < 1 && Math.abs(h - lastH) < 1) return
       // 가드 2: 이미 동일 크기면 setDimensions skip
-      if (canvas._fabricCanvas.getWidth() === w && canvas._fabricCanvas.getHeight() === h) return
+      if (canvas._fabricCanvas.getWidth() === w && canvas._fabricCanvas.getHeight() === h) {
+        // 첫 발화이면 fitToViewport 는 항상 실행 (이미 올바른 크기여도)
+        if (isFirstResize) {
+          isFirstResize = false
+          void import('./Footer').then(({ fitToViewport }) => {
+            fitToViewport(canvas)
+          })
+        }
+        return
+      }
       lastW = w
       lastH = h
       canvas._fabricCanvas.setDimensions({ width: w, height: h })
       canvas._fabricCanvas.requestRenderAll()
+
+      // B.4 fix: 최초 마운트 시 dimensions 가 확정된 후 fitToViewport 자동 실행
+      if (isFirstResize) {
+        isFirstResize = false
+        void import('./Footer').then(({ fitToViewport }) => {
+          fitToViewport(canvas)
+        })
+      }
     }
 
     const ro = new ResizeObserver(() => {
@@ -120,6 +191,9 @@ export function EditorCanvas({
 
   // C-1: ResizeObserver 3중 가드 적용
   useResizeObserverGuard(wrapRef, canvas)
+
+  // B.3: 페이지 경계 오버레이
+  const pageBox = usePageOverlay(canvas)
 
   // 포즈 도구 활성화 (EmptyCanvasHint 칩에서 호출)
   const { setActive } = useToolStore()
@@ -306,14 +380,35 @@ export function EditorCanvas({
       onDragOver={onDragOver}
       onDrop={onDrop}
       className={cn(
-        'relative flex flex-1 items-center justify-center overflow-auto',
-        'bg-[var(--color-surface-muted)]',
+        // B.3: 전체 workspace 를 회색으로 (페이지 경계 인지)
+        'relative flex flex-1 overflow-hidden',
+        'bg-[var(--editor-workspace-bg,#e5e7eb)]',
         // 포커스 링
         'outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[var(--color-brand-500)]',
         // 드래그 활성 시 보라색 dashed outline
         isDragging && 'ring-2 ring-inset ring-[var(--color-brand-500)] ring-dashed',
       )}
     >
+      {/* fabric 캔버스 마운트 포인트 — 뷰포트 전체를 채움 */}
+      <div ref={containerRef} aria-label="fabric 캔버스 마운트" className="absolute inset-0" />
+
+      {/* B.3: 페이지 경계 오버레이 (pointer-events-none — 클릭 투과) */}
+      {pageBox && (
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute"
+          style={{
+            left: pageBox.left,
+            top: pageBox.top,
+            width: pageBox.width,
+            height: pageBox.height,
+            // 페이지 영역 외부 경계 강조 (그림자 + 실선 테두리)
+            boxShadow: '0 4px 32px 0 rgba(0,0,0,0.18), 0 0 0 1px rgba(0,0,0,0.08)',
+            // 페이지 배경은 fabric 이 그리므로 overlay 는 transparent
+          }}
+        />
+      )}
+
       {/* 드래그 활성 시 중앙 뱃지 */}
       {isDragging && (
         <div
@@ -338,17 +433,6 @@ export function EditorCanvas({
 
       {/* 빈 캔버스 힌트 */}
       <EmptyCanvasHint canvas={canvas} onActivatePoseTool={handleActivatePoseTool} />
-
-      {/* 흰색 페이지 + 그림자 */}
-      <div
-        className="relative"
-        style={{
-          // 캔버스는 fabric 이 내부적으로 크기를 결정. 외부 컨테이너를 맞춘다.
-          boxShadow: '0 4px 24px 0 rgba(0,0,0,0.12)',
-        }}
-      >
-        <div ref={containerRef} aria-label="fabric 캔버스 마운트" />
-      </div>
 
       {/* 선택 객체 위 Floating 액션 바 */}
       {selectedIds.length > 0 && (

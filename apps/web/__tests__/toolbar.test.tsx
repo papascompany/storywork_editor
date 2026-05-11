@@ -344,13 +344,13 @@ describe('BackgroundPanel — 컬러 클릭', () => {
     )
   })
 
-  it('12개 색상 버튼이 렌더된다', async () => {
+  it('색상 버튼이 렌더된다 (14색 팔레트)', async () => {
     const { BackgroundPanel } = await import('../components/editor/panels/BackgroundPanel')
 
     render(<BackgroundPanel canvas={null} history={null} layerTree={null} />)
 
     const colorBtns = screen.getAllByRole('button', { name: /배경 적용/ })
-    expect(colorBtns.length).toBe(12)
+    expect(colorBtns.length).toBe(14)
   })
 })
 

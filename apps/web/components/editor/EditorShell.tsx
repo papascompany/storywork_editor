@@ -788,8 +788,10 @@ export function EditorShell() {
       try {
         const img = await FabricImage.fromURL(url, { crossOrigin: 'anonymous' })
 
-        const canvasWidthPx = canvas.mmToPx(DEFAULT_FORMAT.widthMm)
-        const canvasHeightPx = canvas.mmToPx(DEFAULT_FORMAT.heightMm)
+        // B.2 fix: canvas.format 으로 실제 판형 크기 사용 (DEFAULT_FORMAT 하드코드 제거)
+        const format = canvas.format
+        const canvasWidthPx = canvas.mmToPx(format.widthMm)
+        const canvasHeightPx = canvas.mmToPx(format.heightMm)
 
         // ADR-0011a: lowDpi 자산은 페이지 한 변의 1/2 이하로 자동 크기 조정
         const maxFraction = pose.lowDpi ? 0.5 : 0.65
@@ -851,8 +853,10 @@ export function EditorShell() {
         crossOrigin: 'anonymous',
       })
 
-      const centerXPx = canvas.mmToPx(DEFAULT_FORMAT.widthMm / 2)
-      const centerYPx = canvas.mmToPx(DEFAULT_FORMAT.heightMm / 3)
+      // B.2 fix: canvas.format 으로 실제 판형 기준 좌표 계산
+      const format = canvas.format
+      const centerXPx = canvas.mmToPx(format.widthMm / 2)
+      const centerYPx = canvas.mmToPx(format.heightMm / 3)
       const widthPx = canvas.mmToPx(40)
       const heightPx = canvas.mmToPx(40)
 
@@ -884,8 +888,22 @@ export function EditorShell() {
     const layerTree = layerTreeRef.current
     if (!canvas || !history) return
 
-    const widthPx = canvas.mmToPx(DEFAULT_FORMAT.widthMm)
-    const heightPx = canvas.mmToPx(DEFAULT_FORMAT.heightMm)
+    // B.1 fix: 기존 background 객체가 있으면 fill 만 교체 (누적 방지)
+    const existingBg = canvas._fabricCanvas
+      .getObjects()
+      .find((o) => (o as { data?: { kind?: string } }).data?.kind === 'background')
+
+    if (existingBg) {
+      existingBg.set({ fill: SEED_BACKGROUND_FILL })
+      canvas._fabricCanvas.sendObjectToBack(existingBg)
+      canvas._fabricCanvas.requestRenderAll()
+      requestMobileClose()
+      return
+    }
+
+    const format = canvas.format
+    const widthPx = canvas.mmToPx(format.widthMm)
+    const heightPx = canvas.mmToPx(format.heightMm)
 
     const rect = new Rect({
       left: 0,

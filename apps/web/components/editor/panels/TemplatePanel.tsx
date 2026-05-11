@@ -96,9 +96,10 @@ function TemplateCard({ template, onClick, isApplying }: TemplateCardProps) {
       disabled={isApplying}
       onClick={() => onClick(template)}
       className={cn(
-        'flex flex-col gap-2 rounded-[var(--radius-md)]',
+        // C.4 fix: 카드 높이 고정 (grid 내 균일 정렬)
+        'flex flex-col gap-1.5 rounded-[var(--radius-md)]',
         'border border-[var(--editor-border)]',
-        'p-3 text-left',
+        'p-2 text-left w-full',
         'bg-[var(--color-surface)]',
         'hover:bg-[var(--editor-hover)] hover:border-[var(--color-brand-400)]',
         'transition-colors duration-[var(--duration-fast)]',
@@ -106,13 +107,13 @@ function TemplateCard({ template, onClick, isApplying }: TemplateCardProps) {
         isApplying && 'opacity-50 cursor-not-allowed',
       )}
     >
-      {/* 썸네일 or 플레이스홀더 */}
+      {/* C.4 fix: 썸네일 고정 비율 (2:3), 통일된 높이로 그리드 정렬 */}
       {template.thumbnail ? (
         <Image
           src={template.thumbnail}
           alt={template.name}
-          width={130}
-          height={200}
+          width={110}
+          height={165}
           className="w-full aspect-[2/3] object-cover rounded-[var(--radius-sm)]"
           unoptimized
         />
@@ -125,35 +126,28 @@ function TemplateCard({ template, onClick, isApplying }: TemplateCardProps) {
           )}
           aria-hidden="true"
         >
-          <LayoutTemplate className="size-8 text-[var(--editor-text-muted)]" />
+          <LayoutTemplate className="size-6 text-[var(--editor-text-muted)]" />
         </div>
       )}
 
       {/* 이름 */}
-      <span className="text-[12px] font-semibold truncate text-[var(--editor-text)]">
+      <span className="text-[11px] font-semibold truncate text-[var(--editor-text)] leading-tight">
         {template.name}
       </span>
 
       {/* 슬롯 종류 뱃지 */}
-      <div className="flex flex-wrap gap-1" aria-label="슬롯 구성">
+      <div className="flex flex-wrap gap-0.5" aria-label="슬롯 구성">
         {Object.entries(kindCounts).map(([kind, count]) => (
           <span
             key={kind}
             title={`${kind} × ${count}`}
-            className="text-[10px] leading-none"
+            className="text-[9px] leading-none text-[var(--editor-text-muted)]"
             aria-label={`${kind} ${count}개`}
           >
-            {KIND_EMOJI[kind] ?? kind} ×{count}
+            {KIND_EMOJI[kind] ?? kind}×{count}
           </span>
         ))}
       </div>
-
-      {/* intent */}
-      {template.intent && (
-        <span className="text-[10px] text-[var(--editor-text-muted)] line-clamp-1">
-          {template.intent}
-        </span>
-      )}
     </button>
   )
 }
