@@ -268,6 +268,9 @@ function makeCanvasMock(objectKinds: string[] = []) {
     removeObject: vi.fn(),
     on: vi.fn().mockReturnValue(vi.fn()),
     off: vi.fn(),
+    // FOLLOWUP-42: fitToViewport 에서 canvas.format 을 읽음
+    format: { id: 'b5-300dpi', widthMm: 130, heightMm: 200, dpi: 300 },
+    setFormat: vi.fn(),
     _fireEvent: fireEvent_,
   }
 

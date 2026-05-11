@@ -8,7 +8,7 @@ import { deserializeFromJson } from '../serialize/fromJson.js'
 import { serializeToJson } from '../serialize/toJson.js'
 import type { EditorEvent, EventMap, Format, ObjectData, Unsubscribe } from '../types.js'
 
-import { createFabricCanvas } from './adapters/fabric.js'
+import { createFabricCanvas, resizeCanvas } from './adapters/fabric.js'
 import { mmToPx, pxToMm } from './coords.js'
 
 export type StoryCanvasOptions = {
@@ -43,7 +43,7 @@ type ObjectRotatingPayload = { target: FabricObject; e: TPointerEvent }
  * - 다른 editor-* 패키지의 도메인 로직
  */
 export class StoryCanvas {
-  private readonly _format: Format
+  private _format: Format
   private readonly _fabric: Canvas
   private readonly _bus: EditorBus
   /** id → fabric 객체 매핑 */
@@ -273,6 +273,21 @@ export class StoryCanvas {
 
   get format(): Format {
     return this._format
+  }
+
+  /**
+   * 판형(Format)을 런타임에 변경한다.
+   * - fabric 캔버스 dimensions 를 새 판형의 px 크기로 갱신
+   * - mm↔px 변환 기준(dpi)도 함께 갱신
+   * - 캔버스 내 기존 객체 좌표는 유지 (배치는 호출자 책임)
+   *
+   * FOLLOWUP-42: FormatPickerModal 에서 판형 변경 시 호출된다.
+   */
+  setFormat(format: Format): void {
+    if (this._disposed) return
+    this._format = format
+    resizeCanvas(this._fabric, format)
+    this._fabric.requestRenderAll()
   }
 
   /** @internal dispose 상태 확인 (테스트용) */

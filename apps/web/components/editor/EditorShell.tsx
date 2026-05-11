@@ -41,7 +41,7 @@ import { CommandPalette } from './CommandPalette'
 import { EditorCanvas } from './EditorCanvas'
 import { EditorContext } from './EditorContext'
 import { FeatureSidebar } from './FeatureSidebar'
-import { Footer } from './Footer'
+import { fitToViewport, Footer } from './Footer'
 import { useAutosave } from './hooks/useAutosave'
 import { useHistory } from './hooks/useHistory'
 import { useSelection } from './hooks/useSelection'
@@ -323,15 +323,47 @@ export function EditorShell() {
       createProject(format, formatId, title)
       setFormatPickerOpen(false)
       setFileName(title)
-      // 캔버스 초기화
-      if (canvasRef.current) {
-        canvasRef.current._fabricCanvas.clear()
-        canvasRef.current._fabricCanvas.requestRenderAll()
+
+      const canvas = canvasRef.current
+      if (canvas) {
+        // FOLLOWUP-42: 판형 변경 → canvas.setFormat() → fabric dimensions 갱신
+        canvas.setFormat({
+          id: formatId,
+          widthMm: format.widthMm,
+          heightMm: format.heightMm,
+          dpi: format.dpi,
+        })
+        canvas._fabricCanvas.clear()
+        canvas._fabricCanvas.requestRenderAll()
+
+        // fit-to-screen 줌 적용 (판형 변경 후 전체 페이지 보이도록)
+        fitToViewport(canvas)
       }
       prevPageIndexRef.current = 0
     },
     [createProject],
   )
+
+  // ── FOLLOWUP-42: format 변경 감지 → canvas.setFormat() ──────────
+  // project.format 이 바뀌면 (localStorage 복구 포함) canvas 크기를 갱신한다.
+  const prevFormatIdRef = useRef<string | null>(null)
+  useEffect(() => {
+    const canvas = canvasRef.current
+    const format = project?.format
+    const formatId = project?.formatId
+    if (!canvas || !format || !formatId) return
+    // 첫 마운트 or format 변경 시에만 실행
+    if (prevFormatIdRef.current === formatId) return
+    prevFormatIdRef.current = formatId
+
+    canvas.setFormat({
+      id: formatId,
+      widthMm: format.widthMm,
+      heightMm: format.heightMm,
+      dpi: format.dpi,
+    })
+    fitToViewport(canvas)
+  }, [project?.formatId]) // formatId 변경 시에만 실행
 
   // ── 페이지 네비게이션 헬퍼 ──────────────────────────────────────
   const handlePrevPage = useCallback(() => {
@@ -989,6 +1021,7 @@ export function EditorShell() {
             history={historyRef.current as any}
             selectedIds={selectedIds}
             closeRequest={mobileCloseRequest}
+            onPageChange={(idx) => setCurrentPage(idx)}
           />
         </div>
 

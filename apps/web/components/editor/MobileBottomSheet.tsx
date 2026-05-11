@@ -22,6 +22,7 @@ import type { StoryCanvas } from '@storywork/editor-core'
 import type { LayerTree } from '@storywork/editor-layers'
 import { cn } from '@storywork/ui'
 import {
+  BookOpen,
   ChevronLeft,
   Image,
   LayoutTemplate,
@@ -45,6 +46,7 @@ import { ControlBar } from './ControlBar'
 import { applyZoom, fitToViewport, getZoomPercent, MIN_ZOOM, MAX_ZOOM } from './Footer'
 import type { ObjectProps } from './hooks/useSelection'
 import { LayerPanel } from './LayerPanel'
+import { PagePanel } from './page-system/PagePanel'
 import { BackgroundPanel } from './panels/BackgroundPanel'
 import { PlaceholderPanel } from './panels/PlaceholderPanel'
 import { ShapePanel } from './panels/ShapePanel'
@@ -54,7 +56,7 @@ import type { HistoryRef as History } from './types'
 // ── 타입 ─────────────────────────────────────
 export type SheetSnap = 'peek' | 'half' | 'full'
 
-type Tab = 'tools' | 'inspector' | 'layers'
+type Tab = 'tools' | 'inspector' | 'layers' | 'pages'
 
 export type MobileBottomSheetProps = {
   activeTool: ToolId
@@ -69,6 +71,8 @@ export type MobileBottomSheetProps = {
   history: History | null
   selectedIds: string[]
   closeRequest?: number
+  /** 페이지 전환 콜백 (FOLLOWUP-46) */
+  onPageChange?: (index: number) => void
 }
 
 // ── 높이 상수 ─────────────────────────────────
@@ -318,6 +322,8 @@ const TABS: { id: Tab; label: string; icon: () => React.ReactElement }[] = [
   { id: 'tools', label: '도구', icon: () => <MousePointer2 className="size-4" /> },
   { id: 'inspector', label: '속성', icon: () => <Settings2 className="size-4" /> },
   { id: 'layers', label: '레이어', icon: () => <Layers className="size-4" /> },
+  // FOLLOWUP-46: 모바일 PagePanel 접근 — "페이지" 탭 추가
+  { id: 'pages', label: '페이지', icon: () => <BookOpen className="size-4" /> },
 ]
 
 function TabBar({ activeTab, onTabChange }: TabBarProps) {
@@ -489,6 +495,7 @@ export function MobileBottomSheet({
   history,
   selectedIds,
   closeRequest,
+  onPageChange,
 }: MobileBottomSheetProps) {
   const [snap, setSnap] = useState<SheetSnap>('peek')
   const [activeTab, setActiveTab] = useState<Tab>('tools')
@@ -575,6 +582,7 @@ export function MobileBottomSheet({
   // ── 탭 변경 ───────────────────────────────────
   const handleTabChange = useCallback((tab: Tab) => {
     setActiveTab(tab)
+    // 탭 클릭 시 최소 half 스냅으로 열기
     setSnap((prev) => (prev === 'peek' ? 'half' : prev))
   }, [])
 
@@ -682,6 +690,8 @@ export function MobileBottomSheet({
                 isMobile
               />
             )}
+            {/* FOLLOWUP-46: 모바일 PagePanel — PagePanel 컴포넌트 재사용 */}
+            {activeTab === 'pages' && <PagePanel onPageChange={onPageChange} className="min-h-0" />}
           </div>
         )}
       </div>

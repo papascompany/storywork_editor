@@ -22,9 +22,8 @@ import { Point } from 'fabric'
 import { Minus, Plus } from 'lucide-react'
 import React, { useCallback, useEffect, useRef, useState } from 'react'
 
-import { DEFAULT_FORMAT } from '../../lib/editor/seed'
-
 import { PageIndicator } from './PageIndicator'
+import { usePageStore } from './store/usePageStore'
 
 // ─── 상수 ────────────────────────────────────────────────────────────────────
 
@@ -51,13 +50,20 @@ function applyZoom(canvas: StoryCanvas, percent: number): void {
   fabricCanvas.requestRenderAll()
 }
 
-/** 페이지 전체가 뷰포트에 맞도록 줌 + 패닝 */
+/**
+ * 페이지 전체가 뷰포트에 맞도록 줌 + 패닝.
+ *
+ * FOLLOWUP-42: canvas.format 에서 실제 판형을 읽어 pageW/pageH 를 계산한다.
+ * 이전에 DEFAULT_FORMAT 하드코드를 사용하던 부분을 교체.
+ */
 function fitToViewport(canvas: StoryCanvas): void {
   const fabricCanvas = canvas._fabricCanvas
   const viewW = fabricCanvas.getWidth()
   const viewH = fabricCanvas.getHeight()
-  const pageW = canvas.mmToPx(DEFAULT_FORMAT.widthMm)
-  const pageH = canvas.mmToPx(DEFAULT_FORMAT.heightMm)
+  // FOLLOWUP-42: canvas.format 에서 실제 판형 읽기 (DEFAULT_FORMAT 하드코드 제거)
+  const format = canvas.format
+  const pageW = canvas.mmToPx(format.widthMm)
+  const pageH = canvas.mmToPx(format.heightMm)
 
   const zoom = Math.min(
     (viewW - FIT_MARGIN_PX * 2) / pageW,
@@ -101,6 +107,8 @@ export function Footer({
 }: FooterProps) {
   const [zoom, setZoom] = useState(100)
   const throttleRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+  // FOLLOWUP-42: 실제 판형을 store 에서 읽어 Footer 사이즈 표시에 반영
+  const format = usePageStore((s) => s.project?.format)
 
   // 외부(키보드/휠)에서 발생한 줌 변화 동기화
   useEffect(() => {
@@ -194,12 +202,12 @@ export function Footer({
         />
       </div>
 
-      {/* 가운데: 캔버스 사이즈 */}
+      {/* 가운데: 캔버스 사이즈 (FOLLOWUP-42: 실제 판형 반영) */}
       <div
         className="text-xs text-[var(--color-text-muted)]"
-        aria-label={`캔버스 사이즈 ${DEFAULT_FORMAT.widthMm}×${DEFAULT_FORMAT.heightMm}mm`}
+        aria-label={`캔버스 사이즈 ${format?.widthMm ?? 0}×${format?.heightMm ?? 0}mm`}
       >
-        {DEFAULT_FORMAT.widthMm}×{DEFAULT_FORMAT.heightMm}mm
+        {format ? `${format.widthMm}×${format.heightMm}mm` : '—'}
       </div>
 
       {/* 우: 줌 컨트롤 */}
