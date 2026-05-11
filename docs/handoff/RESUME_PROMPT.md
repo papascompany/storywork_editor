@@ -49,18 +49,18 @@ pnpm test && pnpm build
 ```
 
 기대 상태:
-- 마지막 커밋이 `docs(handoff): wrap-up 2026-05-11 ...` 또는 `feat(editor-text): phase2 ...` 류
+- 마지막 커밋이 `feat(editor-template): m5-04 ...` 또는 `docs(handoff): wrap-up 2026-05-11 ...` 류
 - DB Resource 카운트: **1,270건**
-- admin 328 green + web 255 green + editor-text 21 green + editor-history 66 + editor-core 78 = **750+ tests green**
-- Vercel admin `e220aa5` + web `0243653` 모두 READY ✅
+- admin 328 + web 255 + editor-text 21 + editor-bubble 33 + editor-history 66 + editor-core 78 + 기타 = **800+ tests green**
+- Vercel admin `e220aa5` + web `fb93c59` 모두 READY ✅
 
 ### 📊 현재 진행 위치 (한 줄 요약)
 
-> **M0~M3 완료 + 마케팅 표면 4 페이지 (포즈 실 연결 + OG + Storybook 49) + 편집기 Phase 1+2 흡수 (Bookmoa Storige 의 다중선택/클립보드/정렬/회전스냅/자동저장/editor-text)**.
+> **M0~M3 완료 + 마케팅 표면 (포즈 실 연결 + OG + Storybook 49) + 편집기 Phase 1+2 흡수 + M5-01 한글 폴리시 + M5-02 ★ 말풍선 꼬리 자동 화자 추적 (editor-bubble 신규 패키지)**.
 > Vercel 두 도메인 모두 READY. Supabase Cloud PNG 1,270.
-> 사용자 web: 마케팅 4 페이지 + 편집기 (다중선택/그룹/정렬/클립보드/레이어단축키/회전스냅/text도구/한글) 모두 동작.
+> 사용자 web: 마케팅 4 페이지 + 편집기 (다중선택/그룹/정렬/클립보드/레이어단축키/회전스냅/text도구/한글금칙어/말풍선5종+자동화자추적) 모두 동작.
 > admin: 로그인 + 2FA + Format/Resource/Template/TemplateSet/AuditLog 풀 CRUD.
-> **다음 우선순위**: M5-02 말풍선 꼬리 자동 화자 추적 (StoryWork 핵심 차별화) → M4 (ANTHROPIC 키 게이트).
+> **다음 우선순위**: M5-04 `editor-template` (M3-05 SlotCanvas 와 슬롯 매핑, M4 사전 인프라) → M4 (ANTHROPIC 키 게이트).
 
 ### 🎯 권장 다음 작업 (사용자 결정 후 진행)
 

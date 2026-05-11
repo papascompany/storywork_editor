@@ -8,7 +8,7 @@
 
 ## 1. 한 줄 요약
 
-> StoryWork — **마케팅 표면 강화 (포즈 자산 실 연결 + OG 이미지 + Storybook 49) + 편집기 Phase 1+2 흡수 (Bookmoa Storige 의 다중선택/클립보드/정렬/레이어단축키/회전스냅/자동저장 + editor-text 활성화)**. 6 commits, 모두 Vercel READY. 다음 권장: **M5-01 마무리 + M5-02 말풍선 꼬리 자동 화자 추적** (StoryWork 핵심 차별화).
+> StoryWork — **마케팅 표면 강화 + 편집기 Phase 1+2 흡수 (Bookmoa Storige) + M5-01 마무리 (Pretendard + 한글 금칙어 57+16) + M5-02 말풍선 꼬리 자동 화자 추적 (★ StoryWork 핵심 차별화 — `editor-bubble` 신규 패키지)**. 10 commits (8 feat + 2 build fix), 모두 Vercel READY. 다음 권장: **M5-04 `editor-template` (M3-05 SlotCanvas 와 슬롯 매핑, M4 사전 인프라)** → M4 ANTHROPIC 키 게이트.
 
 ---
 
@@ -18,11 +18,11 @@
 |---|---|---|---|---|
 | M0~M3 | 37 | 34 | 3 | 동일 |
 | **M4 AI 파이프라인** | 5 | 0 | 5 | ❌ ANTHROPIC 키 휴먼 게이트 |
-| **M5 텍스트/말풍선/효과** | 4 | **0.5** | 3.5 | 🟡 M5-01 부분 (editor-text 활성화 + 인라인 편집 + ControlBar + 한글 splitByGrapheme) |
+| **M5 텍스트/말풍선/효과** | 4 | **2** | 2 | ✅ M5-01 (Pretendard + 금칙어) + M5-02 (editor-bubble 신규 + 자동 화자 추적, 33 tests) |
 | M6~M9 | 12 | 0 | 12 | ❌ |
 | **마케팅 표면** | 7 | 4 | 3 | ✅ MKT-01~04 (페이지 + DESIGN.md + 포즈자산 + OG/Storybook) |
 
-**합계: 53 + 7 마케팅 = 60건 중 38.5건 (64.2%)**
+**합계: 53 + 7 마케팅 = 60건 중 40건 (66.7%)**
 
 ---
 
@@ -38,9 +38,21 @@ a74db15  feat(web): og images, metadata, sitemap for marketing pages
 b637dfc  docs(storybook): marketing components stories (9 files, 49 stories)
 eb8ff86  feat(editor): phase1 multi-select/clipboard/align/rotate-snap/autosave
 0243653  feat(editor-text): phase2 text object + inline edit + ControlBar + 한글
+28d76ba  docs(handoff): wrap-up 2026-05-11 (중간 정리)
+d17f923  feat(editor-text): m5-01 polish — Pretendard 정식 등록 + 금칙어 50+ + fallback
+3cff7ca  feat(editor-bubble): m5-02 말풍선 꼬리 자동 화자 추적
+🔧 dcb1da1  fix(editor-bubble): add rootDir/paths/tsBuildInfoFile to tsconfig.build.json
+🔧 fb93c59  fix(web): commit Pretendard webfont (M5-01 누락 파일)
 ```
 
-총 **5 코드 commits + 1 docs commit (이번 핸드오프 별도)**. 모두 main push 완료.
+총 **8 feat/docs commits + 2 build fix = 10 commits**. 모두 main push + Vercel READY 완료.
+
+### 빌드 함정 2건 (FOLLOWUP-39/40 등록)
+
+| ID | 증상 | 원인 | 수정 |
+|---|---|---|---|
+| 39 | `editor-bubble:build TS6059 rootDir` | 신규 패키지 tsconfig.build.json 에 rootDir/paths/tsBuildInfoFile 누락 (commit a07dad3 패턴 미적용) | `dcb1da1` editor-text 와 동일한 13줄 설정 적용 |
+| 40 | `next/font/local` src not found | `apps/web/public/fonts/PretendardVariable.woff2` (2MB) 가 git 에 untracked — 로컬은 통과, Vercel 만 실패 | `fb93c59` woff2 add + commit. 향후 git LFS 권장 |
 
 ### 3.2 누적 코드/테스트 변화
 
@@ -50,10 +62,12 @@ eb8ff86  feat(editor): phase1 multi-select/clipboard/align/rotate-snap/autosave
 | editor-text 테스트 | 0 | 21 | +21 (신규 패키지 활성화) |
 | editor-history/core 테스트 | 144 | 144 | 회귀 0 |
 | Storybook 스토리 (마케팅) | 0 | 49 | +49 |
-| editor-* 활성 패키지 | 4 (core/layers/history/export) | 5 (+text) | +1 |
-| 신규 web 컴포넌트 | — | AlignControlBar, TextSection (in ControlBar), TextPanel | — |
-| 신규 web lib | — | clipboard.ts, autosave (localStorage) | — |
+| editor-* 활성 패키지 | 4 (core/layers/history/export) | 6 (+text +bubble) | +2 |
+| 신규 web 컴포넌트 | — | AlignControlBar, TextSection, TextPanel, BubblePanel, BubbleSection | — |
+| 신규 web lib | — | clipboard.ts, autosave (localStorage), font-stack.ts, fonts.ts (Pretendard) | — |
 | 신규 명령 (⌘K) | 30 | 38 | +8 (copy/paste/duplicate/align variants) |
+| editor-bubble 테스트 | 0 | 33 | +33 (신규 패키지) |
+| 한글 금칙어 | 0 | 73 (END 57 + START 16) | +73 |
 
 ### 3.3 마케팅 강화 산출물 (commit 3종)
 
