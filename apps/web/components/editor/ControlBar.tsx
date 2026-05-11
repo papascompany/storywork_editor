@@ -28,7 +28,21 @@ import {
 import type { LayerTree } from '@storywork/editor-layers'
 import { ColorPicker, Input, Slider, cn, showToast } from '@storywork/ui'
 import type { FabricObject } from 'fabric'
-import { Eye, EyeOff, Link, Link2Off, Lock, LockOpen, Trash2 } from 'lucide-react'
+import {
+  AlignCenter,
+  AlignLeft,
+  AlignRight,
+  Bold,
+  Eye,
+  EyeOff,
+  Italic,
+  Link,
+  Link2Off,
+  Lock,
+  LockOpen,
+  Trash2,
+  Underline,
+} from 'lucide-react'
 import React, { useCallback, useRef, useState } from 'react'
 
 import type { ObjectProps } from './hooks/useSelection'
@@ -662,6 +676,246 @@ function ShapeDetailSection({ props, canvas, history }: ShapeDetailSectionProps)
   )
 }
 
+// ─── 섹션 4a: Text 속성 ──────────────────────────────────────────────────────
+
+type TextSectionProps = {
+  props: ObjectProps
+  canvas: StoryCanvas
+  history: History
+}
+
+/** 지원 폰트 MVP 3종 */
+const TEXT_FONTS = ['Pretendard', 'Noto Sans KR', 'system-ui'] as const
+
+function TextSection({ props, canvas, history }: TextSectionProps) {
+  const getObj = (): FabricObject | undefined =>
+    canvas.getObject(props.id) as FabricObject | undefined
+
+  const obj = getObj()
+
+  // 현재 속성 읽기
+  const fontFamily = (obj as { fontFamily?: string })?.fontFamily ?? 'Pretendard'
+  const fontSize = (obj as { fontSize?: number })?.fontSize ?? 24
+  const fill = typeof obj?.fill === 'string' ? obj.fill : '#111111'
+  const fontWeight = (obj as { fontWeight?: string })?.fontWeight ?? 'normal'
+  const fontStyle = (obj as { fontStyle?: string })?.fontStyle ?? 'normal'
+  const underline = (obj as { underline?: boolean })?.underline ?? false
+  const textAlign = (obj as { textAlign?: string })?.textAlign ?? 'left'
+  const lineHeight = (obj as { lineHeight?: number })?.lineHeight ?? 1.4
+  const charSpacing = (obj as { charSpacing?: number })?.charSpacing ?? 0
+
+  const applyAndCommit = (patch: Record<string, unknown>) => {
+    const target = getObj()
+    if (!target) return
+    const before = snapshotFromFabricObject(target)
+    target.set(patch as Parameters<typeof target.set>[0])
+    canvas._fabricCanvas.requestRenderAll()
+    const after = snapshotFromFabricObject(target)
+    // TransformObjectCommand 재사용 (텍스트 속성도 before/after 스냅샷으로 표현)
+    const cmd = new TransformObjectCommand({ canvas, id: props.id, before, after })
+    history.push(cmd)
+  }
+
+  const isBold = fontWeight === 'bold'
+  const isItalic = fontStyle === 'italic'
+
+  return (
+    <>
+      {/* 폰트 선택 */}
+      <section aria-label="폰트">
+        <SectionLabel>폰트</SectionLabel>
+        <select
+          value={fontFamily}
+          aria-label="폰트 선택"
+          onChange={(e) => applyAndCommit({ fontFamily: e.target.value })}
+          className="w-full rounded-[var(--radius-sm)] border border-[var(--color-border)] bg-[var(--color-surface-muted)] px-2 py-1.5 text-xs text-[var(--color-text)] focus:outline-none focus:ring-2 focus:ring-[var(--color-brand-500)]"
+        >
+          {TEXT_FONTS.map((font) => (
+            <option key={font} value={font} style={{ fontFamily: font }}>
+              {font}
+            </option>
+          ))}
+        </select>
+      </section>
+
+      <SectionDivider />
+
+      {/* 크기 */}
+      <section aria-label="글자 크기">
+        <SectionLabel>크기</SectionLabel>
+        <div className="flex items-center gap-2">
+          <div className="flex-1">
+            <Slider
+              label=""
+              unit="px"
+              min={8}
+              max={200}
+              step={1}
+              value={Math.round(fontSize)}
+              onValueChange={(v) => {
+                const target = getObj()
+                if (!target) return
+                target.set({ fontSize: v } as Parameters<typeof target.set>[0])
+                canvas._fabricCanvas.requestRenderAll()
+              }}
+              onValueCommit={(v) => applyAndCommit({ fontSize: v })}
+              aria-label="글자 크기"
+            />
+          </div>
+          <div className="w-14">
+            <NumberInput
+              label=""
+              value={Math.round(fontSize)}
+              unit="px"
+              step={1}
+              min={8}
+              max={200}
+              onCommit={(v) => applyAndCommit({ fontSize: v })}
+              aria-label="글자 크기 (px)"
+            />
+          </div>
+        </div>
+      </section>
+
+      <SectionDivider />
+
+      {/* 서식 버튼 (굵게/기울임/밑줄) + 정렬 */}
+      <section aria-label="서식">
+        <SectionLabel>서식</SectionLabel>
+        <div className="flex gap-1">
+          {/* 굵게 */}
+          <button
+            type="button"
+            aria-label="굵게"
+            aria-pressed={isBold}
+            onClick={() => applyAndCommit({ fontWeight: isBold ? 'normal' : 'bold' })}
+            className={cn(
+              'flex size-7 items-center justify-center rounded-[var(--radius-sm,4px)] border border-[var(--color-border)] text-[var(--color-text-muted)] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-brand-500)]',
+              isBold
+                ? 'border-[var(--color-brand-400)] bg-[var(--color-brand-50)] text-[var(--color-brand-600)] dark:bg-[var(--color-brand-950)]'
+                : 'hover:bg-[var(--color-surface-muted)] hover:text-[var(--color-text)]',
+            )}
+          >
+            <Bold className="size-3.5" aria-hidden="true" />
+          </button>
+
+          {/* 기울임 */}
+          <button
+            type="button"
+            aria-label="기울임"
+            aria-pressed={isItalic}
+            onClick={() => applyAndCommit({ fontStyle: isItalic ? 'normal' : 'italic' })}
+            className={cn(
+              'flex size-7 items-center justify-center rounded-[var(--radius-sm,4px)] border border-[var(--color-border)] text-[var(--color-text-muted)] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-brand-500)]',
+              isItalic
+                ? 'border-[var(--color-brand-400)] bg-[var(--color-brand-50)] text-[var(--color-brand-600)] dark:bg-[var(--color-brand-950)]'
+                : 'hover:bg-[var(--color-surface-muted)] hover:text-[var(--color-text)]',
+            )}
+          >
+            <Italic className="size-3.5" aria-hidden="true" />
+          </button>
+
+          {/* 밑줄 */}
+          <button
+            type="button"
+            aria-label="밑줄"
+            aria-pressed={underline}
+            onClick={() => applyAndCommit({ underline: !underline })}
+            className={cn(
+              'flex size-7 items-center justify-center rounded-[var(--radius-sm,4px)] border border-[var(--color-border)] text-[var(--color-text-muted)] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-brand-500)]',
+              underline
+                ? 'border-[var(--color-brand-400)] bg-[var(--color-brand-50)] text-[var(--color-brand-600)] dark:bg-[var(--color-brand-950)]'
+                : 'hover:bg-[var(--color-surface-muted)] hover:text-[var(--color-text)]',
+            )}
+          >
+            <Underline className="size-3.5" aria-hidden="true" />
+          </button>
+
+          <div aria-hidden="true" className="flex-1" />
+
+          {/* 정렬 */}
+          {(['left', 'center', 'right'] as const).map((align) => {
+            const Icon =
+              align === 'left' ? AlignLeft : align === 'center' ? AlignCenter : AlignRight
+            const labels = { left: '왼쪽 정렬', center: '가운데 정렬', right: '오른쪽 정렬' }
+            return (
+              <button
+                key={align}
+                type="button"
+                aria-label={labels[align]}
+                aria-pressed={textAlign === align}
+                onClick={() => applyAndCommit({ textAlign: align })}
+                className={cn(
+                  'flex size-7 items-center justify-center rounded-[var(--radius-sm,4px)] border border-[var(--color-border)] text-[var(--color-text-muted)] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-brand-500)]',
+                  textAlign === align
+                    ? 'border-[var(--color-brand-400)] bg-[var(--color-brand-50)] text-[var(--color-brand-600)] dark:bg-[var(--color-brand-950)]'
+                    : 'hover:bg-[var(--color-surface-muted)] hover:text-[var(--color-text)]',
+                )}
+              >
+                <Icon className="size-3.5" aria-hidden="true" />
+              </button>
+            )
+          })}
+        </div>
+      </section>
+
+      <SectionDivider />
+
+      {/* 색상 */}
+      <section aria-label="글자 색상">
+        <SectionLabel>글자 색상</SectionLabel>
+        <ColorPicker value={fill} onChange={(hex) => applyAndCommit({ fill: hex })} />
+      </section>
+
+      <SectionDivider />
+
+      {/* 줄간격 */}
+      <section aria-label="줄간격">
+        <SectionLabel>줄간격</SectionLabel>
+        <Slider
+          label=""
+          unit="×"
+          min={0.8}
+          max={2.4}
+          step={0.1}
+          value={Math.round(lineHeight * 10) / 10}
+          onValueChange={(v) => {
+            const target = getObj()
+            if (!target) return
+            target.set({ lineHeight: v } as Parameters<typeof target.set>[0])
+            canvas._fabricCanvas.requestRenderAll()
+          }}
+          onValueCommit={(v) => applyAndCommit({ lineHeight: v })}
+          aria-label="줄간격"
+        />
+      </section>
+
+      <SectionDivider />
+
+      {/* 자간 */}
+      <section aria-label="자간">
+        <SectionLabel>자간</SectionLabel>
+        <Slider
+          label=""
+          unit=""
+          min={-100}
+          max={500}
+          step={10}
+          value={charSpacing}
+          onValueChange={(v) => {
+            const target = getObj()
+            if (!target) return
+            target.set({ charSpacing: v } as Parameters<typeof target.set>[0])
+            canvas._fabricCanvas.requestRenderAll()
+          }}
+          onValueCommit={(v) => applyAndCommit({ charSpacing: v })}
+          aria-label="자간"
+        />
+      </section>
+    </>
+  )
+}
+
 // Placeholder 섹션 (미구현 타입용)
 function PlaceholderSection({ milestone, label }: { milestone: string; label: string }) {
   return (
@@ -738,7 +992,7 @@ export function ControlBar({ props, canvas, layerTree, history }: ControlBarProp
 
       {kind === 'text' && (
         <div className="px-4 py-3">
-          <PlaceholderSection label="텍스트" milestone="M5" />
+          <TextSection props={props} canvas={canvas} history={history} />
         </div>
       )}
 

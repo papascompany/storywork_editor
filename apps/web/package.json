@@ -18,6 +18,7 @@
     "@storywork/editor-export": "workspace:*",
     "@storywork/editor-history": "workspace:*",
     "@storywork/editor-layers": "workspace:*",
+    "@storywork/editor-text": "workspace:*",
     "@storywork/ui": "workspace:^",
     "fabric": "^6.9.1",
     "lucide-react": "^0.513.0",

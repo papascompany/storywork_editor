@@ -43,6 +43,7 @@ import { BackgroundPanel } from './panels/BackgroundPanel'
 import { PlaceholderPanel } from './panels/PlaceholderPanel'
 import { PosePanel } from './panels/PosePanel'
 import { ShapePanel } from './panels/ShapePanel'
+import { TextPanel } from './panels/TextPanel'
 import type { ToolId } from './store/useToolStore'
 import { useToolStore } from './store/useToolStore'
 import type { HistoryRef as History } from './types'
@@ -101,7 +102,7 @@ const TOOL_META: Record<ToolId, ToolMeta> = {
   text: {
     label: '텍스트',
     Icon: Type,
-    milestone: 'M5',
+    // M5-01 에서 활성화됨 (Phase 2) — milestone 제거
     description: '한글 줄바꿈 · 금칙어 처리 · 말풍선 대사 자동 흐름',
   },
   upload: {
@@ -177,6 +178,8 @@ function PanelContent({ tool, canvas, history, layerTree, onAddPoseToCanvas }: P
           onAddToCanvas={onAddPoseToCanvas ?? (() => {})}
         />
       )
+    case 'text':
+      return <TextPanel canvas={canvas} history={history as any} />
     default: {
       const meta = TOOL_META[tool]
       return (
@@ -234,6 +237,7 @@ export function FeatureSidebar({
   const meta = TOOL_META[active as ToolId]
   const PanelIcon = meta.Icon
   const isSearchEnabled = active === 'background' || active === 'shape' || active === 'pose'
+  // text 패널은 자체 UI 가 있으므로 검색창 숨김 (pose 와 동일 처리)
 
   return (
     <aside
@@ -305,8 +309,10 @@ export function FeatureSidebar({
           </button>
         </div>
 
-        {/* 검색창 — pose 패널은 자체 검색창을 가지므로 숨김 */}
-        {active !== 'pose' && <PanelSearch label={meta.label} disabled={!isSearchEnabled} />}
+        {/* 검색창 — pose/text 패널은 자체 UI 를 가지므로 숨김 */}
+        {active !== 'pose' && active !== 'text' && (
+          <PanelSearch label={meta.label} disabled={!isSearchEnabled} />
+        )}
 
         {/* 패널 콘텐츠 */}
         <div className="flex-1 overflow-hidden">

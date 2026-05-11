@@ -347,6 +347,9 @@ importers:
       '@storywork/editor-layers':
         specifier: workspace:*
         version: link:../../packages/editor-layers
+      '@storywork/editor-text':
+        specifier: workspace:*
+        version: link:../../packages/editor-text
       '@storywork/ui':
         specifier: workspace:^
         version: link:../../packages/shared-ui
