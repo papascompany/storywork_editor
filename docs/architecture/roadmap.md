@@ -69,10 +69,10 @@
 
 ## M5 — Text/Bubble/Effects/Templates
 
-- [x] [M5-01] `editor-text` 한글 줄바꿈/금칙어 + textbox 변형 — `0243653` (Phase 2) + `d17f923` (마무리) — Pretendard webfont + 금칙어 73자 (END 57 + START 16) + splitByGrapheme + TextSection ControlBar
+- [x] [M5-01] `editor-text` 한글 줄바꿈/금칙어 + textbox 변형 — `0243653` + `d17f923` — Pretendard webfont + 금칙어 73자 (END 57 + START 16) + splitByGrapheme + TextSection ControlBar
 - [x] [M5-02] 말풍선 꼬리 자동 화자 추적 — `3cff7ca` — `editor-bubble` 신규 패키지 (5 모양 + computeTailPoints + detectSpeaker + attachBubbleTracker, 33 tests)
-- [ ] [M5-03] `editor-effects` 워드효과 50종 + 필터 — 모바일 30fps — @editor-engineer
-- [ ] [M5-04] `editor-template` 템플릿 적용/저장 — 슬롯 매핑 — @editor-engineer (다음 작업)
+- [ ] [M5-03] `editor-effects` 워드효과 50종 + 필터 — 모바일 30fps — @editor-engineer (다음 작업)
+- [x] [M5-04] `editor-template` 템플릿 적용/저장 — `d43e45f` + `28b3dfe` — 5 인라인 프리셋 + applyTemplate/fillSlot/clearSlot + Command + snap-to-slot + 46 tests + ToolBar 활성
 
 ## M6 — POD PDF
 
