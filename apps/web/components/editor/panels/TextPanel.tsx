@@ -27,18 +27,20 @@ export function TextPanel({ canvas, history }: TextPanelProps) {
 
     const { AddTextCommand } = await import('@storywork/editor-text')
 
-    // 캔버스 중앙에 배치
-    const fc = canvas._fabricCanvas
-    const canvasWidth = fc.getWidth()
-    const canvasHeight = fc.getHeight()
+    // canvas.format 기반 페이지 중앙 좌표 계산
+    // fc.getWidth()/getHeight() 는 ResizeObserver 가 적용한 뷰포트 크기를 반환하므로 사용 금지
+    const format = canvas.format
+    const pageWidthPx = canvas.mmToPx(format.widthMm)
+    const pageHeightPx = canvas.mmToPx(format.heightMm)
+    const textWidthPx = canvas.mmToPx(60) // 60mm 텍스트 박스
 
     const cmd = new AddTextCommand({
       canvas,
       textOpts: {
         text: '텍스트를 입력하세요',
-        left: canvasWidth / 2 - 100,
-        top: canvasHeight / 3,
-        width: 200,
+        left: pageWidthPx / 2 - textWidthPx / 2,
+        top: pageHeightPx / 2 - canvas.mmToPx(8),
+        width: textWidthPx,
         fontSize: 24,
         fill: '#111111',
       },
@@ -51,9 +53,10 @@ export function TextPanel({ canvas, history }: TextPanelProps) {
     const id = cmd.assignedId
     if (id) {
       const fabricObj = canvas.getObject(id)
+      const fabricCanvas = canvas._fabricCanvas
       if (fabricObj) {
-        fc.setActiveObject(fabricObj)
-        fc.requestRenderAll()
+        fabricCanvas.setActiveObject(fabricObj)
+        fabricCanvas.requestRenderAll()
         // 편집 모드 진입 (IText/Textbox)
         const itext = fabricObj as { enterEditing?: () => void }
         if (typeof itext.enterEditing === 'function') {
@@ -124,17 +127,19 @@ function QuickStyleButton({ style, canvas, history }: QuickStyleButtonProps) {
 
     const { AddTextCommand } = await import('@storywork/editor-text')
 
-    const fc = canvas._fabricCanvas
-    const canvasWidth = fc.getWidth()
-    const canvasHeight = fc.getHeight()
+    // canvas.format 기반 페이지 중앙 좌표 계산 (fc.getWidth() 는 뷰포트 크기라 사용 금지)
+    const format = canvas.format
+    const pageWidthPx = canvas.mmToPx(format.widthMm)
+    const pageHeightPx = canvas.mmToPx(format.heightMm)
+    const textWidthPx = canvas.mmToPx(60)
 
     const cmd = new AddTextCommand({
       canvas,
       textOpts: {
         text: style.preview,
-        left: canvasWidth / 2 - 100,
-        top: canvasHeight / 3,
-        width: 200,
+        left: pageWidthPx / 2 - textWidthPx / 2,
+        top: pageHeightPx / 2 - canvas.mmToPx(8),
+        width: textWidthPx,
         fontSize: style.fontSize,
         fontWeight: style.fontWeight ?? 'normal',
         fill: '#111111',
@@ -148,8 +153,8 @@ function QuickStyleButton({ style, canvas, history }: QuickStyleButtonProps) {
     if (id) {
       const fabricObj = canvas.getObject(id)
       if (fabricObj) {
-        fc.setActiveObject(fabricObj)
-        fc.requestRenderAll()
+        canvas._fabricCanvas.setActiveObject(fabricObj)
+        canvas._fabricCanvas.requestRenderAll()
       }
     }
   }, [canvas, history, style])

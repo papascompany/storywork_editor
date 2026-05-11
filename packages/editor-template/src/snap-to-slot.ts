@@ -144,8 +144,10 @@ export function attachSnapToSlot(
       cy = (obj.top ?? 0) + h / 2
     }
 
-    const canvasW = typeof fc.getWidth === 'function' ? fc.getWidth() : 600
-    const canvasH = typeof fc.getHeight === 'function' ? fc.getHeight() : 800
+    // 실제 페이지 px 크기 (canvas.format 기반 — fc.getWidth() 는 뷰포트 크기를 반환하므로 사용 금지)
+    const format = canvas.format
+    const canvasW = canvas.mmToPx(format.widthMm)
+    const canvasH = canvas.mmToPx(format.heightMm)
 
     const snap = findNearestSlot(
       slotMap,
@@ -217,8 +219,10 @@ export function attachSnapToSlot(
       cy = (obj.top ?? 0) + h / 2
     }
 
-    const canvasW = typeof fc.getWidth === 'function' ? fc.getWidth() : 600
-    const canvasH = typeof fc.getHeight === 'function' ? fc.getHeight() : 800
+    // 실제 페이지 px 크기 (canvas.format 기반 — fc.getWidth() 는 뷰포트 크기를 반환하므로 사용 금지)
+    const format = canvas.format
+    const canvasW = canvas.mmToPx(format.widthMm)
+    const canvasH = canvas.mmToPx(format.heightMm)
 
     const snap = findNearestSlot(
       slotMap,

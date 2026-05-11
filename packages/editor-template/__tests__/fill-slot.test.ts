@@ -46,13 +46,14 @@ type MockFabricObj = {
   setCoords: () => void
 }
 
-function makeMockCanvas(canvasW = 390, canvasH = 600) {
+function makeMockCanvas(dpi = 72, widthMm = 130, heightMm = 200) {
   const objects = new Map<string, MockFabricObj>()
   let idCounter = 0
+  const format = { id: 'test', widthMm, heightMm, dpi }
 
   const _fabricCanvas = {
-    getWidth: () => canvasW,
-    getHeight: () => canvasH,
+    getWidth: () => Math.round((widthMm * dpi) / 25.4),
+    getHeight: () => Math.round((heightMm * dpi) / 25.4),
     getObjects: () => Array.from(objects.values()),
     requestRenderAll: vi.fn(),
   }
@@ -71,7 +72,8 @@ function makeMockCanvas(canvasW = 390, canvasH = 600) {
       objects.delete(id)
     }),
     getObject: (id: string) => objects.get(id),
-    format: { id: 'test', widthMm: 130, heightMm: 200, dpi: 72 },
+    format,
+    mmToPx: (mm: number) => (mm * dpi) / 25.4,
     _objects: objects,
   }
 
@@ -182,11 +184,15 @@ describe('fillSlot — 기본 동작', () => {
 })
 
 describe('fillSlot — 위치 매핑', () => {
-  it('자산이 슬롯 좌표로 이동', () => {
-    const canvasW = 390
-    const canvasH = 600
+  it('자산이 슬롯 좌표로 이동 (canvas.format 기반 px)', () => {
+    // dpi=72, widthMm=130, heightMm=200 → pageW=368.5, pageH=566.9
+    const dpi = 72
+    const widthMm = 130
+    const heightMm = 200
+    const pageW = (widthMm * dpi) / 25.4
+    const pageH = (heightMm * dpi) / 25.4
 
-    const canvas = makeMockCanvas(canvasW, canvasH) as any
+    const canvas = makeMockCanvas(dpi, widthMm, heightMm) as any
     const slot = makeSlot({ x: 0.1, y: 0.2, rotation: 30 })
     const fabricObj = makeFabricObj()
     const slotMap: SlotMap = new Map([
@@ -204,8 +210,8 @@ describe('fillSlot — 위치 매핑', () => {
     // set 이 호출되어 left/top/angle 이 적용됐는지 확인
     expect(fabricObj.set).toHaveBeenCalledWith(
       expect.objectContaining({
-        left: 0.1 * canvasW,
-        top: 0.2 * canvasH,
+        left: expect.closeTo(0.1 * pageW, 1),
+        top: expect.closeTo(0.2 * pageH, 1),
         angle: 30,
       }),
     )

@@ -129,6 +129,7 @@ describe('attachSnapToSlot', () => {
       _fabricCanvas,
       getObject: vi.fn(),
       format: { id: 'test', widthMm: 130, heightMm: 200, dpi: 72 },
+      mmToPx: (mm: number) => (mm * 72) / 25.4,
     }
 
     const slotMap: SlotMap = new Map()
@@ -166,6 +167,7 @@ describe('attachSnapToSlot', () => {
       _fabricCanvas,
       getObject: vi.fn(),
       format: { id: 'test', widthMm: 130, heightMm: 200, dpi: 72 },
+      mmToPx: (mm: number) => (mm * 72) / 25.4,
     }
 
     const { dispose } = attachSnapToSlot(mockCanvas as any, slotMap, slots, onSnap, {

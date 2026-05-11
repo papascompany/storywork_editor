@@ -53,17 +53,31 @@ function applyZoom(canvas: StoryCanvas, percent: number): void {
 /**
  * 페이지 전체가 뷰포트에 맞도록 줌 + 패닝.
  *
- * FOLLOWUP-42: canvas.format 에서 실제 판형을 읽어 pageW/pageH 를 계산한다.
- * 이전에 DEFAULT_FORMAT 하드코드를 사용하던 부분을 교체.
+ * 뷰포트 크기는 fabric canvas element 의 부모 DOM (wrapper div) 에서 읽는다.
+ * fabric.getWidth()/getHeight() 는 setDimensions() 또는 setFormat() 이 호출된 후
+ * 컨테이너 크기(뷰포트) 또는 판형 px 크기를 반환할 수 있어 신뢰할 수 없다.
+ *
+ * 실제 뷰포트 크기: canvas element 의 가장 가까운 오버플로우 컨테이너
+ * (lowerCanvasEl → wrapperEl → 상위 flex 영역)
+ *
+ * 페이지 크기: canvas.format 에서 계산 (300dpi 기준 px)
  */
 function fitToViewport(canvas: StoryCanvas): void {
   const fabricCanvas = canvas._fabricCanvas
-  const viewW = fabricCanvas.getWidth()
-  const viewH = fabricCanvas.getHeight()
-  // FOLLOWUP-42: canvas.format 에서 실제 판형 읽기 (DEFAULT_FORMAT 하드코드 제거)
   const format = canvas.format
   const pageW = canvas.mmToPx(format.widthMm)
   const pageH = canvas.mmToPx(format.heightMm)
+
+  // 실제 컨테이너 DOM 크기 획득
+  // fabric v6: lowerCanvasEl 은 fabric 내부 canvas element
+  // wrapperEl 은 fabric 이 생성한 감싸는 div (lowerCanvasEl.parentElement)
+  // 그 부모(grand-parent)가 EditorCanvas 의 containerRef div
+  // 그 부모가 EditorCanvas 의 wrapRef div (relative flex 1 overflow-hidden)
+  const lowerCanvas = (fabricCanvas as unknown as { lowerCanvasEl?: HTMLElement }).lowerCanvasEl
+  // 2단계 상위 = wrapRef (EditorCanvas 전체 영역)
+  const containerEl = lowerCanvas?.parentElement?.parentElement
+  const viewW = containerEl ? containerEl.clientWidth : fabricCanvas.getWidth()
+  const viewH = containerEl ? containerEl.clientHeight : fabricCanvas.getHeight()
 
   const zoom = Math.min(
     (viewW - FIT_MARGIN_PX * 2) / pageW,
@@ -71,6 +85,12 @@ function fitToViewport(canvas: StoryCanvas): void {
     MAX_ZOOM / 100,
   )
   const clampedZoom = Math.max(MIN_ZOOM / 100, zoom)
+
+  // fabric canvas dimensions 를 뷰포트에 맞게 재설정 (이미 맞다면 skip)
+  if (fabricCanvas.getWidth() !== viewW || fabricCanvas.getHeight() !== viewH) {
+    fabricCanvas.setWidth(viewW)
+    fabricCanvas.setHeight(viewH)
+  }
 
   // 중앙 정렬: viewportTransform[4], [5] = 패닝
   const offsetX = (viewW - pageW * clampedZoom) / 2

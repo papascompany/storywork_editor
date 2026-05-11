@@ -72,13 +72,20 @@ type MockRect = {
   _hint: string
 }
 
-function makeMockCanvas(canvasW = 390, canvasH = 600) {
+/** mm → px 변환 헬퍼 (테스트 내부 기댓값 계산용) */
+function mmToPxHelper(mm: number, dpi: number): number {
+  return (mm * dpi) / 25.4
+}
+
+function makeMockCanvas(dpi = 72, widthMm = 130, heightMm = 200) {
   const objects = new Map<string, MockRect>()
   let idCounter = 0
+  const format = { id: 'test', widthMm, heightMm, dpi }
 
   const _fabricCanvas = {
-    getWidth: () => canvasW,
-    getHeight: () => canvasH,
+    // getWidth/getHeight 는 이제 apply-template 에서 사용하지 않으나 mock 유지
+    getWidth: () => Math.round(mmToPxHelper(widthMm, dpi)),
+    getHeight: () => Math.round(mmToPxHelper(heightMm, dpi)),
     getObjects: () => Array.from(objects.values()),
     requestRenderAll: vi.fn(),
     on: vi.fn(),
@@ -99,7 +106,8 @@ function makeMockCanvas(canvasW = 390, canvasH = 600) {
       objects.delete(id)
     }),
     getObject: (id: string) => objects.get(id),
-    format: { id: 'test', widthMm: 130, heightMm: 200, dpi: 72 },
+    format,
+    mmToPx: (mm: number) => mmToPxHelper(mm, dpi),
     _objects: objects,
   }
 
@@ -221,18 +229,17 @@ describe('applyTemplate — 슬롯 생성', () => {
 })
 
 describe('applyTemplate — 좌표 변환', () => {
-  it('배경 슬롯(x=0,y=0,w=1,h=1) → 캔버스 전체 크기와 일치', () => {
-    const canvasW = 390
-    const canvasH = 600
+  it('배경 슬롯(x=0,y=0,w=1,h=1) → 실제 페이지 px 크기(format 기반)와 일치', () => {
+    // dpi=72, widthMm=130, heightMm=200 → pageW=368.5, pageH=566.9
+    const canvas = makeMockCanvas(72, 130, 200) as any
+    const pageW = mmToPxHelper(130, 72)
+    const pageH = mmToPxHelper(200, 72)
 
-    const canvas = makeMockCanvas(canvasW, canvasH) as any
     const template = make1on1Template()
 
     applyTemplate(canvas, template)
 
-    // addObject 첫 번째 호출 인자 (배경 슬롯) 검증
     const addedObjects = canvas._objects
-    // 모든 객체를 확인해서 bg 슬롯 찾기
     const bgSlotObj = Array.from(addedObjects.values()).find(
       (o: MockRect) => o.data?.kind === 'background',
     ) as MockRect | undefined
@@ -240,15 +247,15 @@ describe('applyTemplate — 좌표 변환', () => {
     expect(bgSlotObj).toBeDefined()
     expect(bgSlotObj?.left).toBe(0)
     expect(bgSlotObj?.top).toBe(0)
-    expect(bgSlotObj?.width).toBeCloseTo(canvasW, 1)
-    expect(bgSlotObj?.height).toBeCloseTo(canvasH, 1)
+    expect(bgSlotObj?.width).toBeCloseTo(pageW, 1)
+    expect(bgSlotObj?.height).toBeCloseTo(pageH, 1)
   })
 
-  it('left 슬롯(x=0.1,y=0.3,w=0.35,h=0.6) → 정규화 좌표 × 캔버스 크기', () => {
-    const canvasW = 390
-    const canvasH = 600
+  it('left 슬롯(x=0.1,y=0.3,w=0.35,h=0.6) → 정규화 좌표 × 실제 페이지 px 크기', () => {
+    const canvas = makeMockCanvas(72, 130, 200) as any
+    const pageW = mmToPxHelper(130, 72)
+    const pageH = mmToPxHelper(200, 72)
 
-    const canvas = makeMockCanvas(canvasW, canvasH) as any
     const template = make1on1Template()
 
     applyTemplate(canvas, template)
@@ -259,10 +266,10 @@ describe('applyTemplate — 좌표 변환', () => {
 
     const leftObj = poseObjs[0]
     expect(leftObj).toBeDefined()
-    expect(leftObj?.left).toBeCloseTo(0.1 * canvasW, 1)
-    expect(leftObj?.top).toBeCloseTo(0.3 * canvasH, 1)
-    expect(leftObj?.width).toBeCloseTo(0.35 * canvasW, 1)
-    expect(leftObj?.height).toBeCloseTo(0.6 * canvasH, 1)
+    expect(leftObj?.left).toBeCloseTo(0.1 * pageW, 1)
+    expect(leftObj?.top).toBeCloseTo(0.3 * pageH, 1)
+    expect(leftObj?.width).toBeCloseTo(0.35 * pageW, 1)
+    expect(leftObj?.height).toBeCloseTo(0.6 * pageH, 1)
   })
 })
 

@@ -61,13 +61,14 @@ type MockFabricObj = {
   setCoords: () => void
 }
 
-function makeMockCanvas(canvasW = 390, canvasH = 600) {
+function makeMockCanvas(dpi = 72, widthMm = 130, heightMm = 200) {
   const objects = new Map<string, MockFabricObj>()
   let idCounter = 0
+  const format = { id: 'test', widthMm, heightMm, dpi }
 
   const _fabricCanvas = {
-    getWidth: () => canvasW,
-    getHeight: () => canvasH,
+    getWidth: () => Math.round((widthMm * dpi) / 25.4),
+    getHeight: () => Math.round((heightMm * dpi) / 25.4),
     getObjects: () => Array.from(objects.values()),
     requestRenderAll: vi.fn(),
   }
@@ -89,7 +90,8 @@ function makeMockCanvas(canvasW = 390, canvasH = 600) {
       objects.delete(id)
     }),
     getObject: (id: string) => objects.get(id),
-    format: { id: 'test', widthMm: 130, heightMm: 200, dpi: 72 },
+    format,
+    mmToPx: (mm: number) => (mm * dpi) / 25.4,
     _objects: objects,
   }
 

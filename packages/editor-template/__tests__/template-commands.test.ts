@@ -72,10 +72,14 @@ type MockFabricObj = {
 function makeMockCanvas() {
   const objects = new Map<string, MockFabricObj>()
   let idCounter = 0
+  const dpi = 72
+  const widthMm = 130
+  const heightMm = 200
+  const format = { id: 'test', widthMm, heightMm, dpi }
 
   const _fabricCanvas = {
-    getWidth: () => 390,
-    getHeight: () => 600,
+    getWidth: () => Math.round((widthMm * dpi) / 25.4),
+    getHeight: () => Math.round((heightMm * dpi) / 25.4),
     getObjects: () => Array.from(objects.values()),
     requestRenderAll: vi.fn(),
     on: vi.fn(),
@@ -99,7 +103,8 @@ function makeMockCanvas() {
       objects.delete(id)
     }),
     getObject: (id: string) => objects.get(id),
-    format: { id: 'test', widthMm: 130, heightMm: 200, dpi: 72 },
+    format,
+    mmToPx: (mm: number) => (mm * dpi) / 25.4,
     _objects: objects,
   }
 

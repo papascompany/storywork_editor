@@ -64,19 +64,20 @@ function slotToAbsolutePx(
   }
 }
 
-/** 캔버스 px 크기 조회 (fabric v6 호환) */
+/**
+ * 슬롯 배치용 페이지 px 크기 조회.
+ *
+ * 중요: fabric.getWidth()/getHeight() 는 ResizeObserver 가 setDimensions() 를 호출한 이후
+ * 컨테이너(뷰포트) 크기를 반환한다 (예: 800px).
+ * 슬롯의 정규화 좌표(0..1)는 실제 페이지 픽셀 크기(300dpi 기준, 예: 1772px)에 대한 비율이므로
+ * canvas.format 에서 실제 페이지 크기를 계산해야 한다.
+ */
 function getCanvasSize(canvas: StoryCanvas): { w: number; h: number } {
-  const fc = canvas._fabricCanvas
-  // fabric v6: getWidth/getHeight
-  const w =
-    typeof fc.getWidth === 'function'
-      ? fc.getWidth()
-      : ((fc as unknown as { width: number }).width ?? 600)
-  const h =
-    typeof fc.getHeight === 'function'
-      ? fc.getHeight()
-      : ((fc as unknown as { height: number }).height ?? 800)
-  return { w, h }
+  const format = canvas.format
+  return {
+    w: canvas.mmToPx(format.widthMm),
+    h: canvas.mmToPx(format.heightMm),
+  }
 }
 
 /** nanoid-lite (crypto.randomUUID 폴백) */

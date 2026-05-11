@@ -27,8 +27,6 @@ type ShapePanelProps = {
   history: History | null
 }
 
-const FORMAT_DEFAULT = { widthMm: 148, heightMm: 210 }
-
 type ShapeId = 'rect' | 'circle' | 'line' | 'triangle'
 
 const SHAPE_DEFS: {
@@ -95,8 +93,10 @@ export function ShapePanel({ canvas, history }: ShapePanelProps) {
         return
       }
 
-      const cx = canvas.mmToPx(FORMAT_DEFAULT.widthMm / 2)
-      const cy = canvas.mmToPx(FORMAT_DEFAULT.heightMm / 2)
+      // canvas.format 으로 실제 판형 기준 중앙 좌표 계산 (하드코드 제거)
+      const format = canvas.format
+      const cx = canvas.mmToPx(format.widthMm / 2)
+      const cy = canvas.mmToPx(format.heightMm / 2)
       const size = canvas.mmToPx(30)
       const fabricObj = createShape(id, cx, cy, size)
 
