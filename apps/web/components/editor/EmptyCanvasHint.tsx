@@ -64,16 +64,19 @@ export function EmptyCanvasHint({ canvas, onActivatePoseTool }: EmptyCanvasHintP
     const unsubAdded = canvas.on('object:added', update)
     const unsubRemoved = canvas.on('object:removed', update)
 
-    // fabric 직접 이벤트 (위 이벤트가 발화 전 안전망)
+    // fabric 직접 이벤트 (안전망 + after:render — 페이지 복원 후 상태 동기화)
     const fabricCanvas = canvas._fabricCanvas
     fabricCanvas.on('object:added', update)
     fabricCanvas.on('object:removed', update)
+    // loadJson 후 렌더 완료 시점에 isEmpty 재확인 (race condition 방지)
+    fabricCanvas.on('after:render', update)
 
     return () => {
       unsubAdded()
       unsubRemoved()
       fabricCanvas.off('object:added', update)
       fabricCanvas.off('object:removed', update)
+      fabricCanvas.off('after:render', update)
     }
   }, [canvas, update])
 
