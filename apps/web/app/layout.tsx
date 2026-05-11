@@ -2,6 +2,7 @@ import { ThemeProvider, ToastProvider } from '@storywork/ui'
 import type { Metadata, Viewport } from 'next'
 
 import './globals.css'
+import { pretendard } from './fonts'
 
 const BASE_URL = 'https://storywork-editor-web.vercel.app'
 
@@ -60,11 +61,11 @@ export default function RootLayout({
   children: React.ReactNode
 }>) {
   return (
-    <html lang="ko" suppressHydrationWarning>
+    <html lang="ko" suppressHydrationWarning className={pretendard.variable}>
       <head>
         <script dangerouslySetInnerHTML={{ __html: themeInitScript }} />
       </head>
-      <body>
+      <body className={pretendard.className}>
         <ThemeProvider defaultTheme="system" storageKey="sw-ui-theme">
           <ToastProvider>{children}</ToastProvider>
         </ThemeProvider>

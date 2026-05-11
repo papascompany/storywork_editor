@@ -41,10 +41,11 @@
   --mkt-overlay-scrim: #000000;
 
   /* ── 마케팅 타이포그래피 스케일 ───────────────────────────────────────── */
-  /* Pretendard: 한/영 균형, 가변 폰트. weight 축: 300~700 */
+  /* Pretendard: 한/영 균형, 가변 폰트. weight 축: 100~900 */
+  /* next/font/local 이 --font-pretendard CSS 변수를 주입하므로 그것을 우선 경유 */
   --mkt-font-sans:
-    'Pretendard Variable', Pretendard, 'Apple SD Gothic Neo', -apple-system, BlinkMacSystemFont,
-    system-ui, sans-serif;
+    var(--font-pretendard, 'Pretendard Variable'), Pretendard, 'Apple SD Gothic Neo', -apple-system,
+    BlinkMacSystemFont, system-ui, sans-serif;
   --mkt-font-mono: 'JetBrains Mono', 'SF Mono', Menlo, monospace;
 
   /* display-xl: 86px weight-340 lh-1.00 ls--1.72px */
