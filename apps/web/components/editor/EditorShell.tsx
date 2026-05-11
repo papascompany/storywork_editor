@@ -189,6 +189,65 @@ export function EditorShell() {
         return
       }
 
+      // ⌘A / Ctrl+A → 전체 선택
+      if ((e.metaKey || e.ctrlKey) && e.key === 'a') {
+        e.preventDefault()
+        const fc = canvasRef.current?._fabricCanvas
+        if (fc) {
+          const objs = fc.getObjects()
+          if (objs.length > 0) {
+            void import('fabric').then(({ ActiveSelection }) => {
+              fc.discardActiveObject()
+              const sel = new ActiveSelection(objs, { canvas: fc })
+              fc.setActiveObject(sel)
+              fc.requestRenderAll()
+            })
+          }
+        }
+        return
+      }
+
+      // ⌘C / Ctrl+C → 복사
+      if ((e.metaKey || e.ctrlKey) && e.key === 'c') {
+        const fc = canvasRef.current?._fabricCanvas
+        if (fc?.getActiveObject()) {
+          e.preventDefault()
+          const canvas = canvasRef.current
+          if (canvas) {
+            void import('./lib/clipboard').then(({ copySelection }) => {
+              void copySelection(canvas)
+            })
+          }
+        }
+        return
+      }
+
+      // ⌘V / Ctrl+V → 붙여넣기
+      if ((e.metaKey || e.ctrlKey) && e.key === 'v') {
+        const canvas = canvasRef.current
+        const history = historyRef.current
+        if (canvas && history) {
+          e.preventDefault()
+          void import('./lib/clipboard').then(({ paste }) => {
+            void paste(canvas, history)
+          })
+        }
+        return
+      }
+
+      // ⌘D / Ctrl+D → 복제
+      if ((e.metaKey || e.ctrlKey) && e.key === 'd') {
+        e.preventDefault()
+        const canvas = canvasRef.current
+        const history = historyRef.current
+        if (canvas && history) {
+          void import('./lib/clipboard').then(({ duplicateSelection }) => {
+            void duplicateSelection(canvas, history)
+          })
+        }
+        return
+      }
+
       // ⌘Z / Ctrl+Z → Undo
       if ((e.metaKey || e.ctrlKey) && e.key === 'z' && !e.shiftKey) {
         e.preventDefault()
@@ -203,45 +262,201 @@ export function EditorShell() {
         return
       }
 
-      // Del → 선택 객체 삭제
-      if (e.key === 'Delete' || e.key === 'Backspace') {
+      // ⌘G / Ctrl+G → 그룹
+      if ((e.metaKey || e.ctrlKey) && e.key === 'g' && !e.shiftKey) {
+        e.preventDefault()
         const fc = canvasRef.current?._fabricCanvas
-        if (fc) {
+        const canvas = canvasRef.current
+        const layerTree = layerTreeRef.current
+        const history = historyRef.current
+        if (fc && canvas && layerTree && history) {
+          void import('fabric').then(({ ActiveSelection }) => {
+            const active = fc.getActiveObject()
+            if (!(active instanceof ActiveSelection)) return
+            const objs = active.getObjects()
+            const ids = objs
+              .map((o) => (o as { data?: { id?: string } }).data?.id)
+              .filter((id): id is string => Boolean(id))
+            if (ids.length < 2) return
+            void import('@storywork/editor-history').then(({ GroupCommand }) => {
+              const cmd = new GroupCommand({ layerTree, ids })
+              history.push(cmd)
+              fc.discardActiveObject()
+              fc.requestRenderAll()
+            })
+          })
+        }
+        return
+      }
+
+      // ⌘⇧G / Ctrl+⇧G → 그룹 해제
+      if ((e.metaKey || e.ctrlKey) && e.key === 'g' && e.shiftKey) {
+        e.preventDefault()
+        const fc = canvasRef.current?._fabricCanvas
+        const layerTree = layerTreeRef.current
+        const history = historyRef.current
+        if (fc && layerTree && history) {
           const active = fc.getActiveObject()
           if (active) {
-            e.preventDefault()
-            fc.remove(active)
-            fc.discardActiveObject()
-            fc.requestRenderAll()
+            const groupId = (active as { data?: { id?: string } }).data?.id
+            if (groupId) {
+              const node = layerTree.getNode(groupId)
+              if (node?.kind === 'group') {
+                void import('@storywork/editor-history').then(({ UngroupCommand }) => {
+                  const cmd = new UngroupCommand({
+                    layerTree,
+                    groupId,
+                    groupNodeSnapshot: { ...node },
+                  })
+                  history.push(cmd)
+                  fc.discardActiveObject()
+                  fc.requestRenderAll()
+                })
+              }
+            }
           }
         }
         return
       }
 
-      // 레이어 순서 단축키
+      // Del → 선택 객체 삭제
+      if (e.key === 'Delete' || e.key === 'Backspace') {
+        const fc = canvasRef.current?._fabricCanvas
+        const canvas = canvasRef.current
+        const history = historyRef.current
+        if (fc) {
+          const active = fc.getActiveObject()
+          if (active) {
+            e.preventDefault()
+            if (history && canvas) {
+              void import('fabric').then(({ ActiveSelection }) => {
+                void import('@storywork/editor-history').then(({ RemoveObjectCommand }) => {
+                  const targets = active instanceof ActiveSelection ? active.getObjects() : [active]
+                  fc.discardActiveObject()
+                  for (const obj of targets) {
+                    const dataTyped = (obj as { data?: { id?: string; kind?: string } }).data
+                    const id = dataTyped?.id
+                    const objectData = id ? canvas.getObjectData(id) : undefined
+                    if (id && objectData) {
+                      history.push(
+                        new RemoveObjectCommand({ canvas, id, fabricObj: obj, objectData }),
+                      )
+                    } else {
+                      fc.remove(obj)
+                    }
+                  }
+                  fc.requestRenderAll()
+                })
+              })
+            } else {
+              fc.remove(active)
+              fc.discardActiveObject()
+              fc.requestRenderAll()
+            }
+          }
+        }
+        return
+      }
+
+      // 레이어 순서 단축키 (ZOrderCommand 기반)
       const fc = canvasRef.current?._fabricCanvas
+      const layerTree = layerTreeRef.current
+      const history = historyRef.current
       if (fc) {
         const obj = fc.getActiveObject()
+        const id = obj ? (obj as { data?: { id?: string } }).data?.id : undefined
         if (obj && !e.metaKey && !e.ctrlKey) {
           if (e.key === ']') {
-            fc.bringObjectForward(obj)
-            fc.requestRenderAll()
+            if (layerTree && history && id) {
+              void import('@storywork/editor-history').then(({ ZOrderCommand }) => {
+                const parentId = layerTree.getNode(id)?.parentId ?? null
+                const siblings = parentId
+                  ? (layerTree.getNode(parentId)?.childrenIds ?? [])
+                  : layerTree.getRootNodes().map((n) => n.id)
+                history.push(
+                  new ZOrderCommand({
+                    layerTree,
+                    id,
+                    action: 'bringForward',
+                    siblingsBefore: siblings,
+                    parentId,
+                  }),
+                )
+              })
+            } else {
+              fc.bringObjectForward(obj)
+              fc.requestRenderAll()
+            }
           }
           if (e.key === '[') {
-            fc.sendObjectBackwards(obj)
-            fc.requestRenderAll()
+            if (layerTree && history && id) {
+              void import('@storywork/editor-history').then(({ ZOrderCommand }) => {
+                const parentId = layerTree.getNode(id)?.parentId ?? null
+                const siblings = parentId
+                  ? (layerTree.getNode(parentId)?.childrenIds ?? [])
+                  : layerTree.getRootNodes().map((n) => n.id)
+                history.push(
+                  new ZOrderCommand({
+                    layerTree,
+                    id,
+                    action: 'sendBackward',
+                    siblingsBefore: siblings,
+                    parentId,
+                  }),
+                )
+              })
+            } else {
+              fc.sendObjectBackwards(obj)
+              fc.requestRenderAll()
+            }
           }
         }
         if (obj && (e.metaKey || e.ctrlKey)) {
           if (e.key === ']') {
             e.preventDefault()
-            fc.bringObjectToFront(obj)
-            fc.requestRenderAll()
+            if (layerTree && history && id) {
+              void import('@storywork/editor-history').then(({ ZOrderCommand }) => {
+                const parentId = layerTree.getNode(id)?.parentId ?? null
+                const siblings = parentId
+                  ? (layerTree.getNode(parentId)?.childrenIds ?? [])
+                  : layerTree.getRootNodes().map((n) => n.id)
+                history.push(
+                  new ZOrderCommand({
+                    layerTree,
+                    id,
+                    action: 'bringToFront',
+                    siblingsBefore: siblings,
+                    parentId,
+                  }),
+                )
+              })
+            } else {
+              fc.bringObjectToFront(obj)
+              fc.requestRenderAll()
+            }
           }
           if (e.key === '[') {
             e.preventDefault()
-            fc.sendObjectToBack(obj)
-            fc.requestRenderAll()
+            if (layerTree && history && id) {
+              void import('@storywork/editor-history').then(({ ZOrderCommand }) => {
+                const parentId = layerTree.getNode(id)?.parentId ?? null
+                const siblings = parentId
+                  ? (layerTree.getNode(parentId)?.childrenIds ?? [])
+                  : layerTree.getRootNodes().map((n) => n.id)
+                history.push(
+                  new ZOrderCommand({
+                    layerTree,
+                    id,
+                    action: 'sendToBack',
+                    siblingsBefore: siblings,
+                    parentId,
+                  }),
+                )
+              })
+            } else {
+              fc.sendObjectToBack(obj)
+              fc.requestRenderAll()
+            }
           }
         }
       }

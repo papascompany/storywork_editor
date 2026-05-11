@@ -1,5 +1,5 @@
 import type { PageJsonV1 } from '@storywork/schema/editor'
-import type { Canvas, FabricObject, ModifiedEvent } from 'fabric'
+import type { Canvas, FabricObject, ModifiedEvent, TPointerEvent } from 'fabric'
 
 import { createObjectData, extractObjectData } from '../data/object-meta.js'
 import { createEditorBus } from '../events/bus.js'
@@ -27,6 +27,7 @@ type SelectionUpdatedPayload = Partial<{ e: Event }> & {
 }
 type SelectionClearedPayload = Partial<{ e: Event }> & { deselected: FabricObject[] }
 type AfterRenderPayload = { ctx: CanvasRenderingContext2D }
+type ObjectRotatingPayload = { target: FabricObject; e: TPointerEvent }
 
 /**
  * StoryCanvas — @storywork/editor-core 의 핵심 클래스.
@@ -115,6 +116,22 @@ export class StoryCanvas {
   private readonly _onAfterRender = (_e: AfterRenderPayload): void => {
     if (this._disposed) return
     this._bus.emit('render:after', undefined as unknown as void)
+  }
+
+  /**
+   * H1 bound handler: 회전 15° 스냅
+   * Shift 없으면 15° 단위 스냅, Shift 있으면 자유 회전.
+   */
+  private readonly _onObjectRotating = (e: ObjectRotatingPayload): void => {
+    if (this._disposed) return
+    const target = e.target
+    if (!target) return
+    const nativeEvent = e.e as MouseEvent | TouchEvent | undefined
+    const shiftHeld = nativeEvent instanceof MouseEvent ? nativeEvent.shiftKey : false
+    if (!shiftHeld) {
+      const snapped = Math.round((target.angle ?? 0) / 15) * 15
+      target.set({ angle: snapped })
+    }
   }
 
   constructor(opts: StoryCanvasOptions) {
@@ -289,6 +306,8 @@ export class StoryCanvas {
     this._fabric.on('selection:updated', this._onSelectionUpdated)
     this._fabric.on('selection:cleared', this._onSelectionCleared)
     this._fabric.on('after:render', this._onAfterRender)
+    // H1: bound handler — 회전 15° 스냅
+    this._fabric.on('object:rotating', this._onObjectRotating)
   }
 
   /**
@@ -303,5 +322,6 @@ export class StoryCanvas {
     this._fabric.off('selection:updated', this._onSelectionUpdated)
     this._fabric.off('selection:cleared', this._onSelectionCleared)
     this._fabric.off('after:render', this._onAfterRender)
+    this._fabric.off('object:rotating', this._onObjectRotating)
   }
 }

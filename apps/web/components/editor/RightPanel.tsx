@@ -23,6 +23,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger, cn } from '@storywork/ui'
 import { Layers, Settings2 } from 'lucide-react'
 import React, { useEffect, useRef, useState } from 'react'
 
+import { AlignControlBar } from './AlignControlBar'
 import { ControlBar } from './ControlBar'
 import type { ObjectProps } from './hooks/useSelection'
 import { LayerPanel } from './LayerPanel'
@@ -125,6 +126,10 @@ export function RightPanel({ props, canvas, layerTree, history, selectedIds }: R
           value="properties"
           className="overflow-y-auto data-[state=active]:flex data-[state=active]:flex-col"
         >
+          {/* 다중 선택 시 AlignControlBar 노출 */}
+          {selectedIds.length >= 2 && (
+            <AlignControlBar canvas={canvas} history={history as any} selectedIds={selectedIds} />
+          )}
           <ControlBar
             props={props}
             canvas={canvas}

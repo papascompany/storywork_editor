@@ -22,17 +22,17 @@ export type ToolId =
   | 'upload'
   | 'ai'
 
-// 현재 M2 에서 실제 동작하는 도구 집합 (M2-05: pose 활성화)
-export const ACTIVE_TOOLS = new Set<ToolId>(['select', 'background', 'shape', 'pose'])
+// 현재 M2/M5 에서 실제 동작하는 도구 집합
+export const ACTIVE_TOOLS = new Set<ToolId>(['select', 'background', 'shape', 'pose', 'text'])
 
 // 비활성 도구별 활성화 예정 마일스톤 (Toast 메시지용)
 export const TOOL_MILESTONE: Partial<Record<ToolId, string>> = {
   template: 'M3',
   // pose: 'M2',  ← M2-05 에서 활성화됨
+  // text: 'M5',  ← M5-01 에서 활성화됨 (Phase 2)
   bubble: 'M5',
   wordfx: 'M5',
   decoration: 'M3',
-  text: 'M5',
   upload: 'M7',
   ai: 'M4',
 }

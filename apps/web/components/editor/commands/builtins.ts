@@ -1,7 +1,7 @@
 'use client'
 
 /**
- * commands/builtins.ts — 내장 Command 카탈로그 (~30개)
+ * commands/builtins.ts — 내장 Command 카탈로그 (~35개)
  *
  * 정적 배열. 런타임 의존성은 action(ctx) 에서 ctx 를 통해 주입.
  * 아이콘은 lucide-react 를 사용.
@@ -11,6 +11,9 @@ import {
   AlignCenter,
   ChevronDown,
   ChevronUp,
+  Clipboard,
+  Copy,
+  CopyPlus,
   Download,
   FileJson,
   FileType,
@@ -58,6 +61,8 @@ export const SHORTCUT_GROUPS: ShortcutGroup[] = [
       { keys: ['⌘', 'Z'], description: '실행 취소' },
       { keys: ['⌘', '⇧', 'Z'], description: '다시 실행' },
       { keys: ['⌘', 'A'], description: '전체 선택' },
+      { keys: ['⌘', 'C'], description: '복사' },
+      { keys: ['⌘', 'V'], description: '붙여넣기' },
       { keys: ['⌘', 'D'], description: '복제' },
       { keys: ['Del'], description: '삭제' },
       { keys: ['⌘', 'L'], description: '잠금 토글' },
@@ -249,9 +254,63 @@ export const BUILTIN_COMMANDS: Command[] = [
         showToast('캔버스가 초기화되지 않았습니다.', 'error')
         return
       }
-      canvas._fabricCanvas.discardActiveObject()
-      canvas._fabricCanvas.requestRenderAll()
-      showToast('전체 선택은 M1에서 지원 예정입니다.', 'info')
+      const fc = canvas._fabricCanvas
+      const objs = fc.getObjects()
+      if (objs.length === 0) {
+        showToast('캔버스에 객체가 없습니다.', 'info')
+        return
+      }
+      // BUG-013 가드: getContext 확인
+      if (!fc.getElement().getContext) return
+      // fabric v6: ActiveSelection 으로 다중 선택
+      void import('fabric').then(({ ActiveSelection }) => {
+        fc.discardActiveObject()
+        const sel = new ActiveSelection(objs, { canvas: fc })
+        fc.setActiveObject(sel)
+        fc.requestRenderAll()
+      })
+    },
+  },
+  {
+    id: 'edit-copy',
+    category: 'edit',
+    label: '복사',
+    icon: Copy,
+    shortcut: '⌘C',
+    keywords: ['copy', '복사'],
+    action: async ({ canvas, showToast }) => {
+      if (!canvas) return
+      const { copySelection } = await import('../lib/clipboard')
+      const count = await copySelection(canvas)
+      if (count === 0) showToast('복사할 객체를 선택하세요.', 'info')
+    },
+  },
+  {
+    id: 'edit-paste',
+    category: 'edit',
+    label: '붙여넣기',
+    icon: Clipboard,
+    shortcut: '⌘V',
+    keywords: ['paste', '붙여넣기'],
+    action: async ({ canvas, history, showToast }) => {
+      if (!canvas || !history) return
+      const { paste } = await import('../lib/clipboard')
+      const count = await paste(canvas, history)
+      if (count === 0) showToast('붙여넣을 내용이 없습니다. 먼저 복사하세요.', 'info')
+    },
+  },
+  {
+    id: 'edit-duplicate',
+    category: 'edit',
+    label: '복제',
+    icon: CopyPlus,
+    shortcut: '⌘D',
+    keywords: ['duplicate', '복제', 'copy'],
+    action: async ({ canvas, history, showToast }) => {
+      if (!canvas || !history) return
+      const { duplicateSelection } = await import('../lib/clipboard')
+      const count = await duplicateSelection(canvas, history)
+      if (count === 0) showToast('복제할 객체를 선택하세요.', 'info')
     },
   },
   {
@@ -261,7 +320,7 @@ export const BUILTIN_COMMANDS: Command[] = [
     icon: Trash2,
     shortcut: 'Del',
     keywords: ['delete', '삭제', 'remove'],
-    action: ({ canvas, showToast }) => {
+    action: ({ canvas, history, showToast }) => {
       if (!canvas) return
       const fc = canvas._fabricCanvas
       const active = fc.getActiveObject()
@@ -269,9 +328,32 @@ export const BUILTIN_COMMANDS: Command[] = [
         showToast('삭제할 객체를 선택하세요.', 'info')
         return
       }
-      fc.remove(active)
-      fc.discardActiveObject()
-      fc.requestRenderAll()
+      if (!history) {
+        // history 없으면 직접 제거
+        fc.remove(active)
+        fc.discardActiveObject()
+        fc.requestRenderAll()
+        return
+      }
+      // RemoveObjectCommand 로 undo 가능하게
+      void import('@storywork/editor-history').then(({ RemoveObjectCommand }) => {
+        import('fabric').then(({ ActiveSelection }) => {
+          const targets = active instanceof ActiveSelection ? active.getObjects() : [active]
+          fc.discardActiveObject()
+          for (const obj of targets) {
+            const dataTyped = (obj as { data?: { id?: string; kind?: string } }).data
+            const id = dataTyped?.id
+            const objectData = id ? canvas.getObjectData(id) : undefined
+            if (id && objectData) {
+              const cmd = new RemoveObjectCommand({ canvas, id, fabricObj: obj, objectData })
+              history.push(cmd)
+            } else {
+              fc.remove(obj)
+            }
+          }
+          fc.requestRenderAll()
+        })
+      })
     },
   },
 
@@ -283,12 +365,30 @@ export const BUILTIN_COMMANDS: Command[] = [
     icon: ChevronUp,
     shortcut: '⌘]',
     keywords: ['bring to front', '맨 앞', 'front', '앞으로'],
-    action: ({ canvas }) => {
+    action: ({ canvas, layerTree, history }) => {
       if (!canvas) return
       const obj = canvas._fabricCanvas.getActiveObject()
       if (!obj) return
-      canvas._fabricCanvas.bringObjectToFront(obj)
-      canvas._fabricCanvas.requestRenderAll()
+      const id = (obj as { data?: { id?: string } }).data?.id
+      if (layerTree && history && id) {
+        void import('@storywork/editor-history').then(({ ZOrderCommand }) => {
+          const parentId = layerTree.getNode(id)?.parentId ?? null
+          const siblings = parentId
+            ? (layerTree.getNode(parentId)?.childrenIds ?? [])
+            : layerTree.getRootNodes().map((n) => n.id)
+          const cmd = new ZOrderCommand({
+            layerTree,
+            id,
+            action: 'bringToFront',
+            siblingsBefore: siblings,
+            parentId,
+          })
+          history.push(cmd)
+        })
+      } else {
+        canvas._fabricCanvas.bringObjectToFront(obj)
+        canvas._fabricCanvas.requestRenderAll()
+      }
     },
   },
   {
@@ -298,12 +398,30 @@ export const BUILTIN_COMMANDS: Command[] = [
     icon: ChevronUp,
     shortcut: ']',
     keywords: ['bring forward', '앞으로', 'forward'],
-    action: ({ canvas }) => {
+    action: ({ canvas, layerTree, history }) => {
       if (!canvas) return
       const obj = canvas._fabricCanvas.getActiveObject()
       if (!obj) return
-      canvas._fabricCanvas.bringObjectForward(obj)
-      canvas._fabricCanvas.requestRenderAll()
+      const id = (obj as { data?: { id?: string } }).data?.id
+      if (layerTree && history && id) {
+        void import('@storywork/editor-history').then(({ ZOrderCommand }) => {
+          const parentId = layerTree.getNode(id)?.parentId ?? null
+          const siblings = parentId
+            ? (layerTree.getNode(parentId)?.childrenIds ?? [])
+            : layerTree.getRootNodes().map((n) => n.id)
+          const cmd = new ZOrderCommand({
+            layerTree,
+            id,
+            action: 'bringForward',
+            siblingsBefore: siblings,
+            parentId,
+          })
+          history.push(cmd)
+        })
+      } else {
+        canvas._fabricCanvas.bringObjectForward(obj)
+        canvas._fabricCanvas.requestRenderAll()
+      }
     },
   },
   {
@@ -313,12 +431,30 @@ export const BUILTIN_COMMANDS: Command[] = [
     icon: ChevronDown,
     shortcut: '[',
     keywords: ['send backward', '뒤로', 'backward'],
-    action: ({ canvas }) => {
+    action: ({ canvas, layerTree, history }) => {
       if (!canvas) return
       const obj = canvas._fabricCanvas.getActiveObject()
       if (!obj) return
-      canvas._fabricCanvas.sendObjectBackwards(obj)
-      canvas._fabricCanvas.requestRenderAll()
+      const id = (obj as { data?: { id?: string } }).data?.id
+      if (layerTree && history && id) {
+        void import('@storywork/editor-history').then(({ ZOrderCommand }) => {
+          const parentId = layerTree.getNode(id)?.parentId ?? null
+          const siblings = parentId
+            ? (layerTree.getNode(parentId)?.childrenIds ?? [])
+            : layerTree.getRootNodes().map((n) => n.id)
+          const cmd = new ZOrderCommand({
+            layerTree,
+            id,
+            action: 'sendBackward',
+            siblingsBefore: siblings,
+            parentId,
+          })
+          history.push(cmd)
+        })
+      } else {
+        canvas._fabricCanvas.sendObjectBackwards(obj)
+        canvas._fabricCanvas.requestRenderAll()
+      }
     },
   },
   {
@@ -328,12 +464,30 @@ export const BUILTIN_COMMANDS: Command[] = [
     icon: ChevronDown,
     shortcut: '⌘[',
     keywords: ['send to back', '맨 뒤', 'back', '뒤로'],
-    action: ({ canvas }) => {
+    action: ({ canvas, layerTree, history }) => {
       if (!canvas) return
       const obj = canvas._fabricCanvas.getActiveObject()
       if (!obj) return
-      canvas._fabricCanvas.sendObjectToBack(obj)
-      canvas._fabricCanvas.requestRenderAll()
+      const id = (obj as { data?: { id?: string } }).data?.id
+      if (layerTree && history && id) {
+        void import('@storywork/editor-history').then(({ ZOrderCommand }) => {
+          const parentId = layerTree.getNode(id)?.parentId ?? null
+          const siblings = parentId
+            ? (layerTree.getNode(parentId)?.childrenIds ?? [])
+            : layerTree.getRootNodes().map((n) => n.id)
+          const cmd = new ZOrderCommand({
+            layerTree,
+            id,
+            action: 'sendToBack',
+            siblingsBefore: siblings,
+            parentId,
+          })
+          history.push(cmd)
+        })
+      } else {
+        canvas._fabricCanvas.sendObjectToBack(obj)
+        canvas._fabricCanvas.requestRenderAll()
+      }
     },
   },
   {
@@ -343,8 +497,39 @@ export const BUILTIN_COMMANDS: Command[] = [
     icon: Layers,
     shortcut: '⌘G',
     keywords: ['group', '그룹', 'combine'],
-    action: ({ showToast }) => {
-      showToast('그룹 기능은 M5에서 활성화됩니다.', 'info')
+    action: ({ canvas, layerTree, history, showToast }) => {
+      if (!canvas || !layerTree || !history) {
+        showToast('편집기가 준비되지 않았습니다.', 'error')
+        return
+      }
+      const fc = canvas._fabricCanvas
+      const active = fc.getActiveObject()
+      if (!active) {
+        showToast('그룹화할 객체를 선택하세요.', 'info')
+        return
+      }
+      void import('fabric').then(({ ActiveSelection }) => {
+        if (!(active instanceof ActiveSelection)) {
+          showToast('2개 이상 선택 후 그룹화하세요.', 'info')
+          return
+        }
+        const objs = active.getObjects()
+        const ids = objs
+          .map((o) => (o as { data?: { id?: string } }).data?.id)
+          .filter((id): id is string => Boolean(id))
+
+        if (ids.length < 2) {
+          showToast('2개 이상 선택 후 그룹화하세요.', 'info')
+          return
+        }
+
+        void import('@storywork/editor-history').then(({ GroupCommand }) => {
+          const cmd = new GroupCommand({ layerTree, ids })
+          history.push(cmd)
+          fc.discardActiveObject()
+          fc.requestRenderAll()
+        })
+      })
     },
   },
   {
@@ -354,8 +539,37 @@ export const BUILTIN_COMMANDS: Command[] = [
     icon: Layers,
     shortcut: '⌘⇧G',
     keywords: ['ungroup', '그룹 해제', 'separate'],
-    action: ({ showToast }) => {
-      showToast('그룹 해제 기능은 M5에서 활성화됩니다.', 'info')
+    action: ({ canvas, layerTree, history, showToast }) => {
+      if (!canvas || !layerTree || !history) {
+        showToast('편집기가 준비되지 않았습니다.', 'error')
+        return
+      }
+      const fc = canvas._fabricCanvas
+      const active = fc.getActiveObject()
+      if (!active) {
+        showToast('그룹 해제할 그룹을 선택하세요.', 'info')
+        return
+      }
+      const groupId = (active as { data?: { id?: string } }).data?.id
+      if (!groupId) {
+        showToast('그룹 해제할 그룹을 선택하세요.', 'info')
+        return
+      }
+      const node = layerTree.getNode(groupId)
+      if (!node || node.kind !== 'group') {
+        showToast('선택된 객체가 그룹이 아닙니다.', 'info')
+        return
+      }
+      void import('@storywork/editor-history').then(({ UngroupCommand }) => {
+        const cmd = new UngroupCommand({
+          layerTree,
+          groupId,
+          groupNodeSnapshot: { ...node },
+        })
+        history.push(cmd)
+        fc.discardActiveObject()
+        fc.requestRenderAll()
+      })
     },
   },
 
