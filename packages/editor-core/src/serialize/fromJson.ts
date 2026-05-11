@@ -1,6 +1,6 @@
 import { parsePageJson } from '@storywork/schema/editor'
 import type { LayerJson, PageJsonV1 } from '@storywork/schema/editor'
-import { Rect, Group } from 'fabric'
+import { FabricImage, Rect, Group } from 'fabric'
 import type { FabricObject } from 'fabric'
 
 import { mmToPx } from '../canvas/coords.js'
@@ -73,8 +73,36 @@ async function layerToFabricObject(layer: LayerJson, dpi: number): Promise<Fabri
     return group
   }
 
-  // 기본 Rect 로 복원 (실제 포즈 이미지 등은 editor-pose 에서 처리)
-  // M1 에서는 Rect 대리 객체로 형상 보존
+  // fabric.type 이 'image' 이거나 kind 가 'pose' 인 경우 FabricImage 로 복원
+  const fabricType = typeof fabricDef['type'] === 'string' ? fabricDef['type'] : ''
+  const src = typeof fabricDef['src'] === 'string' ? fabricDef['src'] : ''
+
+  if ((fabricType === 'image' || kind === 'pose') && src) {
+    try {
+      const img = await FabricImage.fromURL(src, { crossOrigin: 'anonymous' })
+      img.set({
+        left: mmToPx(leftMm, dpi),
+        top: mmToPx(topMm, dpi),
+        scaleX,
+        scaleY,
+        angle: typeof fabricDef['angle'] === 'number' ? fabricDef['angle'] : 0,
+        opacity: typeof fabricDef['opacity'] === 'number' ? fabricDef['opacity'] : 1,
+        flipX: typeof fabricDef['flipX'] === 'boolean' ? fabricDef['flipX'] : false,
+        flipY: typeof fabricDef['flipY'] === 'boolean' ? fabricDef['flipY'] : false,
+        visible: typeof fabricDef['visible'] === 'boolean' ? fabricDef['visible'] : true,
+        selectable: !objectData.locked,
+        evented: !objectData.locked,
+      })
+      // @ts-expect-error fabric data property
+      img.data = objectData
+      return img
+    } catch {
+      // 이미지 로드 실패 시 Rect 폴백 (콘솔 경고 없이 무음 처리)
+      console.warn(`[editor-core] 이미지 복원 실패 (src=${src.slice(0, 60)}...) → Rect 폴백`)
+    }
+  }
+
+  // 기본 Rect 로 복원 (배경, 도형 등)
   const obj = new Rect({
     left: mmToPx(leftMm, dpi),
     top: mmToPx(topMm, dpi),
