@@ -5,6 +5,7 @@
  */
 
 import { ArrowLeft, Star } from 'lucide-react'
+import Image from 'next/image'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import * as React from 'react'
@@ -206,11 +207,15 @@ export default function NewTemplateSetPage() {
                     />
                   )}
                   {t.thumbnail ? (
-                    <img
-                      src={t.thumbnail}
-                      alt={t.name}
-                      className="w-full h-16 object-cover rounded-[var(--radius-sm)] border border-[var(--color-border)]"
-                    />
+                    <div className="relative w-full h-16 rounded-[var(--radius-sm)] overflow-hidden border border-[var(--color-border)]">
+                      <Image
+                        src={t.thumbnail}
+                        alt={t.name}
+                        fill
+                        sizes="(max-width: 768px) 33vw, 160px"
+                        className="object-cover"
+                      />
+                    </div>
                   ) : (
                     <div className="w-full h-16 bg-[var(--color-surface-muted)] rounded-[var(--radius-sm)] border border-[var(--color-border)] flex items-center justify-center text-xs text-[var(--color-text-disabled)]">
                       미리보기 없음

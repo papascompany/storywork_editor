@@ -8,7 +8,7 @@
     "storybook": "storybook dev --port 6006",
     "build": "storybook build",
     "build-storybook": "storybook build",
-    "lint": "eslint stories --ext .ts,.tsx",
+    "lint": "eslint stories --max-warnings 0",
     "typecheck": "tsc --noEmit",
     "test": "echo 'No unit tests for storybook app'",
     "clean": "rimraf storybook-static"

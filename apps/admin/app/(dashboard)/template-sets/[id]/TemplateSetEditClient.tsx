@@ -18,6 +18,7 @@ import {
   DialogTitle,
 } from '@storywork/ui'
 import { ArrowLeft, Plus, Star, Trash2 } from 'lucide-react'
+import Image from 'next/image'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import * as React from 'react'
@@ -260,11 +261,15 @@ export function TemplateSetEditClient({ set, userRole }: TemplateSetEditClientPr
                       {idx + 1}
                     </span>
                     {t.thumbnail ? (
-                      <img
-                        src={t.thumbnail}
-                        alt={t.name}
-                        className="h-12 w-12 rounded-[var(--radius-sm)] object-cover border border-[var(--color-border)] shrink-0"
-                      />
+                      <div className="relative h-12 w-12 rounded-[var(--radius-sm)] overflow-hidden border border-[var(--color-border)] shrink-0">
+                        <Image
+                          src={t.thumbnail}
+                          alt={t.name}
+                          fill
+                          sizes="48px"
+                          className="object-cover"
+                        />
+                      </div>
                     ) : (
                       <div className="h-12 w-12 rounded-[var(--radius-sm)] bg-[var(--color-surface-muted)] border border-[var(--color-border)] shrink-0 flex items-center justify-center text-xs text-[var(--color-text-disabled)]">
                         없음

@@ -4,6 +4,7 @@
  * ResourceReviewClient — ReviewQueue 기반 검수 UI
  */
 
+import Image from 'next/image'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import * as React from 'react'
@@ -43,12 +44,15 @@ function ReviewCard({ item, isFocused }: { item: ReviewItem; isFocused: boolean 
     >
       {/* 썸네일 */}
       {item.thumbUrl ? (
-        <img
-          src={item.thumbUrl}
-          alt={item.slug}
-          className="w-full aspect-square object-contain rounded-[var(--radius-md)] bg-[var(--color-surface-muted)]"
-          loading="lazy"
-        />
+        <div className="relative w-full aspect-square rounded-[var(--radius-md)] bg-[var(--color-surface-muted)] overflow-hidden">
+          <Image
+            src={item.thumbUrl}
+            alt={item.slug}
+            fill
+            sizes="(max-width: 768px) 50vw, 256px"
+            className="object-contain"
+          />
+        </div>
       ) : (
         <div className="w-full aspect-square flex items-center justify-center rounded-[var(--radius-md)] bg-[var(--color-surface-muted)] text-sm text-[var(--color-text-muted)]">
           이미지 없음

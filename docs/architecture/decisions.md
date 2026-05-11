@@ -96,6 +96,28 @@
   - `LICENSE.json` 누락 + 사이드카에도 license 없음 → 적재 거부
 - **현재 적용**: `data/poses/raw/LICENSE.json` 에 `holder=StoryWork`, `terms=all-rights`, `commercialUse=true`
 
+## ADR-0012 — ESLint 룰 통일: `no-explicit-any: error` + `--max-warnings 0`
+
+- **결정**: 모노레포 전체의 ESLint 를 단일 root `eslint.config.js` 로 통일하고, 모든 lint 스크립트에 `--max-warnings 0` 을 강제한다
+- **맥락**: M3-04(e58730c), M5-02, M5-04(44727eb) 에서 3번 동일한 `(x: any)` 패턴이 반복됐다. 패키지 lint(`pnpm --filter <pkg> lint`)는 통과하지만 `next build` 가 내부적으로 더 엄격한 설정으로 ESLint 를 실행해 Vercel 빌드 실패로 이어졌다
+- **근본 원인**:
+  1. 패키지 lint 스크립트: `eslint src --ext .ts` — `--max-warnings 0` 없이 warning=exit 0
+  2. apps lint 스크립트: `next lint` — Next.js 15 에서 deprecated, `--max-warnings -1`(무제한) 기본값
+  3. `next build` 는 내부적으로 ESLint 를 `--max-warnings 0` 수준으로 실행 → 빌드 단계에서만 실패 발견
+- **결정 내용**:
+  - root `eslint.config.js`: `@next/eslint-plugin-next` Flat Config 통합, 테스트/스토리/백업 파일 적절히 제외
+  - 패키지 lint 스크립트: `eslint src --ext .ts` → `eslint src --max-warnings 0`
+  - apps lint 스크립트: `next lint` → `eslint . --max-warnings 0`
+  - `lint-staged`: `eslint --fix` → `eslint --fix --max-warnings 0`
+  - ESLint 9 Flat Config 에서 `--ext` 플래그는 deprecated — `files` 배열로 대체됨
+  - 백업 파일(`* 2.tsx`) 은 ignores 에 추가
+- **결과**: `pnpm lint` == `next build` 엄격도 동등 보장. 로컬 lint 통과 = Vercel 빌드 통과
+- **에이전트 영향**: `.claude/agents/{architect,admin-builder,editor-engineer,ui-designer}.md` 에 검증 섹션 추가
+- **위반 수정 내역** (이번 PR):
+  - `apps/web/components/editor/panels/PoseGridItem.tsx`: `<img>` → `<Image />`
+  - `apps/web/components/editor/TopBar.tsx`: `<a href="/">` → `<Link href="/">`
+  - `apps/admin/...` 8개 파일: `<img>` → `<Image />` (blob URL 예외 1건은 eslint-disable 주석)
+
 ---
 
 신규 ADR 은 다음 번호로 추가하고 `roadmap.md` 의 관련 작업에서 링크.

@@ -12,6 +12,7 @@
 
 import { cn, Tooltip } from '@storywork/ui'
 import { AlertTriangle, Plus } from 'lucide-react'
+import Image from 'next/image'
 import React, { useCallback } from 'react'
 
 import type { ResourceSummary } from '../../../app/api/_lib/search-types'
@@ -100,14 +101,14 @@ export function PoseGridItem({ pose, onAddToCanvas }: PoseGridItemProps): React.
     >
       {/* 썸네일 이미지 */}
       {pose.thumbUrl ? (
-        <img
+        <Image
           src={pose.thumbUrl}
           alt={label}
-          loading="lazy"
-          decoding="async"
+          fill
+          sizes="132px"
           draggable={false}
           className={cn(
-            'absolute inset-0 h-full w-full object-contain',
+            'object-contain',
             'transition-transform duration-[var(--duration-fast)]',
             'group-hover:scale-105',
             // prefers-reduced-motion 존중

@@ -9,6 +9,7 @@
 
 import type { ColumnDef } from '@tanstack/react-table'
 import { Plus } from 'lucide-react'
+import Image from 'next/image'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import * as React from 'react'
@@ -41,11 +42,15 @@ const columns: ColumnDef<TemplateRow>[] = [
     meta: { mobileLabel: '미리보기' },
     cell: ({ row }) =>
       row.original.thumbnail ? (
-        <img
-          src={row.original.thumbnail}
-          alt={row.original.name}
-          className="h-10 w-10 rounded-[var(--radius-sm)] object-cover border border-[var(--color-border)]"
-        />
+        <div className="relative h-10 w-10 rounded-[var(--radius-sm)] overflow-hidden border border-[var(--color-border)]">
+          <Image
+            src={row.original.thumbnail}
+            alt={row.original.name}
+            fill
+            sizes="40px"
+            className="object-cover"
+          />
+        </div>
       ) : (
         <div className="h-10 w-10 rounded-[var(--radius-sm)] bg-[var(--color-surface-muted)] border border-[var(--color-border)] flex items-center justify-center text-xs text-[var(--color-text-disabled)]">
           없음

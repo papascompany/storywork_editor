@@ -1,5 +1,6 @@
 // @ts-check
 import js from '@eslint/js'
+import nextPlugin from '@next/eslint-plugin-next'
 import tsPlugin from '@typescript-eslint/eslint-plugin'
 import tsParser from '@typescript-eslint/parser'
 import importPlugin from 'eslint-plugin-import'
@@ -266,6 +267,9 @@ export default [
       '**/coverage/**',
       '**/storybook-static/**',
       '**/playwright-report/**',
+      // " 2.tsx / 2.ts" 패턴 — 에디터/에이전트 백업 파일 (실수 생성), 린트 대상 제외
+      '**/* 2.ts',
+      '**/* 2.tsx',
     ],
   },
 
@@ -336,6 +340,18 @@ export default [
     rules: {
       '@typescript-eslint/no-explicit-any': 'off',
       'no-console': 'off',
+      // 테스트/스토리 파일은 Next.js 런타임이 아님 — img/a 태그 직접 사용 허용
+      '@next/next/no-img-element': 'off',
+      '@next/next/no-html-link-for-pages': 'off',
+    },
+  },
+
+  // Storybook stories — 테스트와 동일하게 Next.js 룰 완화
+  {
+    files: ['apps/storybook/**/*.stories.tsx', 'apps/storybook/**/*.stories.ts'],
+    rules: {
+      '@next/next/no-img-element': 'off',
+      '@next/next/no-html-link-for-pages': 'off',
     },
   },
 
@@ -381,6 +397,32 @@ export default [
           ],
         },
       ],
+    },
+  },
+
+  // Next.js apps — @next/eslint-plugin-next 룰 (App Router 전용 + Core Web Vitals)
+  // next lint 는 Next.js 15 에서 deprecated → ESLint CLI 로 대체 (ADR-0012)
+  // 테스트/스펙/스토리 파일은 Next.js 런타임이 아니므로 제외
+  {
+    files: ['apps/web/**/*.{ts,tsx}', 'apps/admin/**/*.{ts,tsx}'],
+    ignores: [
+      '**/__tests__/**',
+      '**/*.test.{ts,tsx}',
+      '**/*.spec.{ts,tsx}',
+      '**/*.stories.{ts,tsx}',
+    ],
+    plugins: {
+      '@next/next': nextPlugin,
+    },
+    settings: {
+      next: {
+        // App Router 전용: pages/ 디렉토리 없음, no-html-link-for-pages 체크 스킵
+        rootDir: ['apps/web/', 'apps/admin/'],
+      },
+    },
+    rules: {
+      ...nextPlugin.configs.recommended.rules,
+      ...nextPlugin.configs['core-web-vitals'].rules,
     },
   },
 ]

@@ -12,6 +12,7 @@
  */
 
 import { Button, cn } from '@storywork/ui'
+import Image from 'next/image'
 import * as React from 'react'
 
 import { KP_NAMES, type KPName, type Keypoint } from '../../lib/schemas/resource'
@@ -264,10 +265,12 @@ export function KeypointEditor({
         className="relative w-full"
         style={{ aspectRatio: width > 0 && height > 0 ? `${width}/${height}` : '1/1' }}
       >
-        <img
+        <Image
           src={imageUrl}
           alt="리소스 이미지"
-          className="absolute inset-0 w-full h-full object-contain"
+          fill
+          sizes="(max-width: 1280px) 100vw, 800px"
+          className="object-contain"
           draggable={false}
         />
         <svg

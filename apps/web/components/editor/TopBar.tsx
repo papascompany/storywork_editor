@@ -41,6 +41,7 @@ import {
   Sun,
   Undo2,
 } from 'lucide-react'
+import Link from 'next/link'
 import React, { useState } from 'react'
 
 import { AutoSaveIndicator } from './AutoSaveIndicator'
@@ -257,7 +258,7 @@ export function TopBar({
       <div className="flex min-w-0 shrink-0 items-center gap-1">
         {/* 로고 */}
         <Tooltip content="StoryWork 홈" side="bottom">
-          <a
+          <Link
             href="/"
             className={cn(
               'flex shrink-0 items-center gap-1',
@@ -278,7 +279,7 @@ export function TopBar({
               aria-hidden="true"
             />
             <span className="hidden text-sm sm:inline">StoryWork</span>
-          </a>
+          </Link>
         </Tooltip>
 
         {/* 파일명 인라인 편집 (데스크톱에서 전체 표시) */}

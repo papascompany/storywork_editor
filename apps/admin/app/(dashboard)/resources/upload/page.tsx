@@ -149,6 +149,7 @@ export default function ResourceUploadPage() {
         >
           {preview ? (
             <>
+              {/* eslint-disable-next-line @next/next/no-img-element -- blob URL (URL.createObjectURL) 은 next/image 미지원 */}
               <img
                 src={preview}
                 alt="미리보기"
