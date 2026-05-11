@@ -17,10 +17,12 @@
 순서대로 꼭 먼저 읽어주세요. 자기 분량을 넘지 말고 핵심만:
 
 1. **`CLAUDE.md`** — 프로젝트 마스터 사양 (단일 진실 원천 SSOT). 도메인/기술 스택/모듈 규칙
-2. **`docs/handoff/SESSION_HANDOFF_2026-05-10.md`** — 직전 세션 (마케팅 표면 4 페이지 + DESIGN.md) 진행 + 환경 + FOLLOWUP-30~33
-3. **`docs/handoff/SESSION_HANDOFF_2026-05-07.md`** — 그 이전 세션 (M3 100% 완료, FOLLOWUP-19~29)
-4. **`docs/handoff/SESSION_HANDOFF_2026-05-06.md`** — 그 이전 세션 (M0~M2 완료, FOLLOWUP-01~18)
-5. **`DESIGN.md`** (루트) — Figma 마케팅 캔버스 디자인 시스템 토큰 명세 (마케팅 페이지 작업 시 필수)
+2. **`docs/handoff/SESSION_HANDOFF_2026-05-11.md`** — 직전 세션 (마케팅 강화 + 편집기 Phase 1+2 흡수) FOLLOWUP-34~38
+3. **`docs/handoff/SESSION_HANDOFF_2026-05-10.md`** — 그 이전 (마케팅 4 페이지 + DESIGN.md) FOLLOWUP-30~33
+4. **`docs/handoff/SESSION_HANDOFF_2026-05-07.md`** — 그 이전 (M3 100% 완료) FOLLOWUP-19~29
+5. **`docs/handoff/SESSION_HANDOFF_2026-05-06.md`** — 그 이전 (M0~M2 완료) FOLLOWUP-01~18
+6. **`DESIGN.md`** (루트) — Figma 마케팅 캔버스 디자인 시스템 토큰
+7. **`docs/reference/FABRIC_EDITOR_GUIDE.md`** (3,106줄) — Bookmoa Storige Fabric.js 운영 백서 (편집기 작업 시 필수)
 4. **`docs/architecture/roadmap.md`** — 53건 작업의 체크박스 (위에서 아래로 미완 픽)
 5. **`docs/architecture/decisions.md`** — ADR 11건 (특히 ADR-0011 포즈 자산 정책)
 6. **`.claude/agents/orchestrator.md`** — 본인이 루틴 진행자 역할일 때의 가드레일
@@ -47,18 +49,18 @@ pnpm test && pnpm build
 ```
 
 기대 상태:
-- 마지막 커밋이 `docs(handoff): wrap-up 2026-05-10 ...` 또는 `feat(web): 마케팅 ...` 류
+- 마지막 커밋이 `docs(handoff): wrap-up 2026-05-11 ...` 또는 `feat(editor-text): phase2 ...` 류
 - DB Resource 카운트: **1,270건**
-- admin 테스트 **328 green** + web 테스트 **231 green** + 그 외 패키지 350+ green
-- Vercel admin `e220aa5` + web `72b57af` 모두 READY ✅
+- admin 328 green + web 255 green + editor-text 21 green + editor-history 66 + editor-core 78 = **750+ tests green**
+- Vercel admin `e220aa5` + web `0243653` 모두 READY ✅
 
 ### 📊 현재 진행 위치 (한 줄 요약)
 
-> **M0~M3 완료 (관리자 콘솔 6/6) + 마케팅 표면 4 페이지 풀 리뉴얼**.
-> Vercel 두 도메인 배포 완료. Supabase Cloud 에 PNG 1,270 / Storage 171.8MB.
-> 사용자 web: 랜딩(`/`) + 서비스 소개(`/intro`) + 편집기 기능(`/features`) + 더비맨 사례(`/showcase/derbyman`) + 편집기(`/editor`) 모두 동작.
-> admin 콘솔: 로그인 + TOTP 2FA + Format/Resource/Template/TemplateSet/AuditLog 풀 CRUD + 키포인트 보정 + PNG 업로드 동작.
-> **다음 우선순위 (이번 세션 진행 중)**: 포즈 자산 실 연결 → OG 이미지 → Storybook 마케팅 → **M4 (ANTHROPIC 키 게이트)**.
+> **M0~M3 완료 + 마케팅 표면 4 페이지 (포즈 실 연결 + OG + Storybook 49) + 편집기 Phase 1+2 흡수 (Bookmoa Storige 의 다중선택/클립보드/정렬/회전스냅/자동저장/editor-text)**.
+> Vercel 두 도메인 모두 READY. Supabase Cloud PNG 1,270.
+> 사용자 web: 마케팅 4 페이지 + 편집기 (다중선택/그룹/정렬/클립보드/레이어단축키/회전스냅/text도구/한글) 모두 동작.
+> admin: 로그인 + 2FA + Format/Resource/Template/TemplateSet/AuditLog 풀 CRUD.
+> **다음 우선순위**: M5-02 말풍선 꼬리 자동 화자 추적 (StoryWork 핵심 차별화) → M4 (ANTHROPIC 키 게이트).
 
 ### 🎯 권장 다음 작업 (사용자 결정 후 진행)
 
