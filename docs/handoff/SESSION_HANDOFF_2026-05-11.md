@@ -8,7 +8,7 @@
 
 ## 1. 한 줄 요약
 
-> StoryWork — **마케팅 표면 강화 + 편집기 Phase 1+2 흡수 (Bookmoa Storige) + M5-01 (Pretendard + 한글 금칙어 73) + M5-02 ★ 말풍선 꼬리 자동 화자 추적 + M5-04 `editor-template` (5 프리셋 + 슬롯 매핑) + admin /api/templates 엔드포인트 + ESLint 통일 (lint vs next build 함정 차단)**. 16+ commits, 모두 Vercel READY. 다음 권장: **M5-03 워드효과 50종** 또는 **M4 ANTHROPIC 키 게이트**.
+> StoryWork — **마케팅 강화 + 편집기 Phase 1+2 + M5-01/02/03/04 (텍스트/말풍선/워드효과/템플릿) + Templates API + ESLint 통일 (ADR-0012) + ★ 페이지 시스템 풀 구현 (FormatPicker + 다중 페이지 + 자동저장 + Storige UX 흡수 + Format remount + 모바일 PagePanel)**. **24 commits** 모두 Vercel READY, **1000+ tests green**. 다음 권장: **G 핸드오프** → **M4 ANTHROPIC 키 게이트** 또는 **M6 POD PDF**.
 
 ---
 
@@ -18,11 +18,12 @@
 |---|---|---|---|---|
 | M0~M3 | 37 | 34 | 3 | 동일 |
 | **M4 AI 파이프라인** | 5 | 0 | 5 | ❌ ANTHROPIC 키 휴먼 게이트 |
-| **M5 텍스트/말풍선/효과** | 4 | **3** | 1 | ✅ M5-01 / M5-02 / M5-04 (editor-template + 5 프리셋 + 46 tests). 남은: M5-03 워드효과 |
+| **M5 텍스트/말풍선/효과** | 4 | **4** | 0 | ✅ M5-01/02/03/04 모두 완료 (M5-03 editor-effects 45 효과 + WordFxPanel 추가) |
+| **★ 페이지 시스템** (신규) | 8 | **8** | 0 | ✅ FormatPicker + PageStore + PagePanel + 자동저장 + Footer dot 인디케이터 + Format remount + 모바일 PagePanel + 4 critical fix |
 | M6~M9 | 12 | 0 | 12 | ❌ |
 | **마케팅 표면** | 7 | 4 | 3 | ✅ MKT-01~04 (페이지 + DESIGN.md + 포즈자산 + OG/Storybook) |
 
-**합계: 53 + 7 마케팅 = 60건 중 41건 (68.3%)**
+**합계: 53 + 7 마케팅 + 8 페이지 시스템 = 68건 중 50건 (73.5%)**
 
 ---
 

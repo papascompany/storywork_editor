@@ -49,18 +49,18 @@ pnpm test && pnpm build
 ```
 
 기대 상태:
-- 마지막 커밋이 `chore(eslint): unify lint vs next build` 또는 `docs(handoff): wrap-up 2026-05-11 v2`
+- 마지막 커밋이 `feat(editor): followup-42 format remount + followup-46 모바일 pagepanel` 또는 `docs(handoff): ...`
 - DB Resource 카운트: **1,270건**
-- admin 328 + web 263 + editor-text 41 + editor-bubble 33 + editor-template 46 + editor-history 66 + editor-core 78 + 기타 = **900+ tests green**
-- Vercel admin `e220aa5` + web `44727eb` 모두 READY ✅
+- admin 328 + web **386** + editor-text 41 + editor-bubble 33 + editor-template 46 + editor-effects 81 + editor-history 66 + editor-core 78 + 기타 = **1000+ tests green**
+- Vercel admin `e220aa5` + web `e8b6815` 모두 READY ✅
 
 ### 📊 현재 진행 위치 (한 줄 요약)
 
-> **M0~M3 + 마케팅 표면 + 편집기 Phase 1+2 + M5-01/02/04 + admin /api/templates + ESLint 통일 (FOLLOWUP-23 정식 fix)**.
+> **M0~M3 + 마케팅 + 편집기 Phase 1+2 + M5 100% + Templates API + ESLint 통일 (ADR-0012) + ★ 페이지 시스템 풀 구현 (8/8)**.
 > Vercel 두 도메인 모두 READY. Supabase Cloud PNG 1,270.
-> 사용자 web: 마케팅 4 페이지 + 편집기 풀 (다중선택/그룹/정렬/클립보드/레이어단축키/회전스냅/text/한글/말풍선5종+자동화자추적/template5프리셋+슬롯) 모두 동작.
-> admin: 로그인 + 2FA + Format/Resource/Template/TemplateSet/AuditLog 풀 CRUD + Templates API 공개.
-> **다음 우선순위**: M5-03 워드효과 50종 (M5 100% 완수) → M4 (ANTHROPIC 키 게이트).
+> 사용자 web 풀: 마케팅 4 페이지 + 편집기 (FormatPicker → 다중 페이지 → 자동저장 → 복구 토스트 → 모든 도구 + 워드효과 45 + 말풍선 5 + 템플릿 5 + 한글/Pretendard + 모바일 PagePanel + Format remount + Storige UX 흡수).
+> admin: 로그인 + 2FA + 풀 CRUD + Templates API.
+> **다음 우선순위**: M4 (ANTHROPIC 키 게이트) 또는 M6 POD PDF (페이지 시스템과 자연 연결).
 
 ### 🎯 권장 다음 작업 (사용자 결정 후 진행)
 

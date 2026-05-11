@@ -69,10 +69,21 @@
 
 ## M5 — Text/Bubble/Effects/Templates
 
-- [x] [M5-01] `editor-text` 한글 줄바꿈/금칙어 + textbox 변형 — `0243653` + `d17f923` — Pretendard webfont + 금칙어 73자 (END 57 + START 16) + splitByGrapheme + TextSection ControlBar
-- [x] [M5-02] 말풍선 꼬리 자동 화자 추적 — `3cff7ca` — `editor-bubble` 신규 패키지 (5 모양 + computeTailPoints + detectSpeaker + attachBubbleTracker, 33 tests)
-- [ ] [M5-03] `editor-effects` 워드효과 50종 + 필터 — 모바일 30fps — @editor-engineer (다음 작업)
-- [x] [M5-04] `editor-template` 템플릿 적용/저장 — `d43e45f` + `28b3dfe` — 5 인라인 프리셋 + applyTemplate/fillSlot/clearSlot + Command + snap-to-slot + 46 tests + ToolBar 활성
+- [x] [M5-01] `editor-text` 한글 줄바꿈/금칙어 + textbox 변형 — `0243653` + `d17f923` — Pretendard webfont + 금칙어 73자 + splitByGrapheme + TextSection ControlBar
+- [x] [M5-02] 말풍선 꼬리 자동 화자 추적 — `3cff7ca` — `editor-bubble` 신규 (5 모양 + 화자 추적, 33 tests)
+- [x] [M5-03] `editor-effects` 워드효과 45종 + 필터 — `2528201` — 8 카테고리 (shadow/outline/glow/gradient/metallic/transform/background/pattern), WordFxPanel, 모바일 fallback, 81 tests
+- [x] [M5-04] `editor-template` 템플릿 적용/저장 — `d43e45f` + `28b3dfe` — 5 프리셋 + applyTemplate/fillSlot/clearSlot + 46 tests
+
+## 📄 페이지 시스템 (신규 카테고리, 2026-05-11) ✅
+
+- [x] [PAGE-01] 페이지 데이터 모델 + Zustand Store (usePageStore) — `4bf6ebc` — Project/Page CRUD + immer
+- [x] [PAGE-02] localStorage 영속화 (5s debounce + 복구 토스트) — `4bf6ebc` — page-persistence.ts
+- [x] [PAGE-03] FormatPickerModal (4 인라인 프리셋: B5/A5/정사각/세로형) — `4bf6ebc` — dismissable=false
+- [x] [PAGE-04] PagePanel (RightPanel 3번째 탭 + 썸네일 + DnD + ⋯ 메뉴) — `4bf6ebc`
+- [x] [PAGE-05] Footer dot/숫자 인디케이터 (5개 이하 dot, 6+ 숫자) + 단축키 ⌘→/⌘←/⌘⇧N — `4bf6ebc` + `08608fa`
+- [x] [PAGE-06] 4 critical bug fix (FabricImage 복원 + 배경 z-order + EmptyHint after:render + lowDpi 톤다운) — `c08ef87` + `08608fa` + `10020e5`
+- [x] [PAGE-07] FOLLOWUP-42 Format remount (formatToPx + StoryCanvas.setFormat + 줌 fit + Footer 사이즈) — `e8b6815`
+- [x] [PAGE-08] FOLLOWUP-46 모바일 PagePanel (BottomSheet 4번째 탭) — `e8b6815`
 
 ## M6 — POD PDF
 
