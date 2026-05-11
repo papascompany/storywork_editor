@@ -7,7 +7,7 @@
     "dev": "next dev --port 3000",
     "build": "next build",
     "start": "next start --port 3000",
-    "lint": "next lint",
+    "lint": "eslint . --max-warnings 0",
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
     "test:e2e": "playwright test",
@@ -16,6 +16,7 @@
   "dependencies": {
     "@storywork/editor-bubble": "workspace:*",
     "@storywork/editor-core": "workspace:*",
+    "@storywork/editor-effects": "workspace:*",
     "@storywork/editor-export": "workspace:*",
     "@storywork/editor-history": "workspace:*",
     "@storywork/editor-layers": "workspace:*",

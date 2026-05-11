@@ -46,6 +46,7 @@ import { PosePanel } from './panels/PosePanel'
 import { ShapePanel } from './panels/ShapePanel'
 import { TemplatePanel } from './panels/TemplatePanel'
 import { TextPanel } from './panels/TextPanel'
+import { WordFxPanel } from './panels/WordFxPanel'
 import type { ToolId } from './store/useToolStore'
 import { useToolStore } from './store/useToolStore'
 import type { HistoryRef as History } from './types'
@@ -88,8 +89,8 @@ const TOOL_META: Record<ToolId, ToolMeta> = {
   wordfx: {
     label: '워드효과',
     Icon: Sparkles,
-    milestone: 'M5',
-    description: '50종 워드 효과 — 집중선, 폭발, 반짝임 등',
+    // M5-03 에서 활성화됨 — milestone 제거
+    description: '45종 워드 효과 — 그림자, 외곽선, 글로우, 그라디언트, 금속, 변형 등',
   },
   decoration: {
     label: '꾸미기',
@@ -186,6 +187,8 @@ function PanelContent({ tool, canvas, history, layerTree, onAddPoseToCanvas }: P
       return <TextPanel canvas={canvas} history={history as any} />
     case 'bubble':
       return <BubblePanel canvas={canvas} history={history as any} />
+    case 'wordfx':
+      return <WordFxPanel canvas={canvas} history={history as any} />
     default: {
       const meta = TOOL_META[tool]
       return (
@@ -315,10 +318,12 @@ export function FeatureSidebar({
           </button>
         </div>
 
-        {/* 검색창 — pose/text/bubble/template 패널은 자체 UI 를 가지므로 숨김 */}
-        {active !== 'pose' && active !== 'text' && active !== 'bubble' && active !== 'template' && (
-          <PanelSearch label={meta.label} disabled={!isSearchEnabled} />
-        )}
+        {/* 검색창 — pose/text/bubble/template/wordfx 패널은 자체 UI 를 가지므로 숨김 */}
+        {active !== 'pose' &&
+          active !== 'text' &&
+          active !== 'bubble' &&
+          active !== 'template' &&
+          active !== 'wordfx' && <PanelSearch label={meta.label} disabled={!isSearchEnabled} />}
 
         {/* 패널 콘텐츠 */}
         <div className="flex-1 overflow-hidden">

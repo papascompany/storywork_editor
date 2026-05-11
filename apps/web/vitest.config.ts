@@ -24,6 +24,14 @@ export default defineConfig({
         '../../packages/editor-export/src/index.ts',
       ),
       '@storywork/editor-text': path.resolve(__dirname, '../../packages/editor-text/src/index.ts'),
+      '@storywork/editor-effects': path.resolve(
+        __dirname,
+        '../../packages/editor-effects/src/index.ts',
+      ),
+      '@storywork/editor-bubble': path.resolve(
+        __dirname,
+        '../../packages/editor-bubble/src/index.ts',
+      ),
       '@storywork/editor-template': path.resolve(
         __dirname,
         '../../packages/editor-template/src/index.ts',

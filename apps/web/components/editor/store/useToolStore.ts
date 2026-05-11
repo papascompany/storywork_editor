@@ -31,6 +31,7 @@ export const ACTIVE_TOOLS = new Set<ToolId>([
   'pose',
   'text',
   'bubble', // M5-02 에서 활성화
+  'wordfx', // M5-03 에서 활성화
 ])
 
 // 비활성 도구별 활성화 예정 마일스톤 (Toast 메시지용)
@@ -39,7 +40,7 @@ export const TOOL_MILESTONE: Partial<Record<ToolId, string>> = {
   // pose: 'M2',  ← M2-05 에서 활성화됨
   // text: 'M5',  ← M5-01 에서 활성화됨 (Phase 2)
   // bubble: 'M5',  ← M5-02 에서 활성화됨
-  wordfx: 'M5',
+  // wordfx: 'M5',  ← M5-03 에서 활성화됨
   decoration: 'M3',
   upload: 'M7',
   ai: 'M4',

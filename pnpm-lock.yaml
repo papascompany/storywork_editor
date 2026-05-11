@@ -156,6 +156,9 @@ importers:
       '@eslint/js':
         specifier: ^9.0.0
         version: 9.39.4
+      '@next/eslint-plugin-next':
+        specifier: ^15.3.0
+        version: 15.5.15
       '@typescript-eslint/eslint-plugin':
         specifier: ^8.0.0
         version: 8.59.1(@typescript-eslint/parser@8.59.1(eslint@9.39.4(jiti@2.6.1))(typescript@5.9.3))(eslint@9.39.4(jiti@2.6.1))(typescript@5.9.3)
@@ -341,6 +344,9 @@ importers:
       '@storywork/editor-core':
         specifier: workspace:*
         version: link:../../packages/editor-core
+      '@storywork/editor-effects':
+        specifier: workspace:*
+        version: link:../../packages/editor-effects
       '@storywork/editor-export':
         specifier: workspace:*
         version: link:../../packages/editor-export
