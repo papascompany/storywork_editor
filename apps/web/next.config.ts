@@ -25,6 +25,7 @@ const nextConfig: NextConfig = {
     '@storywork/editor-template',
     '@storywork/editor-pose',
     '@storywork/editor-text',
+    '@storywork/editor-bubble',
     '@storywork/editor-effects',
     '@storywork/editor-export',
     '@storywork/editor-ui',

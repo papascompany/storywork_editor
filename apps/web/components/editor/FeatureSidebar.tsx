@@ -40,6 +40,7 @@ import React, { useCallback, useEffect } from 'react'
 import type { ResourceSummary } from '../../app/api/_lib/search-types'
 
 import { BackgroundPanel } from './panels/BackgroundPanel'
+import { BubblePanel } from './panels/BubblePanel'
 import { PlaceholderPanel } from './panels/PlaceholderPanel'
 import { PosePanel } from './panels/PosePanel'
 import { ShapePanel } from './panels/ShapePanel'
@@ -80,8 +81,8 @@ const TOOL_META: Record<ToolId, ToolMeta> = {
   bubble: {
     label: '말풍선',
     Icon: MessageCircle,
-    milestone: 'M5',
-    description: '꼬리 방향 자동 화자 추적 · 50종 스타일',
+    // M5-02 에서 활성화됨 — milestone 제거
+    description: '꼬리 방향 자동 화자 추적 · 5종 모양 · 한글 텍스트',
   },
   wordfx: {
     label: '워드효과',
@@ -180,6 +181,8 @@ function PanelContent({ tool, canvas, history, layerTree, onAddPoseToCanvas }: P
       )
     case 'text':
       return <TextPanel canvas={canvas} history={history as any} />
+    case 'bubble':
+      return <BubblePanel canvas={canvas} history={history as any} />
     default: {
       const meta = TOOL_META[tool]
       return (
@@ -237,7 +240,7 @@ export function FeatureSidebar({
   const meta = TOOL_META[active as ToolId]
   const PanelIcon = meta.Icon
   const isSearchEnabled = active === 'background' || active === 'shape' || active === 'pose'
-  // text 패널은 자체 UI 가 있으므로 검색창 숨김 (pose 와 동일 처리)
+  // text/bubble 패널은 자체 UI 가 있으므로 검색창 숨김
 
   return (
     <aside
@@ -309,8 +312,8 @@ export function FeatureSidebar({
           </button>
         </div>
 
-        {/* 검색창 — pose/text 패널은 자체 UI 를 가지므로 숨김 */}
-        {active !== 'pose' && active !== 'text' && (
+        {/* 검색창 — pose/text/bubble 패널은 자체 UI 를 가지므로 숨김 */}
+        {active !== 'pose' && active !== 'text' && active !== 'bubble' && (
           <PanelSearch label={meta.label} disabled={!isSearchEnabled} />
         )}
 

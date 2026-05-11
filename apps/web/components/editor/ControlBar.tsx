@@ -916,6 +916,159 @@ function TextSection({ props, canvas, history }: TextSectionProps) {
   )
 }
 
+// ─── 섹션 4b: Bubble 속성 ──────────────────────────────────────────────────
+
+type BubbleSectionProps = {
+  props: ObjectProps
+  canvas: StoryCanvas
+  history: History
+}
+
+function BubbleSection({ props, canvas, history }: BubbleSectionProps) {
+  const getObj = (): FabricObject | undefined =>
+    canvas.getObject(props.id) as FabricObject | undefined
+
+  const obj = getObj()
+  // bubble Group 내부 첫 path 의 fill/stroke 읽기
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const items: any[] = (obj as any)?.getObjects?.() ?? []
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const bodyPath = items.find((i: any) => i.type === 'path')
+  const currentFill = typeof bodyPath?.fill === 'string' ? bodyPath.fill : '#ffffff'
+  const currentStroke = typeof bodyPath?.stroke === 'string' ? bodyPath.stroke : '#333333'
+  const currentStrokeWidth = (bodyPath?.strokeWidth as number | undefined) ?? 2
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const bubbleMeta = (obj as any)?._bubbleMeta as
+    | { shape?: string; targetId?: string | null }
+    | undefined
+  const speakerLabel = bubbleMeta?.targetId ? '화자 연결됨' : '화자 없음 (자유)'
+
+  const applyAndCommit = (patch: { fill?: string; stroke?: string; strokeWidth?: number }) => {
+    const target = getObj()
+    if (!target) return
+    const before = snapshotFromFabricObject(target)
+    // Group 내 모든 path/polygon 에 적용
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const groupItems: any[] = (target as any).getObjects?.() ?? []
+    for (const item of groupItems) {
+      if (item.type === 'path' || item.type === 'polygon') {
+        if (patch.fill !== undefined) item.set({ fill: patch.fill })
+        if (patch.stroke !== undefined) item.set({ stroke: patch.stroke })
+        if (patch.strokeWidth !== undefined) item.set({ strokeWidth: patch.strokeWidth })
+      }
+    }
+    canvas._fabricCanvas.requestRenderAll()
+    const after = snapshotFromFabricObject(target)
+    const cmd = new TransformObjectCommand({ canvas, id: props.id, before, after })
+    history.push(cmd)
+  }
+
+  const handleSpeakerDetect = () => {
+    const target = getObj()
+    if (!target) return
+    void import('@storywork/editor-bubble').then(
+      ({ detectSpeaker, rebindBubbleTarget, getBubbleMeta }) => {
+        const nearest = detectSpeaker(canvas._fabricCanvas, target)
+        if (nearest) {
+          const nearestId = (nearest.data as { id?: string } | undefined)?.id ?? null
+          rebindBubbleTarget(canvas._fabricCanvas, target, nearestId)
+          const meta = getBubbleMeta(target)
+          if (meta) {
+            showToast('화자가 자동으로 연결되었습니다.', 'success')
+          }
+        } else {
+          showToast('주변에 포즈 객체가 없습니다.', 'info')
+        }
+      },
+    )
+  }
+
+  const handleSpeakerClear = () => {
+    const target = getObj()
+    if (!target) return
+    void import('@storywork/editor-bubble').then(({ BindBubbleToTargetCommand, getBubbleMeta }) => {
+      const meta = getBubbleMeta(target)
+      const cmd = new BindBubbleToTargetCommand({
+        canvas,
+        bubbleId: props.id,
+        newTargetId: null,
+        prevTargetId: meta?.targetId ?? null,
+      })
+      history.push(cmd)
+      showToast('화자 연결이 해제되었습니다.', 'info')
+    })
+  }
+
+  return (
+    <>
+      {/* 채우기 색상 */}
+      <section aria-label="말풍선 채우기">
+        <SectionLabel>채우기</SectionLabel>
+        <ColorPicker value={currentFill} onChange={(hex) => applyAndCommit({ fill: hex })} />
+      </section>
+
+      <SectionDivider />
+
+      {/* 테두리 */}
+      <section aria-label="테두리">
+        <SectionLabel>테두리</SectionLabel>
+        <div className="flex flex-col gap-2">
+          <ColorPicker value={currentStroke} onChange={(hex) => applyAndCommit({ stroke: hex })} />
+          <Slider
+            label="두께"
+            unit="px"
+            min={0}
+            max={8}
+            step={1}
+            value={currentStrokeWidth}
+            onValueChange={(v) => {
+              const target = getObj()
+              if (!target) return
+              // eslint-disable-next-line @typescript-eslint/no-explicit-any
+              const groupItems: any[] = (target as any).getObjects?.() ?? []
+              for (const item of groupItems) {
+                if (item.type === 'path' || item.type === 'polygon') {
+                  item.set({ strokeWidth: v })
+                }
+              }
+              canvas._fabricCanvas.requestRenderAll()
+            }}
+            onValueCommit={(v) => applyAndCommit({ strokeWidth: v })}
+            aria-label="테두리 두께"
+          />
+        </div>
+      </section>
+
+      <SectionDivider />
+
+      {/* 화자 섹션 */}
+      <section aria-label="화자">
+        <SectionLabel>화자</SectionLabel>
+        <div className="flex flex-col gap-2">
+          <p className="text-[11px] text-[var(--color-text-muted)]">{speakerLabel}</p>
+          <div className="flex gap-1">
+            <button
+              type="button"
+              onClick={handleSpeakerDetect}
+              className="flex-1 rounded-[var(--radius-sm)] border border-[var(--color-border)] px-2 py-1.5 text-[11px] text-[var(--color-text-muted)] hover:bg-[var(--color-surface-muted)] hover:text-[var(--color-text)] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-brand-500)]"
+            >
+              자동 감지
+            </button>
+            <button
+              type="button"
+              onClick={handleSpeakerClear}
+              className="flex-1 rounded-[var(--radius-sm)] border border-[var(--color-border)] px-2 py-1.5 text-[11px] text-[var(--color-text-muted)] hover:bg-[var(--color-surface-muted)] hover:text-[var(--color-text)] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-brand-500)]"
+            >
+              해제
+            </button>
+          </div>
+        </div>
+      </section>
+    </>
+  )
+}
+
 // Placeholder 섹션 (미구현 타입용)
 function PlaceholderSection({ milestone, label }: { milestone: string; label: string }) {
   return (
@@ -996,18 +1149,16 @@ export function ControlBar({ props, canvas, layerTree, history }: ControlBarProp
         </div>
       )}
 
-      {(kind === 'bubble' || kind === 'wordfx' || kind === 'decoration' || kind === 'frame') && (
+      {kind === 'speech-bubble' && (
+        <div className="px-4 py-3">
+          <BubbleSection props={props} canvas={canvas} history={history} />
+        </div>
+      )}
+
+      {(kind === 'wordfx' || kind === 'decoration' || kind === 'frame') && (
         <div className="px-4 py-3">
           <PlaceholderSection
-            label={
-              kind === 'bubble'
-                ? '말풍선'
-                : kind === 'wordfx'
-                  ? '워드효과'
-                  : kind === 'decoration'
-                    ? '꾸미기'
-                    : '프레임'
-            }
+            label={kind === 'wordfx' ? '워드효과' : kind === 'decoration' ? '꾸미기' : '프레임'}
             milestone="M5"
           />
         </div>
