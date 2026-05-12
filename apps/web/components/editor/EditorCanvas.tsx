@@ -82,10 +82,16 @@ function usePageOverlay(canvas: StoryCanvas | null) {
 
 // ─────────────────────────────────────────────
 // C-1: ResizeObserver 3중 가드 (BUG-013 — iOS 크래시 차단)
-// 1) RAF 배칭: 한 프레임에 ResizeObserver 알림이 복수여도 resize() 는 1번만
-// 2) 1px 미만 변동 무시: 폰트 스케일링/서브픽셀 정밀도에 의한 루프 차단
-// 3) 동일 크기 setDimensions skip: fabric 불필요 재렌더 방지
-// 4) B.4 fix: 최초 마운트 시 setDimensions + fitToViewport 자동 호출
+//
+// 핵심 설계 원칙:
+//   - fabric canvas 내부 좌표계 = 뷰포트 크기 (setDimensions 로 동적 조정)
+//   - 객체/슬롯 좌표 = 페이지 px (canvas.format 기준, 예: 1772px)
+//   - viewportTransform 으로 1772px 페이지를 뷰포트(800px) 중앙에 fit (fitToViewport)
+//
+// 핵심 수정 사항:
+//   - 크기 변경 시 항상 fitToViewport 호출 (기존: 최초만)
+//   - 1px 미만 변동 무시: 폰트 스케일링/서브픽셀 루프 차단
+//   - RAF 배칭: 한 프레임에 알림이 복수여도 resize() 는 1번만
 // ─────────────────────────────────────────────
 function useResizeObserverGuard(
   wrapperRef: React.RefObject<HTMLDivElement | null>,
@@ -98,41 +104,28 @@ function useResizeObserverGuard(
     let lastW = 0
     let lastH = 0
     let rafId: number | null = null
-    let isFirstResize = true
 
     const resize = () => {
       rafId = null
-      // 가드 3: fabric 내부 컨텍스트가 살아있는지 확인
+      // 가드: fabric 내부 컨텍스트가 살아있는지 확인
       if (!canvas || !(canvas._fabricCanvas as { getContext?: () => unknown }).getContext?.())
         return
       const w = el.offsetWidth
       const h = el.offsetHeight
       if (w <= 0 || h <= 0) return
-      // 가드 1: 1px 미만 변동 무시
+      // 1px 미만 변동 무시: 서브픽셀 루프 차단
       if (Math.abs(w - lastW) < 1 && Math.abs(h - lastH) < 1) return
-      // 가드 2: 이미 동일 크기면 setDimensions skip
-      if (canvas._fabricCanvas.getWidth() === w && canvas._fabricCanvas.getHeight() === h) {
-        // 첫 발화이면 fitToViewport 는 항상 실행 (이미 올바른 크기여도)
-        if (isFirstResize) {
-          isFirstResize = false
-          void import('./Footer').then(({ fitToViewport }) => {
-            fitToViewport(canvas)
-          })
-        }
-        return
-      }
       lastW = w
       lastH = h
-      canvas._fabricCanvas.setDimensions({ width: w, height: h })
-      canvas._fabricCanvas.requestRenderAll()
 
-      // B.4 fix: 최초 마운트 시 dimensions 가 확정된 후 fitToViewport 자동 실행
-      if (isFirstResize) {
-        isFirstResize = false
-        void import('./Footer').then(({ fitToViewport }) => {
-          fitToViewport(canvas)
-        })
-      }
+      // fabric canvas 내부 크기 = 뷰포트 크기로 업데이트
+      canvas._fabricCanvas.setDimensions({ width: w, height: h })
+
+      // 항상 fitToViewport 실행: 크기 변경 시마다 viewportTransform 재계산
+      // (기존 버그: isFirstResize 이후엔 fitToViewport 미호출 → 슬롯/객체 좌표 불일치)
+      void import('./Footer').then(({ fitToViewport }) => {
+        fitToViewport(canvas)
+      })
     }
 
     const ro = new ResizeObserver(() => {

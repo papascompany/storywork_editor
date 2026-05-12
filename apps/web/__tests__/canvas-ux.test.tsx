@@ -32,6 +32,8 @@ const mockDiscardActiveObject = vi.fn()
 // Footer 내부 함수는 모듈 내 직접 호출 → fabricCanvas mock 으로 검증
 const mockZoomToPoint = vi.fn()
 const mockSetZoom = vi.fn()
+const mockSetViewportTransform = vi.fn()
+const mockSetDimensions = vi.fn()
 
 // @storywork/ui 모킹
 vi.mock('@storywork/ui', async (importOriginal) => {
@@ -242,6 +244,8 @@ function makeCanvasMock(objectKinds: string[] = []) {
     zoomToPoint: mockZoomToPoint,
     viewportTransform: [1, 0, 0, 1, 0, 0],
     setZoom: mockSetZoom,
+    setViewportTransform: mockSetViewportTransform,
+    setDimensions: mockSetDimensions,
     on: vi.fn().mockImplementation((event: string, cb: () => void) => {
       if (!listeners.has(event)) listeners.set(event, new Set())
       listeners.get(event)?.add(cb)
@@ -479,7 +483,7 @@ describe('Footer', () => {
     expect(mockZoomToPoint).toHaveBeenCalledTimes(1)
   })
 
-  it('13. 맞춤 버튼 → fabricCanvas.setZoom 호출', async () => {
+  it('13. 맞춤 버튼 → fabricCanvas.setViewportTransform 호출', async () => {
     const { Footer } = await import('../components/editor/Footer')
     const canvas = makeCanvasMock()
     render(<Footer canvas={canvas as never} />)
@@ -487,8 +491,9 @@ describe('Footer', () => {
     const fitBtn = screen.getByRole('button', { name: '페이지 맞춤' })
     fireEvent.click(fitBtn)
 
-    // fitToViewport → fabricCanvas.setZoom 호출 검증
-    expect(mockSetZoom).toHaveBeenCalledTimes(1)
+    // fitToViewport → fabricCanvas.setViewportTransform 호출 검증
+    // (setZoom + pan 을 setViewportTransform 으로 통합 설정)
+    expect(mockSetViewportTransform).toHaveBeenCalledTimes(1)
   })
 
   it('14. canvas null → 버튼 비활성', async () => {

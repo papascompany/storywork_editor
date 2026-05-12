@@ -131,14 +131,16 @@ export function BubblePanel({ canvas, history }: BubblePanelProps) {
       }
 
       const fc = canvas._fabricCanvas
-      const canvasW = fc.getWidth?.() ?? 600
-      const canvasH = fc.getHeight?.() ?? 800
+      // 페이지 px 기준 좌표 계산 (fc.getWidth() 는 canvas DOM 크기이므로 사용 불가)
+      const format = canvas.format
+      const pageW = canvas.mmToPx(format.widthMm)
+      const pageH = canvas.mmToPx(format.heightMm)
 
-      // 캔버스 중앙에 배치
-      const bubbleW = Math.min(180, canvasW * 0.3)
-      const bubbleH = Math.min(90, canvasH * 0.12)
-      const left = (canvasW - bubbleW) / 2
-      const top = canvasH * 0.3
+      // 페이지 정중앙에 배치
+      const bubbleW = canvas.mmToPx(60) // 60mm
+      const bubbleH = canvas.mmToPx(25) // 25mm
+      const left = (pageW - bubbleW) / 2
+      const top = (pageH - bubbleH) / 2
 
       try {
         const { AddBubbleCommand } = await import('@storywork/editor-bubble')

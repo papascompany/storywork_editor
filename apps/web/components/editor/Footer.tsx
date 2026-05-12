@@ -41,9 +41,18 @@ function getZoomPercent(canvas: StoryCanvas): number {
   return Math.round(zoom * 100)
 }
 
-/** 캔버스 중앙 기준 zoomToPoint */
+/**
+ * 캔버스 중앙(뷰포트 중심) 기준 zoomToPoint.
+ *
+ * 설계:
+ *   - fabric canvas 내부 좌표계 = 뷰포트 크기 (setDimensions 로 설정됨, 예: 800px)
+ *   - 객체/슬롯 좌표 = 페이지 px (format 기준, 예: 1772px)
+ *   - zoomToPoint 의 point = canvas DOM 내부 좌표 기준 중앙 = (getWidth/2, getHeight/2)
+ *   - 이는 뷰포트 중앙 DOM 픽셀과 동일하므로 페이지 중앙 기준으로 zoom 됨
+ */
 function applyZoom(canvas: StoryCanvas, percent: number): void {
   const fabricCanvas = canvas._fabricCanvas
+  // canvas 내부 크기 = 뷰포트 크기 (setDimensions 로 설정됨)
   const center = new Point(fabricCanvas.getWidth() / 2, fabricCanvas.getHeight() / 2)
   const zoom = Math.max(MIN_ZOOM, Math.min(MAX_ZOOM, percent)) / 100
   fabricCanvas.zoomToPoint(center, zoom)
@@ -51,16 +60,18 @@ function applyZoom(canvas: StoryCanvas, percent: number): void {
 }
 
 /**
- * 페이지 전체가 뷰포트에 맞도록 줌 + 패닝.
+ * 페이지 전체가 뷰포트에 맞도록 zoom + 중앙 정렬 (viewportTransform 설정).
  *
- * 뷰포트 크기는 fabric canvas element 의 부모 DOM (wrapper div) 에서 읽는다.
- * fabric.getWidth()/getHeight() 는 setDimensions() 또는 setFormat() 이 호출된 후
- * 컨테이너 크기(뷰포트) 또는 판형 px 크기를 반환할 수 있어 신뢰할 수 없다.
+ * 설계 원칙 (확정):
+ *   - fabric canvas 내부 좌표계 = 뷰포트 크기 (ResizeObserver → setDimensions 로 유지)
+ *   - 객체/슬롯 좌표 = 페이지 px (canvas.format × dpi, 예: 1772px)
+ *   - viewportTransform = [zoom, 0, 0, zoom, panX, panY] 으로 페이지를 뷰포트 중앙에 fit
+ *   - 흰 페이지: canvas.backgroundColor = '#ffffff' (createFabricCanvas 에서 설정)
+ *   - 페이지 밖 영역: EditorCanvas wrapper bg-[--editor-workspace-bg] (회색)
  *
- * 실제 뷰포트 크기: canvas element 의 가장 가까운 오버플로우 컨테이너
- * (lowerCanvasEl → wrapperEl → 상위 flex 영역)
- *
- * 페이지 크기: canvas.format 에서 계산 (300dpi 기준 px)
+ * 뷰포트 크기 획득 우선순위:
+ *   1. lowerCanvasEl → wrapperEl → containerRef div (clientWidth/Height)
+ *   2. fabricCanvas.getWidth()/getHeight() (이미 뷰포트 크기로 설정된 경우)
  */
 function fitToViewport(canvas: StoryCanvas): void {
   const fabricCanvas = canvas._fabricCanvas
@@ -68,17 +79,23 @@ function fitToViewport(canvas: StoryCanvas): void {
   const pageW = canvas.mmToPx(format.widthMm)
   const pageH = canvas.mmToPx(format.heightMm)
 
-  // 실제 컨테이너 DOM 크기 획득
-  // fabric v6: lowerCanvasEl 은 fabric 내부 canvas element
-  // wrapperEl 은 fabric 이 생성한 감싸는 div (lowerCanvasEl.parentElement)
-  // 그 부모(grand-parent)가 EditorCanvas 의 containerRef div
-  // 그 부모가 EditorCanvas 의 wrapRef div (relative flex 1 overflow-hidden)
+  // 뷰포트 DOM 크기 획득
+  // DOM 구조: containerRef > wrapperEl(fabric 생성) > lowerCanvasEl
+  // lowerCanvasEl.parentElement = wrapperEl
+  // lowerCanvasEl.parentElement.parentElement = containerRef (absolute inset-0, wrapRef 크기와 동일)
   const lowerCanvas = (fabricCanvas as unknown as { lowerCanvasEl?: HTMLElement }).lowerCanvasEl
-  // 2단계 상위 = wrapRef (EditorCanvas 전체 영역)
   const containerEl = lowerCanvas?.parentElement?.parentElement
   const viewW = containerEl ? containerEl.clientWidth : fabricCanvas.getWidth()
   const viewH = containerEl ? containerEl.clientHeight : fabricCanvas.getHeight()
 
+  if (viewW <= 0 || viewH <= 0) return
+
+  // fabric canvas 내부 크기를 뷰포트에 맞게 업데이트 (이미 맞으면 skip)
+  if (fabricCanvas.getWidth() !== viewW || fabricCanvas.getHeight() !== viewH) {
+    fabricCanvas.setDimensions({ width: viewW, height: viewH })
+  }
+
+  // zoom: 페이지 전체가 뷰포트(여백 32px)에 들어오도록
   const zoom = Math.min(
     (viewW - FIT_MARGIN_PX * 2) / pageW,
     (viewH - FIT_MARGIN_PX * 2) / pageH,
@@ -86,19 +103,12 @@ function fitToViewport(canvas: StoryCanvas): void {
   )
   const clampedZoom = Math.max(MIN_ZOOM / 100, zoom)
 
-  // fabric canvas dimensions 를 뷰포트에 맞게 재설정 (이미 맞다면 skip)
-  if (fabricCanvas.getWidth() !== viewW || fabricCanvas.getHeight() !== viewH) {
-    fabricCanvas.setWidth(viewW)
-    fabricCanvas.setHeight(viewH)
-  }
-
-  // 중앙 정렬: viewportTransform[4], [5] = 패닝
+  // 중앙 정렬: panX/Y = (뷰포트 - 페이지 표시 크기) / 2
   const offsetX = (viewW - pageW * clampedZoom) / 2
   const offsetY = (viewH - pageH * clampedZoom) / 2
 
-  fabricCanvas.setZoom(clampedZoom)
-  fabricCanvas.viewportTransform[4] = offsetX
-  fabricCanvas.viewportTransform[5] = offsetY
+  // viewportTransform 직접 설정 (setZoom + pan 동시 적용)
+  fabricCanvas.setViewportTransform([clampedZoom, 0, 0, clampedZoom, offsetX, offsetY])
   fabricCanvas.requestRenderAll()
 }
 
