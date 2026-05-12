@@ -10,6 +10,13 @@ import Image from 'next/image'
 import Link from 'next/link'
 import * as React from 'react'
 
+import { ColorBlock } from '../components/marketing/ColorBlock'
+import { Footer } from '../components/marketing/Footer'
+import { Header } from '../components/marketing/Header'
+import { MarqueeStrip } from '../components/marketing/MarqueeStrip'
+import { PillButton } from '../components/marketing/PillButton'
+import { getDerbymanScenes, getPoseShowcase } from '../lib/marketing-assets'
+
 const BASE_URL = 'https://storywork-editor-web.vercel.app'
 
 export const metadata: Metadata = {
@@ -40,58 +47,208 @@ export const metadata: Metadata = {
   },
 }
 
-import { ColorBlock } from '../components/marketing/ColorBlock'
-import { Footer } from '../components/marketing/Footer'
-import { Header } from '../components/marketing/Header'
-import { MarqueeStrip } from '../components/marketing/MarqueeStrip'
-import { PillButton } from '../components/marketing/PillButton'
-import { getPoseShowcase } from '../lib/marketing-assets'
-
-/* ── 4컷 콘티 미리보기 ────────────────────────────────────────────────────── */
+/* ── 4컷 미니 콘티 — 더미맨 실 포즈 자산 ──────────────────────────────────── */
 function MiniStoryboard() {
+  const scenes = getDerbymanScenes()
+
   const cuts = [
-    { label: '장면 1', bg: 'var(--mkt-block-cream)' },
-    { label: '장면 2', bg: 'var(--mkt-block-mint)' },
-    { label: '장면 3', bg: 'var(--mkt-block-lilac)' },
-    { label: '장면 4', bg: 'var(--mkt-block-pink)' },
+    {
+      bg: 'var(--mkt-block-cream)',
+      bubble: '월요일이다…',
+      scene: scenes[0],
+    },
+    {
+      bg: 'var(--mkt-block-mint)',
+      bubble: '오늘 쉬고 싶다',
+      scene: scenes[1],
+    },
+    {
+      bg: 'var(--mkt-block-lilac)',
+      bubble: '콘티 그려야지!',
+      scene: scenes[2],
+    },
+    {
+      bg: 'var(--mkt-block-pink)',
+      bubble: '완성!',
+      scene: scenes[3],
+    },
   ]
 
   return (
     <div
       style={{
-        display: 'grid',
-        gridTemplateColumns: '1fr 1fr',
-        gap: 'var(--mkt-space-sm)',
+        display: 'flex',
+        flexDirection: 'column',
+        gap: 'var(--mkt-space-md)',
         width: '100%',
-        maxWidth: '420px',
+        maxWidth: '440px',
       }}
-      aria-label="4컷 콘티 미리보기"
     >
-      {cuts.map((cut) => (
+      {/* 4컷 그리드 */}
+      <Link
+        href="/showcase/derbyman"
+        style={{ display: 'block', textDecoration: 'none' }}
+        aria-label="더미맨의 월요일 — 사례 자세히 보기"
+      >
         <div
-          key={cut.label}
           style={{
-            backgroundColor: cut.bg,
-            borderRadius: 'var(--mkt-rounded-sm)',
-            aspectRatio: '3/4',
-            padding: '12px',
-            display: 'flex',
-            flexDirection: 'column',
-            justifyContent: 'flex-end',
+            display: 'grid',
+            gridTemplateColumns: '1fr 1fr',
+            gap: 'var(--mkt-space-sm)',
           }}
+          aria-label="더미맨의 월요일 4컷 미리보기"
         >
-          <span
-            style={{
-              fontFamily: 'var(--mkt-font-mono)',
-              fontSize: '10px',
-              color: 'var(--mkt-ink)',
-              opacity: 0.5,
-            }}
-          >
-            {cut.label}
-          </span>
+          {cuts.map((cut, i) => (
+            <div
+              key={i}
+              className="hero-cut-card"
+              style={{
+                backgroundColor: cut.bg,
+                borderRadius: 'var(--mkt-rounded-sm)',
+                aspectRatio: '3/4',
+                padding: '10px',
+                display: 'flex',
+                flexDirection: 'column',
+                justifyContent: 'space-between',
+                position: 'relative',
+                overflow: 'hidden',
+                transition: 'transform 180ms ease, box-shadow 180ms ease',
+              }}
+            >
+              {/* 컷 번호 */}
+              <span
+                style={{
+                  fontFamily: 'var(--mkt-font-mono)',
+                  fontSize: '10px',
+                  color: 'var(--mkt-ink)',
+                  opacity: 0.5,
+                  lineHeight: 1,
+                  zIndex: 2,
+                  position: 'relative',
+                }}
+                aria-hidden="true"
+              >
+                0{i + 1}
+              </span>
+
+              {/* 포즈 이미지 */}
+              {cut.scene && (
+                <div
+                  style={{
+                    position: 'absolute',
+                    inset: '24px 4px 32px',
+                  }}
+                  aria-hidden="true"
+                >
+                  <Image
+                    src={cut.scene.thumbUrl}
+                    alt={cut.scene.alt}
+                    fill
+                    sizes="(max-width: 640px) 40vw, 180px"
+                    style={{ objectFit: 'contain' }}
+                    priority={i < 2}
+                  />
+                </div>
+              )}
+
+              {/* 말풍선 */}
+              <div
+                style={{
+                  position: 'relative',
+                  zIndex: 2,
+                  alignSelf: 'flex-end',
+                  backgroundColor: 'var(--mkt-canvas)',
+                  borderRadius: '8px 8px 2px 8px',
+                  padding: '4px 8px',
+                  boxShadow: '0 1px 4px rgba(0,0,0,0.10)',
+                  maxWidth: '90%',
+                }}
+                aria-hidden="true"
+              >
+                <span
+                  style={{
+                    fontFamily: 'var(--mkt-font-sans)',
+                    fontSize: '11px',
+                    fontWeight: 540,
+                    color: 'var(--mkt-ink)',
+                    lineHeight: 1.3,
+                    whiteSpace: 'nowrap',
+                  }}
+                >
+                  {cut.bubble}
+                </span>
+              </div>
+            </div>
+          ))}
         </div>
-      ))}
+      </Link>
+
+      {/* 보조 CTA 영역 */}
+      <div
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          padding: '10px 4px 0',
+          borderTop: '1px solid var(--mkt-hairline)',
+        }}
+      >
+        <span
+          style={{
+            fontFamily: 'var(--mkt-font-sans)',
+            fontSize: '12px',
+            color: 'var(--mkt-ink)',
+            opacity: 0.55,
+          }}
+          aria-hidden="true"
+        >
+          더미맨의 월요일 — 5분 완성
+        </span>
+        <Link
+          href="/showcase/derbyman"
+          style={{
+            fontFamily: 'var(--mkt-font-sans)',
+            fontSize: '12px',
+            fontWeight: 560,
+            color: 'var(--mkt-ink)',
+            textDecoration: 'none',
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: '2px',
+          }}
+          className="hero-case-link"
+          aria-label="사례 자세히 보기 — 더미맨의 월요일"
+        >
+          사례 자세히 보기 →
+        </Link>
+      </div>
+
+      {/* hover + stagger 인터랙션 */}
+      <style>{`
+        .hero-cut-card:hover {
+          transform: translateY(-4px);
+          box-shadow: 0 8px 24px rgba(0,0,0,0.10);
+        }
+        .hero-case-link:hover {
+          text-decoration: underline;
+        }
+        .hero-case-link:focus-visible {
+          outline: 2px solid var(--mkt-ink);
+          border-radius: 2px;
+          outline-offset: 2px;
+        }
+        @keyframes heroCardIn {
+          from { opacity: 0; transform: translateY(12px); }
+          to   { opacity: 1; transform: translateY(0); }
+        }
+        .hero-cut-card:nth-child(1) { animation: heroCardIn 360ms ease both 80ms; }
+        .hero-cut-card:nth-child(2) { animation: heroCardIn 360ms ease both 180ms; }
+        .hero-cut-card:nth-child(3) { animation: heroCardIn 360ms ease both 280ms; }
+        .hero-cut-card:nth-child(4) { animation: heroCardIn 360ms ease both 380ms; }
+        @media (prefers-reduced-motion: reduce) {
+          .hero-cut-card { animation: none !important; }
+        }
+      `}</style>
     </div>
   )
 }

@@ -109,6 +109,23 @@ describe('랜딩 페이지 (/)', () => {
     expect(screen.getByText(/책으로 출판까지, 한 번에/)).toBeInTheDocument()
   })
 
+  it('히어로 4컷 더미맨 카드가 렌더링된다', () => {
+    render(<LandingPage />)
+    const storyboard = screen.getByLabelText('더미맨의 월요일 4컷 미리보기')
+    expect(storyboard).toBeInTheDocument()
+  })
+
+  it('히어로 카드가 /showcase/derbyman 으로 링크된다', () => {
+    render(<LandingPage />)
+    const caseLink = screen.getByLabelText('사례 자세히 보기 — 더미맨의 월요일')
+    expect(caseLink).toHaveAttribute('href', '/showcase/derbyman')
+  })
+
+  it('히어로 보조 CTA "사례 자세히 보기" 가 렌더링된다', () => {
+    render(<LandingPage />)
+    expect(screen.getByText(/사례 자세히 보기/)).toBeInTheDocument()
+  })
+
   it('Showcase teaser 가 렌더링된다', () => {
     render(<LandingPage />)
     expect(screen.getByText(/더미맨의 짧은 콘티/)).toBeInTheDocument()
