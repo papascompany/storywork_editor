@@ -75,7 +75,7 @@ const TEMPLATES: Record<string, OgTemplate> = {
     blockAccent: '편집기\n기능\n6가지',
   },
   derbyman: {
-    headline: '더비맨,\n회사원에서\n콘티 작가가 되다',
+    headline: '더미맨,\n회사원에서\n콘티 작가가 되다',
     sub: '주말 취미로 시작한 짧은 만화. 대본 한 페이지가 4컷 콘티가 되기까지 5분.',
     colorBlock: C.coral,
     blockTextColor: C.ink,

@@ -1,5 +1,5 @@
 /**
- * /showcase/derbyman — 더비맨 사례 페이지
+ * /showcase/derbyman — 더미맨 사례 페이지
  *
  * 색상 흐름:
  * white hero → cream (4컷 콘티) →
@@ -14,14 +14,14 @@ import * as React from 'react'
 const BASE_URL = 'https://storywork-editor-web.vercel.app'
 
 export const metadata: Metadata = {
-  title: '더비맨 — 회사원에서 콘티 작가가 되다',
+  title: '더미맨 — 회사원에서 콘티 작가가 되다',
   description:
     '주말 취미로 시작한 짧은 만화. 대본 한 페이지가 4컷 콘티가 되기까지 5분. 스토리워크 크리에이터 사례.',
   alternates: {
     canonical: `${BASE_URL}/showcase/derbyman`,
   },
   openGraph: {
-    title: '더비맨 — 회사원에서 콘티 작가가 되다',
+    title: '더미맨 — 회사원에서 콘티 작가가 되다',
     description:
       '주말 취미로 시작한 짧은 만화. 스토리워크로 대본 한 페이지를 4컷 콘티로, 5분 만에.',
     url: `${BASE_URL}/showcase/derbyman`,
@@ -30,13 +30,13 @@ export const metadata: Metadata = {
         url: `${BASE_URL}/api/og/derbyman`,
         width: 1200,
         height: 630,
-        alt: '더비맨 — 회사원에서 콘티 작가가 되다',
+        alt: '더미맨 — 회사원에서 콘티 작가가 되다',
       },
     ],
   },
   twitter: {
     card: 'summary_large_image',
-    title: '더비맨 — 회사원에서 콘티 작가가 되다',
+    title: '더미맨 — 회사원에서 콘티 작가가 되다',
     description: '주말 취미 → 4컷 콘티 → POD 인쇄. 스토리워크 크리에이터 사례.',
     images: [`${BASE_URL}/api/og/derbyman`],
   },
@@ -121,11 +121,11 @@ function ScriptMock() {
         }}
         aria-hidden="true"
       >
-        <span style={{ opacity: 0.4 }}># 더비맨의 월요일</span>
+        <span style={{ opacity: 0.4 }}># 더미맨의 월요일</span>
         {'\n\n'}
         <span style={{ opacity: 0.4 }}>[장면 1] 사무실 책상</span>
         {'\n'}
-        더비맨이 엎드려 졸고 있다.
+        더미맨이 엎드려 졸고 있다.
         {'\n'}
         핸드폰이 울린다.
         {'\n\n'}
@@ -133,7 +133,7 @@ function ScriptMock() {
         {'\n'}
         혼자 노트북을 펼친다.
         {'\n'}
-        <span style={{ color: 'var(--mkt-block-navy)', fontWeight: '600' }}>더비맨:</span> "오늘은
+        <span style={{ color: 'var(--mkt-block-navy)', fontWeight: '600' }}>더미맨:</span> "오늘은
         5페이지..."
         {'\n\n'}
         <span style={{ fontFamily: 'var(--mkt-font-mono)', fontSize: '11px', opacity: 0.35 }}>
@@ -152,7 +152,7 @@ function SceneSplitMock() {
       aria-label="AI 장면 분리 결과"
     >
       {[
-        { label: '장면 1', desc: '사무실 책상 / 더비맨 졸고 있음', confidence: 92 },
+        { label: '장면 1', desc: '사무실 책상 / 더미맨 졸고 있음', confidence: 92 },
         { label: '장면 2', desc: '점심시간 / 노트북 + 말풍선', confidence: 87 },
         { label: '장면 3', desc: '카페 / 대본 작업', confidence: 81 },
         { label: '장면 4', desc: '주말 / 책 수령', confidence: 76 },
@@ -212,7 +212,7 @@ function SceneSplitMock() {
 
 /** 포즈 자동 배치 mockup — 실 자산 3개 */
 function PoseAutoMock() {
-  // 더비맨 시나리오 장면1 포즈 후보 3개: 엎드리기, 책상작업, 서서 놀람
+  // 더미맨 시나리오 장면1 포즈 후보 3개: 엎드리기, 책상작업, 서서 놀람
   const candidates = [
     {
       slug: '10-eohdeurin-1',
@@ -372,7 +372,7 @@ function BookMock() {
             lineHeight: '1.3',
           }}
         >
-          더비맨의
+          더미맨의
           <br />
           월요일
         </span>
@@ -414,7 +414,7 @@ export default function DerbymanShowcasePage() {
             </div>
 
             <h1 className="mkt-display-xl" style={{ color: 'var(--mkt-ink)' }}>
-              더비맨,
+              더미맨,
               <br />
               회사원에서
               <br />
@@ -450,7 +450,7 @@ export default function DerbymanShowcasePage() {
           >
             <Image
               src="https://wjpyeqckuxyfeytuzgon.supabase.co/storage/v1/object/public/poses/01-seogi-01-1/thumb.png"
-              alt="더비맨 캐릭터 — 자신감 있게 서 있는 모습"
+              alt="더미맨 캐릭터 — 자신감 있게 서 있는 모습"
               fill
               sizes="(max-width: 768px) 80vw, 400px"
               style={{ objectFit: 'contain', padding: '24px' }}
@@ -468,7 +468,7 @@ export default function DerbymanShowcasePage() {
                 opacity: 0.4,
               }}
             >
-              더비맨 — 평범한 회사원,
+              더미맨 — 평범한 회사원,
               <br />
               비밀스런 만화 작가
             </p>
@@ -491,7 +491,7 @@ export default function DerbymanShowcasePage() {
                     marginBottom: '16px',
                   }}
                 >
-                  THE COMIC — 더비맨의 월요일
+                  THE COMIC — 더미맨의 월요일
                 </span>
                 <h2 className="mkt-headline" style={{ color: 'var(--mkt-ink)' }}>
                   4컷 콘티
@@ -506,12 +506,12 @@ export default function DerbymanShowcasePage() {
                   gap: 'var(--mkt-space-lg)',
                 }}
                 className="comic-grid"
-                aria-label="더비맨의 월요일 4컷 콘티"
+                aria-label="더미맨의 월요일 4컷 콘티"
               >
                 <StickyNote
                   number={1}
                   scene={derbyScenes[0]?.hint ?? '월요일 아침'}
-                  caption={derbyScenes[0]?.alt ?? '사무실 책상에서 졸고 있는 더비맨'}
+                  caption={derbyScenes[0]?.alt ?? '사무실 책상에서 졸고 있는 더미맨'}
                   imageUrl={derbyScenes[0]?.thumbUrl}
                   rotation={-1}
                 />
@@ -605,7 +605,7 @@ export default function DerbymanShowcasePage() {
             무엇인가요?
           </h2>
           <p className="mkt-body-lg" style={{ color: 'var(--mkt-ink)', opacity: 0.6 }}>
-            더비맨처럼, 당신의 이야기도 4컷이 될 수 있습니다.
+            더미맨처럼, 당신의 이야기도 4컷이 될 수 있습니다.
           </p>
           <div
             style={{

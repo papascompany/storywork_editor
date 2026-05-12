@@ -161,9 +161,9 @@ describe('/showcase/derbyman 페이지 메타데이터', () => {
     expect(getTwitterCard(derbymanMetadata)).toBe('summary_large_image')
   })
 
-  it('title 이 더비맨을 포함한다', () => {
+  it('title 이 더미맨을 포함한다', () => {
     const title = typeof derbymanMetadata.title === 'string' ? derbymanMetadata.title : ''
-    expect(title).toMatch(/더비맨/)
+    expect(title).toMatch(/더미맨/)
   })
 
   it('alternates.canonical 이 /showcase/derbyman 경로다', () => {

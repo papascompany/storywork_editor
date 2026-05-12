@@ -219,7 +219,7 @@ function EditorMock() {
           }}
           aria-hidden="true"
         >
-          {['배경', '포즈 — 더비맨', '말풍선', '워드효과'].map((layer, i) => (
+          {['배경', '포즈 — 더미맨', '말풍선', '워드효과'].map((layer, i) => (
             <div
               key={layer}
               style={{
@@ -332,7 +332,7 @@ function AiMock({ aiDemo }: { aiDemo: ReturnType<typeof getFeatureShowcase>['aiD
       >
         <span style={{ opacity: 0.4 }}># 장면 1: 사무실, 아침</span>
         <br />
-        더비맨이 책상에 엎드려 졸고 있다.
+        더미맨이 책상에 엎드려 졸고 있다.
         <br />
         갑자기 핸드폰이 울린다.
       </div>

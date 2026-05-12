@@ -127,7 +127,7 @@ function AiLayoutMock() {
         <br />
         사무실. 아침.
         <br />
-        더비맨이 책상에서
+        더미맨이 책상에서
         <br />
         졸고 있다.
         <br />
@@ -216,7 +216,7 @@ function PdfMock() {
           color: 'var(--mkt-ink)',
         }}
       >
-        더비맨의 월요일
+        더미맨의 월요일
       </div>
       <div
         style={{
@@ -658,7 +658,7 @@ export default function LandingPage() {
               className="mkt-display-lg"
               style={{ color: 'var(--mkt-ink)', marginBottom: 'var(--mkt-space-lg)' }}
             >
-              더비맨의 짧은 콘티,
+              더미맨의 짧은 콘티,
               <br />
               5분 만에 완성
             </h2>
@@ -689,7 +689,7 @@ export default function LandingPage() {
               transition: 'opacity 150ms ease',
             }}
             className="hover:opacity-90 focus-visible:outline-none focus-visible:ring-2"
-            aria-label="더비맨 사례 보기"
+            aria-label="더미맨 사례 보기"
           >
             <div
               style={{
@@ -714,7 +714,7 @@ export default function LandingPage() {
               className="mkt-headline"
               style={{ color: 'var(--mkt-inverse-ink)', marginBottom: 'var(--mkt-space-sm)' }}
             >
-              더비맨
+              더미맨
             </p>
             <p className="mkt-body-sm" style={{ color: 'var(--mkt-inverse-ink)', opacity: 0.6 }}>
               회사원 / 콘티 작가 / StoryWork 사용자

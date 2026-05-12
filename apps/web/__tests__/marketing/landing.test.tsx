@@ -111,7 +111,7 @@ describe('랜딩 페이지 (/)', () => {
 
   it('Showcase teaser 가 렌더링된다', () => {
     render(<LandingPage />)
-    expect(screen.getByText(/더비맨의 짧은 콘티/)).toBeInTheDocument()
+    expect(screen.getByText(/더미맨의 짧은 콘티/)).toBeInTheDocument()
   })
 
   it('Final CTA "먼저 만들어 보세요" 가 렌더링된다', () => {

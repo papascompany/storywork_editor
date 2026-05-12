@@ -1,5 +1,5 @@
 /**
- * 더비맨 사례 페이지 테스트 (/showcase/derbyman)
+ * 더미맨 사례 페이지 테스트 (/showcase/derbyman)
  */
 
 import { render, screen } from '@testing-library/react'
@@ -44,12 +44,12 @@ vi.mock('@storywork/ui', () => ({
 
 import DerbymanPage from '../../app/showcase/derbyman/page'
 
-describe('더비맨 사례 페이지 (/showcase/derbyman)', () => {
+describe('더미맨 사례 페이지 (/showcase/derbyman)', () => {
   it('Hero 헤드라인이 렌더링된다', () => {
     render(<DerbymanPage />)
-    // 더비맨이 여러 곳에 등장하므로 h1 안에서 찾기
+    // 더미맨이 여러 곳에 등장하므로 h1 안에서 찾기
     const heading = screen.getByRole('heading', { level: 1 })
-    expect(heading).toHaveTextContent('더비맨')
+    expect(heading).toHaveTextContent('더미맨')
   })
 
   it('Hero subhead — "5분 만에 완성" 가 렌더링된다', () => {
