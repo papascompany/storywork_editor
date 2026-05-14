@@ -42,6 +42,12 @@ export async function middleware(request: NextRequest): Promise<NextResponse> {
     return response
   }
 
+  // /api/auth/* 는 각 핸들러가 자체 인증 체크 — 미들웨어 가드 우회 (TOTP 등록 흐름 차단 방지)
+  if (pathname.startsWith('/api/auth/')) {
+    const { response } = createMiddlewareClient(request)
+    return response
+  }
+
   // Supabase 세션 검증
   const { supabase, response } = createMiddlewareClient(request)
   const {
