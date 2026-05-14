@@ -15,7 +15,8 @@ import { createMiddlewareClient } from './src/lib/supabase/middleware'
 const PUBLIC_PATHS = new Set(['/login', '/403', '/api/health', '/reset-password'])
 
 // admin role 목록
-const ADMIN_ROLES = new Set(['superadmin', 'curator', 'support', 'readonly'])
+// admin role 목록 — 현재 사용 안 함 (이메일 인증만으로 통과). 향후 RLS 재도입 시 활용.
+// const ADMIN_ROLES = new Set(['superadmin', 'curator', 'support', 'readonly'])
 
 export async function middleware(request: NextRequest): Promise<NextResponse> {
   const { pathname } = request.nextUrl
@@ -51,25 +52,11 @@ export async function middleware(request: NextRequest): Promise<NextResponse> {
     return NextResponse.redirect(loginUrl)
   }
 
-  // admin role 확인 — Supabase app_metadata + user_metadata 양쪽에서 role 조회
-  const appRole = (user.app_metadata?.['role'] as string | undefined) ?? ''
-  const userMetaRole = (user.user_metadata?.['role'] as string | undefined) ?? ''
-  const userRole = appRole || userMetaRole
-
-  const isAdminRole = ADMIN_ROLES.has(userRole)
-
-  // 디버깅: role 정보 콘솔 한 줄 (Vercel runtime logs 에서 확인 가능)
+  // 사용자 요구 (2026-05-14): 이메일 인증만으로 로그인 가능
+  // — admin role 체크 완전 제거. 인증된 사용자는 모두 통과.
+  // (role 기반 세분화 권한은 별도 PR 에서 RLS 또는 페이지별 가드로 재도입)
   // eslint-disable-next-line no-console
-  console.log(
-    `[mw] path=${pathname} email=${user.email} appRole='${appRole}' userMetaRole='${userMetaRole}' admin=${isAdminRole}`,
-  )
-
-  // admin role 미보유 → /403
-  if (!isAdminRole) {
-    const forbiddenUrl = request.nextUrl.clone()
-    forbiddenUrl.pathname = '/403'
-    return NextResponse.redirect(forbiddenUrl)
-  }
+  console.log(`[mw] path=${pathname} email=${user.email} → 통과`)
 
   return response
 }
