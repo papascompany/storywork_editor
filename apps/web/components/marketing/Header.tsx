@@ -1,10 +1,13 @@
 'use client'
 
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@storywork/ui'
+import type { User } from '@supabase/supabase-js'
 import { Menu, X } from 'lucide-react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import * as React from 'react'
+
+import { createWebBrowserClient } from '@/lib/supabase/client'
 
 /**
  * Header — 마케팅 상단 네비게이션 (top-nav)
@@ -100,14 +103,193 @@ function NavLinks({ onSelect }: { onSelect?: () => void }) {
   )
 }
 
+/** 사용자 아바타 + 드롭다운 (로그인 상태) */
+function UserMenu({ user, onLogout }: { user: User; onLogout: () => void }) {
+  const [open, setOpen] = React.useState(false)
+  const displayChar = (user.email?.[0] ?? 'U').toUpperCase()
+
+  return (
+    <div style={{ position: 'relative' }}>
+      <button
+        type="button"
+        aria-label="계정 메뉴 열기"
+        aria-expanded={open}
+        aria-haspopup="menu"
+        onClick={() => setOpen((v) => !v)}
+        style={{
+          width: '32px',
+          height: '32px',
+          borderRadius: 'var(--mkt-rounded-full)',
+          backgroundColor: 'var(--mkt-ink)',
+          color: 'var(--mkt-canvas)',
+          border: 'none',
+          cursor: 'pointer',
+          fontFamily: 'var(--mkt-font-sans)',
+          fontSize: '14px',
+          fontWeight: 540,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+        }}
+      >
+        {displayChar}
+      </button>
+
+      {open && (
+        <>
+          {/* 닫기용 오버레이 */}
+          <div
+            style={{
+              position: 'fixed',
+              inset: 0,
+              zIndex: 48,
+            }}
+            onClick={() => setOpen(false)}
+            aria-hidden="true"
+          />
+          {/* 드롭다운 */}
+          <div
+            role="menu"
+            style={{
+              position: 'absolute',
+              right: 0,
+              top: 'calc(100% + 8px)',
+              zIndex: 49,
+              backgroundColor: 'var(--mkt-canvas)',
+              border: '1px solid var(--mkt-hairline)',
+              borderRadius: 'var(--mkt-rounded-md)',
+              minWidth: '180px',
+              boxShadow: '0 4px 16px rgba(0,0,0,0.10)',
+              padding: '6px 0',
+            }}
+          >
+            {/* 이메일 */}
+            <div
+              style={{
+                padding: '8px 16px 10px',
+                borderBottom: '1px solid var(--mkt-hairline-soft)',
+                marginBottom: '4px',
+              }}
+            >
+              <p
+                style={{
+                  fontFamily: 'var(--mkt-font-sans)',
+                  fontSize: '12px',
+                  fontWeight: 330,
+                  color: 'var(--mkt-ink)',
+                  opacity: 0.5,
+                  margin: 0,
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis',
+                  whiteSpace: 'nowrap',
+                }}
+              >
+                {user.email}
+              </p>
+            </div>
+            {/* 마이페이지 */}
+            <Link
+              href="/mypage"
+              role="menuitem"
+              onClick={() => setOpen(false)}
+              style={{
+                display: 'block',
+                padding: '8px 16px',
+                fontFamily: 'var(--mkt-font-sans)',
+                fontSize: '14px',
+                fontWeight: 330,
+                color: 'var(--mkt-ink)',
+                textDecoration: 'none',
+                opacity: 0.8,
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.backgroundColor = 'var(--mkt-surface-soft)'
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.backgroundColor = 'transparent'
+              }}
+            >
+              마이페이지
+            </Link>
+            {/* 로그아웃 */}
+            <button
+              type="button"
+              role="menuitem"
+              onClick={() => {
+                setOpen(false)
+                onLogout()
+              }}
+              style={{
+                display: 'block',
+                width: '100%',
+                textAlign: 'left',
+                padding: '8px 16px',
+                fontFamily: 'var(--mkt-font-sans)',
+                fontSize: '14px',
+                fontWeight: 330,
+                color: 'var(--mkt-ink)',
+                background: 'none',
+                border: 'none',
+                cursor: 'pointer',
+                opacity: 0.8,
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.backgroundColor = 'var(--mkt-surface-soft)'
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.backgroundColor = 'transparent'
+              }}
+            >
+              로그아웃
+            </button>
+          </div>
+        </>
+      )}
+    </div>
+  )
+}
+
 export function Header() {
   const [menuOpen, setMenuOpen] = React.useState(false)
   const [scrolled, setScrolled] = React.useState(false)
+  const [user, setUser] = React.useState<User | null>(null)
 
   React.useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 4)
     window.addEventListener('scroll', onScroll, { passive: true })
     return () => window.removeEventListener('scroll', onScroll)
+  }, [])
+
+  // 로그인 상태 감지
+  React.useEffect(() => {
+    let cancelled = false
+    const supabase = createWebBrowserClient()
+
+    // 초기 세션 확인
+    supabase.auth.getUser().then(({ data }) => {
+      if (!cancelled) setUser(data.user)
+    })
+
+    // 세션 변경 구독
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((_event, session) => {
+      if (!cancelled) setUser(session?.user ?? null)
+    })
+
+    return () => {
+      cancelled = true
+      subscription.unsubscribe()
+    }
+  }, [])
+
+  const handleLogout = React.useCallback(async () => {
+    try {
+      await fetch('/api/auth/logout', { method: 'POST' })
+      window.location.href = '/'
+    } catch {
+      window.location.href = '/'
+    }
   }, [])
 
   return (
@@ -150,28 +332,45 @@ export function Header() {
           className="hidden md:flex"
           style={{ gap: 'var(--mkt-space-sm)', alignItems: 'center' }}
         >
-          <Link
-            href="https://storywork-editor-admin.vercel.app/login"
-            style={{
-              fontFamily: 'var(--mkt-font-sans)',
-              fontSize: 'var(--mkt-body-sm-size)',
-              fontWeight: 'var(--mkt-body-sm-weight)',
-              color: 'var(--mkt-ink)',
-              textDecoration: 'none',
-              padding: '8px 12px',
-              opacity: 0.7,
-            }}
-            className="hover:opacity-100 focus-visible:outline-none focus-visible:ring-2 rounded"
-          >
-            로그인
-          </Link>
-          <Link
-            href="/editor"
-            className="mkt-btn-primary"
-            style={{ fontSize: '15px', padding: '8px 20px' }}
-          >
-            지금 시작하기
-          </Link>
+          {user ? (
+            // 로그인 됨: 아바타 드롭다운
+            <>
+              <UserMenu user={user} onLogout={handleLogout} />
+              <Link
+                href="/editor"
+                className="mkt-btn-primary"
+                style={{ fontSize: '15px', padding: '8px 20px' }}
+              >
+                지금 시작하기
+              </Link>
+            </>
+          ) : (
+            // 로그인 안 됨: 로그인 + 지금 시작하기
+            <>
+              <Link
+                href="/login"
+                style={{
+                  fontFamily: 'var(--mkt-font-sans)',
+                  fontSize: 'var(--mkt-body-sm-size)',
+                  fontWeight: 'var(--mkt-body-sm-weight)',
+                  color: 'var(--mkt-ink)',
+                  textDecoration: 'none',
+                  padding: '8px 12px',
+                  opacity: 0.7,
+                }}
+                className="hover:opacity-100 focus-visible:outline-none focus-visible:ring-2 rounded"
+              >
+                로그인
+              </Link>
+              <Link
+                href="/editor"
+                className="mkt-btn-primary"
+                style={{ fontSize: '15px', padding: '8px 20px' }}
+              >
+                지금 시작하기
+              </Link>
+            </>
+          )}
         </div>
 
         {/* 모바일: 햄버거 */}
@@ -219,20 +418,61 @@ export function Header() {
                     gap: 'var(--mkt-space-sm)',
                   }}
                 >
-                  <Link
-                    href="https://storywork-editor-admin.vercel.app/login"
-                    onClick={() => setMenuOpen(false)}
-                    style={{
-                      fontFamily: 'var(--mkt-font-sans)',
-                      fontSize: 'var(--mkt-body-size)',
-                      color: 'var(--mkt-ink)',
-                      textDecoration: 'none',
-                      padding: '10px 0',
-                      opacity: 0.7,
-                    }}
-                  >
-                    로그인
-                  </Link>
+                  {user ? (
+                    // 로그인 됨: 마이페이지 + 로그아웃
+                    <>
+                      <Link
+                        href="/mypage"
+                        onClick={() => setMenuOpen(false)}
+                        style={{
+                          fontFamily: 'var(--mkt-font-sans)',
+                          fontSize: 'var(--mkt-body-size)',
+                          color: 'var(--mkt-ink)',
+                          textDecoration: 'none',
+                          padding: '10px 0',
+                          opacity: 0.7,
+                        }}
+                      >
+                        마이페이지
+                      </Link>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setMenuOpen(false)
+                          handleLogout()
+                        }}
+                        style={{
+                          fontFamily: 'var(--mkt-font-sans)',
+                          fontSize: 'var(--mkt-body-size)',
+                          color: 'var(--mkt-ink)',
+                          background: 'none',
+                          border: 'none',
+                          cursor: 'pointer',
+                          padding: '10px 0',
+                          opacity: 0.55,
+                          textAlign: 'left',
+                        }}
+                      >
+                        로그아웃
+                      </button>
+                    </>
+                  ) : (
+                    // 로그인 안 됨
+                    <Link
+                      href="/login"
+                      onClick={() => setMenuOpen(false)}
+                      style={{
+                        fontFamily: 'var(--mkt-font-sans)',
+                        fontSize: 'var(--mkt-body-size)',
+                        color: 'var(--mkt-ink)',
+                        textDecoration: 'none',
+                        padding: '10px 0',
+                        opacity: 0.7,
+                      }}
+                    >
+                      로그인
+                    </Link>
+                  )}
                   <Link
                     href="/editor"
                     className="mkt-btn-primary"

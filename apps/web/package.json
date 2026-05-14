@@ -15,6 +15,8 @@
   },
   "dependencies": {
     "@storywork/editor-bubble": "workspace:*",
+    "@supabase/ssr": "^0.10.2",
+    "@supabase/supabase-js": "^2.105.3",
     "@storywork/editor-core": "workspace:*",
     "@storywork/editor-effects": "workspace:*",
     "@storywork/editor-export": "workspace:*",
