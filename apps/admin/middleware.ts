@@ -51,10 +51,23 @@ export async function middleware(request: NextRequest): Promise<NextResponse> {
     return NextResponse.redirect(loginUrl)
   }
 
-  // admin role 확인 — Supabase app_metadata 에서 role 조회
-  const userRole: string = (session.user.app_metadata?.['role'] as string | undefined) ?? ''
+  // admin role 확인 — Supabase app_metadata + user_metadata 양쪽에서 role 조회
+  const appRole = (session.user.app_metadata?.['role'] as string | undefined) ?? ''
+  const userMetaRole = (session.user.user_metadata?.['role'] as string | undefined) ?? ''
+  const userRole = appRole || userMetaRole
 
   const isAdminRole = ADMIN_ROLES.has(userRole)
+
+  // 디버깅: role 정보 콘솔 (Vercel runtime logs 에서 확인 가능)
+  // eslint-disable-next-line no-console
+  console.log('[middleware]', {
+    pathname,
+    email: session.user.email,
+    appRole,
+    userMetaRole,
+    isAdminRole,
+    appMetaKeys: Object.keys(session.user.app_metadata ?? {}),
+  })
 
   // admin role 미보유 → /403
   if (!isAdminRole) {
