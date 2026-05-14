@@ -85,6 +85,10 @@ model User {
   email         String         @unique
   role          Role           @default(user)
   stripeId      String?        @unique
+  /// 표시 이름 (최대 80자). null 이면 이메일 앞부분(@-prefix) 사용
+  name          String?        @db.VarChar(80)
+  /// 아바타 이미지 URL (외부 URL 허용). null 이면 이니셜 fallback
+  avatarUrl     String?        @db.VarChar(500)
   /// 관리자 TOTP 시크릿 (Base32, otplib 생성) — 서버 사이드 전용, 절대 클라이언트 노출 금지
   totpSecret    String?
   /// TOTP 설정 완료 여부

@@ -91,7 +91,16 @@ export default async function MyPage() {
   // ── 4. Shell 렌더 ─────────────────────────────────────────────────────────────
   const userId = dbUser?.id ?? authUser.id
   const email = dbUser?.email ?? authUser.email ?? ''
+  const name = dbUser?.name ?? null
   const createdAt = dbUser?.createdAt ?? new Date()
 
-  return <MyPageShell userId={userId} email={email} createdAt={createdAt} projects={projects} />
+  return (
+    <MyPageShell
+      userId={userId}
+      email={email}
+      name={name}
+      createdAt={createdAt}
+      projects={projects}
+    />
+  )
 }

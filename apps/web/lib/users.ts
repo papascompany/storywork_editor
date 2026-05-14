@@ -6,11 +6,6 @@
  *
  * 주의: 이 파일은 Server Component / Server Action / Route Handler 전용.
  *       클라이언트 컴포넌트에서 import 금지.
- *
- * 참고: Prisma User 모델에는 name/avatarUrl 필드가 없으므로
- *       표시 이름은 이메일 앞부분(@-prefix) 에서 파생하고,
- *       아바타는 이니셜 fallback 을 사용한다.
- *       프로필 확장(name/avatarUrl 추가)은 별도 마이그레이션 PR 에서 처리.
  */
 
 import { prisma } from './prisma'
@@ -22,9 +17,20 @@ export interface WebUser {
   id: string
   email: string
   role: string
+  /** 표시 이름 (null 이면 이메일 앞부분 fallback) */
+  name: string | null
+  /** 아바타 이미지 URL (null 이면 이니셜 fallback) */
+  avatarUrl: string | null
   createdAt: Date
   updatedAt: Date
 }
+
+// ─── 입력 검증 상수 ───────────────────────────────────────────────────────────
+
+const NAME_MAX_LEN = 80
+const AVATAR_URL_MAX_LEN = 500
+/** https:// 로 시작하는 URL 패턴 */
+const HTTPS_URL_RE = /^https:\/\/.+/
 
 // ─── getCurrentUser ───────────────────────────────────────────────────────────
 
@@ -56,6 +62,8 @@ export async function getCurrentUser(authUser: {
       id: true,
       email: true,
       role: true,
+      name: true,
+      avatarUrl: true,
       createdAt: true,
       updatedAt: true,
     },
@@ -65,7 +73,86 @@ export async function getCurrentUser(authUser: {
     id: user.id,
     email: user.email,
     role: String(user.role),
+    name: user.name ?? null,
+    avatarUrl: user.avatarUrl ?? null,
     createdAt: user.createdAt,
     updatedAt: user.updatedAt,
+  }
+}
+
+// ─── updateUserProfile ────────────────────────────────────────────────────────
+
+export type UpdateProfileInput = {
+  name?: string
+  avatarUrl?: string
+}
+
+export type UpdateProfileResult = { ok: true; user: WebUser } | { ok: false; error: string }
+
+/**
+ * 사용자 프로필을 업데이트한다 (name, avatarUrl).
+ *
+ * - service_role 권한으로 RLS 우회 (서버 전용)
+ * - 입력값 검증: name 1~80자, avatarUrl https:// 패턴
+ */
+export async function updateUserProfile(
+  userId: string,
+  input: UpdateProfileInput,
+): Promise<UpdateProfileResult> {
+  // 입력 검증
+  if (input.name !== undefined) {
+    const trimmed = input.name.trim()
+    if (trimmed.length === 0 || trimmed.length > NAME_MAX_LEN) {
+      return { ok: false, error: `이름은 1~${NAME_MAX_LEN}자 사이여야 합니다.` }
+    }
+    input.name = trimmed
+  }
+
+  if (input.avatarUrl !== undefined) {
+    const trimmed = input.avatarUrl.trim()
+    if (trimmed.length > 0) {
+      if (!HTTPS_URL_RE.test(trimmed)) {
+        return { ok: false, error: '아바타 URL 은 https:// 로 시작해야 합니다.' }
+      }
+      if (trimmed.length > AVATAR_URL_MAX_LEN) {
+        return { ok: false, error: `아바타 URL 은 ${AVATAR_URL_MAX_LEN}자 이하여야 합니다.` }
+      }
+    }
+    input.avatarUrl = trimmed || undefined
+  }
+
+  try {
+    const updated = await prisma.user.update({
+      where: { id: userId },
+      data: {
+        ...(input.name !== undefined ? { name: input.name } : {}),
+        ...(input.avatarUrl !== undefined ? { avatarUrl: input.avatarUrl } : {}),
+      },
+      select: {
+        id: true,
+        email: true,
+        role: true,
+        name: true,
+        avatarUrl: true,
+        createdAt: true,
+        updatedAt: true,
+      },
+    })
+
+    return {
+      ok: true,
+      user: {
+        id: updated.id,
+        email: updated.email,
+        role: String(updated.role),
+        name: updated.name ?? null,
+        avatarUrl: updated.avatarUrl ?? null,
+        createdAt: updated.createdAt,
+        updatedAt: updated.updatedAt,
+      },
+    }
+  } catch (err) {
+    console.error('[users] updateUserProfile 오류:', err)
+    return { ok: false, error: '프로필 업데이트 중 오류가 발생했습니다.' }
   }
 }

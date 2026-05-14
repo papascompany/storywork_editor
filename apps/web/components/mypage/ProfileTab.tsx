@@ -4,16 +4,25 @@
  * components/mypage/ProfileTab.tsx
  *
  * 프로필 탭 — 클라이언트 컴포넌트 (폼 인터랙션).
- * 이메일(read-only), 가입일, 아바타(이니셜 fallback), 로그아웃.
+ * 이메일(read-only), 가입일, 아바타(이니셜 fallback), 이름 수정, 로그아웃.
  *
- * 참고: 현재 Prisma User 모델에 name/avatarUrl 필드가 없으므로
- *       이름 수정 기능은 "곧 지원" UI 만 표시.
- *       DB 확장 PR 이후 활성화.
+ * 이름 수정:
+ *  - updateProfileAction(Server Action) 사용
+ *  - useFormState 로 에러/성공 상태 관리
+ *  - 성공 시 revalidatePath('/mypage') → 서버에서 최신 name 반영
+ *
+ * avatarUrl 수정:
+ *  - 이번 PR 에서는 표시만 (이니셜 fallback 유지)
+ *  - 다음 PR: Supabase Storage 업로드 모달
  */
 
-import { LogOut, Mail, Shield } from 'lucide-react'
+import { LogOut, Mail, Pencil, Shield } from 'lucide-react'
 import Link from 'next/link'
 import * as React from 'react'
+import { useActionState } from 'react'
+
+import { updateProfileAction } from '@/app/mypage/actions'
+import type { ProfileActionState } from '@/app/mypage/actions'
 
 // ─── 가입일 포맷 ──────────────────────────────────────────────────────────────
 
@@ -27,8 +36,13 @@ function formatJoinDate(date: Date): string {
 
 // ─── 아바타 이니셜 ────────────────────────────────────────────────────────────
 
-function getInitial(email: string): string {
-  return (email[0] ?? '?').toUpperCase()
+/**
+ * 표시 이름 또는 이메일에서 이니셜 한 글자를 추출한다.
+ * name 이 있으면 name 첫 글자, 없으면 이메일 첫 글자.
+ */
+function getInitial(name: string | null, email: string): string {
+  const source = name?.trim() || email
+  return (source[0] ?? '?').toUpperCase()
 }
 
 // ─── 컴포넌트 ─────────────────────────────────────────────────────────────────
@@ -36,12 +50,28 @@ function getInitial(email: string): string {
 interface ProfileTabProps {
   userId: string
   email: string
+  /** 표시 이름 (null 이면 이메일 앞부분 fallback) */
+  name: string | null
   createdAt: Date
 }
 
-export function ProfileTab({ email, createdAt }: ProfileTabProps) {
+const INITIAL_STATE: ProfileActionState = { ok: false }
+
+export function ProfileTab({ userId: _userId, email, name, createdAt }: ProfileTabProps) {
+  const [actionState, formAction, isPending] = useActionState(updateProfileAction, INITIAL_STATE)
+
+  const [isEditingName, setIsEditingName] = React.useState(false)
   const [comingSoonVisible, setComingSoonVisible] = React.useState(false)
-  const initial = getInitial(email)
+
+  // 성공 시 편집 모드 종료
+  React.useEffect(() => {
+    if (actionState.ok) {
+      setIsEditingName(false)
+    }
+  }, [actionState.ok])
+
+  const initial = getInitial(name, email)
+  const displayName = name ?? email.split('@')[0]
 
   function handleDeleteAccount() {
     setComingSoonVisible(true)
@@ -84,7 +114,7 @@ export function ProfileTab({ email, createdAt }: ProfileTabProps) {
             borderBottom: '1px solid var(--mkt-hairline)',
           }}
         >
-          {/* 아바타 */}
+          {/* 아바타 이니셜 (avatarUrl 업로드는 다음 PR) */}
           <div
             aria-hidden="true"
             style={{
@@ -116,7 +146,7 @@ export function ProfileTab({ email, createdAt }: ProfileTabProps) {
                 margin: '0 0 2px',
               }}
             >
-              {email.split('@')[0]}
+              {displayName}
             </p>
             <p
               style={{
@@ -135,6 +165,189 @@ export function ProfileTab({ email, createdAt }: ProfileTabProps) {
 
         {/* 정보 항목 목록 */}
         <dl style={{ margin: 0, padding: '0 28px' }}>
+          {/* 이름 (수정 가능) */}
+          <div
+            style={{
+              display: 'flex',
+              alignItems: 'flex-start',
+              gap: 'var(--mkt-space-sm)',
+              padding: '14px 0',
+              borderBottom: '1px solid var(--mkt-hairline)',
+            }}
+          >
+            <span
+              aria-hidden="true"
+              style={{ color: 'var(--mkt-ink)', opacity: 0.4, flexShrink: 0, paddingTop: '1px' }}
+            >
+              <Pencil style={{ width: '16px', height: '16px' }} />
+            </span>
+            <dt
+              style={{
+                fontFamily: 'var(--mkt-font-sans)',
+                fontSize: '13px',
+                fontWeight: 480,
+                color: 'var(--mkt-ink)',
+                opacity: 0.5,
+                width: '80px',
+                flexShrink: 0,
+                margin: 0,
+                paddingTop: '2px',
+              }}
+            >
+              이름
+            </dt>
+            <dd style={{ margin: 0, flex: 1 }}>
+              {isEditingName ? (
+                /* 편집 폼 */
+                <form
+                  action={formAction}
+                  style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}
+                >
+                  <div style={{ display: 'flex', gap: '6px', alignItems: 'center' }}>
+                    <input
+                      name="name"
+                      type="text"
+                      defaultValue={name ?? ''}
+                      placeholder="표시 이름 입력"
+                      maxLength={80}
+                      required
+                      aria-label="표시 이름"
+                      autoFocus
+                      style={{
+                        flex: 1,
+                        height: '32px',
+                        padding: '0 10px',
+                        border: '1px solid var(--mkt-hairline)',
+                        borderRadius: 'var(--mkt-rounded-sm)',
+                        fontFamily: 'var(--mkt-font-sans)',
+                        fontSize: '14px',
+                        color: 'var(--mkt-ink)',
+                        backgroundColor: 'var(--mkt-canvas)',
+                        outline: 'none',
+                      }}
+                      onFocus={(e) => {
+                        ;(e.currentTarget as HTMLInputElement).style.borderColor = 'var(--mkt-ink)'
+                      }}
+                      onBlur={(e) => {
+                        ;(e.currentTarget as HTMLInputElement).style.borderColor =
+                          'var(--mkt-hairline)'
+                      }}
+                    />
+                    <button
+                      type="submit"
+                      disabled={isPending}
+                      style={{
+                        height: '32px',
+                        padding: '0 12px',
+                        borderRadius: 'var(--mkt-rounded-sm)',
+                        border: 'none',
+                        backgroundColor: 'var(--mkt-ink)',
+                        color: 'var(--mkt-canvas)',
+                        fontFamily: 'var(--mkt-font-sans)',
+                        fontSize: '13px',
+                        fontWeight: 480,
+                        cursor: isPending ? 'not-allowed' : 'pointer',
+                        opacity: isPending ? 0.6 : 1,
+                        whiteSpace: 'nowrap',
+                      }}
+                    >
+                      {isPending ? '저장 중...' : '저장'}
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setIsEditingName(false)}
+                      disabled={isPending}
+                      style={{
+                        height: '32px',
+                        padding: '0 10px',
+                        borderRadius: 'var(--mkt-rounded-sm)',
+                        border: '1px solid var(--mkt-hairline)',
+                        backgroundColor: 'transparent',
+                        color: 'var(--mkt-ink)',
+                        fontFamily: 'var(--mkt-font-sans)',
+                        fontSize: '13px',
+                        cursor: isPending ? 'not-allowed' : 'pointer',
+                        opacity: isPending ? 0.5 : 0.65,
+                      }}
+                    >
+                      취소
+                    </button>
+                  </div>
+                  {/* 에러 메시지 */}
+                  {!actionState.ok && actionState.error && (
+                    <p
+                      role="alert"
+                      style={{
+                        fontFamily: 'var(--mkt-font-sans)',
+                        fontSize: '12px',
+                        color: '#e53e3e',
+                        margin: 0,
+                      }}
+                    >
+                      {actionState.error}
+                    </p>
+                  )}
+                  {/* 성공 메시지 (일시적) */}
+                  {actionState.ok && (
+                    <p
+                      role="status"
+                      aria-live="polite"
+                      style={{
+                        fontFamily: 'var(--mkt-font-sans)',
+                        fontSize: '12px',
+                        color: '#38a169',
+                        margin: 0,
+                      }}
+                    >
+                      저장되었습니다.
+                    </p>
+                  )}
+                </form>
+              ) : (
+                /* 표시 모드 */
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <span
+                    style={{
+                      fontFamily: 'var(--mkt-font-sans)',
+                      fontSize: '14px',
+                      fontWeight: 330,
+                      color: 'var(--mkt-ink)',
+                    }}
+                  >
+                    {displayName}
+                  </span>
+                  <button
+                    type="button"
+                    onClick={() => setIsEditingName(true)}
+                    aria-label="이름 편집"
+                    style={{
+                      height: '24px',
+                      padding: '0 8px',
+                      borderRadius: 'var(--mkt-rounded-sm)',
+                      border: '1px solid var(--mkt-hairline)',
+                      backgroundColor: 'transparent',
+                      cursor: 'pointer',
+                      fontFamily: 'var(--mkt-font-sans)',
+                      fontSize: '11px',
+                      fontWeight: 480,
+                      color: 'var(--mkt-ink)',
+                      opacity: 0.5,
+                      letterSpacing: '0.3px',
+                    }}
+                    onMouseEnter={(e) => {
+                      ;(e.currentTarget as HTMLButtonElement).style.opacity = '1'
+                    }}
+                    onMouseLeave={(e) => {
+                      ;(e.currentTarget as HTMLButtonElement).style.opacity = '0.5'
+                    }}
+                  >
+                    수정
+                  </button>
+                </div>
+              )}
+            </dd>
+          </div>
+
           {/* 이메일 */}
           <ProfileRow
             icon={<Mail style={{ width: '16px', height: '16px' }} />}

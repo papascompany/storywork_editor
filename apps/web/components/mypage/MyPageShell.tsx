@@ -38,13 +38,15 @@ const TABS: { id: TabId; label: string; icon: React.ElementType }[] = [
 interface MyPageShellProps {
   userId: string
   email: string
+  /** 표시 이름 (null 이면 이메일 앞부분 fallback) */
+  name: string | null
   createdAt: Date
   projects: ProjectData[]
 }
 
 // ─── 컴포넌트 ─────────────────────────────────────────────────────────────────
 
-export function MyPageShell({ userId, email, createdAt, projects }: MyPageShellProps) {
+export function MyPageShell({ userId, email, name, createdAt, projects }: MyPageShellProps) {
   const router = useRouter()
   const searchParams = useSearchParams()
   const rawTab = searchParams.get('tab') ?? 'projects'
@@ -62,7 +64,7 @@ export function MyPageShell({ userId, email, createdAt, projects }: MyPageShellP
       case 'projects':
         return <ProjectsTab projects={projects} />
       case 'profile':
-        return <ProfileTab userId={userId} email={email} createdAt={createdAt} />
+        return <ProfileTab userId={userId} email={email} name={name} createdAt={createdAt} />
       case 'billing':
         return <BillingTab />
       case 'my-data':
