@@ -44,15 +44,11 @@ interface ResourceEditClientProps {
 
 // ─── 상태 배지 ───────────────────────────────────────────────────────────────
 
-const STATUS_INFO: Record<string, { label: string; className: string }> = {
-  draft: {
-    label: '초안',
-    className:
-      'bg-[var(--color-surface-muted)] text-[var(--color-text-muted)] border border-[var(--color-border)]',
-  },
-  review: { label: '검수중', className: 'bg-amber-100 text-amber-700' },
-  published: { label: '게시됨', className: 'bg-green-100 text-green-700' },
-  rejected: { label: '거절됨', className: 'bg-red-100 text-red-700' },
+const STATUS_INFO: Record<string, { label: string; blockColor: string }> = {
+  draft: { label: '초안', blockColor: 'var(--mkt-hairline-soft)' },
+  review: { label: '검수중', blockColor: 'var(--mkt-block-cream)' },
+  published: { label: '게시됨', blockColor: 'var(--mkt-block-mint)' },
+  rejected: { label: '거절됨', blockColor: 'var(--mkt-block-pink)' },
 }
 
 const KIND_LABELS: Record<string, string> = {
@@ -63,6 +59,32 @@ const KIND_LABELS: Record<string, string> = {
   'speech-bubble': '말풍선',
   'word-fx': '워드효과',
   decoration: '꾸미기',
+}
+
+const INPUT_STYLE: React.CSSProperties = {
+  height: '40px',
+  borderRadius: 'var(--mkt-rounded-md)',
+  border: '1px solid var(--mkt-hairline)',
+  backgroundColor: 'var(--mkt-canvas)',
+  padding: '0 12px',
+  fontFamily: 'var(--mkt-font-sans)',
+  fontSize: '14px',
+  fontWeight: 320,
+  color: 'var(--mkt-ink)',
+  outline: 'none',
+  width: '100%',
+}
+
+const LABEL_STYLE: React.CSSProperties = {
+  fontFamily: 'var(--mkt-font-mono)',
+  fontSize: '11px',
+  fontWeight: 400,
+  letterSpacing: '0.5px',
+  textTransform: 'uppercase',
+  color: 'var(--mkt-ink)',
+  opacity: 0.55,
+  marginBottom: '6px',
+  display: 'block',
 }
 
 // ─── ResourceEditClient ───────────────────────────────────────────────────────
@@ -239,6 +261,8 @@ export function ResourceEditClient({ resource, userRole }: ResourceEditClientPro
   const imageUrl =
     resource.variants?.['webp2x'] ?? resource.variants?.['webp1x'] ?? resource.fileUrl
 
+  const statusInfo = STATUS_INFO[currentStatus]
+
   return (
     <div className="p-6 lg:p-10" style={{ fontFamily: 'var(--mkt-font-sans)' }}>
       {/* 헤더 */}
@@ -299,12 +323,33 @@ export function ResourceEditClient({ resource, userRole }: ResourceEditClientPro
             </span>
             <span style={{ color: 'var(--mkt-hairline)' }}>·</span>
             <span
-              className={`text-xs px-2 py-0.5 rounded-full font-medium ${STATUS_INFO[currentStatus]?.className ?? ''}`}
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                padding: '2px 8px',
+                borderRadius: 'var(--mkt-rounded-full)',
+                backgroundColor: statusInfo?.blockColor ?? 'var(--mkt-hairline-soft)',
+                fontFamily: 'var(--mkt-font-sans)',
+                fontSize: '12px',
+                fontWeight: 480,
+                color: 'var(--mkt-ink)',
+              }}
             >
-              {STATUS_INFO[currentStatus]?.label ?? currentStatus}
+              {statusInfo?.label ?? currentStatus}
             </span>
             {resource.lowDpi && (
-              <span className="text-xs px-2 py-0.5 rounded-full bg-amber-100 text-amber-700">
+              <span
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  padding: '2px 8px',
+                  borderRadius: 'var(--mkt-rounded-full)',
+                  backgroundColor: 'var(--mkt-block-coral)',
+                  fontFamily: 'var(--mkt-font-mono)',
+                  fontSize: '11px',
+                  color: 'var(--mkt-ink)',
+                }}
+              >
                 저해상도
               </span>
             )}
@@ -319,7 +364,7 @@ export function ResourceEditClient({ resource, userRole }: ResourceEditClientPro
                 type="button"
                 onClick={() => void handlePublish()}
                 disabled={isPublishing}
-                className="mkt-btn-primary"
+                className="mkt-btn-primary focus-visible:outline-none focus-visible:ring-2"
                 style={{
                   gap: '8px',
                   display: 'inline-flex',
@@ -334,7 +379,7 @@ export function ResourceEditClient({ resource, userRole }: ResourceEditClientPro
               <button
                 type="button"
                 onClick={() => setShowRejectModal(true)}
-                className="mkt-btn-secondary"
+                className="mkt-btn-secondary focus-visible:outline-none focus-visible:ring-2"
                 style={{
                   gap: '8px',
                   display: 'inline-flex',
@@ -353,7 +398,7 @@ export function ResourceEditClient({ resource, userRole }: ResourceEditClientPro
               type="button"
               onClick={() => void handleDelete()}
               disabled={isDeleting}
-              className="mkt-btn-secondary"
+              className="mkt-btn-secondary focus-visible:outline-none focus-visible:ring-2"
               style={{
                 gap: '8px',
                 display: 'inline-flex',
@@ -374,7 +419,18 @@ export function ResourceEditClient({ resource, userRole }: ResourceEditClientPro
       {message && (
         <div
           role="alert"
-          className={`mb-4 px-4 py-3 rounded-[var(--radius-md)] text-sm ${message.type === 'success' ? 'bg-green-50 text-green-700 border border-green-200' : 'bg-red-50 text-red-700 border border-red-200'}`}
+          style={{
+            marginBottom: '16px',
+            padding: '10px 14px',
+            borderRadius: 'var(--mkt-rounded-md)',
+            backgroundColor:
+              message.type === 'success' ? 'var(--mkt-block-mint)' : 'var(--mkt-block-pink)',
+            border: message.type === 'success' ? '1px solid #a7c4af' : '1px solid #e0b0b0',
+            fontFamily: 'var(--mkt-font-sans)',
+            fontSize: '14px',
+            fontWeight: 330,
+            color: message.type === 'success' ? '#166534' : '#8b2222',
+          }}
         >
           {message.text}
         </div>
@@ -382,7 +438,19 @@ export function ResourceEditClient({ resource, userRole }: ResourceEditClientPro
 
       {/* 거절 사유 표시 */}
       {currentStatus === 'rejected' && poseMeta.rejectionReason && (
-        <div className="mb-4 px-4 py-3 rounded-[var(--radius-md)] bg-red-50 border border-red-200 text-sm text-red-700">
+        <div
+          style={{
+            marginBottom: '16px',
+            padding: '10px 14px',
+            borderRadius: 'var(--mkt-rounded-md)',
+            backgroundColor: 'var(--mkt-block-pink)',
+            border: '1px solid #e0b0b0',
+            fontFamily: 'var(--mkt-font-sans)',
+            fontSize: '14px',
+            fontWeight: 330,
+            color: '#8b2222',
+          }}
+        >
           거절 사유: {poseMeta.rejectionReason}
         </div>
       )}
@@ -391,7 +459,20 @@ export function ResourceEditClient({ resource, userRole }: ResourceEditClientPro
         {/* 좌측: 이미지 + 키포인트 */}
         <div className="flex flex-col gap-6">
           <div>
-            <h2 className="text-base font-semibold text-[var(--color-text)] mb-3">키포인트 편집</h2>
+            <h2
+              style={{
+                fontFamily: 'var(--mkt-font-mono)',
+                fontSize: '11px',
+                fontWeight: 400,
+                letterSpacing: '0.5px',
+                textTransform: 'uppercase',
+                color: 'var(--mkt-ink)',
+                opacity: 0.55,
+                marginBottom: '12px',
+              }}
+            >
+              키포인트 편집
+            </h2>
             <KeypointEditor
               imageUrl={imageUrl}
               width={resource.width ?? 750}
@@ -406,7 +487,13 @@ export function ResourceEditClient({ resource, userRole }: ResourceEditClientPro
                   type="button"
                   onClick={() => void handleSaveKeypoints()}
                   disabled={isSavingKp}
-                  className="inline-flex items-center gap-2 rounded-[var(--radius-md)] bg-[var(--color-brand-500)] px-4 py-2 text-sm font-medium text-white hover:bg-[var(--color-brand-600)] disabled:opacity-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-brand-500)]"
+                  className="mkt-btn-primary focus-visible:outline-none focus-visible:ring-2"
+                  style={{
+                    gap: '8px',
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    opacity: isSavingKp ? 0.6 : undefined,
+                  }}
                 >
                   {isSavingKp ? '저장 중...' : '키포인트 저장'}
                 </button>
@@ -415,43 +502,126 @@ export function ResourceEditClient({ resource, userRole }: ResourceEditClientPro
           </div>
 
           {/* 파일 정보 */}
-          <div className="rounded-[var(--radius-lg)] border border-[var(--color-border)] p-4 bg-[var(--color-surface)] text-sm">
-            <h3 className="font-medium text-[var(--color-text)] mb-3">파일 정보</h3>
-            <dl className="grid grid-cols-2 gap-x-4 gap-y-2 text-xs">
-              <dt className="text-[var(--color-text-muted)]">원본 파일명</dt>
-              <dd className="text-[var(--color-text)] font-mono truncate">
-                {resource.originalFilename}
-              </dd>
-              <dt className="text-[var(--color-text-muted)]">크기</dt>
-              <dd className="text-[var(--color-text)]">
-                {resource.width ?? '?'} × {resource.height ?? '?'} px
-              </dd>
-              <dt className="text-[var(--color-text-muted)]">추정 DPI</dt>
-              <dd className="text-[var(--color-text)]">{resource.masterDpi ?? '-'}</dd>
-              <dt className="text-[var(--color-text-muted)]">포맷</dt>
-              <dd className="text-[var(--color-text)] uppercase">{resource.format}</dd>
-              <dt className="text-[var(--color-text-muted)]">등록일</dt>
-              <dd className="text-[var(--color-text)]">
-                {new Date(resource.createdAt).toLocaleDateString('ko-KR')}
-              </dd>
+          <div
+            style={{
+              borderRadius: 'var(--mkt-rounded-lg)',
+              border: '1px solid var(--mkt-hairline)',
+              padding: '16px',
+              backgroundColor: 'var(--mkt-canvas)',
+            }}
+          >
+            <h3
+              style={{
+                fontFamily: 'var(--mkt-font-mono)',
+                fontSize: '11px',
+                fontWeight: 400,
+                letterSpacing: '0.5px',
+                textTransform: 'uppercase',
+                color: 'var(--mkt-ink)',
+                opacity: 0.55,
+                marginBottom: '12px',
+              }}
+            >
+              파일 정보
+            </h3>
+            <dl
+              style={{
+                display: 'grid',
+                gridTemplateColumns: '1fr 1fr',
+                gap: '8px 16px',
+              }}
+            >
+              {[
+                { label: '원본 파일명', value: resource.originalFilename, mono: true },
+                {
+                  label: '크기',
+                  value: `${resource.width ?? '?'} × ${resource.height ?? '?'} px`,
+                  mono: false,
+                },
+                { label: '추정 DPI', value: String(resource.masterDpi ?? '-'), mono: false },
+                { label: '포맷', value: resource.format.toUpperCase(), mono: false },
+                {
+                  label: '등록일',
+                  value: new Date(resource.createdAt).toLocaleDateString('ko-KR'),
+                  mono: false,
+                },
+              ].map(({ label, value, mono }) => (
+                <React.Fragment key={label}>
+                  <dt
+                    style={{
+                      fontFamily: 'var(--mkt-font-sans)',
+                      fontSize: '12px',
+                      fontWeight: 330,
+                      color: 'var(--mkt-ink)',
+                      opacity: 0.45,
+                    }}
+                  >
+                    {label}
+                  </dt>
+                  <dd
+                    style={{
+                      fontFamily: mono ? 'var(--mkt-font-mono)' : 'var(--mkt-font-sans)',
+                      fontSize: '12px',
+                      fontWeight: mono ? 400 : 330,
+                      color: 'var(--mkt-ink)',
+                      overflow: 'hidden',
+                      textOverflow: 'ellipsis',
+                      whiteSpace: 'nowrap',
+                    }}
+                  >
+                    {value}
+                  </dd>
+                </React.Fragment>
+              ))}
             </dl>
           </div>
         </div>
 
         {/* 우측: 메타 폼 */}
         <div className="flex flex-col gap-6">
-          <h2 className="text-base font-semibold text-[var(--color-text)]">메타 편집</h2>
+          <h2
+            style={{
+              fontFamily: 'var(--mkt-font-mono)',
+              fontSize: '11px',
+              fontWeight: 400,
+              letterSpacing: '0.5px',
+              textTransform: 'uppercase',
+              color: 'var(--mkt-ink)',
+              opacity: 0.55,
+            }}
+          >
+            메타 편집
+          </h2>
 
           {/* 태그 */}
           <div className="flex flex-col gap-1.5">
-            <label className="text-sm font-medium text-[var(--color-text)]">태그</label>
+            <label style={LABEL_STYLE}>태그</label>
             <div
-              className={`flex flex-wrap gap-1.5 min-h-[2.75rem] rounded-[var(--radius-md)] border bg-[var(--color-surface)] px-3 py-2 focus-within:ring-2 focus-within:ring-[var(--color-brand-500)] ${!canEdit ? 'opacity-60' : 'border-[var(--color-border)]'}`}
+              className="flex flex-wrap gap-1.5 focus-within:ring-2"
+              style={{
+                minHeight: '44px',
+                borderRadius: 'var(--mkt-rounded-md)',
+                border: '1px solid var(--mkt-hairline)',
+                backgroundColor: 'var(--mkt-canvas)',
+                padding: '8px 12px',
+                opacity: !canEdit ? 0.6 : 1,
+              }}
             >
               {tags.map((tag) => (
                 <span
                   key={tag}
-                  className="inline-flex items-center gap-1 px-2 py-0.5 text-xs rounded-full bg-[var(--color-brand-100)] text-[var(--color-brand-700)]"
+                  style={{
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '4px',
+                    padding: '2px 8px',
+                    borderRadius: 'var(--mkt-rounded-full)',
+                    backgroundColor: 'var(--mkt-block-lime)',
+                    fontFamily: 'var(--mkt-font-sans)',
+                    fontSize: '12px',
+                    fontWeight: 480,
+                    color: 'var(--mkt-ink)',
+                  }}
                 >
                   {tag}
                   {canEdit && (
@@ -459,6 +629,15 @@ export function ResourceEditClient({ resource, userRole }: ResourceEditClientPro
                       type="button"
                       onClick={() => setTags((prev) => prev.filter((t) => t !== tag))}
                       aria-label={`태그 ${tag} 삭제`}
+                      style={{
+                        background: 'none',
+                        border: 'none',
+                        cursor: 'pointer',
+                        color: 'var(--mkt-ink)',
+                        opacity: 0.6,
+                        padding: 0,
+                        lineHeight: 1,
+                      }}
                       className="focus-visible:outline-none"
                     >
                       ×
@@ -480,7 +659,17 @@ export function ResourceEditClient({ resource, userRole }: ResourceEditClientPro
                     if (tagInput.trim()) addTag(tagInput)
                   }}
                   placeholder={tags.length === 0 ? '태그 입력 후 Enter' : ''}
-                  className="flex-1 min-w-[4rem] bg-transparent text-sm text-[var(--color-text)] placeholder:text-[var(--color-text-disabled)] focus:outline-none"
+                  style={{
+                    flex: 1,
+                    minWidth: '64px',
+                    background: 'transparent',
+                    border: 'none',
+                    outline: 'none',
+                    fontFamily: 'var(--mkt-font-sans)',
+                    fontSize: '14px',
+                    fontWeight: 320,
+                    color: 'var(--mkt-ink)',
+                  }}
                 />
               )}
             </div>
@@ -488,14 +677,35 @@ export function ResourceEditClient({ resource, userRole }: ResourceEditClientPro
 
           {/* 포즈 메타 */}
           {resource.kind === 'pose' && (
-            <fieldset className="flex flex-col gap-4 p-4 rounded-[var(--radius-lg)] border border-[var(--color-border)] bg-[var(--color-surface-muted)]">
-              <legend className="text-sm font-medium text-[var(--color-text)] px-2">
+            <fieldset
+              style={{
+                display: 'flex',
+                flexDirection: 'column',
+                gap: '16px',
+                padding: '20px',
+                borderRadius: 'var(--mkt-rounded-lg)',
+                border: '1px solid var(--mkt-hairline)',
+                backgroundColor: 'var(--mkt-surface-soft)',
+              }}
+            >
+              <legend
+                style={{
+                  fontFamily: 'var(--mkt-font-mono)',
+                  fontSize: '11px',
+                  fontWeight: 400,
+                  letterSpacing: '0.5px',
+                  textTransform: 'uppercase',
+                  color: 'var(--mkt-ink)',
+                  opacity: 0.55,
+                  padding: '0 4px',
+                }}
+              >
                 포즈 메타
               </legend>
 
               <div className="grid grid-cols-2 gap-4">
                 <div className="flex flex-col gap-1.5">
-                  <label htmlFor="edit-bodyType" className="text-sm text-[var(--color-text-muted)]">
+                  <label htmlFor="edit-bodyType" style={LABEL_STYLE}>
                     신체 유형
                   </label>
                   <select
@@ -503,7 +713,7 @@ export function ResourceEditClient({ resource, userRole }: ResourceEditClientPro
                     value={bodyType}
                     onChange={(e) => canEdit && setBodyType(e.target.value)}
                     disabled={!canEdit}
-                    className="h-9 rounded-[var(--radius-md)] border border-[var(--color-border)] bg-[var(--color-surface)] px-3 text-sm text-[var(--color-text)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-brand-500)] disabled:opacity-60"
+                    style={{ ...INPUT_STYLE, opacity: !canEdit ? 0.6 : 1 }}
                   >
                     <option value="">선택 안 함</option>
                     <option value="M">남성 (M)</option>
@@ -514,7 +724,7 @@ export function ResourceEditClient({ resource, userRole }: ResourceEditClientPro
                   </select>
                 </div>
                 <div className="flex flex-col gap-1.5">
-                  <label htmlFor="edit-view" className="text-sm text-[var(--color-text-muted)]">
+                  <label htmlFor="edit-view" style={LABEL_STYLE}>
                     시점
                   </label>
                   <select
@@ -522,7 +732,7 @@ export function ResourceEditClient({ resource, userRole }: ResourceEditClientPro
                     value={view}
                     onChange={(e) => canEdit && setView(e.target.value)}
                     disabled={!canEdit}
-                    className="h-9 rounded-[var(--radius-md)] border border-[var(--color-border)] bg-[var(--color-surface)] px-3 text-sm text-[var(--color-text)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-brand-500)] disabled:opacity-60"
+                    style={{ ...INPUT_STYLE, opacity: !canEdit ? 0.6 : 1 }}
                   >
                     <option value="">선택 안 함</option>
                     <option value="front">정면</option>
@@ -534,7 +744,7 @@ export function ResourceEditClient({ resource, userRole }: ResourceEditClientPro
               </div>
 
               <div className="flex flex-col gap-1.5">
-                <label htmlFor="edit-action" className="text-sm text-[var(--color-text-muted)]">
+                <label htmlFor="edit-action" style={LABEL_STYLE}>
                   액션 키
                 </label>
                 <input
@@ -544,7 +754,7 @@ export function ResourceEditClient({ resource, userRole }: ResourceEditClientPro
                   onChange={(e) => canEdit && setAction(e.target.value)}
                   disabled={!canEdit}
                   placeholder="예: 걷기, 놀람, 싸움"
-                  className="h-9 rounded-[var(--radius-md)] border border-[var(--color-border)] bg-[var(--color-surface)] px-3 text-sm text-[var(--color-text)] placeholder:text-[var(--color-text-disabled)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-brand-500)] disabled:opacity-60"
+                  style={{ ...INPUT_STYLE, opacity: !canEdit ? 0.6 : 1 }}
                 />
               </div>
 
@@ -555,13 +765,43 @@ export function ResourceEditClient({ resource, userRole }: ResourceEditClientPro
                   aria-checked={flippable}
                   onClick={() => canEdit && setFlippable((v) => !v)}
                   disabled={!canEdit}
-                  className={`relative inline-flex h-6 w-11 rounded-full border-2 border-transparent transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-brand-500)] focus-visible:ring-offset-2 disabled:opacity-60 ${flippable ? 'bg-[var(--color-brand-500)]' : 'bg-[var(--color-surface-muted)]'}`}
+                  className="focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2"
+                  style={{
+                    position: 'relative',
+                    display: 'inline-flex',
+                    height: '24px',
+                    width: '44px',
+                    borderRadius: 'var(--mkt-rounded-full)',
+                    border: '2px solid transparent',
+                    backgroundColor: flippable ? 'var(--mkt-ink)' : 'var(--mkt-hairline)',
+                    transition: 'background-color 150ms ease',
+                    cursor: canEdit ? 'pointer' : 'not-allowed',
+                    flexShrink: 0,
+                    opacity: !canEdit ? 0.6 : 1,
+                  }}
                 >
                   <span
-                    className={`inline-block size-5 rounded-full bg-white shadow-sm transition-transform ${flippable ? 'translate-x-5' : 'translate-x-0'}`}
+                    style={{
+                      display: 'inline-block',
+                      width: '20px',
+                      height: '20px',
+                      borderRadius: 'var(--mkt-rounded-full)',
+                      backgroundColor: 'var(--mkt-canvas)',
+                      boxShadow: '0 1px 3px rgba(0,0,0,0.2)',
+                      transform: flippable ? 'translateX(20px)' : 'translateX(0)',
+                      transition: 'transform 150ms ease',
+                    }}
                   />
                 </button>
-                <span className="text-sm text-[var(--color-text-muted)]">
+                <span
+                  style={{
+                    fontFamily: 'var(--mkt-font-sans)',
+                    fontSize: '14px',
+                    fontWeight: 330,
+                    color: 'var(--mkt-ink)',
+                    opacity: 0.7,
+                  }}
+                >
                   좌우 반전 허용 (flippable)
                 </span>
               </div>
@@ -574,7 +814,13 @@ export function ResourceEditClient({ resource, userRole }: ResourceEditClientPro
                 type="button"
                 onClick={() => void handleSaveMeta()}
                 disabled={isSaving}
-                className="inline-flex items-center gap-2 rounded-[var(--radius-md)] bg-[var(--color-brand-500)] px-5 py-2 text-sm font-medium text-white hover:bg-[var(--color-brand-600)] disabled:opacity-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-brand-500)]"
+                className="mkt-btn-primary focus-visible:outline-none focus-visible:ring-2"
+                style={{
+                  gap: '8px',
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  opacity: isSaving ? 0.6 : undefined,
+                }}
               >
                 {isSaving ? '저장 중...' : '메타 저장'}
               </button>
@@ -589,10 +835,30 @@ export function ResourceEditClient({ resource, userRole }: ResourceEditClientPro
           role="dialog"
           aria-modal="true"
           aria-label="거절 사유 입력"
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black/40"
+          className="fixed inset-0 z-50 flex items-center justify-center"
+          style={{ backgroundColor: 'rgba(0,0,0,0.4)' }}
         >
-          <div className="bg-[var(--color-surface)] rounded-[var(--radius-lg)] p-6 shadow-xl w-full max-w-md mx-4">
-            <h3 className="text-base font-semibold text-[var(--color-text)] mb-4">
+          <div
+            style={{
+              backgroundColor: 'var(--mkt-canvas)',
+              borderRadius: 'var(--mkt-rounded-lg)',
+              padding: '24px',
+              boxShadow: '0 8px 32px rgba(0,0,0,0.18)',
+              width: '100%',
+              maxWidth: '420px',
+              margin: '0 16px',
+            }}
+          >
+            <h3
+              style={{
+                fontFamily: 'var(--mkt-font-sans)',
+                fontSize: '18px',
+                fontWeight: 540,
+                letterSpacing: '-0.26px',
+                color: 'var(--mkt-ink)',
+                marginBottom: '16px',
+              }}
+            >
               거절 사유 입력
             </h3>
             <textarea
@@ -605,14 +871,39 @@ export function ResourceEditClient({ resource, userRole }: ResourceEditClientPro
               placeholder="거절 사유를 입력하세요 (최소 5자)"
               rows={4}
               autoFocus
-              className="w-full rounded-[var(--radius-md)] border border-[var(--color-border)] bg-[var(--color-surface)] px-3 py-2 text-sm text-[var(--color-text)] placeholder:text-[var(--color-text-disabled)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-brand-500)] resize-y min-h-[7rem]"
+              style={{
+                width: '100%',
+                borderRadius: 'var(--mkt-rounded-md)',
+                border: '1px solid var(--mkt-hairline)',
+                backgroundColor: 'var(--mkt-canvas)',
+                padding: '10px 12px',
+                fontFamily: 'var(--mkt-font-sans)',
+                fontSize: '14px',
+                fontWeight: 320,
+                color: 'var(--mkt-ink)',
+                outline: 'none',
+                resize: 'vertical',
+                minHeight: '112px',
+              }}
+              className="focus-visible:ring-2"
             />
-            <p className="mt-1 text-xs text-[var(--color-text-muted)]">Ctrl+Enter 로 확인</p>
+            <p
+              style={{
+                fontFamily: 'var(--mkt-font-mono)',
+                fontSize: '11px',
+                color: 'var(--mkt-ink)',
+                opacity: 0.4,
+                marginTop: '4px',
+                letterSpacing: '0.3px',
+              }}
+            >
+              Ctrl+Enter 로 확인
+            </p>
             <div className="mt-4 flex justify-end gap-3">
               <button
                 type="button"
                 onClick={() => setShowRejectModal(false)}
-                className="px-4 py-2 text-sm text-[var(--color-text-muted)] hover:text-[var(--color-text)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-brand-500)] rounded-[var(--radius-md)]"
+                className="mkt-btn-secondary focus-visible:outline-none focus-visible:ring-2"
               >
                 취소
               </button>
@@ -620,7 +911,11 @@ export function ResourceEditClient({ resource, userRole }: ResourceEditClientPro
                 type="button"
                 onClick={() => void handleRejectConfirm()}
                 disabled={isRejecting || rejectReason.trim().length < 5}
-                className="px-4 py-2 text-sm font-medium text-white bg-red-600 rounded-[var(--radius-md)] hover:bg-red-700 disabled:opacity-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-500"
+                className="mkt-btn-primary focus-visible:outline-none focus-visible:ring-2"
+                style={{
+                  backgroundColor: '#dc2626',
+                  opacity: isRejecting || rejectReason.trim().length < 5 ? 0.5 : undefined,
+                }}
               >
                 {isRejecting ? '처리 중...' : '거절 확정'}
               </button>

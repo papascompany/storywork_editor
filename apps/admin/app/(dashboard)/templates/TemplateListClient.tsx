@@ -42,7 +42,13 @@ const columns: ColumnDef<TemplateRow>[] = [
     meta: { mobileLabel: '미리보기' },
     cell: ({ row }) =>
       row.original.thumbnail ? (
-        <div className="relative h-10 w-10 rounded-[var(--radius-sm)] overflow-hidden border border-[var(--color-border)]">
+        <div
+          className="relative h-10 w-10 overflow-hidden"
+          style={{
+            borderRadius: 'var(--mkt-rounded-sm)',
+            border: '1px solid var(--mkt-hairline)',
+          }}
+        >
           <Image
             src={row.original.thumbnail}
             alt={row.original.name}
@@ -52,7 +58,18 @@ const columns: ColumnDef<TemplateRow>[] = [
           />
         </div>
       ) : (
-        <div className="h-10 w-10 rounded-[var(--radius-sm)] bg-[var(--color-surface-muted)] border border-[var(--color-border)] flex items-center justify-center text-xs text-[var(--color-text-disabled)]">
+        <div
+          className="h-10 w-10 flex items-center justify-center"
+          style={{
+            borderRadius: 'var(--mkt-rounded-sm)',
+            border: '1px solid var(--mkt-hairline)',
+            backgroundColor: 'var(--mkt-surface-soft)',
+            fontFamily: 'var(--mkt-font-mono)',
+            fontSize: '11px',
+            color: 'var(--mkt-ink)',
+            opacity: 0.4,
+          }}
+        >
           없음
         </div>
       ),
@@ -69,7 +86,18 @@ const columns: ColumnDef<TemplateRow>[] = [
     enableSorting: false,
     meta: { mobileLabel: '판형' },
     cell: ({ row }) => (
-      <span className="inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium bg-[var(--color-brand-50)] text-[var(--color-brand-700)] border border-[var(--color-brand-200)]">
+      <span
+        style={{
+          display: 'inline-flex',
+          alignItems: 'center',
+          padding: '2px 8px',
+          borderRadius: 'var(--mkt-rounded-full)',
+          backgroundColor: 'var(--mkt-block-lilac)',
+          fontFamily: 'var(--mkt-font-mono)',
+          fontSize: '11px',
+          color: 'var(--mkt-ink)',
+        }}
+      >
         {row.original.formatName}
       </span>
     ),
@@ -259,7 +287,17 @@ export function TemplateListClient({ initialData, formats, userRole }: TemplateL
           keyboardNavigation
           emptyState={
             <div className="flex flex-col items-center gap-2 py-8">
-              <p className="font-medium text-[var(--color-text)]">검색 결과가 없습니다</p>
+              <p
+                style={{
+                  fontFamily: 'var(--mkt-font-sans)',
+                  fontSize: '14px',
+                  fontWeight: 540,
+                  color: 'var(--mkt-ink)',
+                  opacity: 0.55,
+                }}
+              >
+                검색 결과가 없습니다
+              </p>
             </div>
           }
         />

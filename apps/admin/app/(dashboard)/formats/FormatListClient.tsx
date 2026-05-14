@@ -251,7 +251,17 @@ export function FormatListClient({ initialData, userRole }: FormatListClientProp
           keyboardNavigation
           emptyState={
             <div className="flex flex-col items-center gap-2 py-8">
-              <p className="font-medium text-[var(--color-text)]">검색 결과가 없습니다</p>
+              <p
+                style={{
+                  fontFamily: 'var(--mkt-font-sans)',
+                  fontSize: '14px',
+                  fontWeight: 540,
+                  color: 'var(--mkt-ink)',
+                  opacity: 0.55,
+                }}
+              >
+                검색 결과가 없습니다
+              </p>
             </div>
           }
         />

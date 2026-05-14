@@ -50,6 +50,32 @@ interface TemplateEditClientProps {
   userRole: AdminRole
 }
 
+// ─── 공통 인스펙터 스타일 ───────────────────────────────────────────────────
+
+const INSPECTOR_LABEL_STYLE: React.CSSProperties = {
+  fontFamily: 'var(--mkt-font-mono)',
+  fontSize: '10px',
+  fontWeight: 400,
+  letterSpacing: '0.6px',
+  textTransform: 'uppercase',
+  color: 'var(--mkt-ink)',
+  opacity: 0.55,
+}
+
+const INSPECTOR_INPUT_STYLE: React.CSSProperties = {
+  width: '100%',
+  height: '36px',
+  borderRadius: 'var(--mkt-rounded-md)',
+  border: '1px solid var(--mkt-hairline)',
+  backgroundColor: 'var(--mkt-canvas)',
+  padding: '0 10px',
+  fontFamily: 'var(--mkt-font-sans)',
+  fontSize: '13px',
+  fontWeight: 330,
+  color: 'var(--mkt-ink)',
+  outline: 'none',
+}
+
 // ─── 인스펙터 ─────────────────────────────────────────────────────────────────
 
 interface SlotInspectorProps {
@@ -71,15 +97,17 @@ function SlotInspector({ slot, format, onChange, onDelete, readonly }: SlotInspe
     <div className="flex flex-col gap-4">
       {/* kind */}
       <div className="flex flex-col gap-1.5">
-        <label className="text-xs font-medium text-[var(--color-text-muted)] uppercase tracking-wider">
-          종류
-        </label>
+        <label style={INSPECTOR_LABEL_STYLE}>종류</label>
         <select
           value={slot.kind}
           disabled={readonly}
           onChange={(e) => onChange({ ...slot, kind: e.target.value as SlotKind })}
-          className="rounded-[var(--radius-md)] border border-[var(--color-border)] bg-[var(--color-surface)] px-3 py-1.5 text-sm text-[var(--color-text)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-brand-500)] disabled:opacity-60"
-          style={{ borderLeftColor: color, borderLeftWidth: 3 }}
+          style={{
+            ...INSPECTOR_INPUT_STYLE,
+            borderLeftColor: color,
+            borderLeftWidth: 3,
+            opacity: readonly ? 0.6 : 1,
+          }}
         >
           {SLOT_KINDS.map((k) => (
             <option key={k} value={k}>
@@ -91,9 +119,7 @@ function SlotInspector({ slot, format, onChange, onDelete, readonly }: SlotInspe
 
       {/* hint */}
       <div className="flex flex-col gap-1.5">
-        <label className="text-xs font-medium text-[var(--color-text-muted)] uppercase tracking-wider">
-          힌트 (선택)
-        </label>
+        <label style={INSPECTOR_LABEL_STYLE}>힌트 (선택)</label>
         <input
           type="text"
           value={slot.hint ?? ''}
@@ -101,15 +127,13 @@ function SlotInspector({ slot, format, onChange, onDelete, readonly }: SlotInspe
           maxLength={100}
           placeholder="예: 주인공 정면"
           onChange={(e) => onChange({ ...slot, hint: e.target.value || undefined })}
-          className="rounded-[var(--radius-md)] border border-[var(--color-border)] bg-[var(--color-surface)] px-3 py-1.5 text-sm text-[var(--color-text)] placeholder:text-[var(--color-text-disabled)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-brand-500)] disabled:opacity-60"
+          style={{ ...INSPECTOR_INPUT_STYLE, opacity: readonly ? 0.6 : 1 }}
         />
       </div>
 
       {/* position & size */}
       <div className="flex flex-col gap-1.5">
-        <span className="text-xs font-medium text-[var(--color-text-muted)] uppercase tracking-wider">
-          위치 / 크기 (mm)
-        </span>
+        <span style={INSPECTOR_LABEL_STYLE}>위치 / 크기 (mm)</span>
         <div className="grid grid-cols-2 gap-2">
           {(
             [
@@ -120,7 +144,7 @@ function SlotInspector({ slot, format, onChange, onDelete, readonly }: SlotInspe
             ] as { key: 'x' | 'y' | 'w' | 'h'; label: string; dim: number }[]
           ).map(({ key, label, dim }) => (
             <div key={key} className="flex flex-col gap-0.5">
-              <label className="text-xs text-[var(--color-text-muted)]">{label}</label>
+              <label style={{ ...INSPECTOR_LABEL_STYLE, fontSize: '10px' }}>{label}</label>
               <input
                 type="number"
                 min={0}
@@ -132,7 +156,19 @@ function SlotInspector({ slot, format, onChange, onDelete, readonly }: SlotInspe
                   const mm = Number(e.target.value)
                   onChange({ ...slot, [key]: toNorm(mm, dim) })
                 }}
-                className="rounded-[var(--radius-sm)] border border-[var(--color-border)] bg-[var(--color-surface)] px-2 py-1 text-xs text-[var(--color-text)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-brand-500)] disabled:opacity-60"
+                style={{
+                  height: '32px',
+                  borderRadius: 'var(--mkt-rounded-sm)',
+                  border: '1px solid var(--mkt-hairline)',
+                  backgroundColor: 'var(--mkt-canvas)',
+                  padding: '0 8px',
+                  fontFamily: 'var(--mkt-font-sans)',
+                  fontSize: '12px',
+                  color: 'var(--mkt-ink)',
+                  outline: 'none',
+                  opacity: readonly ? 0.6 : 1,
+                  width: '100%',
+                }}
               />
             </div>
           ))}
@@ -141,9 +177,7 @@ function SlotInspector({ slot, format, onChange, onDelete, readonly }: SlotInspe
 
       {/* rotation */}
       <div className="flex flex-col gap-1.5">
-        <label className="text-xs font-medium text-[var(--color-text-muted)] uppercase tracking-wider">
-          회전 ({slot.rotation}°)
-        </label>
+        <label style={INSPECTOR_LABEL_STYLE}>회전 ({slot.rotation}°)</label>
         <input
           type="range"
           min={0}
@@ -152,27 +186,34 @@ function SlotInspector({ slot, format, onChange, onDelete, readonly }: SlotInspe
           value={slot.rotation}
           disabled={readonly}
           onChange={(e) => onChange({ ...slot, rotation: Number(e.target.value) })}
-          className="w-full accent-[var(--color-brand-500)] disabled:opacity-60"
+          className="w-full"
+          style={{ accentColor: 'var(--mkt-ink)', opacity: readonly ? 0.6 : 1 }}
         />
       </div>
 
       {/* locked */}
-      <label className="flex items-center gap-2 cursor-pointer">
+      <label
+        className="flex items-center gap-2 cursor-pointer"
+        style={{
+          fontFamily: 'var(--mkt-font-sans)',
+          fontSize: '13px',
+          fontWeight: 330,
+          color: 'var(--mkt-ink)',
+        }}
+      >
         <input
           type="checkbox"
           checked={slot.locked}
           disabled={readonly}
           onChange={(e) => onChange({ ...slot, locked: e.target.checked })}
-          className="rounded border-[var(--color-border)] accent-[var(--color-brand-500)] disabled:opacity-60"
+          style={{ accentColor: 'var(--mkt-ink)', opacity: readonly ? 0.6 : 1 }}
         />
-        <span className="text-sm text-[var(--color-text)]">자동 배치 잠금</span>
+        자동 배치 잠금
       </label>
 
       {/* preferredTags */}
       <div className="flex flex-col gap-1.5">
-        <label className="text-xs font-medium text-[var(--color-text-muted)] uppercase tracking-wider">
-          우선 태그 (쉼표 구분)
-        </label>
+        <label style={INSPECTOR_LABEL_STYLE}>우선 태그 (쉼표 구분)</label>
         <input
           type="text"
           value={slot.preferredTags.join(', ')}
@@ -186,7 +227,7 @@ function SlotInspector({ slot, format, onChange, onDelete, readonly }: SlotInspe
               .slice(0, 10)
             onChange({ ...slot, preferredTags: tags })
           }}
-          className="rounded-[var(--radius-md)] border border-[var(--color-border)] bg-[var(--color-surface)] px-3 py-1.5 text-sm text-[var(--color-text)] placeholder:text-[var(--color-text-disabled)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-brand-500)] disabled:opacity-60"
+          style={{ ...INSPECTOR_INPUT_STYLE, opacity: readonly ? 0.6 : 1 }}
         />
       </div>
 
@@ -269,10 +310,24 @@ export function TemplateEditClient({ template, userRole }: TemplateEditClientPro
   return (
     <div className="flex flex-col h-full min-h-0 overflow-hidden">
       {/* ─── 툴바 ─── */}
-      <div className="flex items-center gap-3 px-4 py-3 border-b border-[var(--color-border)] bg-[var(--color-surface)] flex-wrap">
+      <div
+        className="flex items-center gap-3 px-4 py-3 flex-wrap"
+        style={{
+          borderBottom: '1px solid var(--mkt-hairline)',
+          backgroundColor: 'var(--mkt-canvas)',
+        }}
+      >
         <Link
           href="/templates"
-          className="inline-flex items-center gap-1 text-sm text-[var(--color-text-muted)] hover:text-[var(--color-text)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-brand-500)] rounded"
+          className="inline-flex items-center gap-1 focus-visible:outline-none focus-visible:ring-2 rounded"
+          style={{
+            fontFamily: 'var(--mkt-font-sans)',
+            fontSize: '13px',
+            fontWeight: 330,
+            color: 'var(--mkt-ink)',
+            opacity: 0.5,
+            textDecoration: 'none',
+          }}
         >
           <ArrowLeft className="size-4" aria-hidden="true" />
           목록
@@ -284,10 +339,33 @@ export function TemplateEditClient({ template, userRole }: TemplateEditClientPro
             value={name}
             onChange={(e) => setName(e.target.value)}
             disabled={!canEdit}
-            className="rounded-[var(--radius-md)] border border-[var(--color-border)] bg-[var(--color-surface)] px-3 py-1.5 text-sm font-medium text-[var(--color-text)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-brand-500)] min-w-0 flex-1 max-w-xs disabled:opacity-60"
+            style={{
+              height: '36px',
+              borderRadius: 'var(--mkt-rounded-md)',
+              border: '1px solid var(--mkt-hairline)',
+              backgroundColor: 'var(--mkt-canvas)',
+              padding: '0 12px',
+              fontFamily: 'var(--mkt-font-sans)',
+              fontSize: '14px',
+              fontWeight: 500,
+              color: 'var(--mkt-ink)',
+              outline: 'none',
+              minWidth: 0,
+              flex: '1 1 0',
+              maxWidth: '20rem',
+              opacity: canEdit ? 1 : 0.6,
+            }}
             aria-label="템플릿 이름"
           />
-          <span className="text-xs text-[var(--color-text-muted)] shrink-0">
+          <span
+            className="shrink-0"
+            style={{
+              fontFamily: 'var(--mkt-font-mono)',
+              fontSize: '11px',
+              color: 'var(--mkt-ink)',
+              opacity: 0.4,
+            }}
+          >
             {template.format.name} · 슬롯 {slots.length}개
           </span>
         </div>
@@ -296,11 +374,20 @@ export function TemplateEditClient({ template, userRole }: TemplateEditClientPro
           <button
             type="button"
             onClick={() => setShowGrid((v) => !v)}
-            className={`inline-flex items-center gap-1.5 rounded-[var(--radius-md)] px-3 py-1.5 text-xs font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-brand-500)] ${
-              showGrid
-                ? 'bg-[var(--color-brand-100)] text-[var(--color-brand-700)]'
-                : 'bg-[var(--color-surface-muted)] text-[var(--color-text-muted)] hover:text-[var(--color-text)]'
-            }`}
+            className="inline-flex items-center gap-1.5 focus-visible:outline-none focus-visible:ring-2 rounded"
+            style={{
+              height: '32px',
+              padding: '0 12px',
+              borderRadius: 'var(--mkt-rounded-md)',
+              fontFamily: 'var(--mkt-font-mono)',
+              fontSize: '11px',
+              fontWeight: 400,
+              color: 'var(--mkt-ink)',
+              backgroundColor: showGrid ? 'var(--mkt-block-lime)' : 'var(--mkt-surface-soft)',
+              border: 'none',
+              cursor: 'pointer',
+              transition: 'background-color 150ms ease',
+            }}
             aria-pressed={showGrid}
             title="격자 토글"
           >
@@ -326,7 +413,14 @@ export function TemplateEditClient({ template, userRole }: TemplateEditClientPro
       {saveError && (
         <div
           role="alert"
-          className="px-4 py-2 bg-red-50 border-b border-red-200 text-sm text-red-600"
+          style={{
+            padding: '10px 16px',
+            borderBottom: '1px solid var(--mkt-hairline)',
+            backgroundColor: 'var(--mkt-block-pink)',
+            fontFamily: 'var(--mkt-font-sans)',
+            fontSize: '13px',
+            color: 'var(--mkt-ink)',
+          }}
         >
           {saveError}
         </div>
@@ -335,7 +429,10 @@ export function TemplateEditClient({ template, userRole }: TemplateEditClientPro
       {/* ─── 본체: 캔버스 + 인스펙터 ─── */}
       <div className="flex flex-1 min-h-0 overflow-hidden">
         {/* 캔버스 영역 */}
-        <div className="flex-1 min-w-0 overflow-hidden p-4">
+        <div
+          className="flex-1 min-w-0 overflow-hidden p-4"
+          style={{ backgroundColor: 'var(--mkt-surface-soft)' }}
+        >
           <SlotCanvas
             format={template.format}
             slots={slots}
@@ -344,19 +441,36 @@ export function TemplateEditClient({ template, userRole }: TemplateEditClientPro
             onChange={canEdit ? setSlots : () => undefined}
             showGrid={showGrid}
             readonly={!canEdit}
-            className="w-full h-full rounded-[var(--radius-lg)] border border-[var(--color-border)]"
+            className="w-full h-full"
           />
         </div>
 
         {/* 인스펙터 패널 */}
         <aside
-          className="w-64 shrink-0 border-l border-[var(--color-border)] bg-[var(--color-surface)] overflow-y-auto"
+          className="w-64 shrink-0 overflow-y-auto"
+          style={{
+            borderLeft: '1px solid var(--mkt-hairline)',
+            backgroundColor: 'var(--mkt-canvas)',
+          }}
           aria-label="슬롯 인스펙터"
         >
           <div className="p-4">
             {selectedSlot ? (
               <>
-                <h2 className="text-sm font-semibold text-[var(--color-text)] mb-4">슬롯 속성</h2>
+                <h2
+                  style={{
+                    fontFamily: 'var(--mkt-font-mono)',
+                    fontSize: '11px',
+                    fontWeight: 400,
+                    letterSpacing: '0.6px',
+                    textTransform: 'uppercase',
+                    color: 'var(--mkt-ink)',
+                    opacity: 0.55,
+                    marginBottom: '16px',
+                  }}
+                >
+                  슬롯 속성
+                </h2>
                 <SlotInspector
                   slot={selectedSlot}
                   format={template.format}
@@ -367,9 +481,27 @@ export function TemplateEditClient({ template, userRole }: TemplateEditClientPro
               </>
             ) : (
               <div className="flex flex-col items-center justify-center py-12 text-center">
-                <p className="text-sm font-medium text-[var(--color-text)]">슬롯을 선택하세요</p>
+                <p
+                  style={{
+                    fontFamily: 'var(--mkt-font-sans)',
+                    fontSize: '14px',
+                    fontWeight: 540,
+                    color: 'var(--mkt-ink)',
+                    marginBottom: '4px',
+                  }}
+                >
+                  슬롯을 선택하세요
+                </p>
                 {canEdit && (
-                  <p className="mt-1 text-xs text-[var(--color-text-muted)]">
+                  <p
+                    style={{
+                      fontFamily: 'var(--mkt-font-sans)',
+                      fontSize: '12px',
+                      fontWeight: 330,
+                      color: 'var(--mkt-ink)',
+                      opacity: 0.55,
+                    }}
+                  >
                     캔버스를 드래그해 새 슬롯을 그리거나, 기존 슬롯을 클릭해 선택하세요.
                   </p>
                 )}
@@ -379,8 +511,19 @@ export function TemplateEditClient({ template, userRole }: TemplateEditClientPro
 
           {/* 슬롯 목록 */}
           {slots.length > 0 && (
-            <div className="border-t border-[var(--color-border)] p-4">
-              <h3 className="text-xs font-semibold text-[var(--color-text-muted)] uppercase tracking-wider mb-3">
+            <div style={{ borderTop: '1px solid var(--mkt-hairline)', padding: '16px' }}>
+              <h3
+                style={{
+                  fontFamily: 'var(--mkt-font-mono)',
+                  fontSize: '10px',
+                  fontWeight: 400,
+                  letterSpacing: '0.6px',
+                  textTransform: 'uppercase',
+                  color: 'var(--mkt-ink)',
+                  opacity: 0.4,
+                  marginBottom: '12px',
+                }}
+              >
                 슬롯 목록 ({slots.length})
               </h3>
               <div className="flex flex-col gap-1">
@@ -392,11 +535,19 @@ export function TemplateEditClient({ template, userRole }: TemplateEditClientPro
                       key={slot.id}
                       type="button"
                       onClick={() => setSelectedId(isSelected ? null : slot.id)}
-                      className={`flex items-center gap-2 rounded-[var(--radius-sm)] px-2 py-1.5 text-left text-xs transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-brand-500)] ${
-                        isSelected
-                          ? 'bg-[var(--color-brand-50)] text-[var(--color-brand-700)]'
-                          : 'text-[var(--color-text)] hover:bg-[var(--color-surface-muted)]'
-                      }`}
+                      className="flex items-center gap-2 text-left focus-visible:outline-none focus-visible:ring-2 rounded"
+                      style={{
+                        padding: '6px 8px',
+                        borderRadius: 'var(--mkt-rounded-sm)',
+                        backgroundColor: isSelected ? 'var(--mkt-block-lime)' : 'transparent',
+                        fontFamily: 'var(--mkt-font-sans)',
+                        fontSize: '12px',
+                        fontWeight: isSelected ? 540 : 330,
+                        color: 'var(--mkt-ink)',
+                        border: 'none',
+                        cursor: 'pointer',
+                        transition: 'background-color 100ms ease',
+                      }}
                     >
                       <span
                         className="size-2 rounded-full shrink-0"

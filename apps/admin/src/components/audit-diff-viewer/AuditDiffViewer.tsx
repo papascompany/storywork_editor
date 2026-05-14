@@ -42,8 +42,19 @@ function DiffRow({ field, before, after }: { field: string; before: unknown; aft
   const isDelete = after === undefined || after === null
 
   return (
-    <div className="border-b border-[var(--color-border)] last:border-b-0 py-2">
-      <div className="text-xs font-semibold text-[var(--color-text-muted)] mb-1 uppercase tracking-wide">
+    <div className="last:border-b-0 py-2" style={{ borderBottom: '1px solid var(--mkt-hairline)' }}>
+      <div
+        style={{
+          fontFamily: 'var(--mkt-font-mono)',
+          fontSize: '10px',
+          fontWeight: 400,
+          letterSpacing: '0.6px',
+          textTransform: 'uppercase',
+          color: 'var(--mkt-ink)',
+          opacity: 0.4,
+          marginBottom: '4px',
+        }}
+      >
         {field}
       </div>
       <div className="flex flex-col gap-1 sm:flex-row sm:gap-3">
@@ -51,9 +62,10 @@ function DiffRow({ field, before, after }: { field: string; before: unknown; aft
         {!isCreate && (
           <pre
             className={cn(
-              'flex-1 rounded-[var(--radius-sm)] px-3 py-1.5 text-xs font-mono whitespace-pre-wrap break-all',
+              'flex-1 px-3 py-1.5 text-xs font-mono whitespace-pre-wrap break-all',
               isDelete ? 'bg-red-50 text-red-700 line-through' : 'bg-red-50 text-red-700',
             )}
+            style={{ borderRadius: 'var(--mkt-rounded-sm)' }}
             aria-label={`${field} 이전 값`}
           >
             {beforeStr}
@@ -63,9 +75,10 @@ function DiffRow({ field, before, after }: { field: string; before: unknown; aft
         {!isDelete && (
           <pre
             className={cn(
-              'flex-1 rounded-[var(--radius-sm)] px-3 py-1.5 text-xs font-mono whitespace-pre-wrap break-all',
+              'flex-1 px-3 py-1.5 text-xs font-mono whitespace-pre-wrap break-all',
               isCreate ? 'bg-green-50 text-green-700' : 'bg-blue-50 text-blue-700',
             )}
+            style={{ borderRadius: 'var(--mkt-rounded-sm)' }}
             aria-label={`${field} 이후 값`}
           >
             {afterStr}
@@ -85,11 +98,15 @@ export function AuditDiffViewer({ diff, meta, className }: AuditDiffViewerProps)
   if (!hasDiff && !hasMeta) {
     return (
       <div
-        className={cn(
-          'rounded-[var(--radius-md)] border border-[var(--color-border)] px-4 py-3',
-          'text-sm text-[var(--color-text-muted)]',
-          className,
-        )}
+        className={cn('px-4 py-3', className)}
+        style={{
+          borderRadius: 'var(--mkt-rounded-md)',
+          border: '1px solid var(--mkt-hairline)',
+          fontFamily: 'var(--mkt-font-sans)',
+          fontSize: '13px',
+          color: 'var(--mkt-ink)',
+          opacity: 0.55,
+        }}
       >
         변경 내역이 없습니다.
       </div>
@@ -98,14 +115,26 @@ export function AuditDiffViewer({ diff, meta, className }: AuditDiffViewerProps)
 
   return (
     <div
-      className={cn(
-        'rounded-[var(--radius-md)] border border-[var(--color-border)] px-4 py-3',
-        className,
-      )}
+      className={cn('px-4 py-3', className)}
+      style={{
+        borderRadius: 'var(--mkt-rounded-md)',
+        border: '1px solid var(--mkt-hairline)',
+      }}
     >
       {hasDiff && (
         <div>
-          <div className="text-xs font-semibold text-[var(--color-text-muted)] mb-2 flex items-center gap-2">
+          <div
+            className="flex items-center gap-2 mb-2"
+            style={{
+              fontFamily: 'var(--mkt-font-mono)',
+              fontSize: '10px',
+              fontWeight: 400,
+              letterSpacing: '0.6px',
+              textTransform: 'uppercase',
+              color: 'var(--mkt-ink)',
+              opacity: 0.4,
+            }}
+          >
             <span>변경 필드</span>
             <span className="text-green-600">추가</span>
             <span className="text-red-600">삭제</span>
@@ -121,8 +150,24 @@ export function AuditDiffViewer({ diff, meta, className }: AuditDiffViewerProps)
 
       {!hasDiff && hasMeta && (
         <div>
-          <div className="text-xs font-semibold text-[var(--color-text-muted)] mb-2">메타</div>
-          <pre className="text-xs font-mono whitespace-pre-wrap break-all text-[var(--color-text)]">
+          <div
+            style={{
+              fontFamily: 'var(--mkt-font-mono)',
+              fontSize: '10px',
+              fontWeight: 400,
+              letterSpacing: '0.6px',
+              textTransform: 'uppercase',
+              color: 'var(--mkt-ink)',
+              opacity: 0.4,
+              marginBottom: '8px',
+            }}
+          >
+            메타
+          </div>
+          <pre
+            className="text-xs font-mono whitespace-pre-wrap break-all"
+            style={{ color: 'var(--mkt-ink)' }}
+          >
             {JSON.stringify(meta, null, 2)}
           </pre>
         </div>

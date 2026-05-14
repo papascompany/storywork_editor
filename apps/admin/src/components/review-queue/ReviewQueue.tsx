@@ -106,17 +106,29 @@ function RejectDialog({ open, onClose, onConfirm }: RejectDialogProps) {
             placeholder="예: 해상도 부족, 라이선스 누락, 컨텐츠 정책 위반 등"
             rows={4}
             aria-label="거절 사유"
-            className={cn(
-              'w-full rounded-[var(--radius-md)] border border-[var(--color-border)]',
-              'bg-[var(--color-surface)] px-3 py-2 text-sm text-[var(--color-text)]',
-              'placeholder:text-[var(--color-text-disabled)]',
-              'focus-visible:outline-none focus-visible:ring-2',
-              'focus-visible:ring-[var(--color-brand-500)] focus-visible:ring-offset-2',
-              'focus-visible:ring-offset-[var(--color-surface)]',
-              'resize-y min-h-[7rem]',
-            )}
+            className="w-full resize-y min-h-[7rem] focus-visible:outline-none"
+            style={{
+              borderRadius: 'var(--mkt-rounded-md)',
+              border: '1px solid var(--mkt-hairline)',
+              backgroundColor: 'var(--mkt-canvas)',
+              padding: '8px 12px',
+              fontFamily: 'var(--mkt-font-sans)',
+              fontSize: '14px',
+              fontWeight: 330,
+              color: 'var(--mkt-ink)',
+            }}
           />
-          <p className="mt-1 text-xs text-[var(--color-text-muted)]">Ctrl+Enter 로 확인</p>
+          <p
+            style={{
+              marginTop: '4px',
+              fontFamily: 'var(--mkt-font-mono)',
+              fontSize: '11px',
+              color: 'var(--mkt-ink)',
+              opacity: 0.4,
+            }}
+          >
+            Ctrl+Enter 로 확인
+          </p>
         </div>
         <DialogFooter>
           <Button variant="secondary" size="sm" onClick={onClose}>
@@ -276,7 +288,10 @@ export function ReviewQueue<T>({
 
   if (!isLoading && items.length === 0) {
     return (
-      <div className={cn('py-24 text-center text-[var(--color-text-muted)]', className)}>
+      <div
+        className={cn('py-24 text-center', className)}
+        style={{ color: 'var(--mkt-ink)', opacity: 0.55, fontFamily: 'var(--mkt-font-sans)' }}
+      >
         {emptyState ?? (
           <div className="flex flex-col items-center gap-3">
             <span className="text-5xl" aria-hidden="true">
@@ -300,7 +315,8 @@ export function ReviewQueue<T>({
         {displayTotal > items.length && (
           <div className="flex items-center gap-3" aria-label="검수 진행률">
             <div
-              className="flex-1 h-2 rounded-full bg-[var(--color-surface-muted)] overflow-hidden"
+              className="flex-1 h-2 rounded-full overflow-hidden"
+              style={{ backgroundColor: 'var(--mkt-surface-soft)' }}
               role="progressbar"
               aria-valuemin={0}
               aria-valuemax={displayTotal}
@@ -308,11 +324,22 @@ export function ReviewQueue<T>({
               aria-label={`${displayTotal}건 중 ${processed}건 완료`}
             >
               <div
-                className="h-full bg-[var(--color-brand-500)] transition-all duration-[var(--duration-slow)]"
-                style={{ width: `${(processed / displayTotal) * 100}%` }}
+                className="h-full transition-all duration-300"
+                style={{
+                  backgroundColor: 'var(--mkt-ink)',
+                  width: `${(processed / displayTotal) * 100}%`,
+                }}
               />
             </div>
-            <span className="text-sm text-[var(--color-text-muted)] whitespace-nowrap">
+            <span
+              className="whitespace-nowrap"
+              style={{
+                fontFamily: 'var(--mkt-font-mono)',
+                fontSize: '12px',
+                color: 'var(--mkt-ink)',
+                opacity: 0.55,
+              }}
+            >
               {processed} / {displayTotal}
             </span>
           </div>
@@ -320,23 +347,50 @@ export function ReviewQueue<T>({
 
         {/* 키보드 단축키 힌트 */}
         <div
-          className="flex flex-wrap gap-x-4 gap-y-1 text-xs text-[var(--color-text-muted)]"
+          className="flex flex-wrap gap-x-4 gap-y-1"
+          style={{
+            fontFamily: 'var(--mkt-font-mono)',
+            fontSize: '11px',
+            color: 'var(--mkt-ink)',
+            opacity: 0.45,
+          }}
           aria-label="키보드 단축키"
         >
           <span>
-            <kbd className="font-mono bg-[var(--color-surface-muted)] px-1 rounded">j/k</kbd> 이동
+            <kbd
+              className="font-mono px-1 rounded"
+              style={{ backgroundColor: 'var(--mkt-surface-soft)' }}
+            >
+              j/k
+            </kbd>{' '}
+            이동
           </span>
           <span>
-            <kbd className="font-mono bg-[var(--color-surface-muted)] px-1 rounded">a</kbd> 승인
+            <kbd
+              className="font-mono px-1 rounded"
+              style={{ backgroundColor: 'var(--mkt-surface-soft)' }}
+            >
+              a
+            </kbd>{' '}
+            승인
           </span>
           <span>
-            <kbd className="font-mono bg-[var(--color-surface-muted)] px-1 rounded">r</kbd> 거절
+            <kbd
+              className="font-mono px-1 rounded"
+              style={{ backgroundColor: 'var(--mkt-surface-soft)' }}
+            >
+              r
+            </kbd>{' '}
+            거절
           </span>
           {extraActions.map(
             (ea) =>
               ea.key && (
                 <span key={ea.id}>
-                  <kbd className="font-mono bg-[var(--color-surface-muted)] px-1 rounded">
+                  <kbd
+                    className="font-mono px-1 rounded"
+                    style={{ backgroundColor: 'var(--mkt-surface-soft)' }}
+                  >
                     {ea.key}
                   </kbd>{' '}
                   {ea.label}
@@ -362,7 +416,12 @@ export function ReviewQueue<T>({
                 <div
                   key={i}
                   aria-hidden="true"
-                  className="rounded-[var(--radius-lg)] border border-[var(--color-border)] bg-[var(--color-surface-raised)] aspect-square animate-pulse"
+                  className="aspect-square animate-pulse"
+                  style={{
+                    borderRadius: 'var(--mkt-rounded-lg)',
+                    border: '1px solid var(--mkt-hairline)',
+                    backgroundColor: 'var(--mkt-surface-soft)',
+                  }}
                 />
               ))
             : items.map((item, idx) => {
@@ -394,21 +453,27 @@ export function ReviewQueue<T>({
                     aria-selected={isFocused}
                     aria-busy={isProcessing}
                     className={cn(
-                      'relative flex flex-col rounded-[var(--radius-lg)]',
-                      'border bg-[var(--color-surface-raised)]',
-                      'transition-all duration-[var(--duration-fast)]',
-                      'focus-visible:outline-none',
-                      isFocused
-                        ? 'border-[var(--color-brand-500)] ring-2 ring-[var(--color-brand-500)] ring-offset-2 ring-offset-[var(--color-surface)]'
-                        : 'border-[var(--color-border)]',
+                      'relative flex flex-col',
+                      'transition-all focus-visible:outline-none',
                       isProcessing && 'opacity-60 pointer-events-none',
                     )}
+                    style={{
+                      borderRadius: 'var(--mkt-rounded-lg)',
+                      border: isFocused
+                        ? '2px solid var(--mkt-ink)'
+                        : '1px solid var(--mkt-hairline)',
+                      backgroundColor: 'var(--mkt-canvas)',
+                      boxShadow: isFocused ? '0 0 0 2px var(--mkt-ink)' : undefined,
+                    }}
                   >
                     {/* 카드 컨텐츠 (외부 renderCard) */}
                     <div className="flex-1">{renderCard(item, { isFocused })}</div>
 
                     {/* 액션 버튼 */}
-                    <div className="flex items-center gap-2 p-3 border-t border-[var(--color-border)]">
+                    <div
+                      className="flex items-center gap-2 p-3"
+                      style={{ borderTop: '1px solid var(--mkt-hairline)' }}
+                    >
                       <Button
                         variant="default"
                         size="sm"

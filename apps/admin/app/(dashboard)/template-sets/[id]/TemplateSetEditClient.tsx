@@ -184,21 +184,63 @@ export function TemplateSetEditClient({ set, userRole }: TemplateSetEditClientPr
   }
 
   return (
-    <div className="p-6 lg:p-8 max-w-4xl">
+    <div className="p-6 lg:p-8 max-w-4xl" style={{ fontFamily: 'var(--mkt-font-sans)' }}>
       {/* 뒤로 */}
       <Link
         href="/template-sets"
-        className="mb-4 inline-flex items-center gap-1 text-sm text-[var(--color-text-muted)] hover:text-[var(--color-text)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-brand-500)] rounded"
+        className="mb-4 inline-flex items-center gap-1 focus-visible:outline-none focus-visible:ring-2 rounded"
+        style={{
+          fontFamily: 'var(--mkt-font-sans)',
+          fontSize: '14px',
+          fontWeight: 330,
+          color: 'var(--mkt-ink)',
+          opacity: 0.5,
+          textDecoration: 'none',
+        }}
       >
         <ArrowLeft className="size-4" aria-hidden="true" />
         세트 목록
       </Link>
 
       {/* 헤더 */}
-      <div className="mt-2 flex items-start justify-between gap-4 mb-6 flex-wrap">
+      <div className="mt-4 flex items-start justify-between gap-4 mb-8 flex-wrap">
         <div>
-          <h1 className="text-2xl font-bold text-[var(--color-text)]">{set.name}</h1>
-          <p className="mt-1 text-sm text-[var(--color-text-muted)]">
+          <p
+            style={{
+              fontFamily: 'var(--mkt-font-mono)',
+              fontSize: '11px',
+              fontWeight: 400,
+              letterSpacing: '0.6px',
+              textTransform: 'uppercase',
+              color: 'var(--mkt-ink)',
+              opacity: 0.4,
+              marginBottom: '6px',
+            }}
+          >
+            Admin / 템플릿 세트 / 편집
+          </p>
+          <h1
+            style={{
+              fontFamily: 'var(--mkt-font-sans)',
+              fontSize: 'clamp(24px, 3.5vw, 32px)',
+              fontWeight: 340,
+              lineHeight: 1.1,
+              letterSpacing: '-0.96px',
+              color: 'var(--mkt-ink)',
+              marginBottom: '4px',
+            }}
+          >
+            {set.name}
+          </h1>
+          <p
+            style={{
+              fontFamily: 'var(--mkt-font-sans)',
+              fontSize: '15px',
+              fontWeight: 330,
+              color: 'var(--mkt-ink)',
+              opacity: 0.55,
+            }}
+          >
             템플릿 {set.templates.length}개
           </p>
         </div>
@@ -211,7 +253,18 @@ export function TemplateSetEditClient({ set, userRole }: TemplateSetEditClientPr
       </div>
 
       {saveError && (
-        <p role="alert" className="mb-4 text-sm text-red-500">
+        <p
+          role="alert"
+          style={{
+            fontFamily: 'var(--mkt-font-sans)',
+            fontSize: '13px',
+            color: 'var(--mkt-ink)',
+            backgroundColor: 'var(--mkt-block-pink)',
+            borderRadius: 'var(--mkt-rounded-md)',
+            padding: '10px 14px',
+            marginBottom: '16px',
+          }}
+        >
           {saveError}
         </p>
       )}
@@ -220,14 +273,37 @@ export function TemplateSetEditClient({ set, userRole }: TemplateSetEditClientPr
         {/* 좌측: 템플릿 목록 */}
         <div className="flex-1 min-w-0">
           <div className="flex items-center justify-between mb-3">
-            <h2 className="text-sm font-semibold text-[var(--color-text)]">
+            <h2
+              style={{
+                fontFamily: 'var(--mkt-font-mono)',
+                fontSize: '11px',
+                fontWeight: 400,
+                letterSpacing: '0.6px',
+                textTransform: 'uppercase',
+                color: 'var(--mkt-ink)',
+                opacity: 0.55,
+              }}
+            >
               포함 템플릿 ({templates.length}개)
             </h2>
             {canEdit && (
               <button
                 type="button"
                 onClick={openAddModal}
-                className="inline-flex items-center gap-1.5 text-xs font-medium text-[var(--color-brand-500)] hover:text-[var(--color-brand-600)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-brand-500)] rounded"
+                className="inline-flex items-center gap-1.5 focus-visible:outline-none focus-visible:ring-2 rounded"
+                style={{
+                  fontFamily: 'var(--mkt-font-mono)',
+                  fontSize: '11px',
+                  fontWeight: 400,
+                  color: 'var(--mkt-ink)',
+                  opacity: 0.7,
+                  background: 'none',
+                  border: 'none',
+                  cursor: 'pointer',
+                  padding: '4px 8px',
+                  borderRadius: 'var(--mkt-rounded-md)',
+                  backgroundColor: 'var(--mkt-surface-soft)',
+                }}
               >
                 <Plus className="size-3.5" aria-hidden="true" />
                 템플릿 추가
@@ -236,13 +312,39 @@ export function TemplateSetEditClient({ set, userRole }: TemplateSetEditClientPr
           </div>
 
           {templates.length === 0 ? (
-            <div className="border border-dashed border-[var(--color-border)] rounded-[var(--radius-lg)] py-12 text-center">
-              <p className="text-sm text-[var(--color-text-muted)]">템플릿이 없습니다.</p>
+            <div
+              className="py-12 text-center"
+              style={{
+                border: '1.5px dashed var(--mkt-hairline)',
+                borderRadius: 'var(--mkt-rounded-lg)',
+              }}
+            >
+              <p
+                style={{
+                  fontFamily: 'var(--mkt-font-sans)',
+                  fontSize: '14px',
+                  fontWeight: 330,
+                  color: 'var(--mkt-ink)',
+                  opacity: 0.55,
+                  marginBottom: '12px',
+                }}
+              >
+                템플릿이 없습니다.
+              </p>
               {canEdit && (
                 <button
                   type="button"
                   onClick={openAddModal}
-                  className="mt-3 text-sm text-[var(--color-brand-500)] hover:underline focus-visible:outline-none"
+                  style={{
+                    fontFamily: 'var(--mkt-font-sans)',
+                    fontSize: '13px',
+                    color: 'var(--mkt-ink)',
+                    textDecoration: 'underline',
+                    background: 'none',
+                    border: 'none',
+                    cursor: 'pointer',
+                    opacity: 0.7,
+                  }}
                 >
                   + 템플릿 추가
                 </button>
@@ -255,13 +357,32 @@ export function TemplateSetEditClient({ set, userRole }: TemplateSetEditClientPr
                 return (
                   <div
                     key={t.id}
-                    className="flex items-center gap-3 rounded-[var(--radius-lg)] border border-[var(--color-border)] bg-[var(--color-surface)] p-3"
+                    className="flex items-center gap-3 p-3"
+                    style={{
+                      borderRadius: 'var(--mkt-rounded-lg)',
+                      border: '1px solid var(--mkt-hairline)',
+                      backgroundColor: 'var(--mkt-canvas)',
+                    }}
                   >
-                    <span className="text-xs text-[var(--color-text-muted)] w-4 shrink-0">
+                    <span
+                      className="w-4 shrink-0"
+                      style={{
+                        fontFamily: 'var(--mkt-font-mono)',
+                        fontSize: '11px',
+                        color: 'var(--mkt-ink)',
+                        opacity: 0.4,
+                      }}
+                    >
                       {idx + 1}
                     </span>
                     {t.thumbnail ? (
-                      <div className="relative h-12 w-12 rounded-[var(--radius-sm)] overflow-hidden border border-[var(--color-border)] shrink-0">
+                      <div
+                        className="relative h-12 w-12 overflow-hidden shrink-0"
+                        style={{
+                          borderRadius: 'var(--mkt-rounded-sm)',
+                          border: '1px solid var(--mkt-hairline)',
+                        }}
+                      >
                         <Image
                           src={t.thumbnail}
                           alt={t.name}
@@ -271,15 +392,41 @@ export function TemplateSetEditClient({ set, userRole }: TemplateSetEditClientPr
                         />
                       </div>
                     ) : (
-                      <div className="h-12 w-12 rounded-[var(--radius-sm)] bg-[var(--color-surface-muted)] border border-[var(--color-border)] shrink-0 flex items-center justify-center text-xs text-[var(--color-text-disabled)]">
+                      <div
+                        className="h-12 w-12 shrink-0 flex items-center justify-center"
+                        style={{
+                          borderRadius: 'var(--mkt-rounded-sm)',
+                          border: '1px solid var(--mkt-hairline)',
+                          backgroundColor: 'var(--mkt-surface-soft)',
+                          fontFamily: 'var(--mkt-font-mono)',
+                          fontSize: '11px',
+                          color: 'var(--mkt-ink)',
+                          opacity: 0.4,
+                        }}
+                      >
                         없음
                       </div>
                     )}
                     <div className="flex-1 min-w-0">
-                      <p className="text-sm font-medium text-[var(--color-text)] truncate">
+                      <p
+                        className="truncate"
+                        style={{
+                          fontFamily: 'var(--mkt-font-sans)',
+                          fontSize: '14px',
+                          fontWeight: 540,
+                          color: 'var(--mkt-ink)',
+                        }}
+                      >
                         {t.name}
                       </p>
-                      <p className="text-xs text-[var(--color-text-muted)]">
+                      <p
+                        style={{
+                          fontFamily: 'var(--mkt-font-mono)',
+                          fontSize: '11px',
+                          color: 'var(--mkt-ink)',
+                          opacity: 0.4,
+                        }}
+                      >
                         {t.formatName} · 슬롯 {t.slotCount}개
                       </p>
                     </div>
@@ -289,11 +436,14 @@ export function TemplateSetEditClient({ set, userRole }: TemplateSetEditClientPr
                           type="button"
                           onClick={() => setCoverIdx(idx)}
                           title={isCover ? '커버 (지정됨)' : '커버로 지정'}
-                          className={`rounded p-1 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-brand-500)] ${
-                            isCover
-                              ? 'text-yellow-500'
-                              : 'text-[var(--color-text-muted)] hover:text-yellow-500'
-                          }`}
+                          className="rounded p-1 focus-visible:outline-none focus-visible:ring-2"
+                          style={{
+                            color: isCover ? '#eab308' : 'var(--mkt-ink)',
+                            opacity: isCover ? 1 : 0.35,
+                            background: 'none',
+                            border: 'none',
+                            cursor: 'pointer',
+                          }}
                         >
                           <Star
                             className={`size-3.5 ${isCover ? 'fill-yellow-400' : ''}`}
@@ -304,7 +454,17 @@ export function TemplateSetEditClient({ set, userRole }: TemplateSetEditClientPr
                           type="button"
                           onClick={() => moveUp(idx)}
                           disabled={idx === 0}
-                          className="text-xs px-1 text-[var(--color-text-muted)] disabled:opacity-30 hover:text-[var(--color-text)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-brand-500)] rounded"
+                          className="rounded focus-visible:outline-none focus-visible:ring-2"
+                          style={{
+                            fontFamily: 'var(--mkt-font-mono)',
+                            fontSize: '12px',
+                            padding: '0 4px',
+                            color: 'var(--mkt-ink)',
+                            opacity: idx === 0 ? 0.2 : 0.6,
+                            cursor: idx === 0 ? 'not-allowed' : 'pointer',
+                            border: 'none',
+                            background: 'none',
+                          }}
                           aria-label="위로"
                         >
                           ↑
@@ -313,7 +473,17 @@ export function TemplateSetEditClient({ set, userRole }: TemplateSetEditClientPr
                           type="button"
                           onClick={() => moveDown(idx)}
                           disabled={idx === templates.length - 1}
-                          className="text-xs px-1 text-[var(--color-text-muted)] disabled:opacity-30 hover:text-[var(--color-text)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-brand-500)] rounded"
+                          className="rounded focus-visible:outline-none focus-visible:ring-2"
+                          style={{
+                            fontFamily: 'var(--mkt-font-mono)',
+                            fontSize: '12px',
+                            padding: '0 4px',
+                            color: 'var(--mkt-ink)',
+                            opacity: idx === templates.length - 1 ? 0.2 : 0.6,
+                            cursor: idx === templates.length - 1 ? 'not-allowed' : 'pointer',
+                            border: 'none',
+                            background: 'none',
+                          }}
                           aria-label="아래로"
                         >
                           ↓
@@ -321,7 +491,17 @@ export function TemplateSetEditClient({ set, userRole }: TemplateSetEditClientPr
                         <button
                           type="button"
                           onClick={() => removeTemplate(t.id)}
-                          className="text-xs px-1 text-red-400 hover:text-red-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-brand-500)] rounded"
+                          className="rounded focus-visible:outline-none focus-visible:ring-2"
+                          style={{
+                            fontFamily: 'var(--mkt-font-mono)',
+                            fontSize: '13px',
+                            padding: '0 4px',
+                            color: 'var(--mkt-ink)',
+                            opacity: 0.4,
+                            border: 'none',
+                            background: 'none',
+                            cursor: 'pointer',
+                          }}
                           aria-label="제거"
                         >
                           ×
@@ -337,11 +517,35 @@ export function TemplateSetEditClient({ set, userRole }: TemplateSetEditClientPr
 
         {/* 우측: 메타 폼 */}
         <div className="w-full lg:w-72 shrink-0">
-          <h2 className="text-sm font-semibold text-[var(--color-text)] mb-3">세트 정보</h2>
+          <h2
+            style={{
+              fontFamily: 'var(--mkt-font-mono)',
+              fontSize: '11px',
+              fontWeight: 400,
+              letterSpacing: '0.6px',
+              textTransform: 'uppercase',
+              color: 'var(--mkt-ink)',
+              opacity: 0.55,
+              marginBottom: '12px',
+            }}
+          >
+            세트 정보
+          </h2>
           <div className="flex flex-col gap-4">
             {/* 이름 */}
             <div className="flex flex-col gap-1.5">
-              <label htmlFor="edit-name" className="text-sm font-medium text-[var(--color-text)]">
+              <label
+                htmlFor="edit-name"
+                style={{
+                  fontFamily: 'var(--mkt-font-mono)',
+                  fontSize: '11px',
+                  fontWeight: 400,
+                  letterSpacing: '0.6px',
+                  textTransform: 'uppercase',
+                  color: 'var(--mkt-ink)',
+                  opacity: 0.55,
+                }}
+              >
                 이름
               </label>
               <input
@@ -352,14 +556,32 @@ export function TemplateSetEditClient({ set, userRole }: TemplateSetEditClientPr
                 onChange={(e) => setName(e.target.value)}
                 minLength={2}
                 maxLength={50}
-                className="rounded-[var(--radius-md)] border border-[var(--color-border)] bg-[var(--color-surface)] px-3 py-2 text-sm text-[var(--color-text)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-brand-500)] disabled:opacity-60"
+                style={{
+                  height: '44px',
+                  borderRadius: 'var(--mkt-rounded-md)',
+                  border: '1px solid var(--mkt-hairline)',
+                  backgroundColor: 'var(--mkt-canvas)',
+                  padding: '0 12px',
+                  fontFamily: 'var(--mkt-font-sans)',
+                  fontSize: '14px',
+                  fontWeight: 330,
+                  color: 'var(--mkt-ink)',
+                  outline: 'none',
+                  opacity: canEdit ? 1 : 0.6,
+                  width: '100%',
+                }}
               />
             </div>
 
             {canEdit && (
-              <Button onClick={handleSave} disabled={isSaving} className="mt-2">
+              <button
+                type="button"
+                onClick={handleSave}
+                disabled={isSaving}
+                className="mkt-btn-primary mt-2"
+              >
                 {isSaving ? '저장 중...' : '저장'}
-              </Button>
+              </button>
             )}
           </div>
         </div>
@@ -379,7 +601,15 @@ export function TemplateSetEditClient({ set, userRole }: TemplateSetEditClientPr
           </DialogHeader>
           <div className="max-h-80 overflow-y-auto">
             {allTemplates.length === 0 ? (
-              <p className="text-sm text-[var(--color-text-muted)] py-4 text-center">
+              <p
+                className="py-4 text-center"
+                style={{
+                  fontFamily: 'var(--mkt-font-sans)',
+                  fontSize: '13px',
+                  color: 'var(--mkt-ink)',
+                  opacity: 0.55,
+                }}
+              >
                 추가할 수 있는 템플릿이 없습니다.
               </p>
             ) : (
@@ -389,11 +619,12 @@ export function TemplateSetEditClient({ set, userRole }: TemplateSetEditClientPr
                   return (
                     <label
                       key={t.id}
-                      className={`flex items-center gap-3 rounded-[var(--radius-md)] p-2 cursor-pointer transition-colors ${
-                        isSelected
-                          ? 'bg-[var(--color-brand-50)]'
-                          : 'hover:bg-[var(--color-surface-muted)]'
-                      }`}
+                      className="flex items-center gap-3 cursor-pointer p-2"
+                      style={{
+                        borderRadius: 'var(--mkt-rounded-md)',
+                        backgroundColor: isSelected ? 'var(--mkt-block-lime)' : 'transparent',
+                        transition: 'background-color 100ms ease',
+                      }}
                     >
                       <input
                         type="checkbox"
@@ -403,13 +634,28 @@ export function TemplateSetEditClient({ set, userRole }: TemplateSetEditClientPr
                             prev.includes(t.id) ? prev.filter((i) => i !== t.id) : [...prev, t.id],
                           )
                         }}
-                        className="rounded border-[var(--color-border)] accent-[var(--color-brand-500)]"
+                        style={{ accentColor: 'var(--mkt-ink)' }}
                       />
                       <div className="flex-1 min-w-0">
-                        <p className="text-sm font-medium text-[var(--color-text)] truncate">
+                        <p
+                          className="truncate"
+                          style={{
+                            fontFamily: 'var(--mkt-font-sans)',
+                            fontSize: '14px',
+                            fontWeight: 540,
+                            color: 'var(--mkt-ink)',
+                          }}
+                        >
                           {t.name}
                         </p>
-                        <p className="text-xs text-[var(--color-text-muted)]">
+                        <p
+                          style={{
+                            fontFamily: 'var(--mkt-font-mono)',
+                            fontSize: '11px',
+                            color: 'var(--mkt-ink)',
+                            opacity: 0.4,
+                          }}
+                        >
                           {t.formatName} · 슬롯 {t.slotCount}개
                         </p>
                       </div>

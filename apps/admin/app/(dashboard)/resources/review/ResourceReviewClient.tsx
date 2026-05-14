@@ -40,11 +40,24 @@ function ReviewCard({ item, isFocused }: { item: ReviewItem; isFocused: boolean 
 
   return (
     <div
-      className={`p-3 flex flex-col gap-2 transition-opacity ${isFocused ? 'opacity-100' : 'opacity-85'}`}
+      style={{
+        padding: '12px',
+        display: 'flex',
+        flexDirection: 'column',
+        gap: '8px',
+        opacity: isFocused ? 1 : 0.85,
+        transition: 'opacity 150ms ease',
+      }}
     >
       {/* 썸네일 */}
       {item.thumbUrl ? (
-        <div className="relative w-full aspect-square rounded-[var(--radius-md)] bg-[var(--color-surface-muted)] overflow-hidden">
+        <div
+          className="relative w-full aspect-square overflow-hidden"
+          style={{
+            borderRadius: 'var(--mkt-rounded-md)',
+            backgroundColor: 'var(--mkt-surface-soft)',
+          }}
+        >
           <Image
             src={item.thumbUrl}
             alt={item.slug}
@@ -54,35 +67,108 @@ function ReviewCard({ item, isFocused }: { item: ReviewItem; isFocused: boolean 
           />
         </div>
       ) : (
-        <div className="w-full aspect-square flex items-center justify-center rounded-[var(--radius-md)] bg-[var(--color-surface-muted)] text-sm text-[var(--color-text-muted)]">
+        <div
+          className="w-full aspect-square flex items-center justify-center"
+          style={{
+            borderRadius: 'var(--mkt-rounded-md)',
+            backgroundColor: 'var(--mkt-surface-soft)',
+            fontFamily: 'var(--mkt-font-sans)',
+            fontSize: '14px',
+            color: 'var(--mkt-ink)',
+            opacity: 0.4,
+          }}
+        >
           이미지 없음
         </div>
       )}
 
       {/* 정보 */}
       <div className="flex flex-col gap-1">
-        <p className="text-sm font-medium text-[var(--color-text)] truncate">{item.slug}</p>
+        <p
+          className="truncate"
+          style={{
+            fontFamily: 'var(--mkt-font-mono)',
+            fontSize: '12px',
+            fontWeight: 400,
+            color: 'var(--mkt-ink)',
+          }}
+        >
+          {item.slug}
+        </p>
         <div className="flex flex-wrap gap-1">
-          <span className="text-xs px-1.5 py-0.5 rounded-full bg-[var(--color-brand-100)] text-[var(--color-brand-700)]">
+          <span
+            style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              padding: '2px 8px',
+              borderRadius: 'var(--mkt-rounded-full)',
+              backgroundColor: 'var(--mkt-block-lilac)',
+              fontFamily: 'var(--mkt-font-mono)',
+              fontSize: '11px',
+              color: 'var(--mkt-ink)',
+            }}
+          >
             {(KIND_LABELS as Record<string, string>)[item.kind] ?? item.kind}
           </span>
           {action && (
-            <span className="text-xs px-1.5 py-0.5 rounded-full bg-[var(--color-surface-muted)] text-[var(--color-text-muted)]">
+            <span
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                padding: '2px 8px',
+                borderRadius: 'var(--mkt-rounded-full)',
+                backgroundColor: 'var(--mkt-surface-soft)',
+                fontFamily: 'var(--mkt-font-sans)',
+                fontSize: '11px',
+                color: 'var(--mkt-ink)',
+                opacity: 0.7,
+              }}
+            >
               {action}
             </span>
           )}
           {bodyType && (
-            <span className="text-xs px-1.5 py-0.5 rounded-full bg-[var(--color-surface-muted)] text-[var(--color-text-muted)]">
+            <span
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                padding: '2px 8px',
+                borderRadius: 'var(--mkt-rounded-full)',
+                backgroundColor: 'var(--mkt-surface-soft)',
+                fontFamily: 'var(--mkt-font-sans)',
+                fontSize: '11px',
+                color: 'var(--mkt-ink)',
+                opacity: 0.7,
+              }}
+            >
               {bodyType}
             </span>
           )}
           {item.lowDpi && (
-            <span className="text-xs px-1.5 py-0.5 rounded-full bg-amber-100 text-amber-700">
+            <span
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                padding: '2px 8px',
+                borderRadius: 'var(--mkt-rounded-full)',
+                backgroundColor: 'var(--mkt-block-coral)',
+                fontFamily: 'var(--mkt-font-mono)',
+                fontSize: '11px',
+                color: 'var(--mkt-ink)',
+              }}
+            >
               저해상도
             </span>
           )}
         </div>
-        <p className="text-xs text-[var(--color-text-disabled)]">
+        <p
+          style={{
+            fontFamily: 'var(--mkt-font-sans)',
+            fontSize: '12px',
+            color: 'var(--mkt-ink)',
+            opacity: 0.4,
+          }}
+        >
           {new Date(item.createdAt).toLocaleDateString('ko-KR')}
         </p>
       </div>
@@ -142,11 +228,32 @@ export function ResourceReviewClient({
       ]}
       emptyState={
         <div className="flex flex-col items-center gap-3">
-          <p className="text-lg font-medium text-[var(--color-text)]">검수 대기 항목이 없습니다</p>
-          <p className="text-sm text-[var(--color-text-muted)]">모든 리소스가 처리되었습니다.</p>
+          <p
+            style={{
+              fontFamily: 'var(--mkt-font-sans)',
+              fontSize: '17px',
+              fontWeight: 540,
+              letterSpacing: '-0.26px',
+              color: 'var(--mkt-ink)',
+            }}
+          >
+            검수 대기 항목이 없습니다
+          </p>
+          <p
+            style={{
+              fontFamily: 'var(--mkt-font-sans)',
+              fontSize: '14px',
+              fontWeight: 330,
+              color: 'var(--mkt-ink)',
+              opacity: 0.55,
+            }}
+          >
+            모든 리소스가 처리되었습니다.
+          </p>
           <Link
             href="/resources/upload"
-            className="mt-2 text-sm text-[var(--color-brand-500)] hover:text-[var(--color-brand-600)] underline focus-visible:outline-none"
+            className="mkt-btn-primary"
+            style={{ marginTop: '8px', display: 'inline-flex', alignItems: 'center', gap: '8px' }}
           >
             신규 업로드 →
           </Link>

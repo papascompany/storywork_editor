@@ -79,12 +79,30 @@ function AddKpModal({ open, existingNames, onAdd, onClose }: AddKpModalProps) {
       onClick={onClose}
     >
       <div
-        className="bg-[var(--color-surface)] rounded-[var(--radius-lg)] p-6 shadow-xl min-w-[260px]"
+        className="p-6 shadow-xl min-w-[260px]"
+        style={{ borderRadius: 'var(--mkt-rounded-lg)', backgroundColor: 'var(--mkt-canvas)' }}
         onClick={(e) => e.stopPropagation()}
       >
-        <h3 className="text-base font-semibold text-[var(--color-text)] mb-4">키포인트 추가</h3>
+        <h3
+          style={{
+            fontFamily: 'var(--mkt-font-sans)',
+            fontSize: '16px',
+            fontWeight: 540,
+            color: 'var(--mkt-ink)',
+            marginBottom: '16px',
+          }}
+        >
+          키포인트 추가
+        </h3>
         {available.length === 0 ? (
-          <p className="text-sm text-[var(--color-text-muted)]">
+          <p
+            style={{
+              fontFamily: 'var(--mkt-font-sans)',
+              fontSize: '13px',
+              color: 'var(--mkt-ink)',
+              opacity: 0.55,
+            }}
+          >
             추가할 수 있는 키포인트가 없습니다.
           </p>
         ) : (
@@ -94,7 +112,23 @@ function AddKpModal({ open, existingNames, onAdd, onClose }: AddKpModalProps) {
                 key={name}
                 type="button"
                 onClick={() => onAdd(name)}
-                className="flex items-center gap-3 px-3 py-2 rounded-[var(--radius-md)] text-sm text-left hover:bg-[var(--color-surface-muted)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-brand-500)]"
+                className="flex items-center gap-3 px-3 py-2 text-left focus-visible:outline-none focus-visible:ring-2 rounded"
+                style={{
+                  borderRadius: 'var(--mkt-rounded-md)',
+                  fontFamily: 'var(--mkt-font-sans)',
+                  fontSize: '13px',
+                  color: 'var(--mkt-ink)',
+                  backgroundColor: 'transparent',
+                  border: 'none',
+                  cursor: 'pointer',
+                }}
+                onMouseEnter={(e) => {
+                  ;(e.currentTarget as HTMLButtonElement).style.backgroundColor =
+                    'var(--mkt-surface-soft)'
+                }}
+                onMouseLeave={(e) => {
+                  ;(e.currentTarget as HTMLButtonElement).style.backgroundColor = 'transparent'
+                }}
               >
                 <span
                   className="size-3 rounded-full shrink-0"
@@ -341,7 +375,15 @@ export function KeypointEditor({
       </div>
 
       {/* 범례 */}
-      <div className="flex flex-wrap gap-2 text-xs text-[var(--color-text-muted)]">
+      <div
+        className="flex flex-wrap gap-2"
+        style={{
+          fontFamily: 'var(--mkt-font-mono)',
+          fontSize: '11px',
+          color: 'var(--mkt-ink)',
+          opacity: 0.55,
+        }}
+      >
         {keypoints.map((kp) => (
           <span key={kp.name} className="flex items-center gap-1">
             <span
@@ -355,13 +397,20 @@ export function KeypointEditor({
               }}
             />
             {KP_LABELS[kp.name]}
-            {kp.inferred && <span className="text-[var(--color-text-disabled)]">(추정)</span>}
+            {kp.inferred && <span style={{ opacity: 0.4 }}>(추정)</span>}
           </span>
         ))}
       </div>
 
       {!readonly && (
-        <p className="text-xs text-[var(--color-text-muted)]">
+        <p
+          style={{
+            fontFamily: 'var(--mkt-font-mono)',
+            fontSize: '11px',
+            color: 'var(--mkt-ink)',
+            opacity: 0.4,
+          }}
+        >
           드래그로 이동 · 방향키로 미세 조정 · 더블클릭으로 추가 · 우클릭/Delete 로 삭제
         </p>
       )}
@@ -387,14 +436,35 @@ export function KeypointEditor({
         <div
           role="menu"
           aria-label="키포인트 메뉴"
-          className="fixed z-50 bg-[var(--color-surface)] border border-[var(--color-border)] rounded-[var(--radius-md)] shadow-lg py-1"
-          style={{ left: contextMenu.x, top: contextMenu.y }}
+          className="fixed z-50 py-1 shadow-lg"
+          style={{
+            backgroundColor: 'var(--mkt-canvas)',
+            border: '1px solid var(--mkt-hairline)',
+            borderRadius: 'var(--mkt-rounded-md)',
+            left: contextMenu.x,
+            top: contextMenu.y,
+          }}
           onClick={(e) => e.stopPropagation()}
         >
           <button
             role="menuitem"
             type="button"
-            className="w-full px-4 py-2 text-sm text-left text-[var(--color-error-500)] hover:bg-[var(--color-surface-muted)] focus-visible:outline-none focus-visible:bg-[var(--color-surface-muted)]"
+            className="w-full px-4 py-2 text-left focus-visible:outline-none"
+            style={{
+              fontFamily: 'var(--mkt-font-sans)',
+              fontSize: '13px',
+              color: '#dc2626',
+              backgroundColor: 'transparent',
+              border: 'none',
+              cursor: 'pointer',
+            }}
+            onMouseEnter={(e) => {
+              ;(e.currentTarget as HTMLButtonElement).style.backgroundColor =
+                'var(--mkt-surface-soft)'
+            }}
+            onMouseLeave={(e) => {
+              ;(e.currentTarget as HTMLButtonElement).style.backgroundColor = 'transparent'
+            }}
             onClick={() => {
               onChange(keypoints.filter((k) => k.name !== contextMenu.name))
               setContextMenu(null)
@@ -411,20 +481,26 @@ export function KeypointEditor({
           {keypoints.map((kp) => (
             <div
               key={kp.name}
-              className="flex items-center gap-2 px-2 py-1 rounded-[var(--radius-sm)] bg-[var(--color-surface-muted)] text-xs"
+              className="flex items-center gap-2 px-2 py-1"
+              style={{
+                borderRadius: 'var(--mkt-rounded-sm)',
+                backgroundColor: 'var(--mkt-surface-soft)',
+                fontFamily: 'var(--mkt-font-mono)',
+                fontSize: '11px',
+              }}
             >
               <span
                 className="size-2 rounded-full shrink-0"
                 style={{ backgroundColor: KP_COLORS[kp.name] }}
               />
-              <span className="text-[var(--color-text-muted)] min-w-[3.5rem]">
+              <span className="min-w-[3.5rem]" style={{ color: 'var(--mkt-ink)', opacity: 0.55 }}>
                 {KP_LABELS[kp.name]}
               </span>
-              <span className="tabular-nums text-[var(--color-text)] ml-auto">
+              <span className="tabular-nums ml-auto" style={{ color: 'var(--mkt-ink)' }}>
                 ({(kp.x * 100).toFixed(1)}%, {(kp.y * 100).toFixed(1)}%)
               </span>
               {kp.inferred && (
-                <span className="text-[var(--color-warning-500)]" title="자동 추정값">
+                <span style={{ color: '#d97706' }} title="자동 추정값">
                   ~
                 </span>
               )}

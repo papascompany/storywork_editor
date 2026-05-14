@@ -25,15 +25,11 @@ import type {
 
 // ─── 상태 배지 ───────────────────────────────────────────────────────────────
 
-const STATUS_STYLE: Record<string, { label: string; className: string }> = {
-  draft: {
-    label: '초안',
-    className:
-      'bg-[var(--color-surface-muted)] text-[var(--color-text-muted)] border border-[var(--color-border)]',
-  },
-  review: { label: '검수중', className: 'bg-amber-100 text-amber-700' },
-  published: { label: '게시됨', className: 'bg-green-100 text-green-700' },
-  rejected: { label: '거절됨', className: 'bg-red-100 text-red-700' },
+const STATUS_STYLE: Record<string, { label: string; blockColor: string; textOpacity: number }> = {
+  draft: { label: '초안', blockColor: 'var(--mkt-hairline-soft)', textOpacity: 0.6 },
+  review: { label: '검수중', blockColor: 'var(--mkt-block-cream)', textOpacity: 1 },
+  published: { label: '게시됨', blockColor: 'var(--mkt-block-mint)', textOpacity: 1 },
+  rejected: { label: '거절됨', blockColor: 'var(--mkt-block-pink)', textOpacity: 1 },
 }
 
 export const KIND_LABELS: Record<string, string> = {
@@ -46,11 +42,37 @@ export const KIND_LABELS: Record<string, string> = {
   decoration: '꾸미기',
 }
 
+const KIND_BLOCK_COLORS: Record<string, string> = {
+  pose: 'var(--mkt-block-lilac)',
+  background: 'var(--mkt-block-mint)',
+  'mise-en-scene': 'var(--mkt-block-lime)',
+  prop: 'var(--mkt-block-cream)',
+  'speech-bubble': 'var(--mkt-block-coral)',
+  'word-fx': 'var(--mkt-block-pink)',
+  decoration: 'var(--mkt-block-lilac)',
+}
+
 function StatusBadge({ status }: { status: string }) {
-  const style = STATUS_STYLE[status] ?? { label: status, className: 'bg-gray-100 text-gray-700' }
+  const style = STATUS_STYLE[status] ?? {
+    label: status,
+    blockColor: 'var(--mkt-hairline-soft)',
+    textOpacity: 0.6,
+  }
   return (
     <span
-      className={`inline-flex items-center px-2 py-0.5 text-xs font-medium rounded-full ${style.className}`}
+      style={{
+        display: 'inline-flex',
+        alignItems: 'center',
+        padding: '2px 8px',
+        borderRadius: 'var(--mkt-rounded-full)',
+        backgroundColor: style.blockColor,
+        fontFamily: 'var(--mkt-font-sans)',
+        fontSize: '12px',
+        fontWeight: 480,
+        color: 'var(--mkt-ink)',
+        opacity: style.textOpacity,
+        whiteSpace: 'nowrap',
+      }}
     >
       {style.label}
     </span>
@@ -59,8 +81,22 @@ function StatusBadge({ status }: { status: string }) {
 
 function KindBadge({ kind }: { kind: string }) {
   const label = KIND_LABELS[kind] ?? kind
+  const blockColor = KIND_BLOCK_COLORS[kind] ?? 'var(--mkt-surface-soft)'
   return (
-    <span className="inline-flex items-center px-2 py-0.5 text-xs rounded-full bg-[var(--color-brand-100)] text-[var(--color-brand-700)]">
+    <span
+      style={{
+        display: 'inline-flex',
+        alignItems: 'center',
+        padding: '2px 8px',
+        borderRadius: 'var(--mkt-rounded-full)',
+        backgroundColor: blockColor,
+        fontFamily: 'var(--mkt-font-mono)',
+        fontSize: '11px',
+        fontWeight: 400,
+        letterSpacing: '0.3px',
+        color: 'var(--mkt-ink)',
+      }}
+    >
       {label}
     </span>
   )
@@ -78,7 +114,13 @@ const columns: ColumnDef<ResourceRow>[] = [
       const thumbUrl =
         row.original.thumbUrl ?? (row.original.variants as Record<string, string> | null)?.['thumb']
       return thumbUrl ? (
-        <div className="relative size-16 rounded-[var(--radius-sm)] bg-[var(--color-surface-muted)] overflow-hidden">
+        <div
+          className="relative size-16 overflow-hidden"
+          style={{
+            borderRadius: 'var(--mkt-rounded-md)',
+            backgroundColor: 'var(--mkt-surface-soft)',
+          }}
+        >
           <Image
             src={thumbUrl}
             alt={row.original.slug}
@@ -88,7 +130,17 @@ const columns: ColumnDef<ResourceRow>[] = [
           />
         </div>
       ) : (
-        <div className="size-16 flex items-center justify-center rounded-[var(--radius-sm)] bg-[var(--color-surface-muted)] text-xs text-[var(--color-text-muted)]">
+        <div
+          className="size-16 flex items-center justify-center"
+          style={{
+            borderRadius: 'var(--mkt-rounded-md)',
+            backgroundColor: 'var(--mkt-surface-soft)',
+            fontFamily: 'var(--mkt-font-sans)',
+            fontSize: '12px',
+            color: 'var(--mkt-ink)',
+            opacity: 0.35,
+          }}
+        >
           없음
         </div>
       )
@@ -100,7 +152,18 @@ const columns: ColumnDef<ResourceRow>[] = [
     header: 'Slug',
     enableSorting: true,
     cell: ({ row }) => (
-      <span className="font-mono text-xs text-[var(--color-text)] max-w-[180px] truncate block">
+      <span
+        style={{
+          fontFamily: 'var(--mkt-font-mono)',
+          fontSize: '12px',
+          color: 'var(--mkt-ink)',
+          display: 'block',
+          maxWidth: '180px',
+          overflow: 'hidden',
+          textOverflow: 'ellipsis',
+          whiteSpace: 'nowrap',
+        }}
+      >
         {row.original.slug}
       </span>
     ),
@@ -129,9 +192,26 @@ const columns: ColumnDef<ResourceRow>[] = [
         | string
         | undefined
       return action ? (
-        <span className="text-xs text-[var(--color-text)]">{action}</span>
+        <span
+          style={{
+            fontFamily: 'var(--mkt-font-sans)',
+            fontSize: '13px',
+            color: 'var(--mkt-ink)',
+          }}
+        >
+          {action}
+        </span>
       ) : (
-        <span className="text-xs text-[var(--color-text-disabled)]">-</span>
+        <span
+          style={{
+            fontFamily: 'var(--mkt-font-sans)',
+            fontSize: '13px',
+            color: 'var(--mkt-ink)',
+            opacity: 0.3,
+          }}
+        >
+          -
+        </span>
       )
     },
     meta: { mobileLabel: '액션' },
@@ -143,7 +223,20 @@ const columns: ColumnDef<ResourceRow>[] = [
     size: 60,
     cell: ({ row }) =>
       row.original.lowDpi ? (
-        <span className="text-xs px-1.5 py-0.5 rounded bg-amber-100 text-amber-700 whitespace-nowrap">
+        <span
+          style={{
+            display: 'inline-flex',
+            alignItems: 'center',
+            padding: '2px 8px',
+            borderRadius: 'var(--mkt-rounded-full)',
+            backgroundColor: 'var(--mkt-block-coral)',
+            fontFamily: 'var(--mkt-font-mono)',
+            fontSize: '11px',
+            fontWeight: 400,
+            color: 'var(--mkt-ink)',
+            whiteSpace: 'nowrap',
+          }}
+        >
           저해상도
         </span>
       ) : null,
@@ -154,7 +247,15 @@ const columns: ColumnDef<ResourceRow>[] = [
     header: '등록일',
     enableSorting: true,
     cell: ({ row }) => (
-      <span className="text-xs text-[var(--color-text-muted)] whitespace-nowrap">
+      <span
+        style={{
+          fontFamily: 'var(--mkt-font-sans)',
+          fontSize: '13px',
+          color: 'var(--mkt-ink)',
+          opacity: 0.55,
+          whiteSpace: 'nowrap',
+        }}
+      >
         {new Date(row.original.createdAt).toLocaleDateString('ko-KR')}
       </span>
     ),
@@ -337,6 +438,31 @@ export function ResourceListClient({
   const ALL_STATUSES = ['draft', 'review', 'published', 'rejected']
   const ALL_KINDS = Object.keys(KIND_LABELS)
 
+  // ── 필터 칩 공통 스타일 ──
+  const chipBase: React.CSSProperties = {
+    display: 'inline-flex',
+    alignItems: 'center',
+    gap: '6px',
+    padding: '4px 12px',
+    borderRadius: 'var(--mkt-rounded-full)',
+    border: '1px solid var(--mkt-hairline)',
+    backgroundColor: 'var(--mkt-canvas)',
+    fontFamily: 'var(--mkt-font-sans)',
+    fontSize: '12px',
+    fontWeight: 330,
+    color: 'var(--mkt-ink)',
+    cursor: 'pointer',
+    transition: 'all 100ms ease',
+  }
+
+  const chipActive: React.CSSProperties = {
+    ...chipBase,
+    backgroundColor: 'var(--mkt-ink)',
+    color: 'var(--mkt-canvas)',
+    borderColor: 'var(--mkt-ink)',
+    fontWeight: 480,
+  }
+
   return (
     <div className="p-6 lg:p-10" style={{ fontFamily: 'var(--mkt-font-sans)' }}>
       {/* 헤더 */}
@@ -455,10 +581,11 @@ export function ResourceListClient({
         </div>
 
         {/* 필터 칩 */}
-        <div className="flex flex-wrap gap-2">
+        <div className="flex flex-wrap gap-2 items-center">
           <Filter
-            className="size-4 text-[var(--color-text-muted)] shrink-0 mt-0.5"
+            className="size-4 shrink-0"
             aria-hidden="true"
+            style={{ color: 'var(--mkt-ink)', opacity: 0.4 }}
           />
 
           {/* 상태 */}
@@ -470,20 +597,25 @@ export function ResourceListClient({
                 key={s}
                 type="button"
                 onClick={() => toggleStatus(s)}
-                className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium border transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-brand-500)] ${
-                  isActive
-                    ? 'bg-[var(--color-brand-500)] text-white border-transparent'
-                    : 'bg-[var(--color-surface)] text-[var(--color-text-muted)] border-[var(--color-border)] hover:bg-[var(--color-surface-muted)]'
-                }`}
+                style={isActive ? chipActive : chipBase}
+                className="focus-visible:outline-none focus-visible:ring-2"
                 aria-pressed={isActive}
               >
                 {STATUS_STYLE[s]?.label ?? s}
-                <span className="opacity-70">({count})</span>
+                <span style={{ opacity: 0.6 }}>({count})</span>
               </button>
             )
           })}
 
-          <div className="w-px h-5 bg-[var(--color-border)] self-center" role="separator" />
+          <div
+            style={{
+              width: '1px',
+              height: '20px',
+              backgroundColor: 'var(--mkt-hairline)',
+              alignSelf: 'center',
+            }}
+            role="separator"
+          />
 
           {/* 종류 */}
           {ALL_KINDS.filter((k) => (facets.byKind[k] ?? 0) > 0).map((k) => {
@@ -494,20 +626,25 @@ export function ResourceListClient({
                 key={k}
                 type="button"
                 onClick={() => toggleKind(k)}
-                className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium border transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-brand-500)] ${
-                  isActive
-                    ? 'bg-[var(--color-brand-100)] text-[var(--color-brand-700)] border-[var(--color-brand-300)]'
-                    : 'bg-[var(--color-surface)] text-[var(--color-text-muted)] border-[var(--color-border)] hover:bg-[var(--color-surface-muted)]'
-                }`}
+                style={isActive ? chipActive : chipBase}
+                className="focus-visible:outline-none focus-visible:ring-2"
                 aria-pressed={isActive}
               >
                 {KIND_LABELS[k] ?? k}
-                <span className="opacity-70">({count.toLocaleString()})</span>
+                <span style={{ opacity: 0.6 }}>({count.toLocaleString()})</span>
               </button>
             )
           })}
 
-          <div className="w-px h-5 bg-[var(--color-border)] self-center" role="separator" />
+          <div
+            style={{
+              width: '1px',
+              height: '20px',
+              backgroundColor: 'var(--mkt-hairline)',
+              alignSelf: 'center',
+            }}
+            role="separator"
+          />
 
           {/* 저해상도 */}
           <button
@@ -518,11 +655,17 @@ export function ResourceListClient({
               setPageIndex(0)
               void fetchData({ lowDpi: next, page: 0 })
             }}
-            className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium border transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-brand-500)] ${
+            style={
               filterLowDpi === true
-                ? 'bg-amber-100 text-amber-700 border-amber-300'
-                : 'bg-[var(--color-surface)] text-[var(--color-text-muted)] border-[var(--color-border)] hover:bg-[var(--color-surface-muted)]'
-            }`}
+                ? {
+                    ...chipActive,
+                    backgroundColor: 'var(--mkt-block-coral)',
+                    color: 'var(--mkt-ink)',
+                    borderColor: 'transparent',
+                  }
+                : chipBase
+            }
+            className="focus-visible:outline-none focus-visible:ring-2"
             aria-pressed={filterLowDpi === true}
           >
             저해상도만
@@ -531,8 +674,21 @@ export function ResourceListClient({
       </div>
 
       {/* 총 건수 */}
-      <p className="mb-3 text-sm text-[var(--color-text-muted)]">
-        총 <strong className="text-[var(--color-text)]">{totalCount.toLocaleString()}</strong>건
+      <p
+        style={{
+          marginBottom: '12px',
+          fontFamily: 'var(--mkt-font-sans)',
+          fontSize: '14px',
+          fontWeight: 330,
+          color: 'var(--mkt-ink)',
+          opacity: 0.55,
+        }}
+      >
+        총{' '}
+        <strong style={{ fontWeight: 540, opacity: 1, color: 'var(--mkt-ink)' }}>
+          {totalCount.toLocaleString()}
+        </strong>
+        건
       </p>
 
       {/* 테이블 */}
@@ -565,8 +721,27 @@ export function ResourceListClient({
         keyboardNavigation
         emptyState={
           <div className="flex flex-col items-center gap-2 py-8">
-            <p className="font-medium text-[var(--color-text)]">리소스가 없습니다</p>
-            <p className="text-sm text-[var(--color-text-muted)]">
+            <p
+              style={{
+                fontFamily: 'var(--mkt-font-sans)',
+                fontSize: '17px',
+                fontWeight: 540,
+                letterSpacing: '-0.26px',
+                color: 'var(--mkt-ink)',
+                marginBottom: '4px',
+              }}
+            >
+              리소스가 없습니다
+            </p>
+            <p
+              style={{
+                fontFamily: 'var(--mkt-font-sans)',
+                fontSize: '14px',
+                fontWeight: 330,
+                color: 'var(--mkt-ink)',
+                opacity: 0.55,
+              }}
+            >
               필터를 초기화하거나 새 리소스를 업로드하세요.
             </p>
           </div>

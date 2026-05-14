@@ -154,10 +154,6 @@ export function BulkActionBar({ selectedCount, onClear, actions, className }: Bu
           'fixed bottom-6 left-1/2 -translate-x-1/2 z-40',
           'flex items-center gap-3',
           'px-5 py-3',
-          'rounded-[var(--radius-xl)]',
-          'bg-[var(--color-surface-raised)]',
-          'border border-[var(--color-border)]',
-          'shadow-[var(--elevation-e3,0_8px_32px_rgba(0,0,0,0.16))]',
           // 애니메이션
           'transition-all duration-200',
           selectedCount > 0
@@ -165,10 +161,24 @@ export function BulkActionBar({ selectedCount, onClear, actions, className }: Bu
             : 'translate-y-4 opacity-0 pointer-events-none',
           className,
         )}
+        style={{
+          borderRadius: 'var(--mkt-rounded-xl, 20px)',
+          backgroundColor: 'var(--mkt-canvas)',
+          border: '1px solid var(--mkt-hairline)',
+          boxShadow: '0 8px 32px rgba(0,0,0,0.16)',
+        }}
       >
         {/* 선택 정보 */}
         <div className="flex items-center gap-2">
-          <span className="text-sm font-semibold text-[var(--color-text)] whitespace-nowrap">
+          <span
+            className="whitespace-nowrap"
+            style={{
+              fontFamily: 'var(--mkt-font-sans)',
+              fontSize: '14px',
+              fontWeight: 540,
+              color: 'var(--mkt-ink)',
+            }}
+          >
             {selectedCount}개 선택됨
           </span>
           <Button
@@ -177,7 +187,13 @@ export function BulkActionBar({ selectedCount, onClear, actions, className }: Bu
             size="sm"
             onClick={onClear}
             aria-label="선택 해제"
-            className="text-xs text-[var(--color-text-muted)] h-7 px-2"
+            className="h-7 px-2"
+            style={{
+              fontFamily: 'var(--mkt-font-sans)',
+              fontSize: '12px',
+              color: 'var(--mkt-ink)',
+              opacity: 0.5,
+            }}
           >
             해제
           </Button>
@@ -185,7 +201,8 @@ export function BulkActionBar({ selectedCount, onClear, actions, className }: Bu
 
         {/* 구분선 */}
         <div
-          className="w-px h-6 bg-[var(--color-border)] shrink-0"
+          className="w-px h-6 shrink-0"
+          style={{ backgroundColor: 'var(--mkt-hairline)' }}
           role="separator"
           aria-orientation="vertical"
         />

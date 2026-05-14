@@ -17,12 +17,12 @@ import type { AuditListResponse, AuditLogRow } from '../../api/audit/route'
 
 // ─── 배지 스타일 ──────────────────────────────────────────────────────────────
 
-const ACTION_STYLE: Record<string, { label: string; className: string }> = {
-  create: { label: '생성', className: 'bg-green-100 text-green-700' },
-  update: { label: '수정', className: 'bg-blue-100 text-blue-700' },
-  delete: { label: '삭제', className: 'bg-red-100 text-red-700' },
-  publish: { label: '게시', className: 'bg-green-100 text-green-700' },
-  reject: { label: '거절', className: 'bg-orange-100 text-orange-700' },
+const ACTION_BADGE_COLORS: Record<string, { bg: string; label: string }> = {
+  create: { label: '생성', bg: 'var(--mkt-block-mint)' },
+  update: { label: '수정', bg: 'var(--mkt-block-cream)' },
+  delete: { label: '삭제', bg: 'var(--mkt-block-pink)' },
+  publish: { label: '게시', bg: 'var(--mkt-block-lime)' },
+  reject: { label: '거절', bg: 'var(--mkt-block-coral)' },
 }
 
 const ENTITY_TYPE_LABELS: Record<string, string> = {
@@ -34,12 +34,21 @@ const ENTITY_TYPE_LABELS: Record<string, string> = {
 }
 
 function ActionBadge({ action }: { action: string }) {
-  const style = ACTION_STYLE[action] ?? { label: action, className: 'bg-gray-100 text-gray-700' }
+  const badge = ACTION_BADGE_COLORS[action] ?? { label: action, bg: 'var(--mkt-surface-soft)' }
   return (
     <span
-      className={`inline-flex items-center px-2 py-0.5 text-xs font-medium rounded-full ${style.className}`}
+      style={{
+        display: 'inline-flex',
+        alignItems: 'center',
+        padding: '2px 8px',
+        borderRadius: 'var(--mkt-rounded-full)',
+        backgroundColor: badge.bg,
+        fontFamily: 'var(--mkt-font-mono)',
+        fontSize: '11px',
+        color: 'var(--mkt-ink)',
+      }}
     >
-      {style.label}
+      {badge.label}
     </span>
   )
 }
@@ -73,7 +82,8 @@ function makeSummary(row: AuditLogRow): string {
     const fields = Object.keys(diff).join(', ')
     return `${label} (${fields} 변경)`
   }
-  if (meta['name']) return `"${meta['name']}" ${ACTION_STYLE[row.action]?.label ?? row.action}`
+  const actionLabel = ACTION_BADGE_COLORS[row.action]?.label ?? row.action
+  if (meta['name']) return `"${meta['name']}" ${actionLabel}`
   return label
 }
 
@@ -200,7 +210,8 @@ export function AuditListClient({ initialData, initialTotalCount }: AuditListCli
               e.stopPropagation()
               setExpandedId(isExpanded ? null : row.original.id)
             }}
-            className="p-1 rounded-[var(--radius-sm)] text-[var(--color-text-muted)] hover:text-[var(--color-text)] hover:bg-[var(--color-surface-muted)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-brand-500)]"
+            className="p-1 rounded focus-visible:outline-none focus-visible:ring-2"
+            style={{ color: 'var(--mkt-ink)', opacity: 0.5 }}
             aria-label={isExpanded ? '접기' : '펼치기'}
             aria-expanded={isExpanded}
           >
@@ -221,7 +232,13 @@ export function AuditListClient({ initialData, initialTotalCount }: AuditListCli
       meta: { mobileLabel: '시각' },
       cell: ({ row }) => (
         <span
-          className="text-[var(--color-text-muted)] text-xs whitespace-nowrap"
+          style={{
+            fontFamily: 'var(--mkt-font-mono)',
+            fontSize: '11px',
+            color: 'var(--mkt-ink)',
+            opacity: 0.55,
+            whiteSpace: 'nowrap',
+          }}
           title={new Date(row.original.createdAt).toLocaleString('ko-KR')}
         >
           {relativeTime(row.original.createdAt)}
@@ -239,7 +256,14 @@ export function AuditListClient({ initialData, initialTotalCount }: AuditListCli
             ? 'system'
             : (row.original.actorEmail ?? row.original.actorId)
         return (
-          <span className="text-sm font-mono text-[var(--color-text)] truncate max-w-[10rem] block">
+          <span
+            className="truncate max-w-[10rem] block"
+            style={{
+              fontFamily: 'var(--mkt-font-mono)',
+              fontSize: '12px',
+              color: 'var(--mkt-ink)',
+            }}
+          >
             {label}
           </span>
         )
@@ -265,11 +289,18 @@ export function AuditListClient({ initialData, initialTotalCount }: AuditListCli
             : row.original.entityId
         return (
           <span
-            className="text-sm text-[var(--color-text)]"
+            style={{
+              fontFamily: 'var(--mkt-font-sans)',
+              fontSize: '13px',
+              color: 'var(--mkt-ink)',
+            }}
             title={`${et}:${row.original.entityId}`}
           >
-            <span className="font-medium">{et}</span>
-            <span className="text-[var(--color-text-muted)]"> {shortId}</span>
+            <span style={{ fontWeight: 540 }}>{et}</span>
+            <span style={{ opacity: 0.5, fontFamily: 'var(--mkt-font-mono)', fontSize: '11px' }}>
+              {' '}
+              {shortId}
+            </span>
           </span>
         )
       },
@@ -280,7 +311,15 @@ export function AuditListClient({ initialData, initialTotalCount }: AuditListCli
       enableSorting: false,
       meta: { mobileLabel: '요약' },
       cell: ({ row }) => (
-        <span className="text-sm text-[var(--color-text-muted)] truncate max-w-[14rem] block">
+        <span
+          className="truncate max-w-[14rem] block"
+          style={{
+            fontFamily: 'var(--mkt-font-sans)',
+            fontSize: '13px',
+            color: 'var(--mkt-ink)',
+            opacity: 0.55,
+          }}
+        >
           {makeSummary(row.original)}
         </span>
       ),
@@ -293,6 +332,24 @@ export function AuditListClient({ initialData, initialTotalCount }: AuditListCli
     filter.actions.length +
     (filter.preset !== 'all' ? 1 : 0) +
     (filter.search ? 1 : 0)
+
+  // ── 사이드바 버튼 스타일 헬퍼 ──
+  const sidebarBtnStyle = (isActive: boolean): React.CSSProperties => ({
+    display: 'block',
+    width: '100%',
+    textAlign: 'left',
+    padding: '5px 8px',
+    borderRadius: 'var(--mkt-rounded-sm)',
+    fontFamily: 'var(--mkt-font-sans)',
+    fontSize: '13px',
+    fontWeight: isActive ? 540 : 330,
+    color: 'var(--mkt-ink)',
+    backgroundColor: isActive ? 'var(--mkt-block-lime)' : 'transparent',
+    border: 'none',
+    cursor: 'pointer',
+    transition: 'background-color 100ms ease',
+    opacity: isActive ? 1 : 0.7,
+  })
 
   return (
     <div className="p-6 lg:p-10" style={{ fontFamily: 'var(--mkt-font-sans)' }}>
@@ -341,18 +398,36 @@ export function AuditListClient({ initialData, initialTotalCount }: AuditListCli
       <div className="flex flex-col lg:flex-row gap-6">
         {/* ── 필터 사이드바 ── */}
         <aside className="w-full lg:w-56 shrink-0" aria-label="감사 로그 필터">
-          <div className="rounded-[var(--radius-lg)] border border-[var(--color-border)] bg-[var(--color-surface)] p-4 flex flex-col gap-4">
+          <div
+            className="flex flex-col gap-4 p-4"
+            style={{
+              borderRadius: 'var(--mkt-rounded-lg)',
+              border: '1px solid var(--mkt-hairline)',
+              backgroundColor: 'var(--mkt-canvas)',
+            }}
+          >
             {/* 검색 */}
             <div>
               <label
                 htmlFor="audit-search"
-                className="block text-xs font-semibold text-[var(--color-text-muted)] mb-1 uppercase tracking-wide"
+                style={{
+                  display: 'block',
+                  fontFamily: 'var(--mkt-font-mono)',
+                  fontSize: '10px',
+                  fontWeight: 400,
+                  letterSpacing: '0.6px',
+                  textTransform: 'uppercase',
+                  color: 'var(--mkt-ink)',
+                  opacity: 0.4,
+                  marginBottom: '6px',
+                }}
               >
                 검색
               </label>
               <div className="relative">
                 <Search
-                  className="absolute left-2.5 top-1/2 -translate-y-1/2 size-3.5 text-[var(--color-text-muted)]"
+                  className="absolute left-2.5 top-1/2 -translate-y-1/2 size-3.5"
+                  style={{ color: 'var(--mkt-ink)', opacity: 0.35 }}
                   aria-hidden="true"
                 />
                 <input
@@ -361,17 +436,40 @@ export function AuditListClient({ initialData, initialTotalCount }: AuditListCli
                   placeholder="entityId / 내용..."
                   defaultValue={filter.search}
                   onChange={(e) => handleSearchChange(e.target.value)}
-                  className="w-full rounded-[var(--radius-md)] border border-[var(--color-border)] bg-[var(--color-surface-muted)] pl-8 pr-3 py-1.5 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-brand-500)]"
+                  style={{
+                    width: '100%',
+                    height: '36px',
+                    borderRadius: 'var(--mkt-rounded-md)',
+                    border: '1px solid var(--mkt-hairline)',
+                    backgroundColor: 'var(--mkt-surface-soft)',
+                    paddingLeft: '32px',
+                    paddingRight: '12px',
+                    fontFamily: 'var(--mkt-font-sans)',
+                    fontSize: '13px',
+                    color: 'var(--mkt-ink)',
+                    outline: 'none',
+                  }}
                 />
               </div>
             </div>
 
             {/* 날짜 프리셋 */}
             <div>
-              <div className="text-xs font-semibold text-[var(--color-text-muted)] mb-2 uppercase tracking-wide">
+              <div
+                style={{
+                  fontFamily: 'var(--mkt-font-mono)',
+                  fontSize: '10px',
+                  fontWeight: 400,
+                  letterSpacing: '0.6px',
+                  textTransform: 'uppercase',
+                  color: 'var(--mkt-ink)',
+                  opacity: 0.4,
+                  marginBottom: '6px',
+                }}
+              >
                 기간
               </div>
-              <div className="flex flex-col gap-1">
+              <div className="flex flex-col gap-0.5">
                 {(Object.keys(PRESET_LABELS) as FilterState['preset'][]).map((preset) => (
                   <button
                     key={preset}
@@ -380,11 +478,7 @@ export function AuditListClient({ initialData, initialTotalCount }: AuditListCli
                       setPageIndex(0)
                       setFilter((prev) => ({ ...prev, preset }))
                     }}
-                    className={`text-left text-sm px-2 py-1 rounded-[var(--radius-sm)] transition-colors ${
-                      filter.preset === preset
-                        ? 'bg-[var(--color-brand-100)] text-[var(--color-brand-700)] font-medium'
-                        : 'text-[var(--color-text-muted)] hover:bg-[var(--color-surface-muted)]'
-                    }`}
+                    style={sidebarBtnStyle(filter.preset === preset)}
                     aria-pressed={filter.preset === preset}
                   >
                     {PRESET_LABELS[preset]}
@@ -395,10 +489,21 @@ export function AuditListClient({ initialData, initialTotalCount }: AuditListCli
 
             {/* entityType */}
             <div>
-              <div className="text-xs font-semibold text-[var(--color-text-muted)] mb-2 uppercase tracking-wide">
+              <div
+                style={{
+                  fontFamily: 'var(--mkt-font-mono)',
+                  fontSize: '10px',
+                  fontWeight: 400,
+                  letterSpacing: '0.6px',
+                  textTransform: 'uppercase',
+                  color: 'var(--mkt-ink)',
+                  opacity: 0.4,
+                  marginBottom: '6px',
+                }}
+              >
                 대상 유형
               </div>
-              <div className="flex flex-col gap-1">
+              <div className="flex flex-col gap-0.5">
                 {['format', 'resource', 'template', 'templateset', 'user'].map((et) => {
                   const isActive = filter.entityTypes.includes(et)
                   return (
@@ -412,11 +517,7 @@ export function AuditListClient({ initialData, initialTotalCount }: AuditListCli
                           entityTypes: toggleItem(prev.entityTypes, et),
                         }))
                       }}
-                      className={`text-left text-sm px-2 py-1 rounded-[var(--radius-sm)] transition-colors ${
-                        isActive
-                          ? 'bg-[var(--color-brand-100)] text-[var(--color-brand-700)] font-medium'
-                          : 'text-[var(--color-text-muted)] hover:bg-[var(--color-surface-muted)]'
-                      }`}
+                      style={sidebarBtnStyle(isActive)}
                       aria-pressed={isActive}
                     >
                       {ENTITY_TYPE_LABELS[et] ?? et}
@@ -428,13 +529,24 @@ export function AuditListClient({ initialData, initialTotalCount }: AuditListCli
 
             {/* action */}
             <div>
-              <div className="text-xs font-semibold text-[var(--color-text-muted)] mb-2 uppercase tracking-wide">
+              <div
+                style={{
+                  fontFamily: 'var(--mkt-font-mono)',
+                  fontSize: '10px',
+                  fontWeight: 400,
+                  letterSpacing: '0.6px',
+                  textTransform: 'uppercase',
+                  color: 'var(--mkt-ink)',
+                  opacity: 0.4,
+                  marginBottom: '6px',
+                }}
+              >
                 액션
               </div>
-              <div className="flex flex-col gap-1">
+              <div className="flex flex-col gap-0.5">
                 {['create', 'update', 'delete', 'publish', 'reject'].map((action) => {
                   const isActive = filter.actions.includes(action)
-                  const style = ACTION_STYLE[action]
+                  const badge = ACTION_BADGE_COLORS[action]
                   return (
                     <button
                       key={action}
@@ -446,17 +558,22 @@ export function AuditListClient({ initialData, initialTotalCount }: AuditListCli
                           actions: toggleItem(prev.actions, action),
                         }))
                       }}
-                      className={`text-left text-sm px-2 py-1 rounded-[var(--radius-sm)] transition-colors flex items-center gap-2 ${
-                        isActive
-                          ? 'bg-[var(--color-brand-100)] text-[var(--color-brand-700)] font-medium'
-                          : 'text-[var(--color-text-muted)] hover:bg-[var(--color-surface-muted)]'
-                      }`}
+                      className="flex items-center gap-2"
+                      style={sidebarBtnStyle(isActive)}
                       aria-pressed={isActive}
                     >
                       <span
-                        className={`inline-flex px-1.5 py-0.5 text-xs rounded-full ${style?.className ?? 'bg-gray-100 text-gray-700'}`}
+                        style={{
+                          display: 'inline-flex',
+                          padding: '1px 6px',
+                          borderRadius: 'var(--mkt-rounded-full)',
+                          backgroundColor: badge?.bg ?? 'var(--mkt-surface-soft)',
+                          fontFamily: 'var(--mkt-font-mono)',
+                          fontSize: '10px',
+                          color: 'var(--mkt-ink)',
+                        }}
                       >
-                        {style?.label ?? action}
+                        {badge?.label ?? action}
                       </span>
                     </button>
                   )
@@ -472,7 +589,17 @@ export function AuditListClient({ initialData, initialTotalCount }: AuditListCli
                   setPageIndex(0)
                   setFilter(INITIAL_FILTER)
                 }}
-                className="flex items-center gap-1.5 text-xs text-[var(--color-text-muted)] hover:text-[var(--color-text)] transition-colors"
+                className="flex items-center gap-1.5"
+                style={{
+                  fontFamily: 'var(--mkt-font-mono)',
+                  fontSize: '11px',
+                  color: 'var(--mkt-ink)',
+                  opacity: 0.5,
+                  background: 'none',
+                  border: 'none',
+                  cursor: 'pointer',
+                  padding: 0,
+                }}
                 aria-label="필터 초기화"
               >
                 <X className="size-3.5" aria-hidden="true" />
@@ -485,12 +612,16 @@ export function AuditListClient({ initialData, initialTotalCount }: AuditListCli
         {/* ── 본문 ── */}
         <div className="flex-1 min-w-0">
           {/* 총 건수 */}
-          <div className="mb-3 text-sm text-[var(--color-text-muted)]">
-            총{' '}
-            <span className="font-medium text-[var(--color-text)]">
-              {totalCount.toLocaleString()}
-            </span>
-            건
+          <div
+            className="mb-3"
+            style={{
+              fontFamily: 'var(--mkt-font-sans)',
+              fontSize: '13px',
+              color: 'var(--mkt-ink)',
+              opacity: 0.55,
+            }}
+          >
+            총 <span style={{ fontWeight: 540, opacity: 1 }}>{totalCount.toLocaleString()}</span>건
           </div>
 
           <DataTable
@@ -514,8 +645,26 @@ export function AuditListClient({ initialData, initialTotalCount }: AuditListCli
             keyboardNavigation
             emptyState={
               <div className="flex flex-col items-center gap-2 py-8">
-                <p className="font-medium text-[var(--color-text)]">감사 로그가 없습니다</p>
-                <p className="text-sm text-[var(--color-text-muted)]">
+                <p
+                  style={{
+                    fontFamily: 'var(--mkt-font-sans)',
+                    fontSize: '14px',
+                    fontWeight: 540,
+                    color: 'var(--mkt-ink)',
+                    opacity: 0.55,
+                  }}
+                >
+                  감사 로그가 없습니다
+                </p>
+                <p
+                  style={{
+                    fontFamily: 'var(--mkt-font-sans)',
+                    fontSize: '13px',
+                    fontWeight: 330,
+                    color: 'var(--mkt-ink)',
+                    opacity: 0.4,
+                  }}
+                >
                   필터 조건을 변경하거나 초기화해 보세요.
                 </p>
               </div>
@@ -534,21 +683,46 @@ export function AuditListClient({ initialData, initialTotalCount }: AuditListCli
               return (
                 <div
                   key={expandedId}
-                  className="mt-3 rounded-[var(--radius-lg)] border border-[var(--color-border)] bg-[var(--color-surface)] p-4"
+                  className="mt-3 p-4"
+                  style={{
+                    borderRadius: 'var(--mkt-rounded-lg)',
+                    border: '1px solid var(--mkt-hairline)',
+                    backgroundColor: 'var(--mkt-canvas)',
+                  }}
                   role="region"
                   aria-label={`${row.entityType}:${row.entityId} 변경 상세`}
                 >
                   <div className="flex items-center justify-between mb-3">
-                    <div className="text-sm font-semibold text-[var(--color-text)]">
+                    <div
+                      style={{
+                        fontFamily: 'var(--mkt-font-sans)',
+                        fontSize: '13px',
+                        fontWeight: 540,
+                        color: 'var(--mkt-ink)',
+                      }}
+                    >
                       변경 상세 —{' '}
-                      <span className="font-mono text-xs text-[var(--color-text-muted)]">
+                      <span
+                        style={{
+                          fontFamily: 'var(--mkt-font-mono)',
+                          fontSize: '11px',
+                          opacity: 0.55,
+                        }}
+                      >
                         {row.target}
                       </span>
                     </div>
                     <button
                       type="button"
                       onClick={() => setExpandedId(null)}
-                      className="text-[var(--color-text-muted)] hover:text-[var(--color-text)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-brand-500)] rounded-[var(--radius-sm)] p-1"
+                      className="rounded focus-visible:outline-none focus-visible:ring-2 p-1"
+                      style={{
+                        color: 'var(--mkt-ink)',
+                        opacity: 0.4,
+                        border: 'none',
+                        background: 'none',
+                        cursor: 'pointer',
+                      }}
                       aria-label="닫기"
                     >
                       <X className="size-4" aria-hidden="true" />

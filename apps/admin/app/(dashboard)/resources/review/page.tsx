@@ -50,19 +50,64 @@ export default async function ResourceReviewPage() {
   }))
 
   return (
-    <div className="p-6 lg:p-8">
-      <div className="mb-6 flex items-center justify-between gap-4">
+    <div className="p-6 lg:p-10" style={{ fontFamily: 'var(--mkt-font-sans)' }}>
+      {/* 헤더 */}
+      <div className="mb-8 flex items-start justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-[var(--color-text)]">검수 큐</h1>
-          <p className="mt-1 text-sm text-[var(--color-text-muted)]">
-            게시 대기 중인 리소스를 검수합니다. (총 {totalPending.toLocaleString()}건)
+          <p
+            style={{
+              fontFamily: 'var(--mkt-font-mono)',
+              fontSize: '11px',
+              fontWeight: 400,
+              letterSpacing: '0.6px',
+              textTransform: 'uppercase',
+              color: 'var(--mkt-ink)',
+              opacity: 0.4,
+              marginBottom: '6px',
+            }}
+          >
+            Admin / 리소스 / 검수
+          </p>
+          <h1
+            style={{
+              fontFamily: 'var(--mkt-font-sans)',
+              fontSize: 'clamp(24px, 3.5vw, 32px)',
+              fontWeight: 340,
+              lineHeight: 1.1,
+              letterSpacing: '-0.96px',
+              color: 'var(--mkt-ink)',
+              marginBottom: '6px',
+            }}
+          >
+            검수 큐
+          </h1>
+          <p
+            style={{
+              fontFamily: 'var(--mkt-font-sans)',
+              fontSize: '15px',
+              fontWeight: 330,
+              color: 'var(--mkt-ink)',
+              opacity: 0.55,
+            }}
+          >
+            게시 대기 중인 리소스를 검수합니다. (총{' '}
+            <strong style={{ fontWeight: 540, opacity: 1 }}>{totalPending.toLocaleString()}</strong>
+            건)
           </p>
         </div>
         <Link
           href="/resources"
-          className="text-sm text-[var(--color-text-muted)] hover:text-[var(--color-text)] underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-brand-500)] rounded"
+          style={{
+            fontFamily: 'var(--mkt-font-sans)',
+            fontSize: '14px',
+            fontWeight: 330,
+            color: 'var(--mkt-ink)',
+            opacity: 0.5,
+            textDecoration: 'none',
+          }}
+          className="focus-visible:outline-none focus-visible:ring-2 rounded mt-1"
         >
-          목록으로 돌아가기
+          ← 목록으로
         </Link>
       </div>
 

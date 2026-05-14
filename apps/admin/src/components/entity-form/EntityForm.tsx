@@ -148,26 +148,27 @@ function FieldWidget({
             aria-describedby={descId}
             onBlur={onBlur}
             onClick={() => onChange(!value)}
-            className={cn(
-              'relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full',
-              'border-2 border-transparent transition-colors duration-[var(--duration-fast)]',
-              'focus-visible:outline-none focus-visible:ring-2',
-              'focus-visible:ring-[var(--color-brand-500)] focus-visible:ring-offset-2',
-              'focus-visible:ring-offset-[var(--color-surface)]',
-              value ? 'bg-[var(--color-brand-500)]' : 'bg-[var(--color-surface-muted)]',
-            )}
+            className="relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2"
+            style={{ backgroundColor: value ? 'var(--mkt-ink)' : 'var(--mkt-surface-soft)' }}
           >
             <span
               aria-hidden="true"
               className={cn(
                 'pointer-events-none inline-block size-5 rounded-full',
-                'bg-white shadow-sm ring-0',
-                'transition-transform duration-[var(--duration-fast)]',
+                'bg-white shadow-sm ring-0 transition-transform',
                 value ? 'translate-x-5' : 'translate-x-0',
               )}
             />
           </button>
-          <label htmlFor={fieldId} className="text-sm font-medium text-[var(--color-text)]">
+          <label
+            htmlFor={fieldId}
+            style={{
+              fontFamily: 'var(--mkt-font-sans)',
+              fontSize: '14px',
+              fontWeight: 330,
+              color: 'var(--mkt-ink)',
+            }}
+          >
             {label}
           </label>
         </div>
@@ -175,10 +176,12 @@ function FieldWidget({
           <p
             id={descId}
             role={error ? 'alert' : undefined}
-            className={cn(
-              'text-xs',
-              error ? 'text-[var(--color-error-500)]' : 'text-[var(--color-text-muted)]',
-            )}
+            style={{
+              fontFamily: 'var(--mkt-font-sans)',
+              fontSize: '12px',
+              color: error ? '#dc2626' : 'var(--mkt-ink)',
+              opacity: error ? 1 : 0.55,
+            }}
           >
             {error ?? meta.helpText}
           </p>
@@ -190,7 +193,18 @@ function FieldWidget({
   if (widget === 'textarea') {
     return (
       <div className="flex flex-col gap-1.5">
-        <label htmlFor={fieldId} className="text-sm font-medium text-[var(--color-text)]">
+        <label
+          htmlFor={fieldId}
+          style={{
+            fontFamily: 'var(--mkt-font-mono)',
+            fontSize: '11px',
+            fontWeight: 400,
+            letterSpacing: '0.6px',
+            textTransform: 'uppercase',
+            color: 'var(--mkt-ink)',
+            opacity: 0.55,
+          }}
+        >
           {label}
         </label>
         <textarea
@@ -198,28 +212,28 @@ function FieldWidget({
           value={String(value ?? '')}
           onChange={(e) => onChange(e.target.value)}
           rows={4}
-          className={cn(
-            'flex w-full min-h-[7rem]',
-            'rounded-[var(--radius-md)] border bg-[var(--color-surface)]',
-            'px-3 py-2 text-base text-[var(--color-text)]',
-            'placeholder:text-[var(--color-text-disabled)]',
-            'transition-colors duration-[var(--duration-fast)]',
-            'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2',
-            'focus-visible:ring-[var(--color-brand-500)] focus-visible:ring-offset-[var(--color-surface)]',
-            'disabled:cursor-not-allowed disabled:opacity-50 resize-y',
-            error
-              ? 'border-[var(--color-error-500)] focus-visible:ring-[var(--color-error-500)]'
-              : 'border-[var(--color-border)]',
-          )}
+          className="flex w-full min-h-[7rem] focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50 resize-y"
+          style={{
+            borderRadius: 'var(--mkt-rounded-md)',
+            border: error ? '1px solid #dc2626' : '1px solid var(--mkt-hairline)',
+            backgroundColor: 'var(--mkt-canvas)',
+            padding: '8px 12px',
+            fontFamily: 'var(--mkt-font-sans)',
+            fontSize: '14px',
+            fontWeight: 330,
+            color: 'var(--mkt-ink)',
+          }}
         />
         {(error ?? meta.helpText) && (
           <p
             id={descId}
             role={error ? 'alert' : undefined}
-            className={cn(
-              'text-xs',
-              error ? 'text-[var(--color-error-500)]' : 'text-[var(--color-text-muted)]',
-            )}
+            style={{
+              fontFamily: 'var(--mkt-font-sans)',
+              fontSize: '12px',
+              color: error ? '#dc2626' : 'var(--mkt-ink)',
+              opacity: error ? 1 : 0.55,
+            }}
           >
             {error ?? meta.helpText}
           </p>
@@ -231,25 +245,36 @@ function FieldWidget({
   if (widget === 'select') {
     return (
       <div className="flex flex-col gap-1.5">
-        <label htmlFor={fieldId} className="text-sm font-medium text-[var(--color-text)]">
+        <label
+          htmlFor={fieldId}
+          style={{
+            fontFamily: 'var(--mkt-font-mono)',
+            fontSize: '11px',
+            fontWeight: 400,
+            letterSpacing: '0.6px',
+            textTransform: 'uppercase',
+            color: 'var(--mkt-ink)',
+            opacity: 0.55,
+          }}
+        >
           {label}
         </label>
         <select
           {...commonInputProps}
           value={String(value ?? '')}
           onChange={(e) => onChange(e.target.value)}
-          className={cn(
-            'flex w-full h-11',
-            'rounded-[var(--radius-md)] border bg-[var(--color-surface)]',
-            'px-3 py-2 text-base text-[var(--color-text)]',
-            'transition-colors duration-[var(--duration-fast)]',
-            'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2',
-            'focus-visible:ring-[var(--color-brand-500)] focus-visible:ring-offset-[var(--color-surface)]',
-            'disabled:cursor-not-allowed disabled:opacity-50',
-            error
-              ? 'border-[var(--color-error-500)] focus-visible:ring-[var(--color-error-500)]'
-              : 'border-[var(--color-border)]',
-          )}
+          className="flex w-full focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50"
+          style={{
+            height: '44px',
+            borderRadius: 'var(--mkt-rounded-md)',
+            border: error ? '1px solid #dc2626' : '1px solid var(--mkt-hairline)',
+            backgroundColor: 'var(--mkt-canvas)',
+            padding: '0 12px',
+            fontFamily: 'var(--mkt-font-sans)',
+            fontSize: '14px',
+            fontWeight: 330,
+            color: 'var(--mkt-ink)',
+          }}
         >
           {!value && <option value="">선택하세요</option>}
           {(meta.options ?? []).map((opt) => (
@@ -262,10 +287,12 @@ function FieldWidget({
           <p
             id={descId}
             role={error ? 'alert' : undefined}
-            className={cn(
-              'text-xs',
-              error ? 'text-[var(--color-error-500)]' : 'text-[var(--color-text-muted)]',
-            )}
+            style={{
+              fontFamily: 'var(--mkt-font-sans)',
+              fontSize: '12px',
+              color: error ? '#dc2626' : 'var(--mkt-ink)',
+              opacity: error ? 1 : 0.55,
+            }}
           >
             {error ?? meta.helpText}
           </p>
@@ -292,31 +319,45 @@ function FieldWidget({
 
     return (
       <div className="flex flex-col gap-1.5">
-        <label htmlFor={fieldId} className="text-sm font-medium text-[var(--color-text)]">
+        <label
+          htmlFor={fieldId}
+          style={{
+            fontFamily: 'var(--mkt-font-mono)',
+            fontSize: '11px',
+            fontWeight: 400,
+            letterSpacing: '0.6px',
+            textTransform: 'uppercase',
+            color: 'var(--mkt-ink)',
+            opacity: 0.55,
+          }}
+        >
           {label}
         </label>
         <div
-          className={cn(
-            'flex flex-wrap gap-1.5 min-h-[2.75rem]',
-            'rounded-[var(--radius-md)] border bg-[var(--color-surface)]',
-            'px-3 py-2',
-            'transition-colors duration-[var(--duration-fast)]',
-            'focus-within:ring-2 focus-within:ring-offset-2',
-            'focus-within:ring-[var(--color-brand-500)] focus-within:ring-offset-[var(--color-surface)]',
-            error ? 'border-[var(--color-error-500)]' : 'border-[var(--color-border)]',
-          )}
+          className="flex flex-wrap gap-1.5 min-h-[2.75rem] px-3 py-2 focus-within:ring-2 focus-within:ring-offset-2"
+          style={{
+            borderRadius: 'var(--mkt-rounded-md)',
+            border: error ? '1px solid #dc2626' : '1px solid var(--mkt-hairline)',
+            backgroundColor: 'var(--mkt-canvas)',
+          }}
         >
           {tags.map((tag) => (
             <span
               key={tag}
-              className="inline-flex items-center gap-1 px-2 py-0.5 text-xs rounded-full bg-[var(--color-brand-100)] text-[var(--color-brand-700)]"
+              className="inline-flex items-center gap-1 px-2 py-0.5 text-xs rounded-full"
+              style={{
+                backgroundColor: 'var(--mkt-block-lime)',
+                color: 'var(--mkt-ink)',
+                fontFamily: 'var(--mkt-font-mono)',
+              }}
             >
               {tag}
               <button
                 type="button"
                 onClick={() => removeTag(tag)}
                 aria-label={`태그 ${tag} 삭제`}
-                className="text-[var(--color-brand-500)] hover:text-[var(--color-brand-700)] focus-visible:outline-none"
+                className="focus-visible:outline-none"
+                style={{ color: 'var(--mkt-ink)', opacity: 0.6 }}
               >
                 ×
               </button>
@@ -340,17 +381,24 @@ function FieldWidget({
               }
             }}
             placeholder={tags.length === 0 ? placeholder || '태그 입력 후 Enter' : ''}
-            className="flex-1 min-w-[4rem] bg-transparent text-sm text-[var(--color-text)] placeholder:text-[var(--color-text-disabled)] focus:outline-none"
+            className="flex-1 min-w-[4rem] bg-transparent focus:outline-none"
+            style={{
+              fontFamily: 'var(--mkt-font-sans)',
+              fontSize: '14px',
+              color: 'var(--mkt-ink)',
+            }}
           />
         </div>
         {(error ?? meta.helpText) && (
           <p
             id={descId}
             role={error ? 'alert' : undefined}
-            className={cn(
-              'text-xs',
-              error ? 'text-[var(--color-error-500)]' : 'text-[var(--color-text-muted)]',
-            )}
+            style={{
+              fontFamily: 'var(--mkt-font-sans)',
+              fontSize: '12px',
+              color: error ? '#dc2626' : 'var(--mkt-ink)',
+              opacity: error ? 1 : 0.55,
+            }}
           >
             {error ?? meta.helpText}
           </p>
@@ -362,7 +410,18 @@ function FieldWidget({
   if (widget === 'colorPicker') {
     return (
       <div className="flex flex-col gap-1.5">
-        <label htmlFor={fieldId} className="text-sm font-medium text-[var(--color-text)]">
+        <label
+          htmlFor={fieldId}
+          style={{
+            fontFamily: 'var(--mkt-font-mono)',
+            fontSize: '11px',
+            fontWeight: 400,
+            letterSpacing: '0.6px',
+            textTransform: 'uppercase',
+            color: 'var(--mkt-ink)',
+            opacity: 0.55,
+          }}
+        >
           {label}
         </label>
         <div className="flex items-center gap-3">
@@ -371,22 +430,33 @@ function FieldWidget({
             type="color"
             value={String(value ?? '#000000')}
             onChange={(e) => onChange(e.target.value)}
-            className={cn(
-              'h-11 w-20 rounded-[var(--radius-md)] border cursor-pointer',
-              'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-brand-500)]',
-              error ? 'border-[var(--color-error-500)]' : 'border-[var(--color-border)]',
-            )}
+            className="h-11 w-20 cursor-pointer focus-visible:outline-none focus-visible:ring-2"
+            style={{
+              borderRadius: 'var(--mkt-rounded-md)',
+              border: error ? '1px solid #dc2626' : '1px solid var(--mkt-hairline)',
+            }}
           />
-          <span className="text-sm text-[var(--color-text-muted)]">{String(value ?? '')}</span>
+          <span
+            style={{
+              fontFamily: 'var(--mkt-font-mono)',
+              fontSize: '12px',
+              color: 'var(--mkt-ink)',
+              opacity: 0.55,
+            }}
+          >
+            {String(value ?? '')}
+          </span>
         </div>
         {(error ?? meta.helpText) && (
           <p
             id={descId}
             role={error ? 'alert' : undefined}
-            className={cn(
-              'text-xs',
-              error ? 'text-[var(--color-error-500)]' : 'text-[var(--color-text-muted)]',
-            )}
+            style={{
+              fontFamily: 'var(--mkt-font-sans)',
+              fontSize: '12px',
+              color: error ? '#dc2626' : 'var(--mkt-ink)',
+              opacity: error ? 1 : 0.55,
+            }}
           >
             {error ?? meta.helpText}
           </p>

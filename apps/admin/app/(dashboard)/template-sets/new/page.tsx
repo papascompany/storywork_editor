@@ -187,11 +187,19 @@ export default function NewTemplateSetPage() {
       <form onSubmit={handleSubmit} className="flex flex-col gap-6">
         {/* 이름 */}
         <div className="flex flex-col gap-1.5">
-          <label htmlFor="set-name" className="text-sm font-medium text-[var(--color-text)]">
-            세트 이름{' '}
-            <span aria-hidden="true" className="text-red-500">
-              *
-            </span>
+          <label
+            htmlFor="set-name"
+            style={{
+              fontFamily: 'var(--mkt-font-mono)',
+              fontSize: '11px',
+              fontWeight: 400,
+              letterSpacing: '0.6px',
+              textTransform: 'uppercase',
+              color: 'var(--mkt-ink)',
+              opacity: 0.55,
+            }}
+          >
+            세트 이름 <span aria-hidden="true">*</span>
           </label>
           <input
             id="set-name"
@@ -203,30 +211,59 @@ export default function NewTemplateSetPage() {
             maxLength={50}
             placeholder="예: 로맨스 코믹 기본 세트"
             autoFocus
-            className="rounded-[var(--radius-md)] border border-[var(--color-border)] bg-[var(--color-surface)] px-3 py-2 text-sm text-[var(--color-text)] placeholder:text-[var(--color-text-disabled)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-brand-500)]"
+            style={{
+              height: '44px',
+              borderRadius: 'var(--mkt-rounded-md)',
+              border: '1px solid var(--mkt-hairline)',
+              backgroundColor: 'var(--mkt-canvas)',
+              padding: '0 12px',
+              fontFamily: 'var(--mkt-font-sans)',
+              fontSize: '14px',
+              fontWeight: 330,
+              color: 'var(--mkt-ink)',
+              outline: 'none',
+            }}
           />
         </div>
 
         {/* 템플릿 선택 */}
         <div className="flex flex-col gap-2">
-          <span className="text-sm font-medium text-[var(--color-text)]">
-            템플릿 선택{' '}
-            <span aria-hidden="true" className="text-red-500">
-              *
-            </span>
-            <span className="ml-2 text-xs text-[var(--color-text-muted)] font-normal">
-              (선택됨 {selectedIds.length}개)
-            </span>
+          <span
+            style={{
+              fontFamily: 'var(--mkt-font-mono)',
+              fontSize: '11px',
+              fontWeight: 400,
+              letterSpacing: '0.6px',
+              textTransform: 'uppercase',
+              color: 'var(--mkt-ink)',
+              opacity: 0.55,
+            }}
+          >
+            템플릿 선택 <span aria-hidden="true">*</span>
+            <span style={{ marginLeft: '8px', opacity: 0.7 }}>(선택됨 {selectedIds.length}개)</span>
           </span>
           {templates.length === 0 && (
-            <p className="text-sm text-[var(--color-text-muted)]">
+            <p
+              style={{
+                fontFamily: 'var(--mkt-font-sans)',
+                fontSize: '13px',
+                color: 'var(--mkt-ink)',
+                opacity: 0.55,
+              }}
+            >
               등록된 템플릿이 없습니다.{' '}
-              <Link href="/templates/new" className="text-[var(--color-brand-500)] underline">
+              <Link href="/templates/new" style={{ textDecoration: 'underline' }}>
                 먼저 템플릿을 만드세요
               </Link>
             </p>
           )}
-          <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 max-h-64 overflow-y-auto border border-[var(--color-border)] rounded-[var(--radius-lg)] p-2">
+          <div
+            className="grid grid-cols-2 sm:grid-cols-3 gap-2 max-h-64 overflow-y-auto p-2"
+            style={{
+              border: '1px solid var(--mkt-hairline)',
+              borderRadius: 'var(--mkt-rounded-lg)',
+            }}
+          >
             {templates.map((t) => {
               const isSelected = selectedIds.includes(t.id)
               const selIdx = selectedIds.indexOf(t.id)
@@ -236,11 +273,15 @@ export default function NewTemplateSetPage() {
                   key={t.id}
                   type="button"
                   onClick={() => toggleSelect(t.id)}
-                  className={`relative flex flex-col items-start gap-1 rounded-[var(--radius-md)] border p-2 text-left transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-brand-500)] ${
-                    isSelected
-                      ? 'border-[var(--color-brand-500)] bg-[var(--color-brand-50)]'
-                      : 'border-[var(--color-border)] bg-[var(--color-surface)] hover:bg-[var(--color-surface-muted)]'
-                  }`}
+                  className="relative flex flex-col items-start gap-1 text-left focus-visible:outline-none focus-visible:ring-2 rounded"
+                  style={{
+                    padding: '8px',
+                    borderRadius: 'var(--mkt-rounded-md)',
+                    border: `1px solid ${isSelected ? 'var(--mkt-ink)' : 'var(--mkt-hairline)'}`,
+                    backgroundColor: isSelected ? 'var(--mkt-block-lime)' : 'var(--mkt-canvas)',
+                    transition: 'background-color 100ms ease, border-color 100ms ease',
+                    cursor: 'pointer',
+                  }}
                   aria-pressed={isSelected}
                 >
                   {isCover && (
@@ -250,7 +291,13 @@ export default function NewTemplateSetPage() {
                     />
                   )}
                   {t.thumbnail ? (
-                    <div className="relative w-full h-16 rounded-[var(--radius-sm)] overflow-hidden border border-[var(--color-border)]">
+                    <div
+                      className="relative w-full h-16 overflow-hidden"
+                      style={{
+                        borderRadius: 'var(--mkt-rounded-sm)',
+                        border: '1px solid var(--mkt-hairline)',
+                      }}
+                    >
                       <Image
                         src={t.thumbnail}
                         alt={t.name}
@@ -260,14 +307,40 @@ export default function NewTemplateSetPage() {
                       />
                     </div>
                   ) : (
-                    <div className="w-full h-16 bg-[var(--color-surface-muted)] rounded-[var(--radius-sm)] border border-[var(--color-border)] flex items-center justify-center text-xs text-[var(--color-text-disabled)]">
+                    <div
+                      className="w-full h-16 flex items-center justify-center"
+                      style={{
+                        borderRadius: 'var(--mkt-rounded-sm)',
+                        border: '1px solid var(--mkt-hairline)',
+                        backgroundColor: 'var(--mkt-surface-soft)',
+                        fontFamily: 'var(--mkt-font-mono)',
+                        fontSize: '11px',
+                        color: 'var(--mkt-ink)',
+                        opacity: 0.4,
+                      }}
+                    >
                       미리보기 없음
                     </div>
                   )}
-                  <span className="text-xs font-medium text-[var(--color-text)] truncate w-full">
+                  <span
+                    className="truncate w-full"
+                    style={{
+                      fontFamily: 'var(--mkt-font-sans)',
+                      fontSize: '12px',
+                      fontWeight: 540,
+                      color: 'var(--mkt-ink)',
+                    }}
+                  >
                     {t.name}
                   </span>
-                  <span className="text-xs text-[var(--color-text-muted)]">
+                  <span
+                    style={{
+                      fontFamily: 'var(--mkt-font-mono)',
+                      fontSize: '10px',
+                      color: 'var(--mkt-ink)',
+                      opacity: 0.55,
+                    }}
+                  >
                     {t.formatName} · 슬롯 {t.slotCount}개
                   </span>
                 </button>
@@ -279,8 +352,26 @@ export default function NewTemplateSetPage() {
         {/* 선택된 템플릿 순서 조정 */}
         {selectedIds.length > 0 && (
           <div className="flex flex-col gap-2">
-            <span className="text-sm font-medium text-[var(--color-text)]">순서 / 커버 지정</span>
-            <div className="flex flex-col gap-1 border border-[var(--color-border)] rounded-[var(--radius-lg)] p-2">
+            <span
+              style={{
+                fontFamily: 'var(--mkt-font-mono)',
+                fontSize: '11px',
+                fontWeight: 400,
+                letterSpacing: '0.6px',
+                textTransform: 'uppercase',
+                color: 'var(--mkt-ink)',
+                opacity: 0.55,
+              }}
+            >
+              순서 / 커버 지정
+            </span>
+            <div
+              className="flex flex-col gap-1 p-2"
+              style={{
+                border: '1px solid var(--mkt-hairline)',
+                borderRadius: 'var(--mkt-rounded-lg)',
+              }}
+            >
               {selectedIds.map((id, idx) => {
                 const t = templates.find((x) => x.id === id)
                 if (!t) return null
@@ -288,23 +379,43 @@ export default function NewTemplateSetPage() {
                 return (
                   <div
                     key={id}
-                    className="flex items-center gap-2 rounded-[var(--radius-md)] px-2 py-1.5 bg-[var(--color-surface-muted)]"
+                    className="flex items-center gap-2 px-2 py-1.5"
+                    style={{
+                      borderRadius: 'var(--mkt-rounded-md)',
+                      backgroundColor: 'var(--mkt-surface-soft)',
+                    }}
                   >
-                    <span className="text-xs text-[var(--color-text-muted)] w-5 text-right shrink-0">
+                    <span
+                      className="w-5 text-right shrink-0"
+                      style={{
+                        fontFamily: 'var(--mkt-font-mono)',
+                        fontSize: '11px',
+                        color: 'var(--mkt-ink)',
+                        opacity: 0.4,
+                      }}
+                    >
                       {idx + 1}
                     </span>
-                    <span className="flex-1 min-w-0 text-sm text-[var(--color-text)] truncate">
+                    <span
+                      className="flex-1 min-w-0 truncate"
+                      style={{
+                        fontFamily: 'var(--mkt-font-sans)',
+                        fontSize: '13px',
+                        fontWeight: 330,
+                        color: 'var(--mkt-ink)',
+                      }}
+                    >
                       {t.name}
                     </span>
                     <button
                       type="button"
                       onClick={() => setCoverIdx(idx)}
                       title="커버로 지정"
-                      className={`rounded p-0.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-brand-500)] ${
-                        isCover
-                          ? 'text-yellow-500'
-                          : 'text-[var(--color-text-muted)] hover:text-yellow-500'
-                      }`}
+                      className="rounded p-0.5 focus-visible:outline-none focus-visible:ring-2"
+                      style={{
+                        color: isCover ? '#eab308' : 'var(--mkt-ink)',
+                        opacity: isCover ? 1 : 0.4,
+                      }}
                     >
                       <Star
                         className={`size-3.5 ${isCover ? 'fill-yellow-400' : ''}`}
@@ -315,7 +426,17 @@ export default function NewTemplateSetPage() {
                       type="button"
                       onClick={() => moveUp(idx)}
                       disabled={idx === 0}
-                      className="text-xs px-1 text-[var(--color-text-muted)] disabled:opacity-30 hover:text-[var(--color-text)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-brand-500)] rounded"
+                      className="rounded focus-visible:outline-none focus-visible:ring-2"
+                      style={{
+                        fontFamily: 'var(--mkt-font-mono)',
+                        fontSize: '12px',
+                        padding: '0 4px',
+                        color: 'var(--mkt-ink)',
+                        opacity: idx === 0 ? 0.2 : 0.6,
+                        cursor: idx === 0 ? 'not-allowed' : 'pointer',
+                        border: 'none',
+                        background: 'none',
+                      }}
                       aria-label="위로 이동"
                     >
                       ↑
@@ -324,7 +445,17 @@ export default function NewTemplateSetPage() {
                       type="button"
                       onClick={() => moveDown(idx)}
                       disabled={idx === selectedIds.length - 1}
-                      className="text-xs px-1 text-[var(--color-text-muted)] disabled:opacity-30 hover:text-[var(--color-text)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-brand-500)] rounded"
+                      className="rounded focus-visible:outline-none focus-visible:ring-2"
+                      style={{
+                        fontFamily: 'var(--mkt-font-mono)',
+                        fontSize: '12px',
+                        padding: '0 4px',
+                        color: 'var(--mkt-ink)',
+                        opacity: idx === selectedIds.length - 1 ? 0.2 : 0.6,
+                        cursor: idx === selectedIds.length - 1 ? 'not-allowed' : 'pointer',
+                        border: 'none',
+                        background: 'none',
+                      }}
                       aria-label="아래로 이동"
                     >
                       ↓
@@ -332,7 +463,17 @@ export default function NewTemplateSetPage() {
                     <button
                       type="button"
                       onClick={() => toggleSelect(id)}
-                      className="text-xs px-1 text-red-500 hover:text-red-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-brand-500)] rounded"
+                      className="rounded focus-visible:outline-none focus-visible:ring-2"
+                      style={{
+                        fontFamily: 'var(--mkt-font-mono)',
+                        fontSize: '13px',
+                        padding: '0 4px',
+                        color: 'var(--mkt-ink)',
+                        opacity: 0.5,
+                        border: 'none',
+                        background: 'none',
+                        cursor: 'pointer',
+                      }}
                       aria-label="제거"
                     >
                       ×
@@ -346,24 +487,27 @@ export default function NewTemplateSetPage() {
 
         {/* 에러 */}
         {error && (
-          <p role="alert" className="text-sm text-red-500">
+          <p
+            role="alert"
+            style={{
+              fontFamily: 'var(--mkt-font-sans)',
+              fontSize: '13px',
+              color: 'var(--mkt-ink)',
+              backgroundColor: 'var(--mkt-block-pink)',
+              borderRadius: 'var(--mkt-rounded-md)',
+              padding: '10px 14px',
+            }}
+          >
             {error}
           </p>
         )}
 
         {/* 버튼 */}
         <div className="flex items-center gap-3">
-          <button
-            type="submit"
-            disabled={isLoading}
-            className="inline-flex items-center gap-2 rounded-[var(--radius-md)] bg-[var(--color-brand-500)] px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-[var(--color-brand-600)] disabled:opacity-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-brand-500)]"
-          >
+          <button type="submit" disabled={isLoading} className="mkt-btn-primary">
             {isLoading ? '저장 중...' : '세트 만들기'}
           </button>
-          <Link
-            href="/template-sets"
-            className="text-sm text-[var(--color-text-muted)] hover:text-[var(--color-text)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-brand-500)] rounded"
-          >
+          <Link href="/template-sets" className="mkt-btn-secondary">
             취소
           </Link>
         </div>

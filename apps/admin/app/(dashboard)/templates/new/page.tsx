@@ -127,18 +127,37 @@ export default function NewTemplatePage() {
       <form onSubmit={handleSubmit} className="flex flex-col gap-5">
         {/* 판형 선택 */}
         <div className="flex flex-col gap-1.5">
-          <label htmlFor="template-format" className="text-sm font-medium text-[var(--color-text)]">
-            판형 선택{' '}
-            <span aria-hidden="true" className="text-red-500">
-              *
-            </span>
+          <label
+            htmlFor="template-format"
+            style={{
+              fontFamily: 'var(--mkt-font-mono)',
+              fontSize: '11px',
+              fontWeight: 400,
+              letterSpacing: '0.6px',
+              textTransform: 'uppercase',
+              color: 'var(--mkt-ink)',
+              opacity: 0.55,
+            }}
+          >
+            판형 선택 <span aria-hidden="true">*</span>
           </label>
           <select
             id="template-format"
             value={formatId}
             onChange={(e) => setFormatId(e.target.value)}
             required
-            className="rounded-[var(--radius-md)] border border-[var(--color-border)] bg-[var(--color-surface)] px-3 py-2 text-sm text-[var(--color-text)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-brand-500)]"
+            style={{
+              height: '44px',
+              borderRadius: 'var(--mkt-rounded-md)',
+              border: '1px solid var(--mkt-hairline)',
+              backgroundColor: 'var(--mkt-canvas)',
+              padding: '0 12px',
+              fontFamily: 'var(--mkt-font-sans)',
+              fontSize: '14px',
+              fontWeight: 330,
+              color: 'var(--mkt-ink)',
+              outline: 'none',
+            }}
           >
             <option value="">판형을 선택하세요</option>
             {formats.map((f) => (
@@ -148,9 +167,16 @@ export default function NewTemplatePage() {
             ))}
           </select>
           {formats.length === 0 && (
-            <p className="text-xs text-[var(--color-text-muted)]">
+            <p
+              style={{
+                fontFamily: 'var(--mkt-font-sans)',
+                fontSize: '12px',
+                color: 'var(--mkt-ink)',
+                opacity: 0.55,
+              }}
+            >
               판형이 없습니다.{' '}
-              <Link href="/formats/new" className="text-[var(--color-brand-500)] underline">
+              <Link href="/formats/new" style={{ textDecoration: 'underline' }}>
                 판형을 먼저 등록하세요
               </Link>
             </p>
@@ -159,11 +185,19 @@ export default function NewTemplatePage() {
 
         {/* 이름 입력 */}
         <div className="flex flex-col gap-1.5">
-          <label htmlFor="template-name" className="text-sm font-medium text-[var(--color-text)]">
-            템플릿 이름{' '}
-            <span aria-hidden="true" className="text-red-500">
-              *
-            </span>
+          <label
+            htmlFor="template-name"
+            style={{
+              fontFamily: 'var(--mkt-font-mono)',
+              fontSize: '11px',
+              fontWeight: 400,
+              letterSpacing: '0.6px',
+              textTransform: 'uppercase',
+              color: 'var(--mkt-ink)',
+              opacity: 0.55,
+            }}
+          >
+            템플릿 이름 <span aria-hidden="true">*</span>
           </label>
           <input
             id="template-name"
@@ -175,30 +209,44 @@ export default function NewTemplatePage() {
             maxLength={50}
             placeholder="예: 기본 2컷 레이아웃"
             autoFocus
-            className="rounded-[var(--radius-md)] border border-[var(--color-border)] bg-[var(--color-surface)] px-3 py-2 text-sm text-[var(--color-text)] placeholder:text-[var(--color-text-disabled)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-brand-500)]"
+            style={{
+              height: '44px',
+              borderRadius: 'var(--mkt-rounded-md)',
+              border: '1px solid var(--mkt-hairline)',
+              backgroundColor: 'var(--mkt-canvas)',
+              padding: '0 12px',
+              fontFamily: 'var(--mkt-font-sans)',
+              fontSize: '14px',
+              fontWeight: 330,
+              color: 'var(--mkt-ink)',
+              outline: 'none',
+            }}
           />
         </div>
 
         {/* 에러 */}
         {error && (
-          <p role="alert" className="text-sm text-red-500">
+          <p
+            role="alert"
+            style={{
+              fontFamily: 'var(--mkt-font-sans)',
+              fontSize: '13px',
+              color: 'var(--mkt-ink)',
+              backgroundColor: 'var(--mkt-block-pink)',
+              borderRadius: 'var(--mkt-rounded-md)',
+              padding: '10px 14px',
+            }}
+          >
             {error}
           </p>
         )}
 
         {/* 버튼 */}
         <div className="flex items-center gap-3">
-          <button
-            type="submit"
-            disabled={isLoading}
-            className="inline-flex items-center gap-2 rounded-[var(--radius-md)] bg-[var(--color-brand-500)] px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-[var(--color-brand-600)] disabled:opacity-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-brand-500)]"
-          >
+          <button type="submit" disabled={isLoading} className="mkt-btn-primary">
             {isLoading ? '생성 중...' : '템플릿 만들기 및 슬롯 편집'}
           </button>
-          <Link
-            href="/templates"
-            className="text-sm text-[var(--color-text-muted)] hover:text-[var(--color-text)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-brand-500)] rounded"
-          >
+          <Link href="/templates" className="mkt-btn-secondary">
             취소
           </Link>
         </div>

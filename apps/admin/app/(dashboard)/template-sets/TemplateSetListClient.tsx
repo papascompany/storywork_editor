@@ -37,7 +37,13 @@ const columns: ColumnDef<TemplateSetRow>[] = [
     meta: { mobileLabel: '커버' },
     cell: ({ row }) =>
       row.original.coverThumbnail ? (
-        <div className="relative h-10 w-10 rounded-[var(--radius-sm)] overflow-hidden border border-[var(--color-border)]">
+        <div
+          className="relative h-10 w-10 overflow-hidden"
+          style={{
+            borderRadius: 'var(--mkt-rounded-sm)',
+            border: '1px solid var(--mkt-hairline)',
+          }}
+        >
           <Image
             src={row.original.coverThumbnail}
             alt={row.original.name}
@@ -47,7 +53,18 @@ const columns: ColumnDef<TemplateSetRow>[] = [
           />
         </div>
       ) : (
-        <div className="h-10 w-10 rounded-[var(--radius-sm)] bg-[var(--color-surface-muted)] border border-[var(--color-border)] flex items-center justify-center text-xs text-[var(--color-text-disabled)]">
+        <div
+          className="h-10 w-10 flex items-center justify-center"
+          style={{
+            borderRadius: 'var(--mkt-rounded-sm)',
+            border: '1px solid var(--mkt-hairline)',
+            backgroundColor: 'var(--mkt-surface-soft)',
+            fontFamily: 'var(--mkt-font-mono)',
+            fontSize: '11px',
+            color: 'var(--mkt-ink)',
+            opacity: 0.4,
+          }}
+        >
           없음
         </div>
       ),
@@ -207,7 +224,17 @@ export function TemplateSetListClient({ initialData, userRole }: TemplateSetList
           keyboardNavigation
           emptyState={
             <div className="flex flex-col items-center gap-2 py-8">
-              <p className="font-medium text-[var(--color-text)]">검색 결과가 없습니다</p>
+              <p
+                style={{
+                  fontFamily: 'var(--mkt-font-sans)',
+                  fontSize: '14px',
+                  fontWeight: 540,
+                  color: 'var(--mkt-ink)',
+                  opacity: 0.55,
+                }}
+              >
+                검색 결과가 없습니다
+              </p>
             </div>
           }
         />
