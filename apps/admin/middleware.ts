@@ -14,7 +14,7 @@ import { NextResponse } from 'next/server'
 import { createMiddlewareClient } from './src/lib/supabase/middleware'
 
 // 인증 없이 접근 가능한 경로
-const PUBLIC_PATHS = new Set(['/login', '/403', '/api/health'])
+const PUBLIC_PATHS = new Set(['/login', '/403', '/api/health', '/reset-password'])
 
 // TOTP 관련 경로 (인증 후 접근 가능하지만 TOTP 검증 전에 허용)
 const TOTP_PATHS = new Set(['/setup-2fa', '/verify-2fa'])
