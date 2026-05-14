@@ -44,6 +44,7 @@ import { FeatureSidebar } from './FeatureSidebar'
 import { fitToViewport, Footer } from './Footer'
 import { useAutosave } from './hooks/useAutosave'
 import { useHistory } from './hooks/useHistory'
+import { consumePendingSave, useSaveProject } from './hooks/useSaveProject'
 import { useSelection } from './hooks/useSelection'
 import type { EditorRefs } from './hooks/useStoryCanvas'
 import { useStoryCanvas } from './hooks/useStoryCanvas'
@@ -52,6 +53,7 @@ import { MobileBottomSheet } from './MobileBottomSheet'
 import { FormatPickerModal } from './page-system/FormatPickerModal'
 import { captureThumbnail } from './page-system/thumbnail'
 import { RightPanel } from './RightPanel'
+import { SaveLoginGateModal } from './SaveLoginGateModal'
 import {
   createDebouncedSave,
   loadLatestProject,
@@ -148,6 +150,10 @@ export function EditorShell() {
     historyRef.current,
   )
 
+  // PR7: 서버 저장 게이트
+  const { serverSaveStatus, triggerSave, showLoginGate, closeLoginGate, isAuthenticated } =
+    useSaveProject(project)
+
   // 프로젝트 이름을 파일명 상태에 동기화
   const [fileName, setFileName] = useState(project?.title ?? '새 콘티')
 
@@ -167,6 +173,25 @@ export function EditorShell() {
   useEffect(() => {
     if (!readyTick) return // canvas 아직 미준비
     if (project) return // 이미 프로젝트 있음
+
+    // PR7: sessionStorage 에 pending save 가 있으면 먼저 복원
+    // (로그인 후 /editor 로 돌아온 경우 — 로그인 전 작품 데이터 복원)
+    const pending = consumePendingSave()
+    if (pending) {
+      loadProject(pending)
+      setFileName(pending.title)
+      const currentPage = pending.pages[pending.currentPageIndex]
+      if (currentPage && canvasRef.current) {
+        void canvasRef.current.loadJson(currentPage.fabricJson as PageJsonV1).catch((err) => {
+          console.warn('[EditorShell] pending save 복원 실패:', err)
+        })
+      }
+      if (!recoveryToastShown) {
+        setRecoveryToastShown(true)
+        showToast('"로그인 전 작품" 복원됨. 저장 버튼으로 클라우드에 저장하세요.', 'success')
+      }
+      return
+    }
 
     // localStorage 에서 최근 프로젝트 복구 시도
     const latest = loadLatestProject()
@@ -411,6 +436,13 @@ export function EditorShell() {
       const target = e.target as HTMLElement
       const isInput =
         target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.isContentEditable
+
+      // ⌘S / Ctrl+S → 저장 (PR7: 게이트 포함)
+      if ((e.metaKey || e.ctrlKey) && e.key === 's') {
+        e.preventDefault()
+        void triggerSave()
+        return
+      }
 
       // ⌘K / Ctrl+K → CommandPalette
       if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
@@ -753,6 +785,7 @@ export function EditorShell() {
     handleNextPage,
     handlePrevPage,
     handleAddPage,
+    triggerSave,
   ])
 
   // ── Custom Events (builtins.ts 에서 dispatch) ────────────────
@@ -975,6 +1008,9 @@ export function EditorShell() {
           onNextPage={handleNextPage}
           onOpenCommandPalette={() => setCommandPaletteOpen(true)}
           onOpenShortcuts={() => setShortcutsModalOpen(true)}
+          isAuthenticated={isAuthenticated}
+          serverSaveStatus={serverSaveStatus}
+          onSave={() => void triggerSave()}
         />
 
         {/* 중앙 영역: ToolBar | FeatureSidebar | Canvas | RightPanel */}
@@ -1063,6 +1099,9 @@ export function EditorShell() {
           onSelect={handleFormatSelect}
           onClose={() => setFormatPickerOpen(false)}
         />
+
+        {/* SaveLoginGateModal — 미인증 상태에서 저장 시도 시 */}
+        <SaveLoginGateModal open={showLoginGate} onClose={closeLoginGate} />
       </div>
     </EditorContext.Provider>
   )

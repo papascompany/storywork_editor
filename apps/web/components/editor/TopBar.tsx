@@ -31,11 +31,15 @@ import {
   useTheme,
 } from '@storywork/ui'
 import {
+  Check,
   Eye,
   HelpCircle,
+  Lock,
+  Loader2,
   Moon,
   MoreVertical,
   Redo2,
+  Save,
   Share2,
   Sparkles,
   Sun,
@@ -80,6 +84,11 @@ export type TopBarProps = {
   // M1-08f: 명령 팔레트 / 단축키 모달 트리거
   onOpenCommandPalette?: () => void
   onOpenShortcuts?: () => void
+
+  // PR7: 서버 저장 게이트
+  isAuthenticated?: boolean
+  serverSaveStatus?: 'idle' | 'saving' | 'saved' | 'error'
+  onSave?: () => void
 }
 
 // ─── TopBar ──────────────────────────────────────────────────────────────────
@@ -100,6 +109,9 @@ export function TopBar({
   // currentPage, totalPages, onPrevPage, onNextPage — Footer 에서 단일 표시 (중복 제거)
   onOpenCommandPalette,
   onOpenShortcuts,
+  isAuthenticated = false,
+  serverSaveStatus = 'idle',
+  onSave,
 }: TopBarProps) {
   const { resolvedTheme, toggleTheme } = useTheme()
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
@@ -111,6 +123,87 @@ export function TopBar({
 
   const handlePreview = () => {
     showToast('미리보기 기능은 M5에서 활성화됩니다.', 'info')
+  }
+
+  // ── 저장 버튼 렌더 헬퍼 ────────────────────────────────
+  const renderSaveButton = (mobile = false) => {
+    // 서버 저장 상태별 아이콘·레이블
+    let icon: React.ReactNode
+    let label: string
+    let tooltip: string
+
+    if (serverSaveStatus === 'saving') {
+      icon = (
+        <Loader2 className={cn(mobile ? 'size-5' : 'size-4', 'animate-spin')} aria-hidden="true" />
+      )
+      label = '저장 중...'
+      tooltip = '저장 중...'
+    } else if (serverSaveStatus === 'saved') {
+      icon = <Check className={mobile ? 'size-5' : 'size-4'} aria-hidden="true" />
+      label = '저장됨'
+      tooltip = '저장됨'
+    } else if (!isAuthenticated) {
+      // 미인증 — 자물쇠 힌트
+      icon = (
+        <span className="relative flex items-center">
+          <Save className={mobile ? 'size-5' : 'size-4'} aria-hidden="true" />
+          <Lock
+            className={cn(
+              'absolute -bottom-0.5 -right-1',
+              'size-2.5',
+              'text-[var(--color-text-muted)]',
+            )}
+            aria-hidden="true"
+          />
+        </span>
+      )
+      label = '저장'
+      tooltip = '저장 (로그인 필요)'
+    } else {
+      icon = <Save className={mobile ? 'size-5' : 'size-4'} aria-hidden="true" />
+      label = '저장'
+      tooltip = '저장 (⌘S)'
+    }
+
+    if (mobile) {
+      return (
+        <button
+          type="button"
+          onClick={onSave}
+          disabled={serverSaveStatus === 'saving'}
+          aria-label={tooltip}
+          className={cn(
+            'flex items-center gap-3 px-4 py-3 text-sm rounded-[var(--radius-md)]',
+            'text-[var(--color-text)] hover:bg-[var(--color-surface-muted)]',
+            'disabled:opacity-50 disabled:pointer-events-none',
+            'min-h-[2.75rem]',
+            serverSaveStatus === 'saved' && 'text-[var(--color-success-500)]',
+          )}
+        >
+          {icon}
+          {label}
+        </button>
+      )
+    }
+
+    return (
+      <Tooltip content={tooltip} side="bottom">
+        <Button
+          variant="ghost"
+          size="icon"
+          onClick={onSave}
+          disabled={serverSaveStatus === 'saving'}
+          aria-label={tooltip}
+          className={cn(
+            'size-9 [&_svg]:size-4',
+            serverSaveStatus === 'saved' && 'text-[var(--color-success-500)]',
+          )}
+          data-testid="topbar-save"
+        >
+          {icon}
+        </Button>
+      </Tooltip>
+    )
   }
 
   // ── 우측 액션 그룹 (데스크톱용) ─────────────────────────
@@ -165,6 +258,9 @@ export function TopBar({
 
       {/* 다운로드 드롭다운 */}
       <DownloadMenu canvas={canvas} layerTree={layerTree} fileName={fileName} />
+
+      {/* 저장 */}
+      {renderSaveButton()}
 
       {/* 공유 */}
       <Tooltip content="공유" side="bottom">
@@ -416,6 +512,11 @@ export function TopBar({
             </SheetHeader>
 
             <div className="flex flex-col gap-1 py-4">
+              {/* 저장 (모바일 최상단) */}
+              <div onClick={() => setMobileMenuOpen(false)}>{renderSaveButton(true)}</div>
+
+              <div className="my-1 h-px bg-[var(--color-border)]" role="separator" />
+
               {/* Undo */}
               <button
                 type="button"
