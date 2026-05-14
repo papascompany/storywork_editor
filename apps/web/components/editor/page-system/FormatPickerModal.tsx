@@ -157,8 +157,9 @@ export function FormatPickerModal({
       <DialogContent
         className={cn(
           'max-w-xl w-full',
-          // dismissable=false 이면 X 버튼 숨김
-          !dismissable && '[&>button[aria-label]]:hidden',
+          // dismissable=false 이면 X 버튼만 숨김
+          // (selector 가 너무 광범위하면 footer 의 시작하기 버튼까지 0×0 으로 가려짐 — 실제 production 에서 발생)
+          !dismissable && '[&>button[aria-label="닫기"]]:hidden',
         )}
         aria-describedby={undefined}
       >
