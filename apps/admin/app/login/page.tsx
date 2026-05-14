@@ -34,7 +34,15 @@ function handleInputBlur(e: FocusEvent<HTMLInputElement>) {
 function LoginForm() {
   const router = useRouter()
   const searchParams = useSearchParams()
-  const nextPath = searchParams.get('next') ?? '/'
+  // 안전한 next 만 허용 (외부 URL 차단 + 삭제된 2FA 페이지 차단)
+  const requestedNext = searchParams.get('next') ?? '/'
+  const STALE_PATHS = new Set(['/verify-2fa', '/setup-2fa'])
+  const nextPath =
+    requestedNext.startsWith('/') &&
+    !requestedNext.startsWith('//') &&
+    !STALE_PATHS.has(requestedNext)
+      ? requestedNext
+      : '/'
 
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
