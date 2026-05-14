@@ -77,12 +77,17 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: '6자리 숫자를 입력하세요.' }, { status: 400 })
     }
 
-    // DB에서 totpSecret 조회
+    // DB에서 totpSecret 조회 — Prisma User.id 는 cuid() 자동 생성이라 auth.users.id 와 다름.
+    // email 로 매칭 (User.email 은 unique).
+    const userEmail = session.user.email
+    if (!userEmail) {
+      return NextResponse.json({ error: '세션에 이메일 정보가 없습니다.' }, { status: 400 })
+    }
     const service = createAdminServiceClient()
     const { data: userData, error: dbError } = await service
       .from('User')
       .select('totpSecret, totpVerified')
-      .eq('id', userId)
+      .eq('email', userEmail)
       .single()
 
     if (dbError || !userData) {

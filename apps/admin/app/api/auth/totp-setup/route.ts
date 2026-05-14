@@ -50,12 +50,16 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // DB 업데이트: totpSecret, totpVerified 저장
+    // DB 업데이트: totpSecret, totpVerified 저장 — email 매칭 (User.id 는 cuid).
+    const userEmail = session.user.email
+    if (!userEmail) {
+      return NextResponse.json({ error: '세션에 이메일 정보가 없습니다.' }, { status: 400 })
+    }
     const service = createAdminServiceClient()
     const { error: dbError } = await service
       .from('User')
       .update({ totpSecret: secret, totpVerified: true })
-      .eq('id', session.user.id)
+      .eq('email', userEmail)
 
     if (dbError) {
       console.error('[totp-setup] DB 업데이트 실패:', dbError)
