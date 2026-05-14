@@ -284,27 +284,22 @@ export function ResourceEditClient({ resource, userRole }: ResourceEditClientPro
             리소스 목록
           </Link>
           <p
+            className="mkt-eyebrow"
             style={{
-              fontFamily: 'var(--mkt-font-mono)',
-              fontSize: '11px',
-              fontWeight: 400,
-              letterSpacing: '0.6px',
-              textTransform: 'uppercase',
               color: 'var(--mkt-ink)',
               opacity: 0.4,
-              marginBottom: '6px',
+              marginBottom: 'var(--mkt-space-xs)',
+              fontSize: '12px',
             }}
           >
-            Admin / 리소스 / 편집
+            ADMIN / RESOURCES / EDIT
           </p>
           <h1
+            className="mkt-headline"
             style={{
-              fontFamily: 'var(--mkt-font-mono)',
-              fontSize: 'clamp(18px, 2.5vw, 24px)',
-              fontWeight: 400,
-              letterSpacing: '0px',
               color: 'var(--mkt-ink)',
-              marginBottom: '8px',
+              marginBottom: 'var(--mkt-space-xs)',
+              fontFamily: 'var(--mkt-font-mono)',
             }}
           >
             {resource.slug}

@@ -8,7 +8,6 @@
  */
 
 import {
-  Button,
   Dialog,
   DialogContent,
   DialogDescription,
@@ -154,53 +153,41 @@ export function FormatEditClient({ format, userRole }: FormatEditClientProps) {
       </Link>
 
       {/* 헤더 */}
-      <div className="flex items-start justify-between gap-4 mb-8">
+      <div
+        className="flex items-start justify-between gap-4 mb-8"
+        style={{
+          paddingBottom: 'var(--mkt-space-lg)',
+          borderBottom: '1px solid var(--mkt-hairline)',
+        }}
+      >
         <div>
           <p
+            className="mkt-eyebrow"
             style={{
-              fontFamily: 'var(--mkt-font-mono)',
-              fontSize: '11px',
-              fontWeight: 400,
-              letterSpacing: '0.6px',
-              textTransform: 'uppercase',
               color: 'var(--mkt-ink)',
               opacity: 0.4,
-              marginBottom: '6px',
+              marginBottom: 'var(--mkt-space-xs)',
+              fontSize: '12px',
             }}
           >
-            Admin / 판형 / 편집
+            ADMIN / FORMATS / EDIT
           </p>
           <h1
-            style={{
-              fontFamily: 'var(--mkt-font-sans)',
-              fontSize: 'clamp(24px, 3.5vw, 32px)',
-              fontWeight: 340,
-              lineHeight: 1.1,
-              letterSpacing: '-0.96px',
-              color: 'var(--mkt-ink)',
-              marginBottom: '6px',
-            }}
+            className="mkt-display-lg"
+            style={{ color: 'var(--mkt-ink)', marginBottom: 'var(--mkt-space-xs)' }}
           >
             {format.name}
           </h1>
-          <p
-            style={{
-              fontFamily: 'var(--mkt-font-sans)',
-              fontSize: '14px',
-              fontWeight: 330,
-              color: 'var(--mkt-ink)',
-              opacity: 0.55,
-            }}
-          >
+          <p className="mkt-body-sm" style={{ color: 'var(--mkt-ink)', opacity: 0.55 }}>
             템플릿 {format.templateCount}개 · 프로젝트 {format.projectCount}개 연결됨
           </p>
         </div>
 
         {/* 삭제 버튼 — superadmin 만 */}
         {isSuperadmin && (
-          <Button
-            variant="destructive"
-            size="sm"
+          <button
+            type="button"
+            className="mkt-btn-secondary"
             onClick={() => setDeleteDialogOpen(true)}
             disabled={usageCount > 0}
             title={
@@ -208,10 +195,18 @@ export function FormatEditClient({ format, userRole }: FormatEditClientProps) {
                 ? `사용 중인 판형은 삭제할 수 없습니다 (템플릿 ${format.templateCount}개, 프로젝트 ${format.projectCount}개)`
                 : '판형 삭제'
             }
+            style={{
+              gap: '8px',
+              display: 'inline-flex',
+              alignItems: 'center',
+              borderColor: '#dc2626',
+              color: '#dc2626',
+              opacity: usageCount > 0 ? 0.4 : undefined,
+            }}
           >
             <Trash2 className="size-4" aria-hidden="true" />
             삭제
-          </Button>
+          </button>
         )}
       </div>
 
@@ -251,17 +246,23 @@ export function FormatEditClient({ format, userRole }: FormatEditClientProps) {
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>
-            <Button
-              variant="secondary"
-              size="sm"
+            <button
+              type="button"
+              className="mkt-btn-secondary"
               onClick={() => setDeleteDialogOpen(false)}
               disabled={isDeleting}
             >
               취소
-            </Button>
-            <Button variant="destructive" size="sm" onClick={handleDelete} disabled={isDeleting}>
+            </button>
+            <button
+              type="button"
+              className="mkt-btn-primary"
+              onClick={() => void handleDelete()}
+              disabled={isDeleting}
+              style={{ backgroundColor: '#dc2626', opacity: isDeleting ? 0.6 : undefined }}
+            >
               {isDeleting ? '삭제 중...' : '삭제'}
-            </Button>
+            </button>
           </DialogFooter>
         </DialogContent>
       </Dialog>

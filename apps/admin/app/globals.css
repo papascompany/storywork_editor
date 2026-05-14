@@ -275,10 +275,28 @@
   outline-offset: 3px;
 }
 
+/* ── inverse secondary 버튼 (navy 등 어두운 배경 위) ──────────────────────── */
+.mkt-btn-secondary-inverse {
+  background-color: transparent;
+  color: var(--mkt-inverse-ink);
+  border-color: var(--mkt-inverse-ink);
+}
+
 /* ── 마케팅 컬러블록 섹션 ────────────────────────────────────────────────── */
 .mkt-block {
   border-radius: var(--mkt-rounded-lg);
   padding: var(--mkt-space-xxl);
+}
+
+/* 768px 아래: full-bleed (모서리 제거) */
+@media (max-width: 768px) {
+  .mkt-block {
+    border-radius: 0;
+    margin-left: calc(var(--mkt-space-lg) * -1);
+    margin-right: calc(var(--mkt-space-lg) * -1);
+    padding-left: var(--mkt-space-lg);
+    padding-right: var(--mkt-space-lg);
+  }
 }
 
 .mkt-block-lime {
@@ -308,4 +326,33 @@
 .mkt-block-navy {
   background-color: var(--mkt-block-navy);
   color: var(--mkt-inverse-ink);
+}
+
+/* ── body 기본 스타일 ────────────────────────────────────────────────────── */
+/* 마케팅 페이지와 동일한 폰트/배경/색상 기본값 */
+body {
+  font-family: var(--mkt-font-sans);
+  color: var(--mkt-ink);
+  background-color: var(--mkt-surface-soft);
+  font-feature-settings: 'kern' 1;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* ── admin 전용 DataTable — mkt 토큰 매핑 ──────────────────────────────────
+ * DataTable 이 사용하는 --color-* 변수를 --mkt-* 로 연결.
+ * shadcn 기본 변수를 덮어쓰지 않고 추가 매핑만.
+ */
+:root {
+  --color-surface-muted: var(--mkt-hairline-soft);
+  --color-surface-raised: var(--mkt-canvas);
+  --color-border: var(--mkt-hairline);
+  --color-text: var(--mkt-ink);
+  --color-text-muted: color-mix(in srgb, var(--mkt-ink) 50%, transparent);
+  --color-brand-500: var(--mkt-ink);
+  --color-brand-200: var(--mkt-hairline);
+  --color-brand-50: var(--mkt-hairline-soft);
+  --radius-lg: var(--mkt-rounded-md);
+  --radius-sm: var(--mkt-rounded-xs);
+  --duration-fast: 100ms;
 }

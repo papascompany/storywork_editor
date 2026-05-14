@@ -9,7 +9,6 @@
 
 import type { ColumnDef, SortingState } from '@tanstack/react-table'
 import { Filter, Plus, Search } from 'lucide-react'
-import Image from 'next/image'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import * as React from 'react'
@@ -111,22 +110,26 @@ const columns: ColumnDef<ResourceRow>[] = [
     enableSorting: false,
     size: 80,
     cell: ({ row }) => {
+      // fallback chain: thumbUrl → variants.thumb → variants.webp1x → fileUrl
       const thumbUrl =
-        row.original.thumbUrl ?? (row.original.variants as Record<string, string> | null)?.['thumb']
+        row.original.thumbUrl ??
+        (row.original.variants as Record<string, string> | null)?.['thumb'] ??
+        (row.original.variants as Record<string, string> | null)?.['webp1x'] ??
+        row.original.fileUrl
       return thumbUrl ? (
         <div
           className="relative size-16 overflow-hidden"
           style={{
             borderRadius: 'var(--mkt-rounded-md)',
-            backgroundColor: 'var(--mkt-surface-soft)',
+            backgroundColor: 'var(--mkt-block-lilac)',
           }}
         >
-          <Image
+          {/* eslint-disable-next-line @next/next/no-img-element -- Supabase Storage URL이 다양한 서브도메인을 가질 수 있어 next/image remotePatterns 커버 불가 시 fallback */}
+          <img
             src={thumbUrl}
             alt={row.original.slug}
-            fill
-            sizes="64px"
-            className="object-contain"
+            loading="lazy"
+            style={{ width: '100%', height: '100%', objectFit: 'contain' }}
           />
         </div>
       ) : (
@@ -134,11 +137,13 @@ const columns: ColumnDef<ResourceRow>[] = [
           className="size-16 flex items-center justify-center"
           style={{
             borderRadius: 'var(--mkt-rounded-md)',
-            backgroundColor: 'var(--mkt-surface-soft)',
-            fontFamily: 'var(--mkt-font-sans)',
-            fontSize: '12px',
+            backgroundColor: 'var(--mkt-block-lilac)',
+            fontFamily: 'var(--mkt-font-mono)',
+            fontSize: '10px',
             color: 'var(--mkt-ink)',
-            opacity: 0.35,
+            opacity: 0.45,
+            letterSpacing: '0.3px',
+            textTransform: 'uppercase',
           }}
         >
           없음
@@ -466,48 +471,36 @@ export function ResourceListClient({
   return (
     <div className="p-6 lg:p-10" style={{ fontFamily: 'var(--mkt-font-sans)' }}>
       {/* 헤더 */}
-      <div className="mb-8 flex items-start justify-between gap-4 flex-wrap">
+      <header
+        className="mb-10 flex items-end justify-between gap-6 flex-wrap"
+        style={{
+          paddingBottom: 'var(--mkt-space-lg)',
+          borderBottom: '1px solid var(--mkt-hairline)',
+        }}
+      >
         <div>
           <p
+            className="mkt-eyebrow"
             style={{
-              fontFamily: 'var(--mkt-font-mono)',
-              fontSize: '11px',
-              fontWeight: 400,
-              letterSpacing: '0.6px',
-              textTransform: 'uppercase',
               color: 'var(--mkt-ink)',
               opacity: 0.4,
-              marginBottom: '6px',
+              marginBottom: 'var(--mkt-space-sm)',
+              fontSize: '12px',
             }}
           >
-            Admin / 리소스
+            ADMIN / RESOURCES / 02
           </p>
           <h1
-            style={{
-              fontFamily: 'var(--mkt-font-sans)',
-              fontSize: 'clamp(24px, 3.5vw, 32px)',
-              fontWeight: 340,
-              lineHeight: 1.1,
-              letterSpacing: '-0.96px',
-              color: 'var(--mkt-ink)',
-              marginBottom: '6px',
-            }}
+            className="mkt-display-lg"
+            style={{ color: 'var(--mkt-ink)', marginBottom: 'var(--mkt-space-sm)' }}
           >
             리소스 관리
           </h1>
-          <p
-            style={{
-              fontFamily: 'var(--mkt-font-sans)',
-              fontSize: '15px',
-              fontWeight: 330,
-              color: 'var(--mkt-ink)',
-              opacity: 0.55,
-            }}
-          >
+          <p className="mkt-body" style={{ color: 'var(--mkt-ink)', opacity: 0.55 }}>
             포즈/배경/소품 등 관리자 등록 리소스를 검수하고 관리합니다.
           </p>
         </div>
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-3 flex-wrap">
           <Link
             href="/resources/review"
             className="mkt-btn-secondary"
@@ -545,7 +538,7 @@ export function ResourceListClient({
             </Link>
           )}
         </div>
-      </div>
+      </header>
 
       {/* 검색 + 필터 */}
       <div className="mb-6 flex flex-col gap-4">
@@ -720,28 +713,11 @@ export function ResourceListClient({
         isLoading={isLoading}
         keyboardNavigation
         emptyState={
-          <div className="flex flex-col items-center gap-2 py-8">
-            <p
-              style={{
-                fontFamily: 'var(--mkt-font-sans)',
-                fontSize: '17px',
-                fontWeight: 540,
-                letterSpacing: '-0.26px',
-                color: 'var(--mkt-ink)',
-                marginBottom: '4px',
-              }}
-            >
+          <div className="flex flex-col items-center gap-3 py-12">
+            <p className="mkt-headline" style={{ color: 'var(--mkt-ink)' }}>
               리소스가 없습니다
             </p>
-            <p
-              style={{
-                fontFamily: 'var(--mkt-font-sans)',
-                fontSize: '14px',
-                fontWeight: 330,
-                color: 'var(--mkt-ink)',
-                opacity: 0.55,
-              }}
-            >
+            <p className="mkt-body-sm" style={{ color: 'var(--mkt-ink)', opacity: 0.55 }}>
               필터를 초기화하거나 새 리소스를 업로드하세요.
             </p>
           </div>

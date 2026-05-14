@@ -7,9 +7,13 @@
  * 정렬/필터/페이지네이션 controlled + uncontrolled 모두 지원.
  * 키보드 네비게이션: j/k(행 이동), x(선택 토글), Space(선택), Enter(디테일)
  * 반응형: ≥768px 테이블 / <768px 카드 리스트 자동 전환
+ *
+ * 마케팅 디자인 시스템 토큰(--mkt-*) 직접 사용.
+ * 테이블 헤더: mkt-eyebrow 스타일 (mono uppercase tracking-wide opacity 0.5)
+ * 페이지네이션: mkt-btn-secondary (pill)
  */
 
-import { Button, Checkbox, cn } from '@storywork/ui'
+import { Checkbox, cn } from '@storywork/ui'
 import {
   type ColumnDef,
   type ColumnFiltersState,
@@ -72,7 +76,13 @@ function SkeletonRow({ columnCount }: { columnCount: number }) {
     <tr aria-hidden="true">
       {Array.from({ length: columnCount }).map((_, i) => (
         <td key={i} className="px-4 py-3">
-          <div className="h-4 w-full rounded-[var(--radius-sm)] bg-[var(--color-surface-muted)] animate-pulse" />
+          <div
+            className="h-4 w-full animate-pulse"
+            style={{
+              borderRadius: 'var(--mkt-rounded-xs)',
+              backgroundColor: 'var(--mkt-hairline-soft)',
+            }}
+          />
         </td>
       ))}
     </tr>
@@ -82,11 +92,16 @@ function SkeletonRow({ columnCount }: { columnCount: number }) {
 // ─── 정렬 아이콘 ─────────────────────────────────────────────────────────────
 
 function SortIcon({ direction }: { direction: 'asc' | 'desc' | false }) {
-  if (direction === 'asc') return <ChevronUp className="size-4 shrink-0" aria-hidden="true" />
-  if (direction === 'desc') return <ChevronDown className="size-4 shrink-0" aria-hidden="true" />
-  return (
-    <ChevronsUpDown className="size-4 shrink-0 text-[var(--color-text-muted)]" aria-hidden="true" />
-  )
+  const style: React.CSSProperties = {
+    color: 'var(--mkt-ink)',
+    opacity: 0.4,
+    width: '14px',
+    height: '14px',
+    flexShrink: 0,
+  }
+  if (direction === 'asc') return <ChevronUp style={style} aria-hidden="true" />
+  if (direction === 'desc') return <ChevronDown style={style} aria-hidden="true" />
+  return <ChevronsUpDown style={style} aria-hidden="true" />
 }
 
 // ─── 모바일 카드 뷰 ──────────────────────────────────────────────────────────
@@ -113,13 +128,17 @@ function MobileCard<T>({
       role="row"
       aria-selected={isSelected}
       className={cn(
-        'rounded-[var(--radius-lg)] border border-[var(--color-border)]',
-        'bg-[var(--color-surface-raised)] p-4 flex flex-col gap-2',
-        'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-brand-500)]',
-        isFocused && 'ring-2 ring-[var(--color-brand-500)]',
-        isSelected && 'bg-[var(--color-brand-50)] border-[var(--color-brand-200)]',
+        'flex flex-col gap-2',
+        'focus-visible:outline-none focus-visible:ring-2',
         onRowClick && 'cursor-pointer',
       )}
+      style={{
+        borderRadius: 'var(--mkt-rounded-md)',
+        border: `1px solid ${isSelected ? 'var(--mkt-ink)' : 'var(--mkt-hairline)'}`,
+        backgroundColor: isSelected ? 'var(--mkt-hairline-soft)' : 'var(--mkt-canvas)',
+        padding: 'var(--mkt-space-md)',
+        transition: 'background-color 100ms ease, border-color 100ms ease',
+      }}
       onClick={() => onRowClick?.(row.original)}
     >
       {onSelect && (
@@ -137,11 +156,32 @@ function MobileCard<T>({
         // 체크박스 컬럼 스킵
         if (cell.column.id === '__select__') return null
         return (
-          <div key={cell.id} className="flex items-start gap-2 text-sm">
-            <span className="font-medium text-[var(--color-text-muted)] min-w-[6rem] shrink-0">
+          <div key={cell.id} className="flex items-start gap-2">
+            <span
+              style={{
+                fontFamily: 'var(--mkt-font-mono)',
+                fontSize: '10px',
+                fontWeight: 400,
+                letterSpacing: '0.4px',
+                textTransform: 'uppercase',
+                color: 'var(--mkt-ink)',
+                opacity: 0.45,
+                minWidth: '5rem',
+                flexShrink: 0,
+                paddingTop: '2px',
+              }}
+            >
               {label}
             </span>
-            <span className="text-[var(--color-text)] break-words">
+            <span
+              style={{
+                fontFamily: 'var(--mkt-font-sans)',
+                fontSize: '14px',
+                fontWeight: 330,
+                color: 'var(--mkt-ink)',
+                wordBreak: 'break-all',
+              }}
+            >
               {flexRender(cell.column.columnDef.cell, cell.getContext())}
             </span>
           </div>
@@ -346,14 +386,27 @@ export function DataTable<T>({
   return (
     <div className={cn('flex flex-col gap-4', className)}>
       {/* ─── 데스크톱 테이블 ─── */}
-      <div className="hidden md:block overflow-x-auto rounded-[var(--radius-lg)] border border-[var(--color-border)]">
+      <div
+        className="hidden md:block overflow-x-auto"
+        style={{
+          borderRadius: 'var(--mkt-rounded-md)',
+          border: '1px solid var(--mkt-hairline)',
+          backgroundColor: 'var(--mkt-canvas)',
+        }}
+      >
         <table
           role="grid"
           aria-rowcount={pagination?.totalCount ?? data.length}
           aria-colcount={columnCount}
           className="w-full text-sm border-collapse"
         >
-          <thead className="bg-[var(--color-surface-muted)] border-b border-[var(--color-border)]">
+          {/* 테이블 헤더: mkt-eyebrow 스타일 — mono uppercase tracking-wide */}
+          <thead
+            style={{
+              backgroundColor: 'var(--mkt-hairline-soft)',
+              borderBottom: '1px solid var(--mkt-hairline)',
+            }}
+          >
             {table.getHeaderGroups().map((headerGroup) => (
               <tr key={headerGroup.id} role="row">
                 {headerGroup.headers.map((header) => {
@@ -373,12 +426,20 @@ export function DataTable<T>({
                               : undefined
                       }
                       className={cn(
-                        'px-4 py-3 text-left font-semibold text-[var(--color-text)]',
-                        'whitespace-nowrap',
-                        canSort &&
-                          'cursor-pointer select-none hover:bg-[var(--color-surface-raised)]',
+                        'px-4 py-3 text-left whitespace-nowrap',
+                        canSort && 'cursor-pointer select-none',
                       )}
-                      style={{ width: header.getSize() !== 150 ? header.getSize() : undefined }}
+                      style={{
+                        // mkt-eyebrow 스타일 (mono uppercase tracking)
+                        fontFamily: 'var(--mkt-font-mono)',
+                        fontSize: '10px',
+                        fontWeight: 400,
+                        letterSpacing: '0.5px',
+                        textTransform: 'uppercase',
+                        color: 'var(--mkt-ink)',
+                        opacity: 0.5,
+                        width: header.getSize() !== 150 ? header.getSize() : undefined,
+                      }}
                       onClick={canSort ? header.column.getToggleSortingHandler() : undefined}
                       onKeyDown={(e) => {
                         if (canSort && (e.key === 'Enter' || e.key === ' ')) {
@@ -409,14 +470,21 @@ export function DataTable<T>({
               <tr role="row">
                 <td
                   colSpan={columnCount}
-                  className="px-4 py-16 text-center text-[var(--color-text-muted)]"
+                  className="px-4 py-16 text-center"
+                  style={{ color: 'var(--mkt-ink)', opacity: 0.45 }}
                 >
                   {emptyState ?? (
                     <div className="flex flex-col items-center gap-2">
-                      <span className="text-4xl" aria-hidden="true">
-                        📭
-                      </span>
-                      <p className="text-base font-medium">데이터가 없습니다</p>
+                      <p
+                        style={{
+                          fontFamily: 'var(--mkt-font-sans)',
+                          fontSize: '16px',
+                          fontWeight: 540,
+                          color: 'var(--mkt-ink)',
+                        }}
+                      >
+                        데이터가 없습니다
+                      </p>
                     </div>
                   )}
                 </td>
@@ -436,14 +504,17 @@ export function DataTable<T>({
                       if (el) rowRefs.current.set(idx, el)
                       else rowRefs.current.delete(idx)
                     }}
+                    style={{
+                      borderBottom: '1px solid var(--mkt-hairline)',
+                      backgroundColor: isSelected ? 'var(--mkt-hairline-soft)' : 'transparent',
+                      transition: 'background-color 100ms ease',
+                      cursor: onRowClick ? 'pointer' : undefined,
+                      outline: isFocused ? `2px solid var(--mkt-ink)` : undefined,
+                      outlineOffset: isFocused ? '-2px' : undefined,
+                    }}
                     className={cn(
-                      'border-b border-[var(--color-border)] last:border-b-0',
-                      'transition-colors duration-[var(--duration-fast)]',
-                      'hover:bg-[var(--color-surface-muted)]',
-                      isSelected && 'bg-[var(--color-brand-50)]',
-                      isFocused &&
-                        'outline outline-2 outline-[var(--color-brand-500)] outline-offset-[-2px]',
-                      onRowClick && 'cursor-pointer',
+                      'hover:bg-[var(--mkt-hairline-soft)]',
+                      'focus-visible:outline-none',
                     )}
                     onClick={() => onRowClick?.(row.original)}
                     onKeyDown={(e) => {
@@ -474,26 +545,41 @@ export function DataTable<T>({
             <div
               key={i}
               aria-hidden="true"
-              className="rounded-[var(--radius-lg)] border border-[var(--color-border)] bg-[var(--color-surface-raised)] p-4"
+              style={{
+                borderRadius: 'var(--mkt-rounded-md)',
+                border: '1px solid var(--mkt-hairline)',
+                backgroundColor: 'var(--mkt-canvas)',
+                padding: 'var(--mkt-space-md)',
+              }}
             >
               <div className="flex flex-col gap-3">
                 {Array.from({ length: 3 }).map((_, j) => (
                   <div
                     key={j}
-                    className="h-4 w-full rounded-[var(--radius-sm)] bg-[var(--color-surface-muted)] animate-pulse"
+                    className="h-4 w-full animate-pulse"
+                    style={{
+                      borderRadius: 'var(--mkt-rounded-xs)',
+                      backgroundColor: 'var(--mkt-hairline-soft)',
+                    }}
                   />
                 ))}
               </div>
             </div>
           ))
         ) : rows.length === 0 ? (
-          <div className="py-16 text-center text-[var(--color-text-muted)]">
+          <div className="py-16 text-center" style={{ color: 'var(--mkt-ink)', opacity: 0.45 }}>
             {emptyState ?? (
               <div className="flex flex-col items-center gap-2">
-                <span className="text-4xl" aria-hidden="true">
-                  📭
-                </span>
-                <p className="text-base font-medium">데이터가 없습니다</p>
+                <p
+                  style={{
+                    fontFamily: 'var(--mkt-font-sans)',
+                    fontSize: '16px',
+                    fontWeight: 540,
+                    color: 'var(--mkt-ink)',
+                  }}
+                >
+                  데이터가 없습니다
+                </p>
               </div>
             )}
           </div>
@@ -530,21 +616,30 @@ export function DataTable<T>({
         )}
       </div>
 
-      {/* ─── 페이지네이션 ─── */}
+      {/* ─── 페이지네이션 — mkt-btn-secondary pill ─── */}
       {totalPages > 1 && (
         <nav
           aria-label="페이지 네비게이션"
           className="flex items-center justify-between gap-4 flex-wrap"
         >
-          <span className="text-sm text-[var(--color-text-muted)]">
+          <span
+            style={{
+              fontFamily: 'var(--mkt-font-sans)',
+              fontSize: '14px',
+              fontWeight: 330,
+              color: 'var(--mkt-ink)',
+              opacity: 0.55,
+            }}
+          >
             {pagination
               ? `총 ${pagination.totalCount.toLocaleString()}건`
               : `총 ${data.length.toLocaleString()}건`}
           </span>
           <div className="flex items-center gap-2">
-            <Button
-              variant="secondary"
-              size="sm"
+            <button
+              type="button"
+              className="mkt-btn-secondary"
+              style={{ minHeight: '36px', padding: '6px 18px', fontSize: '14px' }}
               disabled={currentPage === 0}
               onClick={() => {
                 if (pagination) {
@@ -556,13 +651,21 @@ export function DataTable<T>({
               aria-label="이전 페이지"
             >
               이전
-            </Button>
-            <span className="text-sm text-[var(--color-text)]">
+            </button>
+            <span
+              style={{
+                fontFamily: 'var(--mkt-font-mono)',
+                fontSize: '13px',
+                color: 'var(--mkt-ink)',
+                opacity: 0.55,
+              }}
+            >
               {currentPage + 1} / {totalPages}
             </span>
-            <Button
-              variant="secondary"
-              size="sm"
+            <button
+              type="button"
+              className="mkt-btn-secondary"
+              style={{ minHeight: '36px', padding: '6px 18px', fontSize: '14px' }}
               disabled={currentPage >= totalPages - 1}
               onClick={() => {
                 if (pagination) {
@@ -574,7 +677,7 @@ export function DataTable<T>({
               aria-label="다음 페이지"
             >
               다음
-            </Button>
+            </button>
           </div>
         </nav>
       )}

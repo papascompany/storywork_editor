@@ -354,46 +354,34 @@ export function AuditListClient({ initialData, initialTotalCount }: AuditListCli
   return (
     <div className="p-6 lg:p-10" style={{ fontFamily: 'var(--mkt-font-sans)' }}>
       {/* 헤더 */}
-      <div className="mb-8">
+      <header
+        className="mb-10"
+        style={{
+          paddingBottom: 'var(--mkt-space-lg)',
+          borderBottom: '1px solid var(--mkt-hairline)',
+        }}
+      >
         <p
+          className="mkt-eyebrow"
           style={{
-            fontFamily: 'var(--mkt-font-mono)',
-            fontSize: '11px',
-            fontWeight: 400,
-            letterSpacing: '0.6px',
-            textTransform: 'uppercase',
             color: 'var(--mkt-ink)',
             opacity: 0.4,
-            marginBottom: '6px',
+            marginBottom: 'var(--mkt-space-sm)',
+            fontSize: '12px',
           }}
         >
-          Admin / 감사 로그
+          ADMIN / AUDIT / 05
         </p>
         <h1
-          style={{
-            fontFamily: 'var(--mkt-font-sans)',
-            fontSize: 'clamp(24px, 3.5vw, 32px)',
-            fontWeight: 340,
-            lineHeight: 1.1,
-            letterSpacing: '-0.96px',
-            color: 'var(--mkt-ink)',
-            marginBottom: '6px',
-          }}
+          className="mkt-display-lg"
+          style={{ color: 'var(--mkt-ink)', marginBottom: 'var(--mkt-space-sm)' }}
         >
           감사 로그
         </h1>
-        <p
-          style={{
-            fontFamily: 'var(--mkt-font-sans)',
-            fontSize: '15px',
-            fontWeight: 330,
-            color: 'var(--mkt-ink)',
-            opacity: 0.55,
-          }}
-        >
+        <p className="mkt-body" style={{ color: 'var(--mkt-ink)', opacity: 0.55 }}>
           관리자 액션 이력을 조회합니다. 수정·삭제 불가.
         </p>
-      </div>
+      </header>
 
       <div className="flex flex-col lg:flex-row gap-6">
         {/* ── 필터 사이드바 ── */}

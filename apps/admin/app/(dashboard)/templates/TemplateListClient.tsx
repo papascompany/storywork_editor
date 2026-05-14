@@ -152,44 +152,32 @@ export function TemplateListClient({ initialData, formats, userRole }: TemplateL
   return (
     <div className="p-6 lg:p-10" style={{ fontFamily: 'var(--mkt-font-sans)' }}>
       {/* 헤더 */}
-      <div className="mb-8 flex items-start justify-between gap-4 flex-wrap">
+      <header
+        className="mb-10 flex items-end justify-between gap-6 flex-wrap"
+        style={{
+          paddingBottom: 'var(--mkt-space-lg)',
+          borderBottom: '1px solid var(--mkt-hairline)',
+        }}
+      >
         <div>
           <p
+            className="mkt-eyebrow"
             style={{
-              fontFamily: 'var(--mkt-font-mono)',
-              fontSize: '11px',
-              fontWeight: 400,
-              letterSpacing: '0.6px',
-              textTransform: 'uppercase',
               color: 'var(--mkt-ink)',
               opacity: 0.4,
-              marginBottom: '6px',
+              marginBottom: 'var(--mkt-space-sm)',
+              fontSize: '12px',
             }}
           >
-            Admin / 템플릿
+            ADMIN / TEMPLATES / 03
           </p>
           <h1
-            style={{
-              fontFamily: 'var(--mkt-font-sans)',
-              fontSize: 'clamp(24px, 3.5vw, 32px)',
-              fontWeight: 340,
-              lineHeight: 1.1,
-              letterSpacing: '-0.96px',
-              color: 'var(--mkt-ink)',
-              marginBottom: '6px',
-            }}
+            className="mkt-display-lg"
+            style={{ color: 'var(--mkt-ink)', marginBottom: 'var(--mkt-space-sm)' }}
           >
             템플릿 관리
           </h1>
-          <p
-            style={{
-              fontFamily: 'var(--mkt-font-sans)',
-              fontSize: '15px',
-              fontWeight: 330,
-              color: 'var(--mkt-ink)',
-              opacity: 0.55,
-            }}
-          >
+          <p className="mkt-body" style={{ color: 'var(--mkt-ink)', opacity: 0.55 }}>
             페이지 레이아웃 템플릿과 슬롯을 등록하고 관리합니다.
           </p>
         </div>
@@ -200,7 +188,7 @@ export function TemplateListClient({ initialData, formats, userRole }: TemplateL
         >
           <Plus className="size-4" aria-hidden="true" />새 템플릿
         </Link>
-      </div>
+      </header>
 
       {/* 필터 */}
       <div className="mb-5 flex flex-wrap gap-3">
@@ -230,37 +218,21 @@ export function TemplateListClient({ initialData, formats, userRole }: TemplateL
         </select>
       </div>
 
-      {/* 빈 상태 */}
+      {/* 빈 상태 — pastel block */}
       {data.length === 0 && (
-        <div
-          className="flex flex-col items-center justify-center py-16 text-center"
-          style={{
-            borderRadius: 'var(--mkt-rounded-lg)',
-            border: '1.5px dashed var(--mkt-hairline)',
-            backgroundColor: 'var(--mkt-canvas)',
-          }}
+        <section
+          className="mkt-block mkt-block-mint flex flex-col items-center justify-center text-center"
+          style={{ minHeight: '240px' }}
         >
           <p
-            style={{
-              fontFamily: 'var(--mkt-font-sans)',
-              fontSize: '17px',
-              fontWeight: 540,
-              letterSpacing: '-0.26px',
-              color: 'var(--mkt-ink)',
-              marginBottom: '6px',
-            }}
+            className="mkt-headline"
+            style={{ color: 'var(--mkt-ink)', marginBottom: 'var(--mkt-space-xs)' }}
           >
             등록된 템플릿이 없습니다
           </p>
           <p
-            style={{
-              fontFamily: 'var(--mkt-font-sans)',
-              fontSize: '14px',
-              fontWeight: 330,
-              color: 'var(--mkt-ink)',
-              opacity: 0.55,
-              marginBottom: '20px',
-            }}
+            className="mkt-body-sm"
+            style={{ color: 'var(--mkt-ink)', opacity: 0.55, marginBottom: 'var(--mkt-space-xl)' }}
           >
             새 템플릿을 추가해 슬롯을 정의해 보세요.
           </p>
@@ -271,7 +243,7 @@ export function TemplateListClient({ initialData, formats, userRole }: TemplateL
           >
             <Plus className="size-4" aria-hidden="true" />새 템플릿 추가
           </Link>
-        </div>
+        </section>
       )}
 
       {/* 테이블 */}

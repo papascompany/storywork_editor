@@ -185,58 +185,44 @@ export default function NewFormatPage() {
         판형 목록
       </Link>
 
-      <p
+      <header
+        className="mb-8"
         style={{
-          fontFamily: 'var(--mkt-font-mono)',
-          fontSize: '11px',
-          fontWeight: 400,
-          letterSpacing: '0.6px',
-          textTransform: 'uppercase',
-          color: 'var(--mkt-ink)',
-          opacity: 0.4,
-          marginBottom: '6px',
+          paddingBottom: 'var(--mkt-space-lg)',
+          borderBottom: '1px solid var(--mkt-hairline)',
         }}
       >
-        Admin / 판형 / 새 등록
-      </p>
-      <h1
-        style={{
-          fontFamily: 'var(--mkt-font-sans)',
-          fontSize: 'clamp(24px, 3.5vw, 32px)',
-          fontWeight: 340,
-          lineHeight: 1.1,
-          letterSpacing: '-0.96px',
-          color: 'var(--mkt-ink)',
-          marginBottom: '6px',
-        }}
-      >
-        새 판형 등록
-      </h1>
-      <p
-        style={{
-          fontFamily: 'var(--mkt-font-sans)',
-          fontSize: '15px',
-          fontWeight: 330,
-          color: 'var(--mkt-ink)',
-          opacity: 0.55,
-          marginBottom: '32px',
-        }}
-      >
-        프리셋을 선택하거나 직접 입력해 판형을 등록합니다.
-      </p>
-
-      {/* 프리셋 카드 */}
-      <section aria-label="프리셋에서 시작" className="mb-8">
-        <h2
+        <p
+          className="mkt-eyebrow"
           style={{
-            fontFamily: 'var(--mkt-font-mono)',
-            fontSize: '11px',
-            fontWeight: 400,
-            letterSpacing: '0.6px',
-            textTransform: 'uppercase',
             color: 'var(--mkt-ink)',
-            opacity: 0.5,
-            marginBottom: '12px',
+            opacity: 0.4,
+            marginBottom: 'var(--mkt-space-xs)',
+            fontSize: '12px',
+          }}
+        >
+          ADMIN / FORMATS / NEW
+        </p>
+        <h1
+          className="mkt-display-lg"
+          style={{ color: 'var(--mkt-ink)', marginBottom: 'var(--mkt-space-xs)' }}
+        >
+          새 판형 등록
+        </h1>
+        <p className="mkt-body" style={{ color: 'var(--mkt-ink)', opacity: 0.55 }}>
+          프리셋을 선택하거나 직접 입력해 판형을 등록합니다.
+        </p>
+      </header>
+
+      {/* 프리셋 카드 — mkt-block-cream 섹션 */}
+      <section aria-label="프리셋에서 시작" className="mkt-block mkt-block-cream mb-8">
+        <h2
+          className="mkt-eyebrow"
+          style={{
+            color: 'var(--mkt-ink)',
+            opacity: 0.55,
+            marginBottom: 'var(--mkt-space-md)',
+            fontSize: '12px',
           }}
         >
           프리셋에서 시작
