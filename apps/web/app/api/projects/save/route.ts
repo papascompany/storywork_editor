@@ -22,6 +22,7 @@
 import { NextResponse } from 'next/server'
 import { z } from 'zod'
 import { createWebServerClient } from '@/lib/supabase/server'
+import { resolveFormatId } from '@/lib/format-mapping'
 import { getPrismaClient } from '../../_lib/prisma'
 /* eslint-enable import/order */
 
@@ -97,14 +98,19 @@ export async function POST(req: Request): Promise<NextResponse> {
     return jsonError('요청 형식이 올바르지 않습니다.', 400)
   }
 
-  const { projectId, title, formatId, pages } = body
+  const { projectId, title, pages } = body
+  // preset:b5-novel 형태의 클라이언트 ID → DB ID (preset-b5-novel) 로 정규화
+  const formatId = resolveFormatId(body.formatId)
   const prisma = getPrismaClient()
   const now = new Date()
 
   // 4. Format 존재 확인
   const format = await prisma.format.findUnique({ where: { id: formatId } })
   if (!format) {
-    return jsonError(`판형(formatId=${formatId})을 찾을 수 없습니다.`, 400)
+    return jsonError(
+      `지원하지 않는 판형입니다 (formatId=${body.formatId}). 관리자에게 문의하세요.`,
+      400,
+    )
   }
 
   try {
