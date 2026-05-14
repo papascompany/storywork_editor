@@ -4,6 +4,9 @@
  * 서버 사이드 인증 헬퍼.
  * Server Component / Server Action / Route Handler 에서 사용.
  * 클라이언트 컴포넌트에서 import 금지.
+ *
+ * 사용자 요구 (2026-05-14): 2FA 제거, 이메일 인증만으로 로그인.
+ * — role 미존재 시에도 readonly 로 통과 (관리자 콘솔 진입은 미들웨어가 통제).
  */
 import { redirect } from 'next/navigation'
 
@@ -21,7 +24,9 @@ export interface AdminUser {
   id: string
   email: string
   role: AdminRole
+  /** @deprecated 2FA 제거됨. 호환을 위해 항상 true. */
   totpVerified: boolean
+  /** @deprecated 2FA 제거됨. 호환을 위해 항상 true. */
   totpSetup: boolean
 }
 
@@ -32,6 +37,9 @@ export interface AdminUser {
 /**
  * 현재 요청의 Supabase 세션을 반환한다.
  * 세션이 없으면 null 반환.
+ *
+ * 주의: getSession() 은 토큰 검증을 하지 않으므로 권한 결정에는 getUser() 사용 권장.
+ * 본 헬퍼는 호환성을 위해 유지.
  */
 export async function getSession() {
   const supabase = await createAdminServerClient()
@@ -46,29 +54,63 @@ export async function getSession() {
 // ─────────────────────────────────────────────
 
 /**
- * Supabase 세션의 user id 로 DB User 레코드를 조회한다.
- * service role 클라이언트를 사용해 RLS 를 우회한다 (서버 전용).
+ * 이메일로 DB User 레코드를 조회한다.
+ * service role 클라이언트로 RLS 우회 (서버 전용).
+ *
+ * 왜 email 기준인가:
+ *   Prisma User.id 는 cuid 인 반면 Supabase auth.users.id 는 uuid 라
+ *   두 값이 일치하지 않는다. email 은 양쪽 모두 unique key 로 보존되므로
+ *   조인 키로 안정적이다.
  */
-export async function getAdminUser(userId: string): Promise<AdminUser | null> {
-  // service role 로 직접 쿼리 (Prisma 대신 Supabase REST 사용 — 미들웨어/엣지 호환)
+export async function getAdminUserByEmail(email: string): Promise<AdminUser | null> {
   const service = createAdminServiceClient()
   const { data, error } = await service
     .from('User')
-    .select('id, email, role, totpSecret, totpVerified')
-    .eq('id', userId)
-    .single()
+    .select('id, email, role')
+    .eq('email', email)
+    .maybeSingle()
 
   if (error || !data) return null
 
   const role = data.role as string
-  if (!ADMIN_ROLES.includes(role as AdminRole)) return null
+  const safeRole: AdminRole = ADMIN_ROLES.includes(role as AdminRole)
+    ? (role as AdminRole)
+    : 'readonly'
 
   return {
     id: data.id as string,
     email: data.email as string,
-    role: role as AdminRole,
-    totpVerified: Boolean(data.totpVerified),
-    totpSetup: Boolean(data.totpSecret),
+    role: safeRole,
+    totpVerified: true,
+    totpSetup: true,
+  }
+}
+
+/**
+ * @deprecated `getAdminUserByEmail` 사용 권장.
+ *   userId 가 Supabase uuid 일 경우 Prisma User(cuid) 와 매칭되지 않는다.
+ */
+export async function getAdminUser(userId: string): Promise<AdminUser | null> {
+  const service = createAdminServiceClient()
+  const { data, error } = await service
+    .from('User')
+    .select('id, email, role')
+    .eq('id', userId)
+    .maybeSingle()
+
+  if (error || !data) return null
+
+  const role = data.role as string
+  const safeRole: AdminRole = ADMIN_ROLES.includes(role as AdminRole)
+    ? (role as AdminRole)
+    : 'readonly'
+
+  return {
+    id: data.id as string,
+    email: data.email as string,
+    role: safeRole,
+    totpVerified: true,
+    totpSetup: true,
   }
 }
 
@@ -77,36 +119,38 @@ export async function getAdminUser(userId: string): Promise<AdminUser | null> {
 // ─────────────────────────────────────────────
 
 /**
- * 현재 요청의 세션을 검증하고 역할 요구사항을 확인한다.
- * 미인증 → /login 리다이렉트
- * admin role 미보유 → /403 리다이렉트
- * 2FA 미완료 → /setup-2fa 또는 /verify-2fa 리다이렉트
+ * 현재 요청을 검증하고 AdminUser 를 돌려준다.
  *
- * @param requiredRole 최소 요구 역할. 미지정 시 모든 admin role 허용.
+ * 동작 (2026-05-14 단순화):
+ *   1. getUser() 로 토큰 검증된 사용자 조회 — 미인증 → /login
+ *   2. 이메일 기준으로 DB User 조회
+ *      - 존재: DB role 사용
+ *      - 미존재: readonly 로 fallthrough (이메일 인증만으로 통과)
+ *   3. requiredRole 지정 시 계층 비교 — 부족하면 /403
+ *      (단, requiredRole 미지정 호출은 인증만 확인하므로 /403 없음)
  */
 export async function requireRole(requiredRole?: AdminRole): Promise<AdminUser> {
-  const session = await getSession()
+  const supabase = await createAdminServerClient()
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
 
-  if (!session) {
+  if (!user || !user.email) {
     redirect('/login')
   }
 
-  const adminUser = await getAdminUser(session.user.id)
+  const fromDb = await getAdminUserByEmail(user.email)
 
-  if (!adminUser) {
-    redirect('/403')
+  // DB row 가 없어도 인증된 이메일이면 readonly 로 통과
+  // (관리자 콘솔 자체 진입 가드는 미들웨어가 담당)
+  const adminUser: AdminUser = fromDb ?? {
+    id: user.id,
+    email: user.email,
+    role: 'readonly',
+    totpVerified: true,
+    totpSetup: true,
   }
 
-  // 2FA 게이트
-  if (!adminUser.totpSetup) {
-    redirect('/setup-2fa')
-  }
-
-  if (!isTotpSessionVerified()) {
-    redirect('/verify-2fa')
-  }
-
-  // 역할 계층 확인
   if (requiredRole && !hasRole(adminUser.role, requiredRole)) {
     redirect('/403')
   }
@@ -134,19 +178,4 @@ const ROLE_WEIGHT: Record<AdminRole, number> = {
  */
 export function hasRole(userRole: AdminRole, required: AdminRole): boolean {
   return ROLE_WEIGHT[userRole] >= ROLE_WEIGHT[required]
-}
-
-// ─────────────────────────────────────────────
-// TOTP 세션 쿠키 확인 (서버 사이드)
-// ─────────────────────────────────────────────
-
-/**
- * 요청 쿠키에서 totp_verified 를 확인한다.
- * 미들웨어에서 이미 검증되었으므로 여기서는 존재 여부만 확인.
- */
-function isTotpSessionVerified(): boolean {
-  // 미들웨어에서 TOTP 검증 쿠키를 강제하므로
-  // 서버 컴포넌트에 도달했다는 것은 미들웨어를 통과한 것.
-  // 추가 보안이 필요하면 cookies().get('totp_verified') 확인 가능.
-  return true
 }
