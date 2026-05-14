@@ -1,7 +1,6 @@
 /**
  * 미들웨어 라우팅 로직 단위 테스트
  * - PUBLIC_PATHS 화이트리스트
- * - TOTP_PATHS 화이트리스트
  * - ADMIN_ROLES 집합
  */
 import { describe, expect, it } from 'vitest'
@@ -9,8 +8,7 @@ import { describe, expect, it } from 'vitest'
 // 미들웨어 내부 상수를 재정의해서 테스트
 // (Next.js Request 의존성 없이 순수 로직만 테스트)
 
-const PUBLIC_PATHS = new Set(['/login', '/403', '/api/health'])
-const TOTP_PATHS = new Set(['/setup-2fa', '/verify-2fa'])
+const PUBLIC_PATHS = new Set(['/login', '/403', '/api/health', '/reset-password'])
 const ADMIN_ROLES = new Set(['superadmin', 'curator', 'support', 'readonly'])
 
 describe('PUBLIC_PATHS 화이트리스트', () => {
@@ -26,26 +24,16 @@ describe('PUBLIC_PATHS 화이트리스트', () => {
     expect(PUBLIC_PATHS.has('/api/health')).toBe(true)
   })
 
+  it('/reset-password 는 공개 경로다', () => {
+    expect(PUBLIC_PATHS.has('/reset-password')).toBe(true)
+  })
+
   it('/ 는 공개 경로가 아니다', () => {
     expect(PUBLIC_PATHS.has('/')).toBe(false)
   })
 
-  it('/api/auth/totp-verify 는 공개 경로가 아니다', () => {
-    expect(PUBLIC_PATHS.has('/api/auth/totp-verify')).toBe(false)
-  })
-})
-
-describe('TOTP_PATHS 화이트리스트', () => {
-  it('/setup-2fa 는 TOTP 경로다', () => {
-    expect(TOTP_PATHS.has('/setup-2fa')).toBe(true)
-  })
-
-  it('/verify-2fa 는 TOTP 경로다', () => {
-    expect(TOTP_PATHS.has('/verify-2fa')).toBe(true)
-  })
-
-  it('/ 는 TOTP 경로가 아니다', () => {
-    expect(TOTP_PATHS.has('/')).toBe(false)
+  it('/api/auth/logout 는 공개 경로가 아니다', () => {
+    expect(PUBLIC_PATHS.has('/api/auth/logout')).toBe(false)
   })
 })
 

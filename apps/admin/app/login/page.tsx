@@ -71,7 +71,7 @@ function LoginForm() {
         return
       }
 
-      // 로그인 성공 → 미들웨어가 TOTP 게이트로 리다이렉트
+      // 로그인 성공 → 대시보드로 이동
       router.push(nextPath)
       router.refresh()
     } catch {
