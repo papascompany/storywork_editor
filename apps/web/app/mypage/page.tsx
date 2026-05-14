@@ -1,176 +1,97 @@
 /**
  * apps/web/app/mypage/page.tsx
  *
- * 마이페이지 — placeholder (다음 PR 에서 본체 구현).
- * 미인증 접근 시 middleware 가 /login?next=/mypage 로 리다이렉트.
- * 인증된 사용자는 이 페이지 도달.
+ * 마이페이지 — Server Component.
+ * 1. Supabase auth 사용자 확인 (미들웨어 가드 백업)
+ * 2. DB User upsert (getCurrentUser)
+ * 3. 작품 목록 조회 (최신 수정 순)
+ * 4. MyPageShell 에 데이터 전달
+ *
+ * URL query param ?tab=projects|profile|billing|my-data 는
+ * MyPageShell(client) 에서 처리.
  */
 import { redirect } from 'next/navigation'
+import * as React from 'react'
 
+import { MyPageShell } from '@/components/mypage/MyPageShell'
+import { prisma } from '@/lib/prisma'
 import { createWebServerClient } from '@/lib/supabase/server'
+import { getCurrentUser } from '@/lib/users'
 
-export const metadata = {
-  title: '마이페이지',
-}
+export const dynamic = 'force-dynamic'
 
 export default async function MyPage() {
+  // ── 1. 인증 확인 ────────────────────────────────────────────────────────────
   const supabase = await createWebServerClient()
   const {
-    data: { user },
+    data: { user: authUser },
   } = await supabase.auth.getUser()
 
-  // 미인증 → 로그인 (미들웨어 가드 백업)
-  if (!user) {
+  if (!authUser) {
     redirect('/login?next=/mypage')
   }
 
-  const displayName = user.email?.split('@')[0] ?? '사용자'
+  // ── 2. DB User upsert ────────────────────────────────────────────────────────
+  // DB 연결 실패 시에도 기본 정보로 fallthrough (UX 우선)
+  let dbUser = null
+  try {
+    dbUser = await getCurrentUser({
+      id: authUser.id,
+      email: authUser.email,
+    })
+  } catch {
+    // DB 오류 시 auth 정보로만 렌더 (작품 목록은 빈 배열)
+  }
 
-  return (
-    <div
-      style={{
-        minHeight: '100dvh',
-        backgroundColor: 'var(--mkt-surface-soft)',
-        fontFamily: 'var(--mkt-font-sans)',
-        padding: 'var(--mkt-space-xl)',
-      }}
-    >
-      <div
-        style={{
-          maxWidth: '640px',
-          margin: '0 auto',
-          paddingTop: 'var(--mkt-space-xxl)',
-        }}
-      >
-        {/* 카드 */}
-        <div
-          style={{
-            backgroundColor: 'var(--mkt-canvas)',
-            borderRadius: 'var(--mkt-rounded-lg)',
-            border: '1px solid var(--mkt-hairline)',
-            padding: '40px 36px',
-          }}
-        >
-          {/* 아바타 + 이름 */}
-          <div
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: 'var(--mkt-space-md)',
-              marginBottom: 'var(--mkt-space-xl)',
-            }}
-          >
-            <div
-              style={{
-                width: '48px',
-                height: '48px',
-                borderRadius: 'var(--mkt-rounded-full)',
-                backgroundColor: 'var(--mkt-ink)',
-                color: 'var(--mkt-canvas)',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                fontFamily: 'var(--mkt-font-sans)',
-                fontSize: '20px',
-                fontWeight: 540,
-                textTransform: 'uppercase',
-                flexShrink: 0,
-              }}
-              aria-hidden="true"
-            >
-              {displayName[0]}
-            </div>
-            <div>
-              <p
-                style={{
-                  fontFamily: 'var(--mkt-font-sans)',
-                  fontSize: '18px',
-                  fontWeight: 540,
-                  letterSpacing: '-0.26px',
-                  color: 'var(--mkt-ink)',
-                  margin: 0,
-                }}
-              >
-                {displayName}
-              </p>
-              <p
-                style={{
-                  fontFamily: 'var(--mkt-font-sans)',
-                  fontSize: '14px',
-                  fontWeight: 330,
-                  color: 'var(--mkt-ink)',
-                  opacity: 0.5,
-                  margin: '2px 0 0',
-                }}
-              >
-                {user.email}
-              </p>
-            </div>
-          </div>
+  // ── 3. 작품 목록 조회 ────────────────────────────────────────────────────────
+  // DB user 가 있을 때만 조회, 없으면 빈 배열
+  let rawProjects: {
+    id: string
+    title: string
+    status: string
+    updatedAt: Date
+    _count: { pages: number }
+    pages: { thumbnail: string | null }[]
+  }[] = []
 
-          {/* 준비 중 안내 */}
-          <div
-            style={{
-              backgroundColor: 'var(--mkt-surface-soft)',
-              borderRadius: 'var(--mkt-rounded-md)',
-              padding: '24px',
-              textAlign: 'center',
-            }}
-          >
-            <p
-              style={{
-                fontFamily: 'var(--mkt-font-sans)',
-                fontSize: '16px',
-                fontWeight: 330,
-                lineHeight: 1.6,
-                color: 'var(--mkt-ink)',
-                opacity: 0.6,
-                margin: '0 0 8px',
-              }}
-            >
-              마이페이지 본체 준비 중입니다.
-            </p>
-            <p
-              style={{
-                fontFamily: 'var(--mkt-font-mono)',
-                fontSize: '12px',
-                fontWeight: 400,
-                letterSpacing: '0.6px',
-                textTransform: 'uppercase',
-                color: 'var(--mkt-ink)',
-                opacity: 0.3,
-                margin: 0,
-              }}
-            >
-              Coming soon — Next PR
-            </p>
-          </div>
+  if (dbUser) {
+    try {
+      rawProjects = await prisma.project.findMany({
+        where: { ownerId: dbUser.id },
+        orderBy: { updatedAt: 'desc' },
+        select: {
+          id: true,
+          title: true,
+          status: true,
+          updatedAt: true,
+          _count: { select: { pages: true } },
+          // 첫 번째 페이지 썸네일만 가져옴
+          pages: {
+            take: 1,
+            orderBy: { index: 'asc' },
+            select: { thumbnail: true },
+          },
+        },
+      })
+    } catch {
+      // DB 오류 시 빈 배열 유지
+    }
+  }
 
-          {/* 로그아웃 */}
-          <div style={{ marginTop: 'var(--mkt-space-xl)', textAlign: 'right' }}>
-            <form action="/api/auth/logout" method="POST">
-              <button
-                type="submit"
-                style={{
-                  fontFamily: 'var(--mkt-font-sans)',
-                  fontSize: '14px',
-                  fontWeight: 480,
-                  color: 'var(--mkt-ink)',
-                  opacity: 0.55,
-                  background: 'none',
-                  border: 'none',
-                  cursor: 'pointer',
-                  textDecoration: 'underline',
-                  textUnderlineOffset: '3px',
-                  padding: 0,
-                }}
-              >
-                로그아웃
-              </button>
-            </form>
-          </div>
-        </div>
-      </div>
-    </div>
-  )
+  // ProjectData 타입으로 변환
+  const projects = rawProjects.map((p) => ({
+    id: p.id,
+    title: p.title,
+    status: String(p.status),
+    thumbnail: p.pages[0]?.thumbnail ?? null,
+    updatedAt: p.updatedAt,
+    pageCount: p._count.pages,
+  }))
+
+  // ── 4. Shell 렌더 ─────────────────────────────────────────────────────────────
+  const userId = dbUser?.id ?? authUser.id
+  const email = dbUser?.email ?? authUser.email ?? ''
+  const createdAt = dbUser?.createdAt ?? new Date()
+
+  return <MyPageShell userId={userId} email={email} createdAt={createdAt} projects={projects} />
 }
