@@ -118,9 +118,44 @@ export default function ResourceUploadPage() {
   }
 
   return (
-    <div className="p-6 lg:p-8 max-w-2xl">
-      <h1 className="text-2xl font-bold text-[var(--color-text)] mb-2">신규 리소스 업로드</h1>
-      <p className="text-sm text-[var(--color-text-muted)] mb-6">
+    <div className="p-6 lg:p-10 max-w-2xl" style={{ fontFamily: 'var(--mkt-font-sans)' }}>
+      <p
+        style={{
+          fontFamily: 'var(--mkt-font-mono)',
+          fontSize: '11px',
+          fontWeight: 400,
+          letterSpacing: '0.6px',
+          textTransform: 'uppercase',
+          color: 'var(--mkt-ink)',
+          opacity: 0.4,
+          marginBottom: '6px',
+        }}
+      >
+        Admin / 리소스 / 업로드
+      </p>
+      <h1
+        style={{
+          fontFamily: 'var(--mkt-font-sans)',
+          fontSize: 'clamp(24px, 3.5vw, 32px)',
+          fontWeight: 340,
+          lineHeight: 1.1,
+          letterSpacing: '-0.96px',
+          color: 'var(--mkt-ink)',
+          marginBottom: '6px',
+        }}
+      >
+        신규 리소스 업로드
+      </h1>
+      <p
+        style={{
+          fontFamily: 'var(--mkt-font-sans)',
+          fontSize: '15px',
+          fontWeight: 330,
+          color: 'var(--mkt-ink)',
+          opacity: 0.55,
+          marginBottom: '32px',
+        }}
+      >
         PNG 파일을 업로드합니다. 업로드 후 검수 큐에 등록됩니다.
       </p>
 

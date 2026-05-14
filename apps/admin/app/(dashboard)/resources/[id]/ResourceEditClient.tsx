@@ -240,37 +240,74 @@ export function ResourceEditClient({ resource, userRole }: ResourceEditClientPro
     resource.variants?.['webp2x'] ?? resource.variants?.['webp1x'] ?? resource.fileUrl
 
   return (
-    <div className="p-6 lg:p-8">
+    <div className="p-6 lg:p-10" style={{ fontFamily: 'var(--mkt-font-sans)' }}>
       {/* 헤더 */}
-      <div className="mb-6 flex items-center justify-between gap-4 flex-wrap">
-        <div className="flex items-center gap-3">
+      <div className="mb-8 flex items-start justify-between gap-4 flex-wrap">
+        <div>
           <Link
             href="/resources"
-            className="text-[var(--color-text-muted)] hover:text-[var(--color-text)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-brand-500)] rounded"
-            aria-label="목록으로"
+            className="mb-4 inline-flex items-center gap-1.5 focus-visible:outline-none focus-visible:ring-2 rounded"
+            style={{
+              fontFamily: 'var(--mkt-font-sans)',
+              fontSize: '14px',
+              fontWeight: 330,
+              color: 'var(--mkt-ink)',
+              opacity: 0.5,
+              textDecoration: 'none',
+            }}
           >
-            <ArrowLeft className="size-5" />
+            <ArrowLeft className="size-4" aria-hidden="true" />
+            리소스 목록
           </Link>
-          <div>
-            <h1 className="text-xl font-bold text-[var(--color-text)] font-mono">
-              {resource.slug}
-            </h1>
-            <div className="flex items-center gap-2 mt-1">
-              <span className="text-xs text-[var(--color-text-muted)]">
-                {KIND_LABELS[resource.kind] ?? resource.kind}
+          <p
+            style={{
+              fontFamily: 'var(--mkt-font-mono)',
+              fontSize: '11px',
+              fontWeight: 400,
+              letterSpacing: '0.6px',
+              textTransform: 'uppercase',
+              color: 'var(--mkt-ink)',
+              opacity: 0.4,
+              marginBottom: '6px',
+            }}
+          >
+            Admin / 리소스 / 편집
+          </p>
+          <h1
+            style={{
+              fontFamily: 'var(--mkt-font-mono)',
+              fontSize: 'clamp(18px, 2.5vw, 24px)',
+              fontWeight: 400,
+              letterSpacing: '0px',
+              color: 'var(--mkt-ink)',
+              marginBottom: '8px',
+            }}
+          >
+            {resource.slug}
+          </h1>
+          <div className="flex items-center gap-2 flex-wrap">
+            <span
+              style={{
+                fontFamily: 'var(--mkt-font-sans)',
+                fontSize: '13px',
+                fontWeight: 330,
+                color: 'var(--mkt-ink)',
+                opacity: 0.55,
+              }}
+            >
+              {KIND_LABELS[resource.kind] ?? resource.kind}
+            </span>
+            <span style={{ color: 'var(--mkt-hairline)' }}>·</span>
+            <span
+              className={`text-xs px-2 py-0.5 rounded-full font-medium ${STATUS_INFO[currentStatus]?.className ?? ''}`}
+            >
+              {STATUS_INFO[currentStatus]?.label ?? currentStatus}
+            </span>
+            {resource.lowDpi && (
+              <span className="text-xs px-2 py-0.5 rounded-full bg-amber-100 text-amber-700">
+                저해상도
               </span>
-              <span className="text-xs text-[var(--color-text-disabled)]">·</span>
-              <span
-                className={`text-xs px-2 py-0.5 rounded-full font-medium ${STATUS_INFO[currentStatus]?.className ?? ''}`}
-              >
-                {STATUS_INFO[currentStatus]?.label ?? currentStatus}
-              </span>
-              {resource.lowDpi && (
-                <span className="text-xs px-2 py-0.5 rounded-full bg-amber-100 text-amber-700">
-                  저해상도
-                </span>
-              )}
-            </div>
+            )}
           </div>
         </div>
 
@@ -282,7 +319,14 @@ export function ResourceEditClient({ resource, userRole }: ResourceEditClientPro
                 type="button"
                 onClick={() => void handlePublish()}
                 disabled={isPublishing}
-                className="inline-flex items-center gap-2 rounded-[var(--radius-md)] bg-green-600 px-4 py-2 text-sm font-medium text-white hover:bg-green-700 disabled:opacity-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-500"
+                className="mkt-btn-primary"
+                style={{
+                  gap: '8px',
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  backgroundColor: 'var(--mkt-semantic-success)',
+                  opacity: isPublishing ? 0.6 : undefined,
+                }}
               >
                 <Check className="size-4" aria-hidden="true" />
                 {isPublishing ? '처리 중...' : '게시'}
@@ -290,7 +334,14 @@ export function ResourceEditClient({ resource, userRole }: ResourceEditClientPro
               <button
                 type="button"
                 onClick={() => setShowRejectModal(true)}
-                className="inline-flex items-center gap-2 rounded-[var(--radius-md)] bg-red-600 px-4 py-2 text-sm font-medium text-white hover:bg-red-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-500"
+                className="mkt-btn-secondary"
+                style={{
+                  gap: '8px',
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  borderColor: '#dc2626',
+                  color: '#dc2626',
+                }}
               >
                 <X className="size-4" aria-hidden="true" />
                 거절
@@ -302,7 +353,15 @@ export function ResourceEditClient({ resource, userRole }: ResourceEditClientPro
               type="button"
               onClick={() => void handleDelete()}
               disabled={isDeleting}
-              className="inline-flex items-center gap-2 rounded-[var(--radius-md)] border border-red-300 px-4 py-2 text-sm font-medium text-red-600 hover:bg-red-50 disabled:opacity-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-500"
+              className="mkt-btn-secondary"
+              style={{
+                gap: '8px',
+                display: 'inline-flex',
+                alignItems: 'center',
+                borderColor: '#dc2626',
+                color: '#dc2626',
+                opacity: isDeleting ? 0.6 : undefined,
+              }}
             >
               <Trash2 className="size-4" aria-hidden="true" />
               {isDeleting ? '삭제 중...' : '삭제'}

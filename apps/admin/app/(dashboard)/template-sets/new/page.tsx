@@ -127,17 +127,60 @@ export default function NewTemplateSetPage() {
   }
 
   return (
-    <div className="p-6 lg:p-8 max-w-3xl">
+    <div className="p-6 lg:p-10 max-w-3xl" style={{ fontFamily: 'var(--mkt-font-sans)' }}>
       <Link
         href="/template-sets"
-        className="mb-4 inline-flex items-center gap-1 text-sm text-[var(--color-text-muted)] hover:text-[var(--color-text)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-brand-500)] rounded"
+        className="mb-6 inline-flex items-center gap-1.5 focus-visible:outline-none focus-visible:ring-2 rounded"
+        style={{
+          fontFamily: 'var(--mkt-font-sans)',
+          fontSize: '14px',
+          fontWeight: 330,
+          color: 'var(--mkt-ink)',
+          opacity: 0.5,
+          textDecoration: 'none',
+        }}
       >
         <ArrowLeft className="size-4" aria-hidden="true" />
         세트 목록
       </Link>
 
-      <h1 className="mt-2 text-2xl font-bold text-[var(--color-text)]">새 템플릿 세트 만들기</h1>
-      <p className="mt-1 text-sm text-[var(--color-text-muted)] mb-6">
+      <p
+        style={{
+          fontFamily: 'var(--mkt-font-mono)',
+          fontSize: '11px',
+          fontWeight: 400,
+          letterSpacing: '0.6px',
+          textTransform: 'uppercase',
+          color: 'var(--mkt-ink)',
+          opacity: 0.4,
+          marginBottom: '6px',
+        }}
+      >
+        Admin / 템플릿 세트 / 새 등록
+      </p>
+      <h1
+        style={{
+          fontFamily: 'var(--mkt-font-sans)',
+          fontSize: 'clamp(24px, 3.5vw, 32px)',
+          fontWeight: 340,
+          lineHeight: 1.1,
+          letterSpacing: '-0.96px',
+          color: 'var(--mkt-ink)',
+          marginBottom: '6px',
+        }}
+      >
+        새 템플릿 세트 만들기
+      </h1>
+      <p
+        style={{
+          fontFamily: 'var(--mkt-font-sans)',
+          fontSize: '15px',
+          fontWeight: 330,
+          color: 'var(--mkt-ink)',
+          opacity: 0.55,
+          marginBottom: '32px',
+        }}
+      >
         여러 템플릿을 선택하고 순서를 지정해 세트를 구성합니다.
       </p>
 

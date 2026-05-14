@@ -338,23 +338,72 @@ export function ResourceListClient({
   const ALL_KINDS = Object.keys(KIND_LABELS)
 
   return (
-    <div className="p-6 lg:p-8">
+    <div className="p-6 lg:p-10" style={{ fontFamily: 'var(--mkt-font-sans)' }}>
       {/* 헤더 */}
-      <div className="mb-6 flex items-center justify-between gap-4 flex-wrap">
+      <div className="mb-8 flex items-start justify-between gap-4 flex-wrap">
         <div>
-          <h1 className="text-2xl font-bold text-[var(--color-text)]">리소스 관리</h1>
-          <p className="mt-1 text-sm text-[var(--color-text-muted)]">
+          <p
+            style={{
+              fontFamily: 'var(--mkt-font-mono)',
+              fontSize: '11px',
+              fontWeight: 400,
+              letterSpacing: '0.6px',
+              textTransform: 'uppercase',
+              color: 'var(--mkt-ink)',
+              opacity: 0.4,
+              marginBottom: '6px',
+            }}
+          >
+            Admin / 리소스
+          </p>
+          <h1
+            style={{
+              fontFamily: 'var(--mkt-font-sans)',
+              fontSize: 'clamp(24px, 3.5vw, 32px)',
+              fontWeight: 340,
+              lineHeight: 1.1,
+              letterSpacing: '-0.96px',
+              color: 'var(--mkt-ink)',
+              marginBottom: '6px',
+            }}
+          >
+            리소스 관리
+          </h1>
+          <p
+            style={{
+              fontFamily: 'var(--mkt-font-sans)',
+              fontSize: '15px',
+              fontWeight: 330,
+              color: 'var(--mkt-ink)',
+              opacity: 0.55,
+            }}
+          >
             포즈/배경/소품 등 관리자 등록 리소스를 검수하고 관리합니다.
           </p>
         </div>
         <div className="flex items-center gap-3">
           <Link
             href="/resources/review"
-            className="inline-flex items-center gap-2 rounded-[var(--radius-md)] border border-[var(--color-border)] bg-[var(--color-surface)] px-4 py-2 text-sm font-medium text-[var(--color-text)] hover:bg-[var(--color-surface-muted)] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-brand-500)]"
+            className="mkt-btn-secondary"
+            style={{ gap: '8px', display: 'inline-flex', alignItems: 'center' }}
           >
             검수 큐
             {(facets.byStatus['draft'] ?? 0) + (facets.byStatus['review'] ?? 0) > 0 && (
-              <span className="ml-1 inline-flex items-center justify-center size-5 text-xs rounded-full bg-amber-100 text-amber-700 font-semibold">
+              <span
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  width: '20px',
+                  height: '20px',
+                  borderRadius: 'var(--mkt-rounded-full)',
+                  backgroundColor: 'var(--mkt-block-coral)',
+                  fontFamily: 'var(--mkt-font-sans)',
+                  fontSize: '11px',
+                  fontWeight: 540,
+                  color: 'var(--mkt-ink)',
+                }}
+              >
                 {(facets.byStatus['draft'] ?? 0) + (facets.byStatus['review'] ?? 0)}
               </span>
             )}
@@ -362,7 +411,8 @@ export function ResourceListClient({
           {canEdit && (
             <Link
               href="/resources/upload"
-              className="inline-flex items-center gap-2 rounded-[var(--radius-md)] bg-[var(--color-brand-500)] px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-[var(--color-brand-600)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-brand-500)] focus-visible:ring-offset-2"
+              className="mkt-btn-primary"
+              style={{ gap: '8px', display: 'inline-flex', alignItems: 'center' }}
             >
               <Plus className="size-4" aria-hidden="true" />
               신규 업로드
@@ -376,8 +426,9 @@ export function ResourceListClient({
         {/* 검색 */}
         <div className="relative max-w-md">
           <Search
-            className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-[var(--color-text-muted)]"
+            className="absolute left-3 top-1/2 -translate-y-1/2 size-4"
             aria-hidden="true"
+            style={{ color: 'var(--mkt-ink)', opacity: 0.4 }}
           />
           <input
             type="search"
@@ -385,7 +436,21 @@ export function ResourceListClient({
             onChange={(e) => handleSearchChange(e.target.value)}
             placeholder="Slug, 태그, 액션 검색..."
             aria-label="리소스 검색"
-            className="w-full pl-9 pr-4 py-2 rounded-[var(--radius-md)] border border-[var(--color-border)] bg-[var(--color-surface)] text-sm text-[var(--color-text)] placeholder:text-[var(--color-text-disabled)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-brand-500)]"
+            style={{
+              width: '100%',
+              paddingLeft: '36px',
+              paddingRight: '16px',
+              paddingTop: '10px',
+              paddingBottom: '10px',
+              borderRadius: 'var(--mkt-rounded-md)',
+              border: '1px solid var(--mkt-hairline)',
+              backgroundColor: 'var(--mkt-canvas)',
+              fontFamily: 'var(--mkt-font-sans)',
+              fontSize: '15px',
+              fontWeight: 320,
+              color: 'var(--mkt-ink)',
+              outline: 'none',
+            }}
           />
         </div>
 

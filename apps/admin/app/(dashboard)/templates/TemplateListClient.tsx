@@ -122,29 +122,75 @@ export function TemplateListClient({ initialData, formats, userRole }: TemplateL
   }, [selectedIds, router])
 
   return (
-    <div className="p-6 lg:p-8">
+    <div className="p-6 lg:p-10" style={{ fontFamily: 'var(--mkt-font-sans)' }}>
       {/* 헤더 */}
-      <div className="mb-6 flex items-center justify-between gap-4 flex-wrap">
+      <div className="mb-8 flex items-start justify-between gap-4 flex-wrap">
         <div>
-          <h1 className="text-2xl font-bold text-[var(--color-text)]">템플릿 관리</h1>
-          <p className="mt-1 text-sm text-[var(--color-text-muted)]">
+          <p
+            style={{
+              fontFamily: 'var(--mkt-font-mono)',
+              fontSize: '11px',
+              fontWeight: 400,
+              letterSpacing: '0.6px',
+              textTransform: 'uppercase',
+              color: 'var(--mkt-ink)',
+              opacity: 0.4,
+              marginBottom: '6px',
+            }}
+          >
+            Admin / 템플릿
+          </p>
+          <h1
+            style={{
+              fontFamily: 'var(--mkt-font-sans)',
+              fontSize: 'clamp(24px, 3.5vw, 32px)',
+              fontWeight: 340,
+              lineHeight: 1.1,
+              letterSpacing: '-0.96px',
+              color: 'var(--mkt-ink)',
+              marginBottom: '6px',
+            }}
+          >
+            템플릿 관리
+          </h1>
+          <p
+            style={{
+              fontFamily: 'var(--mkt-font-sans)',
+              fontSize: '15px',
+              fontWeight: 330,
+              color: 'var(--mkt-ink)',
+              opacity: 0.55,
+            }}
+          >
             페이지 레이아웃 템플릿과 슬롯을 등록하고 관리합니다.
           </p>
         </div>
         <Link
           href="/templates/new"
-          className="inline-flex items-center gap-2 rounded-[var(--radius-md)] bg-[var(--color-brand-500)] px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-[var(--color-brand-600)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-brand-500)] focus-visible:ring-offset-2"
+          className="mkt-btn-primary"
+          style={{ gap: '8px', display: 'inline-flex', alignItems: 'center', flexShrink: 0 }}
         >
           <Plus className="size-4" aria-hidden="true" />새 템플릿
         </Link>
       </div>
 
       {/* 필터 */}
-      <div className="mb-4 flex flex-wrap gap-3">
+      <div className="mb-5 flex flex-wrap gap-3">
         <select
           value={filterFormatId}
           onChange={(e) => setFilterFormatId(e.target.value)}
-          className="rounded-[var(--radius-md)] border border-[var(--color-border)] bg-[var(--color-surface)] px-3 py-1.5 text-sm text-[var(--color-text)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-brand-500)]"
+          style={{
+            borderRadius: 'var(--mkt-rounded-md)',
+            border: '1px solid var(--mkt-hairline)',
+            backgroundColor: 'var(--mkt-canvas)',
+            padding: '8px 12px',
+            fontFamily: 'var(--mkt-font-sans)',
+            fontSize: '14px',
+            fontWeight: 330,
+            color: 'var(--mkt-ink)',
+            outline: 'none',
+            cursor: 'pointer',
+          }}
           aria-label="판형 필터"
         >
           <option value="">모든 판형</option>
@@ -158,14 +204,42 @@ export function TemplateListClient({ initialData, formats, userRole }: TemplateL
 
       {/* 빈 상태 */}
       {data.length === 0 && (
-        <div className="flex flex-col items-center justify-center rounded-[var(--radius-lg)] border border-[var(--color-border)] border-dashed bg-[var(--color-surface)] py-16 text-center">
-          <p className="text-base font-medium text-[var(--color-text)]">등록된 템플릿이 없습니다</p>
-          <p className="mt-1 text-sm text-[var(--color-text-muted)]">
+        <div
+          className="flex flex-col items-center justify-center py-16 text-center"
+          style={{
+            borderRadius: 'var(--mkt-rounded-lg)',
+            border: '1.5px dashed var(--mkt-hairline)',
+            backgroundColor: 'var(--mkt-canvas)',
+          }}
+        >
+          <p
+            style={{
+              fontFamily: 'var(--mkt-font-sans)',
+              fontSize: '17px',
+              fontWeight: 540,
+              letterSpacing: '-0.26px',
+              color: 'var(--mkt-ink)',
+              marginBottom: '6px',
+            }}
+          >
+            등록된 템플릿이 없습니다
+          </p>
+          <p
+            style={{
+              fontFamily: 'var(--mkt-font-sans)',
+              fontSize: '14px',
+              fontWeight: 330,
+              color: 'var(--mkt-ink)',
+              opacity: 0.55,
+              marginBottom: '20px',
+            }}
+          >
             새 템플릿을 추가해 슬롯을 정의해 보세요.
           </p>
           <Link
             href="/templates/new"
-            className="mt-4 inline-flex items-center gap-2 rounded-[var(--radius-md)] bg-[var(--color-brand-500)] px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-[var(--color-brand-600)]"
+            className="mkt-btn-primary"
+            style={{ gap: '8px', display: 'inline-flex', alignItems: 'center' }}
           >
             <Plus className="size-4" aria-hidden="true" />새 템플릿 추가
           </Link>
