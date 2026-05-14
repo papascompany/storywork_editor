@@ -58,16 +58,11 @@ export async function middleware(request: NextRequest): Promise<NextResponse> {
 
   const isAdminRole = ADMIN_ROLES.has(userRole)
 
-  // 디버깅: role 정보 콘솔 (Vercel runtime logs 에서 확인 가능)
+  // 디버깅: role 정보 콘솔 한 줄 (Vercel runtime logs 에서 확인 가능)
   // eslint-disable-next-line no-console
-  console.log('[middleware]', {
-    pathname,
-    email: user.email,
-    appRole,
-    userMetaRole,
-    isAdminRole,
-    appMetaKeys: Object.keys(user.app_metadata ?? {}),
-  })
+  console.log(
+    `[mw] path=${pathname} email=${user.email} appRole='${appRole}' userMetaRole='${userMetaRole}' admin=${isAdminRole}`,
+  )
 
   // admin role 미보유 → /403
   if (!isAdminRole) {
