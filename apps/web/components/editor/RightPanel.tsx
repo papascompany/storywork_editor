@@ -109,8 +109,9 @@ export function RightPanel({
       className={cn(
         'hidden md:flex md:flex-col',
         'w-[280px] shrink-0',
-        'border-l border-[var(--color-border)]',
-        'bg-[var(--color-surface)]',
+        // editor-border 사용으로 토큰 통일
+        'border-l border-[var(--editor-border,var(--color-border))]',
+        'bg-[var(--editor-panel,var(--color-surface))]',
         'overflow-hidden',
       )}
     >

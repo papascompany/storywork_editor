@@ -209,13 +209,13 @@ export function AlignControlBar({ canvas, history, selectedIds }: AlignControlBa
   }
 
   return (
-    <section aria-label="정렬 및 분배" className="px-4 py-3">
-      <h3 className="mb-2 text-[10px] font-semibold uppercase tracking-wider text-[var(--color-text-muted)]">
+    <section aria-label="정렬 및 분배" className="px-4 py-4">
+      <h3 className="mb-2 text-[10px] font-medium uppercase tracking-[0.6px] text-[var(--editor-text-muted,var(--color-text-muted))] opacity-70">
         정렬
       </h3>
 
       {/* 수평 정렬 */}
-      <div className="mb-2 flex gap-1">
+      <div className="mb-2.5 flex gap-1.5">
         <AlignButton label="왼쪽 정렬" onClick={() => handleAlign('left')}>
           <AlignLeft className="size-3.5" aria-hidden="true" />
         </AlignButton>
@@ -228,7 +228,7 @@ export function AlignControlBar({ canvas, history, selectedIds }: AlignControlBa
       </div>
 
       {/* 수직 정렬 */}
-      <div className="mb-2 flex gap-1">
+      <div className="mb-2.5 flex gap-1.5">
         <AlignButton label="위쪽 정렬" onClick={() => handleAlign('top')}>
           <AlignStartVertical className="size-3.5" aria-hidden="true" />
         </AlignButton>
@@ -241,7 +241,7 @@ export function AlignControlBar({ canvas, history, selectedIds }: AlignControlBa
       </div>
 
       {/* 분배 (3개 이상) */}
-      <div className="flex gap-1">
+      <div className="flex gap-1.5">
         <AlignButton
           label="가로 균등 분배 (3개 이상)"
           disabled={!canDistribute}

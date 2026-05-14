@@ -60,14 +60,21 @@ type ControlBarProps = {
 // ─── 섹션 구분선 ──────────────────────────────────────────────────────────────
 
 function SectionDivider() {
-  return <div aria-hidden="true" className="my-1 h-px w-full bg-[var(--color-border)]" />
+  // 섹션 간 hairline — my-2 로 호흡감 확보
+  return (
+    <div
+      aria-hidden="true"
+      className="my-2 h-px w-full bg-[var(--editor-border,var(--color-border))] opacity-60"
+    />
+  )
 }
 
 // ─── 섹션 헤더 ────────────────────────────────────────────────────────────────
 
 function SectionLabel({ children }: { children: React.ReactNode }) {
+  // eyebrow 스타일 — 마케팅 DESIGN.md caption 토큰 기준, 편집기 고밀도 절제 버전
   return (
-    <h3 className="mb-2 text-[10px] font-semibold uppercase tracking-wider text-[var(--color-text-muted)]">
+    <h3 className="mb-2 text-[10px] font-medium uppercase tracking-[0.6px] text-[var(--editor-text-muted,var(--color-text-muted))] opacity-70">
       {children}
     </h3>
   )
@@ -1106,57 +1113,58 @@ export function ControlBar({ props, canvas, layerTree, history }: ControlBarProp
   })()
 
   return (
-    <div className="flex flex-col gap-0 divide-y divide-[var(--color-border)]">
+    // 섹션 간 hairline divider + 호흡감 개선: py-3 → py-4
+    <div className="flex flex-col gap-0 divide-y divide-[var(--editor-border,var(--color-border))]">
       {/* 섹션 1: 위치/크기 */}
-      <div className="px-4 py-3">
+      <div className="px-4 py-4">
         <PositionSizeSection props={props} canvas={canvas} history={history} />
       </div>
 
       {/* 섹션 2: 투명도 */}
-      <div className="px-4 py-3">
+      <div className="px-4 py-4">
         <OpacitySection props={props} canvas={canvas} history={history} />
       </div>
 
       {/* 섹션 3: 상태 */}
       {layerTree && (
-        <div className="px-4 py-3">
+        <div className="px-4 py-4">
           <StateSection props={props} canvas={canvas} layerTree={layerTree} history={history} />
         </div>
       )}
 
       {/* 섹션 4: 타입별 */}
       {kind === 'background' && (
-        <div className="px-4 py-3">
+        <div className="px-4 py-4">
           <BackgroundFillSection props={props} canvas={canvas} history={history} />
         </div>
       )}
 
       {kind === 'shape' && (
-        <div className="px-4 py-3">
+        <div className="px-4 py-4">
           <ShapeDetailSection props={props} canvas={canvas} history={history} />
         </div>
       )}
 
       {kind === 'pose' && (
-        <div className="px-4 py-3">
+        <div className="px-4 py-4">
           <PlaceholderSection label="포즈" milestone="M2" />
         </div>
       )}
 
       {kind === 'text' && (
-        <div className="px-4 py-3">
+        <div className="px-4 py-4">
           <TextSection props={props} canvas={canvas} history={history} />
         </div>
       )}
 
       {kind === 'speech-bubble' && (
-        <div className="px-4 py-3">
+        <div className="px-4 py-4">
           <BubbleSection props={props} canvas={canvas} history={history} />
         </div>
       )}
 
       {(kind === 'wordfx' || kind === 'decoration' || kind === 'frame') && (
-        <div className="px-4 py-3">
+        <div className="px-4 py-4">
           <PlaceholderSection
             label={kind === 'wordfx' ? '워드효과' : kind === 'decoration' ? '꾸미기' : '프레임'}
             milestone="M5"

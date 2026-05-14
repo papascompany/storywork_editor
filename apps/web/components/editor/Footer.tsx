@@ -211,9 +211,10 @@ export function Footer({
       className={cn(
         // 데스크톱(md+) 전용
         'hidden md:flex',
-        'h-10 items-center justify-between px-3',
-        'border-t border-[var(--color-border)]',
-        'bg-[var(--color-surface)]',
+        // 높이 40px → 44px 로 터치 타겟 확보, 좌우 패딩 16px → 20px 호흡감
+        'h-11 items-center justify-between px-5',
+        'border-t border-[var(--editor-border,var(--color-border))]',
+        'bg-[var(--editor-panel,var(--color-surface))]',
         'select-none',
         className,
       )}
@@ -242,7 +243,7 @@ export function Footer({
 
       {/* 우: 줌 컨트롤 */}
       <div
-        className="flex min-w-[200px] items-center justify-end gap-1"
+        className="flex min-w-[200px] items-center justify-end gap-1.5"
         role="group"
         aria-label="줌 컨트롤"
       >

@@ -167,8 +167,8 @@ export function FormatPickerModal({
           <DialogTitle className="text-lg font-semibold">어떤 판형으로 시작할까요?</DialogTitle>
         </DialogHeader>
 
-        {/* 프리셋 카드 그리드 */}
-        <div className="grid grid-cols-2 gap-3 mt-2" role="radiogroup" aria-label="판형 선택">
+        {/* 프리셋 카드 그리드 — gap-4 mt-4 호흡감 */}
+        <div className="grid grid-cols-2 gap-4 mt-4" role="radiogroup" aria-label="판형 선택">
           {FORMAT_PRESETS.map((preset) => {
             const isSelected = selectedPreset?.id === preset.id
             return (
@@ -179,7 +179,8 @@ export function FormatPickerModal({
                 aria-checked={isSelected}
                 onClick={() => setSelectedPreset(preset)}
                 className={cn(
-                  'flex flex-col items-center gap-2 p-4 rounded-[var(--radius-lg)]',
+                  // relative 필수: 내부 absolute 체크 뱃지용
+                  'relative flex flex-col items-center gap-3 p-5 rounded-[var(--radius-lg)]',
                   'border-2 transition-all duration-[var(--duration-fast)]',
                   'cursor-pointer text-left',
                   'hover:shadow-md hover:-translate-y-0.5',
@@ -223,7 +224,7 @@ export function FormatPickerModal({
 
         {/* 프로젝트 이름 입력 */}
         {selectedPreset && (
-          <div className="mt-4 space-y-1.5">
+          <div className="mt-5 space-y-2">
             <label
               htmlFor="project-title-input"
               className="text-sm font-medium text-[var(--color-text)]"
@@ -260,7 +261,7 @@ export function FormatPickerModal({
         <Button
           onClick={handleConfirm}
           disabled={!selectedPreset}
-          className="w-full mt-4"
+          className="w-full mt-5"
           data-testid="format-picker-confirm"
           aria-label="선택한 판형으로 시작하기"
         >

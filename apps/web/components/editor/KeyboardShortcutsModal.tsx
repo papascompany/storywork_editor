@@ -127,8 +127,8 @@ export function KeyboardShortcutsModal({ open, onClose }: KeyboardShortcutsModal
           'motion-reduce:transition-none',
         )}
       >
-        {/* 헤더 */}
-        <div className="flex shrink-0 items-center justify-between border-b border-[var(--color-border)] px-5 py-3">
+        {/* 헤더 — px-6 py-4 로 호흡감 */}
+        <div className="flex shrink-0 items-center justify-between border-b border-[var(--color-border)] px-6 py-4">
           <h2 id="shortcuts-modal-title" className="text-sm font-semibold text-[var(--color-text)]">
             키보드 단축키
           </h2>
@@ -149,8 +149,8 @@ export function KeyboardShortcutsModal({ open, onClose }: KeyboardShortcutsModal
           </button>
         </div>
 
-        {/* 검색 */}
-        <div className="shrink-0 border-b border-[var(--color-border)] px-4 py-2.5">
+        {/* 검색 — px-6 py-3 호흡감 */}
+        <div className="shrink-0 border-b border-[var(--color-border)] px-6 py-3">
           <div className="flex items-center gap-2">
             <Search className="size-4 shrink-0 text-[var(--color-text-muted)]" aria-hidden="true" />
             <input
@@ -180,8 +180,8 @@ export function KeyboardShortcutsModal({ open, onClose }: KeyboardShortcutsModal
           </div>
         </div>
 
-        {/* 단축키 목록 */}
-        <div className="flex-1 overflow-y-auto p-5" role="region" aria-label="단축키 목록">
+        {/* 단축키 목록 — p-6 호흡감 */}
+        <div className="flex-1 overflow-y-auto p-6" role="region" aria-label="단축키 목록">
           {filteredGroups.length === 0 ? (
             <p className="py-8 text-center text-sm text-[var(--color-text-muted)]">
               일치하는 단축키가 없습니다
@@ -232,8 +232,8 @@ export function KeyboardShortcutsModal({ open, onClose }: KeyboardShortcutsModal
           )}
         </div>
 
-        {/* 푸터 */}
-        <div className="shrink-0 border-t border-[var(--color-border)] bg-[var(--color-surface-muted)] px-5 py-2.5">
+        {/* 푸터 — px-6 py-3.5 로 hairline 위 호흡감 */}
+        <div className="shrink-0 border-t border-[var(--color-border)] bg-[var(--color-surface-muted)] px-6 py-3.5">
           <p className="text-[11px] text-[var(--color-text-muted)]">
             Windows 에선 <KeyCap>Ctrl</KeyCap> 을 ⌘ 대신 사용하세요. 입력 필드에서는 일부 단축키가
             비활성화됩니다.

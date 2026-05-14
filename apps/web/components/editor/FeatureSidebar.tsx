@@ -130,8 +130,9 @@ type PanelSearchProps = {
 }
 
 function PanelSearch({ label, disabled = false }: PanelSearchProps) {
+  // 검색창 영역 — 좌우 16px, 상하 12px 호흡감
   return (
-    <div className="relative px-4 py-3 border-b border-[var(--editor-border)]">
+    <div className="relative px-4 py-3.5 border-b border-[var(--editor-border)]">
       <Search
         className="absolute left-7 top-1/2 -translate-y-1/2 size-4 text-[var(--editor-text-muted)] pointer-events-none"
         aria-hidden="true"
@@ -285,18 +286,20 @@ export function FeatureSidebar({
         aria-live="polite"
         aria-atomic="false"
       >
-        {/* 패널 헤더 */}
+        {/* 패널 헤더 — px-4 py-3 → px-4 py-3.5 로 수직 호흡감 */}
         <div
           className={cn(
             'flex items-center justify-between',
-            'px-4 py-3',
+            'px-4 py-3.5',
             'border-b border-[var(--editor-border)]',
+            // 패널 헤더 미세 강조
+            'bg-[var(--editor-panel)]',
             'shrink-0',
           )}
         >
           <div className="flex items-center gap-2">
             <PanelIcon className="size-4 text-[var(--editor-accent)]" aria-hidden="true" />
-            <h2 className="text-[13px] font-semibold tracking-tight text-[var(--editor-text)] truncate">
+            <h2 className="text-[13px] font-semibold tracking-[-0.1px] text-[var(--editor-text)] truncate">
               {meta.label}
             </h2>
           </div>

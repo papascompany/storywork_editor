@@ -106,8 +106,9 @@ export function SaveLoginGateModal({ open, onClose }: SaveLoginGateModalProps) {
           'bg-[var(--color-surface)]',
           'border border-[var(--color-border)]',
           'shadow-[var(--elevation-e3,0_8px_32px_rgba(0,0,0,0.18))]',
-          'p-6',
-          'flex flex-col items-center gap-5',
+          // p-6 → p-8 으로 호흡감, gap-5 → gap-6 으로 섹션 간격
+          'p-8',
+          'flex flex-col items-center gap-6',
         )}
         // 클릭 이벤트가 백드롭까지 버블링되지 않도록
         onClick={(e) => e.stopPropagation()}
@@ -177,8 +178,8 @@ export function SaveLoginGateModal({ open, onClose }: SaveLoginGateModalProps) {
           </p>
         </div>
 
-        {/* CTA 버튼 그룹 */}
-        <div className="flex w-full flex-col gap-2.5">
+        {/* CTA 버튼 그룹 — gap-3 으로 호흡감 */}
+        <div className="flex w-full flex-col gap-3">
           {/* 회원가입 (primary pill) */}
           <button
             ref={primaryBtnRef}

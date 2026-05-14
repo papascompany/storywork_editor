@@ -621,8 +621,8 @@ export function MobileBottomSheet({
         )}
         style={{ height: snapToHeight(snap) }}
       >
-        {/* 핸들 행 (줌 컨트롤 포함) */}
-        <div className="flex shrink-0 items-center px-2">
+        {/* 핸들 행 (줌 컨트롤 포함) — px-3 로 좌우 호흡감 */}
+        <div className="flex shrink-0 items-center px-3">
           {/* 핸들 버튼 (왼쪽) */}
           <button
             type="button"

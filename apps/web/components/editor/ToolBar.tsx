@@ -202,7 +202,8 @@ export function ToolBar() {
         'w-[72px] shrink-0 flex-col items-center',
         'border-r border-[var(--editor-border)]',
         'bg-[var(--editor-panel)]',
-        'py-2 gap-1',
+        // 상하 패딩 8→12px, 버튼 간 gap 4→6px — 호흡감 개선
+        'py-3 gap-1.5',
         'overflow-y-auto',
         // z-index (FeatureSidebar 보다 위)
         'z-[101]',
@@ -217,8 +218,8 @@ export function ToolBar() {
         onClick={() => handleToolClick(SELECT_DEF)}
       />
 
-      {/* 구분선 */}
-      <div aria-hidden="true" className="my-1 h-px w-10 bg-[var(--editor-border)]" />
+      {/* 구분선 — 호흡감 my-2 */}
+      <div aria-hidden="true" className="my-2 h-px w-10 bg-[var(--editor-border)]" />
 
       {/* 나머지 10종 도구 */}
       {TOOL_DEFS.map((def) => (

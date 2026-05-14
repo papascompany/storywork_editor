@@ -239,8 +239,12 @@ export function TopBar({
         </Button>
       </Tooltip>
 
-      {/* 구분선 */}
-      <div className="mx-1 h-5 w-px bg-[var(--color-border)]" role="separator" aria-hidden="true" />
+      {/* 구분선 — 호흡감을 위해 mx-2 적용 */}
+      <div
+        className="mx-2 h-5 w-px bg-[var(--editor-border,var(--color-border))]"
+        role="separator"
+        aria-hidden="true"
+      />
 
       {/* 미리보기 */}
       <Tooltip content="미리보기" side="bottom">
@@ -340,14 +344,14 @@ export function TopBar({
         // 배경/보더
         'bg-[var(--editor-panel,var(--color-surface))]',
         'border-b border-[var(--editor-border,var(--color-border))]',
-        // 패딩
-        'px-2 md:px-3',
+        // 패딩 — 호흡감 개선: 모바일 16px / 데스크톱 20px
+        'px-4 md:px-5',
         // z-index (panel 레이어)
         'z-[20]',
       )}
     >
       {/* ── 좌측 그룹 ─────────────────────────────────────── */}
-      <div className="flex min-w-0 shrink-0 items-center gap-1">
+      <div className="flex min-w-0 shrink-0 items-center gap-2">
         {/* 로고 */}
         <Tooltip content="StoryWork 홈" side="bottom">
           <Link
@@ -375,10 +379,10 @@ export function TopBar({
         </Tooltip>
 
         {/* 파일명 인라인 편집 (데스크톱에서 전체 표시) */}
-        <div className="hidden sm:flex items-center gap-0.5">
+        <div className="hidden sm:flex items-center gap-1">
           {/* 구분선 */}
           <div
-            className="mx-1 h-4 w-px bg-[var(--color-border)]"
+            className="mx-1 h-4 w-px bg-[var(--editor-border,var(--color-border))]"
             role="separator"
             aria-hidden="true"
           />
@@ -475,7 +479,7 @@ export function TopBar({
 
       {/* ── 우측 그룹 (데스크톱) ─────────────────────────────── */}
       <div
-        className="hidden md:flex shrink-0 items-center gap-0.5"
+        className="hidden md:flex shrink-0 items-center gap-1"
         role="toolbar"
         aria-label="편집 도구"
       >

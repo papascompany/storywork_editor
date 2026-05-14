@@ -985,7 +985,7 @@ export function EditorShell() {
   return (
     <EditorContext.Provider value={ctxValue}>
       <div
-        className="flex h-dvh flex-col overflow-hidden bg-[var(--color-surface)]"
+        className="flex h-dvh flex-col overflow-hidden bg-[var(--editor-panel,var(--color-surface))]"
         role="application"
         aria-label="StoryWork 편집기"
       >
