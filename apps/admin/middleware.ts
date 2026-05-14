@@ -37,14 +37,14 @@ export async function middleware(request: NextRequest): Promise<NextResponse> {
     return response
   }
 
-  // Supabase 세션 검증
+  // Supabase 사용자 검증 — getUser() 사용 (getSession 은 토큰 검증 안 함, 권장 X)
   const { supabase, response } = createMiddlewareClient(request)
   const {
-    data: { session },
-  } = await supabase.auth.getSession()
+    data: { user },
+  } = await supabase.auth.getUser()
 
   // 미인증 → /login
-  if (!session) {
+  if (!user) {
     const loginUrl = request.nextUrl.clone()
     loginUrl.pathname = '/login'
     loginUrl.searchParams.set('next', pathname)
@@ -52,8 +52,8 @@ export async function middleware(request: NextRequest): Promise<NextResponse> {
   }
 
   // admin role 확인 — Supabase app_metadata + user_metadata 양쪽에서 role 조회
-  const appRole = (session.user.app_metadata?.['role'] as string | undefined) ?? ''
-  const userMetaRole = (session.user.user_metadata?.['role'] as string | undefined) ?? ''
+  const appRole = (user.app_metadata?.['role'] as string | undefined) ?? ''
+  const userMetaRole = (user.user_metadata?.['role'] as string | undefined) ?? ''
   const userRole = appRole || userMetaRole
 
   const isAdminRole = ADMIN_ROLES.has(userRole)
@@ -62,11 +62,11 @@ export async function middleware(request: NextRequest): Promise<NextResponse> {
   // eslint-disable-next-line no-console
   console.log('[middleware]', {
     pathname,
-    email: session.user.email,
+    email: user.email,
     appRole,
     userMetaRole,
     isAdminRole,
-    appMetaKeys: Object.keys(session.user.app_metadata ?? {}),
+    appMetaKeys: Object.keys(user.app_metadata ?? {}),
   })
 
   // admin role 미보유 → /403
