@@ -151,7 +151,7 @@ export function Header() {
           style={{ gap: 'var(--mkt-space-sm)', alignItems: 'center' }}
         >
           <Link
-            href="/api/auth/signin"
+            href="https://storywork-editor-admin.vercel.app/login"
             style={{
               fontFamily: 'var(--mkt-font-sans)',
               fontSize: 'var(--mkt-body-sm-size)',
@@ -220,7 +220,7 @@ export function Header() {
                   }}
                 >
                   <Link
-                    href="/api/auth/signin"
+                    href="https://storywork-editor-admin.vercel.app/login"
                     onClick={() => setMenuOpen(false)}
                     style={{
                       fontFamily: 'var(--mkt-font-sans)',
