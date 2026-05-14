@@ -54,18 +54,52 @@ function PresetCard({
       type="button"
       onClick={onClick}
       className={cn(
-        'flex flex-col items-start gap-1 rounded-[var(--radius-lg)] border p-4 text-left transition-colors',
-        'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-brand-500)]',
-        selected
-          ? 'border-[var(--color-brand-500)] bg-[var(--color-brand-50)]'
-          : 'border-[var(--color-border)] bg-[var(--color-surface)] hover:bg-[var(--color-surface-muted)]',
+        'flex flex-col items-start gap-1 text-left transition-colors',
+        'focus-visible:outline-none focus-visible:ring-2',
       )}
+      style={{
+        padding: '14px',
+        borderRadius: 'var(--mkt-rounded-md)',
+        border: selected ? '2px solid var(--mkt-ink)' : '1.5px solid var(--mkt-hairline)',
+        backgroundColor: selected ? 'var(--mkt-block-lime)' : 'var(--mkt-canvas)',
+        cursor: 'pointer',
+      }}
       aria-pressed={selected}
     >
-      <span className="font-semibold text-sm text-[var(--color-text)]">{preset.name}</span>
-      <span className="text-xs text-[var(--color-text-muted)]">{preset.description}</span>
-      <span className="text-xs text-[var(--color-text-disabled)] font-mono mt-1">
-        {preset.values.widthMm} × {preset.values.heightMm} mm · {preset.values.dpi} DPI
+      <span
+        style={{
+          fontFamily: 'var(--mkt-font-sans)',
+          fontSize: '14px',
+          fontWeight: 540,
+          letterSpacing: '-0.10px',
+          color: 'var(--mkt-ink)',
+        }}
+      >
+        {preset.name}
+      </span>
+      <span
+        style={{
+          fontFamily: 'var(--mkt-font-sans)',
+          fontSize: '12px',
+          fontWeight: 330,
+          color: 'var(--mkt-ink)',
+          opacity: 0.55,
+          lineHeight: 1.4,
+        }}
+      >
+        {preset.description}
+      </span>
+      <span
+        style={{
+          fontFamily: 'var(--mkt-font-mono)',
+          fontSize: '11px',
+          fontWeight: 400,
+          color: 'var(--mkt-ink)',
+          opacity: 0.4,
+          marginTop: '4px',
+        }}
+      >
+        {preset.values.widthMm} × {preset.values.heightMm}mm · {preset.values.dpi}dpi
       </span>
     </button>
   )
@@ -133,24 +167,80 @@ export default function NewFormatPage() {
   }
 
   return (
-    <div className="p-6 lg:p-8 max-w-2xl">
+    <div className="p-6 lg:p-10 max-w-2xl" style={{ fontFamily: 'var(--mkt-font-sans)' }}>
       {/* 뒤로 가기 */}
       <Link
         href="/formats"
-        className="mb-4 inline-flex items-center gap-1 text-sm text-[var(--color-text-muted)] hover:text-[var(--color-text)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-brand-500)] rounded"
+        className="mb-6 inline-flex items-center gap-1.5 focus-visible:outline-none focus-visible:ring-2 rounded"
+        style={{
+          fontFamily: 'var(--mkt-font-sans)',
+          fontSize: '14px',
+          fontWeight: 330,
+          color: 'var(--mkt-ink)',
+          opacity: 0.5,
+          textDecoration: 'none',
+        }}
       >
         <ArrowLeft className="size-4" aria-hidden="true" />
         판형 목록
       </Link>
 
-      <h1 className="mt-2 text-2xl font-bold text-[var(--color-text)]">새 판형 등록</h1>
-      <p className="mt-1 text-sm text-[var(--color-text-muted)] mb-6">
+      <p
+        style={{
+          fontFamily: 'var(--mkt-font-mono)',
+          fontSize: '11px',
+          fontWeight: 400,
+          letterSpacing: '0.6px',
+          textTransform: 'uppercase',
+          color: 'var(--mkt-ink)',
+          opacity: 0.4,
+          marginBottom: '6px',
+        }}
+      >
+        Admin / 판형 / 새 등록
+      </p>
+      <h1
+        style={{
+          fontFamily: 'var(--mkt-font-sans)',
+          fontSize: 'clamp(24px, 3.5vw, 32px)',
+          fontWeight: 340,
+          lineHeight: 1.1,
+          letterSpacing: '-0.96px',
+          color: 'var(--mkt-ink)',
+          marginBottom: '6px',
+        }}
+      >
+        새 판형 등록
+      </h1>
+      <p
+        style={{
+          fontFamily: 'var(--mkt-font-sans)',
+          fontSize: '15px',
+          fontWeight: 330,
+          color: 'var(--mkt-ink)',
+          opacity: 0.55,
+          marginBottom: '32px',
+        }}
+      >
         프리셋을 선택하거나 직접 입력해 판형을 등록합니다.
       </p>
 
       {/* 프리셋 카드 */}
       <section aria-label="프리셋에서 시작" className="mb-8">
-        <h2 className="text-sm font-semibold text-[var(--color-text)] mb-3">프리셋에서 시작</h2>
+        <h2
+          style={{
+            fontFamily: 'var(--mkt-font-mono)',
+            fontSize: '11px',
+            fontWeight: 400,
+            letterSpacing: '0.6px',
+            textTransform: 'uppercase',
+            color: 'var(--mkt-ink)',
+            opacity: 0.5,
+            marginBottom: '12px',
+          }}
+        >
+          프리셋에서 시작
+        </h2>
         <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
           {FORMAT_PRESETS.map((preset) => (
             <PresetCard

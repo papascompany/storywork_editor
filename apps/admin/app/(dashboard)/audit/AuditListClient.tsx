@@ -295,11 +295,45 @@ export function AuditListClient({ initialData, initialTotalCount }: AuditListCli
     (filter.search ? 1 : 0)
 
   return (
-    <div className="p-6 lg:p-8">
+    <div className="p-6 lg:p-10" style={{ fontFamily: 'var(--mkt-font-sans)' }}>
       {/* 헤더 */}
-      <div className="mb-6">
-        <h1 className="text-2xl font-bold text-[var(--color-text)]">감사 로그</h1>
-        <p className="mt-1 text-sm text-[var(--color-text-muted)]">
+      <div className="mb-8">
+        <p
+          style={{
+            fontFamily: 'var(--mkt-font-mono)',
+            fontSize: '11px',
+            fontWeight: 400,
+            letterSpacing: '0.6px',
+            textTransform: 'uppercase',
+            color: 'var(--mkt-ink)',
+            opacity: 0.4,
+            marginBottom: '6px',
+          }}
+        >
+          Admin / 감사 로그
+        </p>
+        <h1
+          style={{
+            fontFamily: 'var(--mkt-font-sans)',
+            fontSize: 'clamp(24px, 3.5vw, 32px)',
+            fontWeight: 340,
+            lineHeight: 1.1,
+            letterSpacing: '-0.96px',
+            color: 'var(--mkt-ink)',
+            marginBottom: '6px',
+          }}
+        >
+          감사 로그
+        </h1>
+        <p
+          style={{
+            fontFamily: 'var(--mkt-font-sans)',
+            fontSize: '15px',
+            fontWeight: 330,
+            color: 'var(--mkt-ink)',
+            opacity: 0.55,
+          }}
+        >
           관리자 액션 이력을 조회합니다. 수정·삭제 불가.
         </p>
       </div>

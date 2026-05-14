@@ -4,20 +4,21 @@
  * (dashboard)/layout.tsx
  *
  * 인증 통과 후 관리자 콘솔 셸 레이아웃.
+ * 마케팅 디자인 시스템(--mkt-* 토큰 + Pretendard) 적용.
  * 좌측 사이드바(데스크톱) + 상단 헤더(모바일 햄버거) 구성.
- * Server Component 가 아닌 Client Component — 사이드바 활성 상태 추적에 usePathname 필요.
  */
 
-import { Button, cn } from '@storywork/ui'
+import { cn } from '@storywork/ui'
 import {
   FileText,
   Layers,
+  Layers2,
   LayoutDashboard,
   List,
   LogOut,
   Menu,
   ScrollText,
-  Layers2,
+  Sparkles,
   X,
 } from 'lucide-react'
 import Link from 'next/link'
@@ -58,16 +59,28 @@ function NavItem({
       href={href}
       onClick={onClick}
       className={cn(
-        'flex items-center gap-3 rounded-[var(--radius-md)] px-3 py-2 text-sm font-medium',
-        'transition-colors duration-[var(--duration-fast)]',
-        'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-brand-500)]',
-        isActive
-          ? 'bg-[var(--color-brand-100)] text-[var(--color-brand-700)]'
-          : 'text-[var(--color-text-muted)] hover:bg-[var(--color-surface-muted)] hover:text-[var(--color-text)]',
+        'flex items-center gap-3 px-3 py-2.5 text-sm transition-colors duration-100',
+        'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-1',
+        isActive ? 'font-medium' : 'font-normal',
       )}
+      style={{
+        borderRadius: 'var(--mkt-rounded-md)',
+        fontFamily: 'var(--mkt-font-sans)',
+        fontSize: '15px',
+        fontWeight: isActive ? 480 : 330,
+        letterSpacing: '-0.10px',
+        color: isActive ? 'var(--mkt-ink)' : 'var(--mkt-ink)',
+        opacity: isActive ? 1 : 0.55,
+        backgroundColor: isActive ? 'var(--mkt-hairline-soft)' : 'transparent',
+        textDecoration: 'none',
+      }}
       aria-current={isActive ? 'page' : undefined}
     >
-      <Icon className="size-4 shrink-0" aria-hidden="true" />
+      <Icon
+        className="size-4 shrink-0"
+        aria-hidden="true"
+        style={{ opacity: isActive ? 1 : 0.7 }}
+      />
       {label}
     </Link>
   )
@@ -77,16 +90,45 @@ function NavItem({
 
 function Sidebar({ onClose }: { onClose?: () => void }) {
   return (
-    <nav aria-label="관리자 메뉴" className="flex flex-col gap-1 p-4">
+    <nav aria-label="관리자 메뉴" className="flex flex-col gap-0.5 p-4">
       {/* 로고 */}
-      <div className="mb-4 flex items-center justify-between">
-        <span className="text-base font-bold text-[var(--color-text)]">StoryWork Admin</span>
+      <div
+        className="mb-6 flex items-center justify-between"
+        style={{ paddingBottom: '16px', borderBottom: '1px solid var(--mkt-hairline)' }}
+      >
+        <div className="flex items-center gap-2">
+          <Sparkles className="size-5" aria-hidden="true" style={{ color: 'var(--mkt-ink)' }} />
+          <span
+            style={{
+              fontFamily: 'var(--mkt-font-sans)',
+              fontSize: '16px',
+              fontWeight: 540,
+              letterSpacing: '-0.26px',
+              color: 'var(--mkt-ink)',
+            }}
+          >
+            StoryWork{' '}
+            <span
+              style={{
+                fontFamily: 'var(--mkt-font-mono)',
+                fontSize: '10px',
+                fontWeight: 400,
+                letterSpacing: '0.6px',
+                textTransform: 'uppercase',
+                opacity: 0.45,
+              }}
+            >
+              Admin
+            </span>
+          </span>
+        </div>
         {onClose && (
           <button
             type="button"
             onClick={onClose}
             aria-label="메뉴 닫기"
-            className="rounded-[var(--radius-sm)] p-1 text-[var(--color-text-muted)] hover:text-[var(--color-text)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-brand-500)]"
+            className="rounded-md p-1 focus-visible:outline-none focus-visible:ring-2"
+            style={{ color: 'var(--mkt-ink)', opacity: 0.5 }}
           >
             <X className="size-5" />
           </button>
@@ -106,25 +148,40 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   const [mobileOpen, setMobileOpen] = React.useState(false)
 
   return (
-    <div className="flex min-h-dvh bg-[var(--color-surface-muted)]">
+    <div
+      className="flex min-h-dvh"
+      style={{ backgroundColor: 'var(--mkt-surface-soft)', fontFamily: 'var(--mkt-font-sans)' }}
+    >
       {/* ─── 데스크톱 사이드바 ─── */}
       <aside
-        className="hidden w-56 shrink-0 border-r border-[var(--color-border)] bg-[var(--color-surface)] md:flex md:flex-col"
+        className="hidden w-56 shrink-0 md:flex md:flex-col"
         aria-label="사이드바"
+        style={{
+          backgroundColor: 'var(--mkt-canvas)',
+          borderRight: '1px solid var(--mkt-hairline)',
+        }}
       >
         <Sidebar />
 
-        {/* 로그아웃 버튼 */}
-        <div className="mt-auto border-t border-[var(--color-border)] p-4">
+        {/* 로그아웃 */}
+        <div className="mt-auto p-4" style={{ borderTop: '1px solid var(--mkt-hairline)' }}>
           <form action="/api/auth/logout" method="post">
             <button
               type="submit"
-              className={cn(
-                'flex w-full items-center gap-3 rounded-[var(--radius-md)] px-3 py-2 text-sm font-medium',
-                'text-[var(--color-text-muted)] transition-colors duration-[var(--duration-fast)]',
-                'hover:bg-[var(--color-surface-muted)] hover:text-[var(--color-text)]',
-                'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-brand-500)]',
-              )}
+              className="flex w-full items-center gap-3 px-3 py-2.5 text-sm transition-opacity hover:opacity-80 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-1"
+              style={{
+                borderRadius: 'var(--mkt-rounded-md)',
+                fontFamily: 'var(--mkt-font-sans)',
+                fontSize: '15px',
+                fontWeight: 330,
+                letterSpacing: '-0.10px',
+                color: 'var(--mkt-ink)',
+                opacity: 0.45,
+                background: 'none',
+                border: 'none',
+                cursor: 'pointer',
+                textAlign: 'left',
+              }}
             >
               <LogOut className="size-4 shrink-0" aria-hidden="true" />
               로그아웃
@@ -148,7 +205,10 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
             aria-hidden="true"
           />
           {/* 드로어 */}
-          <div className="absolute left-0 top-0 bottom-0 w-64 bg-[var(--color-surface)] shadow-xl">
+          <div
+            className="absolute left-0 top-0 bottom-0 w-64 shadow-xl"
+            style={{ backgroundColor: 'var(--mkt-canvas)' }}
+          >
             <Sidebar onClose={() => setMobileOpen(false)} />
           </div>
         </div>
@@ -157,17 +217,37 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       {/* ─── 메인 영역 ─── */}
       <div className="flex flex-1 flex-col overflow-hidden">
         {/* 모바일 헤더 */}
-        <header className="flex items-center gap-3 border-b border-[var(--color-border)] bg-[var(--color-surface)] px-4 py-3 md:hidden">
-          <Button
-            variant="ghost"
-            size="sm"
+        <header
+          className="flex items-center gap-3 px-4 py-3 md:hidden"
+          style={{
+            backgroundColor: 'var(--mkt-canvas)',
+            borderBottom: '1px solid var(--mkt-hairline)',
+          }}
+        >
+          <button
+            type="button"
             onClick={() => setMobileOpen(true)}
             aria-label="메뉴 열기"
             aria-expanded={mobileOpen}
+            className="flex items-center justify-center rounded-md p-1.5 focus-visible:outline-none focus-visible:ring-2"
+            style={{ color: 'var(--mkt-ink)', opacity: 0.6 }}
           >
             <Menu className="size-5" aria-hidden="true" />
-          </Button>
-          <span className="text-sm font-bold text-[var(--color-text)]">StoryWork Admin</span>
+          </button>
+          <div className="flex items-center gap-1.5">
+            <Sparkles className="size-4" aria-hidden="true" style={{ color: 'var(--mkt-ink)' }} />
+            <span
+              style={{
+                fontFamily: 'var(--mkt-font-sans)',
+                fontSize: '15px',
+                fontWeight: 540,
+                letterSpacing: '-0.26px',
+                color: 'var(--mkt-ink)',
+              }}
+            >
+              StoryWork Admin
+            </span>
+          </div>
         </header>
 
         {/* 페이지 콘텐츠 */}
