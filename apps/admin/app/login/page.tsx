@@ -2,7 +2,7 @@
 
 import { Sparkles } from 'lucide-react'
 import Link from 'next/link'
-import { useRouter, useSearchParams } from 'next/navigation'
+import { useSearchParams } from 'next/navigation'
 import { type CSSProperties, type FocusEvent, type FormEvent, Suspense, useState } from 'react'
 
 import { createAdminBrowserClient } from '../../src/lib/supabase/client'
@@ -32,7 +32,6 @@ function handleInputBlur(e: FocusEvent<HTMLInputElement>) {
 }
 
 function LoginForm() {
-  const router = useRouter()
   const searchParams = useSearchParams()
   // 안전한 next 만 허용 (외부 URL 차단 + 삭제된 2FA 페이지 차단)
   const requestedNext = searchParams.get('next') ?? '/'
@@ -80,8 +79,9 @@ function LoginForm() {
       }
 
       // 로그인 성공 → 대시보드로 이동
-      router.push(nextPath)
-      router.refresh()
+      // Supabase SSR cookie 가 set 되는 시점과 router.push 의 race condition 회피.
+      // window.location.href 로 full page reload → 미들웨어가 새 cookie 받고 처리.
+      window.location.href = nextPath
     } catch {
       setError('로그인 중 오류가 발생했습니다. 다시 시도하세요.')
     } finally {
