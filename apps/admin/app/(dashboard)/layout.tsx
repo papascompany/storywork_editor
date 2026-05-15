@@ -73,34 +73,25 @@ function SidebarLogo({ email }: { email: string }) {
 
 // ─── 로그아웃 슬롯 ───────────────────────────────────────────────────────────
 
+/**
+ * SidebarLogout — Server Component 호환 (이벤트 핸들러 X, CSS :hover 만)
+ *
+ * 이전 버전에 onMouseEnter/onMouseLeave 가 있어 RSC 에서
+ * "Event handlers cannot be passed to Client Component props" 500 에러 유발.
+ * → tailwind hover: 클래스로 대체.
+ */
 function SidebarLogout() {
   return (
     <div style={{ borderTop: '1px solid var(--nike-hairline-soft)', padding: '12px 8px' }}>
       <form action="/api/auth/logout" method="post">
         <button
           type="submit"
+          className="flex items-center gap-2.5 w-full px-3 py-2.5 rounded-lg border-none bg-transparent cursor-pointer text-left transition-colors hover:bg-[var(--nike-soft-cloud)]"
           style={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: '10px',
-            width: '100%',
-            padding: '10px 12px',
-            borderRadius: '8px',
-            border: 'none',
-            background: 'none',
-            cursor: 'pointer',
             fontFamily: 'var(--nike-font-text)',
             fontSize: '14px',
             fontWeight: 400,
             color: 'var(--nike-mute)',
-            textAlign: 'left',
-            transition: 'background-color 100ms',
-          }}
-          onMouseEnter={(e) => {
-            ;(e.currentTarget as HTMLButtonElement).style.backgroundColor = 'var(--nike-soft-cloud)'
-          }}
-          onMouseLeave={(e) => {
-            ;(e.currentTarget as HTMLButtonElement).style.backgroundColor = 'transparent'
           }}
         >
           <LogOut
