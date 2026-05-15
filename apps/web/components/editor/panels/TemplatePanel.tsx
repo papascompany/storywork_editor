@@ -22,6 +22,8 @@ import { LayoutTemplate, Search } from 'lucide-react'
 import Image from 'next/image'
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 
+import { fitToViewport } from '../Footer'
+
 // ─── API 연동 ─────────────────────────────────────────────────────────────────
 
 type RawTemplate = {
@@ -209,6 +211,11 @@ export function TemplatePanel({ canvas }: TemplatePanelProps) {
       try {
         const { applyTemplate } = await import('@storywork/editor-template')
         applyTemplate(canvas, template, { existingObjects: 'preserve-user' })
+        // 슬롯 배치 후 viewportTransform 을 항상 재계산한다.
+        // applyTemplate 는 슬롯을 페이지 px 좌표에 배치하지만 viewportTransform 은
+        // 건드리지 않는다. 이전 페이지 전환·판형 변경·ResizeObserver 타이밍 등으로
+        // viewportTransform 이 identity 상태이면 슬롯이 좌상단에 겹쳐 보인다.
+        fitToViewport(canvas)
         showToast(`"${template.name}" 템플릿 적용됨`, 'success')
       } catch (err) {
         console.error('[TemplatePanel] applyTemplate 실패:', err)

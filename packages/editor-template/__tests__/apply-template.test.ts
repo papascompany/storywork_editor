@@ -391,3 +391,83 @@ describe('applyTemplate — locked 슬롯', () => {
     expect(poseObj?.evented).toBe(true)
   })
 })
+
+// ─── 회귀 방지: canvas.format 다양한 케이스 ─────────────────────────────────────
+// P0 버그 재현 조건:
+//   TemplateSpec.format(130×200) 과 canvas.format 이 다를 때도
+//   getCanvasSize() 는 항상 canvas.format 기준으로 계산해야 한다.
+// ─────────────────────────────────────────────────────────────────────────────
+
+describe('applyTemplate — canvas.format 다양한 케이스 (P0 회귀 방지)', () => {
+  it('canvas.format=B5(182×257,300dpi) 일 때 슬롯이 실제 canvas.format 기준 px 에 배치됨', () => {
+    // DEFAULT_FORMAT 과 동일한 크기: useStoryCanvas 초기화 시 사용하는 format
+    const dpi = 300
+    const canvas = makeMockCanvas(dpi, 182, 257) as any
+    const pageW = mmToPxHelper(182, dpi)
+    const pageH = mmToPxHelper(257, dpi)
+
+    // 1대1 대화 템플릿(format: 130×200)을 DEFAULT_FORMAT canvas 에 적용
+    const template = make1on1Template()
+    applyTemplate(canvas, template)
+
+    // 배경은 canvas.format 기준 전체 페이지(2150×3039px) 크기여야 한다
+    const bgObj = Array.from(canvas._objects.values()).find(
+      (o: MockRect) => o.data?.kind === 'background',
+    ) as MockRect | undefined
+    expect(bgObj).toBeDefined()
+    expect(bgObj?.width).toBeCloseTo(pageW, 0)
+    expect(bgObj?.height).toBeCloseTo(pageH, 0)
+  })
+
+  it('canvas.format=square(150×150,300dpi) 일 때 슬롯이 square 기준 px 에 배치됨', () => {
+    const dpi = 300
+    const canvas = makeMockCanvas(dpi, 150, 150) as any
+    const pageW = mmToPxHelper(150, dpi)
+    const pageH = mmToPxHelper(150, dpi)
+
+    const template = make1on1Template()
+    applyTemplate(canvas, template)
+
+    const bgObj = Array.from(canvas._objects.values()).find(
+      (o: MockRect) => o.data?.kind === 'background',
+    ) as MockRect | undefined
+    expect(bgObj).toBeDefined()
+    expect(bgObj?.width).toBeCloseTo(pageW, 0)
+    expect(bgObj?.height).toBeCloseTo(pageH, 0)
+    // left-pose: x=0.1 * 1772px ≈ 177px
+    const poseObjs = Array.from(canvas._objects.values()).filter(
+      (o: MockRect) => o.data?.kind === 'pose',
+    ) as MockRect[]
+    const leftPose = poseObjs[0]
+    expect(leftPose).toBeDefined()
+    expect(leftPose?.left).toBeCloseTo(0.1 * pageW, 0)
+    expect(leftPose?.top).toBeCloseTo(0.3 * pageH, 0)
+  })
+
+  it('canvas.format 의 widthMm/heightMm 이 TemplateSpec.format 과 달라도 슬롯 비율은 유지됨', () => {
+    // TemplateSpec 의 format 은 메타데이터일 뿐 — getCanvasSize 에서 무시된다
+    // canvas.format=A5(148×210), template.format=B5(130×200) 비율 검증
+    const dpi = 300
+    const canvas = makeMockCanvas(dpi, 148, 210) as any
+    const pageW = mmToPxHelper(148, dpi)
+    const pageH = mmToPxHelper(210, dpi)
+
+    const template = make1on1Template() // format: { widthMm:130, heightMm:200 }
+    applyTemplate(canvas, template)
+
+    // bg 는 canvas.format 기준 전체 크기
+    const bgObj = Array.from(canvas._objects.values()).find(
+      (o: MockRect) => o.data?.kind === 'background',
+    ) as MockRect | undefined
+    expect(bgObj?.width).toBeCloseTo(pageW, 0)
+    expect(bgObj?.height).toBeCloseTo(pageH, 0)
+
+    // left-pose: x=0.1, y=0.3 → canvas.format 기준 상대 위치
+    const poseObjs = Array.from(canvas._objects.values()).filter(
+      (o: MockRect) => o.data?.kind === 'pose',
+    ) as MockRect[]
+    const leftPose = poseObjs[0]
+    expect(leftPose?.left).toBeCloseTo(0.1 * pageW, 0)
+    expect(leftPose?.top).toBeCloseTo(0.3 * pageH, 0)
+  })
+})

@@ -70,8 +70,9 @@ function applyZoom(canvas: StoryCanvas, percent: number): void {
  *   - 페이지 밖 영역: EditorCanvas wrapper bg-[--editor-workspace-bg] (회색)
  *
  * 뷰포트 크기 획득 우선순위:
- *   1. lowerCanvasEl → wrapperEl → containerRef div (clientWidth/Height)
- *   2. fabricCanvas.getWidth()/getHeight() (이미 뷰포트 크기로 설정된 경우)
+ *   1. lowerCanvasEl → fabric wrapper div → containerRef(inset-4) → clientWidth/Height
+ *   2. containerRef 가 0 이면 wrapRef (한 단계 상위) 시도
+ *   3. 모두 0 이면 fabricCanvas.getWidth()/getHeight() fallback
  */
 function fitToViewport(canvas: StoryCanvas): void {
   const fabricCanvas = canvas._fabricCanvas
@@ -80,13 +81,29 @@ function fitToViewport(canvas: StoryCanvas): void {
   const pageH = canvas.mmToPx(format.heightMm)
 
   // 뷰포트 DOM 크기 획득
-  // DOM 구조: containerRef > wrapperEl(fabric 생성) > lowerCanvasEl
-  // lowerCanvasEl.parentElement = wrapperEl
-  // lowerCanvasEl.parentElement.parentElement = containerRef (absolute inset-0, wrapRef 크기와 동일)
+  // DOM 구조 (f6b2bfc 이후):
+  //   wrapRef (relative flex-1 overflow-hidden)
+  //   └── containerRef (absolute inset-4 md:inset-6 lg:inset-8)   ← 마운트 포인트
+  //        └── fabric container div (data-fabric="wrapper")       ← fabric 생성 wrapper
+  //             └── lower-canvas (lowerCanvasEl)
+  //
+  // 1차: lowerCanvasEl → fabric wrapper div → containerRef → clientWidth/Height
+  // 2차: containerRef 가 0 이면 wrapRef(한 단계 위) 를 시도
+  // 3차: 모두 0 이면 fabricCanvas.getWidth()/getHeight() fallback
   const lowerCanvas = (fabricCanvas as unknown as { lowerCanvasEl?: HTMLElement }).lowerCanvasEl
   const containerEl = lowerCanvas?.parentElement?.parentElement
-  const viewW = containerEl ? containerEl.clientWidth : fabricCanvas.getWidth()
-  const viewH = containerEl ? containerEl.clientHeight : fabricCanvas.getHeight()
+  let viewW = containerEl ? containerEl.clientWidth : 0
+  let viewH = containerEl ? containerEl.clientHeight : 0
+  // 2차 fallback: containerRef 가 0 이면 wrapRef 시도
+  if ((viewW <= 0 || viewH <= 0) && containerEl?.parentElement) {
+    viewW = containerEl.parentElement.clientWidth
+    viewH = containerEl.parentElement.clientHeight
+  }
+  // 3차 fallback: DOM 접근 불가(headless/초기화 전) → fabric 내부 크기 사용
+  if (viewW <= 0 || viewH <= 0) {
+    viewW = fabricCanvas.getWidth()
+    viewH = fabricCanvas.getHeight()
+  }
 
   if (viewW <= 0 || viewH <= 0) return
 
