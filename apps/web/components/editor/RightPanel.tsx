@@ -120,8 +120,8 @@ export function RightPanel({
         onValueChange={handleTabChange}
         className="flex flex-1 flex-col overflow-hidden"
       >
-        {/* 탭바 — px-3 으로 좌우 호흡감 (탭이 컨테이너 끝과 붙지 않게) */}
-        <TabsList className="shrink-0 px-3">
+        {/* 탭바 — px-4 로 좌우 호흡감 (탭이 컨테이너 끝과 붙지 않게) */}
+        <TabsList className="shrink-0 px-4">
           <TabsTrigger value="properties" className="gap-1.5">
             <Settings2 className="size-3.5" aria-hidden="true" />
             <span>속성</span>

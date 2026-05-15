@@ -230,9 +230,9 @@ export function TemplatePanel({ canvas }: TemplatePanelProps) {
   return (
     <div className="flex flex-col h-full overflow-hidden">
       {/* 검색창 */}
-      <div className="relative px-3 py-4 border-b border-[var(--editor-border)] shrink-0">
+      <div className="relative px-4 py-4 border-b border-[var(--editor-border)] shrink-0">
         <Search
-          className="absolute left-7 top-1/2 -translate-y-1/2 size-4 text-[var(--editor-text-muted)] pointer-events-none"
+          className="absolute left-8 top-1/2 -translate-y-1/2 size-4 text-[var(--editor-text-muted)] pointer-events-none"
           aria-hidden="true"
         />
         <input
@@ -256,7 +256,7 @@ export function TemplatePanel({ canvas }: TemplatePanelProps) {
       </div>
 
       {/* 본문 */}
-      <div className="flex-1 overflow-y-auto px-[10px] py-5">
+      <div className="flex-1 overflow-y-auto p-4">
         {loading ? (
           // 로딩
           <div className="flex flex-col gap-3" aria-live="polite" aria-busy="true">
@@ -278,7 +278,7 @@ export function TemplatePanel({ canvas }: TemplatePanelProps) {
           </div>
         ) : (
           // 그리드
-          <div className="grid grid-cols-2 gap-[36px]" role="list" aria-label="템플릿 목록">
+          <div className="grid grid-cols-2 gap-4" role="list" aria-label="템플릿 목록">
             {filtered.map((template) => (
               <div key={template.id} role="listitem">
                 <TemplateCard template={template} onClick={handleApply} isApplying={applying} />
@@ -291,7 +291,7 @@ export function TemplatePanel({ canvas }: TemplatePanelProps) {
       {/* 안내 */}
       <div
         className={cn(
-          'shrink-0 px-3 py-3 border-t border-[var(--editor-border)]',
+          'shrink-0 px-4 py-4 border-t border-[var(--editor-border)]',
           'text-[11px] text-[var(--editor-text-muted)]',
         )}
       >

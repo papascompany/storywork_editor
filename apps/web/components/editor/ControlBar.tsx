@@ -244,7 +244,7 @@ function PositionSizeSection({ props, canvas, history }: PositionSizeSectionProp
       <SectionLabel>위치 / 크기</SectionLabel>
       <div className="flex flex-col gap-3.5">
         {/* X / Y */}
-        <div className="grid grid-cols-2 gap-5">
+        <div className="grid grid-cols-2 gap-4">
           <NumberInput label="X" value={props.x} onCommit={handleX} aria-label="X 위치 (mm)" />
           <NumberInput label="Y" value={props.y} onCommit={handleY} aria-label="Y 위치 (mm)" />
         </div>
@@ -1116,55 +1116,55 @@ export function ControlBar({ props, canvas, layerTree, history }: ControlBarProp
     // 섹션 간 hairline divider + 호흡감 개선: py-3 → py-4
     <div className="flex flex-col gap-0 divide-y divide-[var(--editor-border,var(--color-border))]">
       {/* 섹션 1: 위치/크기 */}
-      <div className="px-3 py-5">
+      <div className="p-4">
         <PositionSizeSection props={props} canvas={canvas} history={history} />
       </div>
 
       {/* 섹션 2: 투명도 */}
-      <div className="px-3 py-5">
+      <div className="p-4">
         <OpacitySection props={props} canvas={canvas} history={history} />
       </div>
 
       {/* 섹션 3: 상태 */}
       {layerTree && (
-        <div className="px-3 py-5">
+        <div className="p-4">
           <StateSection props={props} canvas={canvas} layerTree={layerTree} history={history} />
         </div>
       )}
 
       {/* 섹션 4: 타입별 */}
       {kind === 'background' && (
-        <div className="px-3 py-5">
+        <div className="p-4">
           <BackgroundFillSection props={props} canvas={canvas} history={history} />
         </div>
       )}
 
       {kind === 'shape' && (
-        <div className="px-3 py-5">
+        <div className="p-4">
           <ShapeDetailSection props={props} canvas={canvas} history={history} />
         </div>
       )}
 
       {kind === 'pose' && (
-        <div className="px-3 py-5">
+        <div className="p-4">
           <PlaceholderSection label="포즈" milestone="M2" />
         </div>
       )}
 
       {kind === 'text' && (
-        <div className="px-3 py-5">
+        <div className="p-4">
           <TextSection props={props} canvas={canvas} history={history} />
         </div>
       )}
 
       {kind === 'speech-bubble' && (
-        <div className="px-3 py-5">
+        <div className="p-4">
           <BubbleSection props={props} canvas={canvas} history={history} />
         </div>
       )}
 
       {(kind === 'wordfx' || kind === 'decoration' || kind === 'frame') && (
-        <div className="px-3 py-5">
+        <div className="p-4">
           <PlaceholderSection
             label={kind === 'wordfx' ? '워드효과' : kind === 'decoration' ? '꾸미기' : '프레임'}
             milestone="M5"
