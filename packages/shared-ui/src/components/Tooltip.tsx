@@ -60,6 +60,8 @@ export function Tooltip({
           <TooltipPrimitive.Content
             side={side}
             sideOffset={sideOffset}
+            collisionPadding={16}
+            avoidCollisions
             className={cn(
               // 레이아웃
               'inline-flex items-center gap-2',

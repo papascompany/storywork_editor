@@ -74,7 +74,7 @@ function SectionDivider() {
 function SectionLabel({ children }: { children: React.ReactNode }) {
   // eyebrow 스타일 — 마케팅 DESIGN.md caption 토큰 기준, 편집기 고밀도 절제 버전
   return (
-    <h3 className="mb-2 text-[10px] font-medium uppercase tracking-[0.6px] text-[var(--editor-text-muted,var(--color-text-muted))] opacity-70">
+    <h3 className="mb-3 text-[10px] font-medium uppercase tracking-[0.6px] text-[var(--editor-text-muted,var(--color-text-muted))] opacity-70">
       {children}
     </h3>
   )
@@ -125,7 +125,7 @@ function NumberInput({
   )
 
   return (
-    <div className="flex flex-col gap-0.5">
+    <div className="flex flex-col gap-1.5">
       <label className="text-[10px] text-[var(--color-text-muted)]">{label}</label>
       <div className="relative flex items-center">
         <Input
@@ -242,16 +242,16 @@ function PositionSizeSection({ props, canvas, history }: PositionSizeSectionProp
   return (
     <section aria-label="위치 및 크기">
       <SectionLabel>위치 / 크기</SectionLabel>
-      <div className="flex flex-col gap-2">
+      <div className="flex flex-col gap-3.5">
         {/* X / Y */}
-        <div className="grid grid-cols-2 gap-1.5">
+        <div className="grid grid-cols-2 gap-2.5">
           <NumberInput label="X" value={props.x} onCommit={handleX} aria-label="X 위치 (mm)" />
           <NumberInput label="Y" value={props.y} onCommit={handleY} aria-label="Y 위치 (mm)" />
         </div>
 
         {/* Width / Height + 비율 잠금 */}
-        <div className="flex items-end gap-1">
-          <div className="grid flex-1 grid-cols-2 gap-1.5">
+        <div className="flex items-end gap-1.5">
+          <div className="grid flex-1 grid-cols-2 gap-2.5">
             <NumberInput
               label="너비"
               value={props.width}
@@ -1116,55 +1116,55 @@ export function ControlBar({ props, canvas, layerTree, history }: ControlBarProp
     // 섹션 간 hairline divider + 호흡감 개선: py-3 → py-4
     <div className="flex flex-col gap-0 divide-y divide-[var(--editor-border,var(--color-border))]">
       {/* 섹션 1: 위치/크기 */}
-      <div className="px-4 py-4">
+      <div className="px-5 py-5">
         <PositionSizeSection props={props} canvas={canvas} history={history} />
       </div>
 
       {/* 섹션 2: 투명도 */}
-      <div className="px-4 py-4">
+      <div className="px-5 py-5">
         <OpacitySection props={props} canvas={canvas} history={history} />
       </div>
 
       {/* 섹션 3: 상태 */}
       {layerTree && (
-        <div className="px-4 py-4">
+        <div className="px-5 py-5">
           <StateSection props={props} canvas={canvas} layerTree={layerTree} history={history} />
         </div>
       )}
 
       {/* 섹션 4: 타입별 */}
       {kind === 'background' && (
-        <div className="px-4 py-4">
+        <div className="px-5 py-5">
           <BackgroundFillSection props={props} canvas={canvas} history={history} />
         </div>
       )}
 
       {kind === 'shape' && (
-        <div className="px-4 py-4">
+        <div className="px-5 py-5">
           <ShapeDetailSection props={props} canvas={canvas} history={history} />
         </div>
       )}
 
       {kind === 'pose' && (
-        <div className="px-4 py-4">
+        <div className="px-5 py-5">
           <PlaceholderSection label="포즈" milestone="M2" />
         </div>
       )}
 
       {kind === 'text' && (
-        <div className="px-4 py-4">
+        <div className="px-5 py-5">
           <TextSection props={props} canvas={canvas} history={history} />
         </div>
       )}
 
       {kind === 'speech-bubble' && (
-        <div className="px-4 py-4">
+        <div className="px-5 py-5">
           <BubbleSection props={props} canvas={canvas} history={history} />
         </div>
       )}
 
       {(kind === 'wordfx' || kind === 'decoration' || kind === 'frame') && (
-        <div className="px-4 py-4">
+        <div className="px-5 py-5">
           <PlaceholderSection
             label={kind === 'wordfx' ? '워드효과' : kind === 'decoration' ? '꾸미기' : '프레임'}
             milestone="M5"
