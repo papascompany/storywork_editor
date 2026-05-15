@@ -200,7 +200,7 @@ export function ToolBar() {
         'hidden md:flex',
         // 레이아웃 — 폭 80px (호흡감 추가 +4)
         'w-20 shrink-0 flex-col items-center',
-        'border-r border-[var(--editor-border)]',
+        'border-r border-[var(--editor-border-soft,var(--editor-border))]',
         'bg-[var(--editor-panel)]',
         // 상하 패딩 24px, 버튼 간 gap 14px — 다닥다닥 회피, 호흡감 풀 강화
         'py-6 gap-3.5',

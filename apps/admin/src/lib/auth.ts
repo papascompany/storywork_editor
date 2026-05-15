@@ -117,16 +117,30 @@ const getVerifiedAdminUser = cache(async function getVerifiedAdminUserImpl(): Pr
 /**
  * @deprecated `getAdminUserByEmail` 사용 권장.
  *   userId 가 Supabase uuid 일 경우 Prisma User(cuid) 와 매칭되지 않는다.
+ *
+ * 호환 유지: id 직접 매칭 실패 시 현재 인증 세션의 email 로 fallback 조회.
+ *   → 이로 인해 모든 API route(getSession + getAdminUser 패턴) 가 일관 동작.
  */
 export async function getAdminUser(userId: string): Promise<AdminUser | null> {
   const service = createAdminServiceClient()
-  const { data, error } = await service
-    .from('User')
-    .select('id, email, role')
-    .eq('id', userId)
-    .maybeSingle()
+  let { data } = await service.from('User').select('id, email, role').eq('id', userId).maybeSingle()
 
-  if (error || !data) return null
+  // id 매칭 실패 → email fallback (Supabase uuid ↔ Prisma cuid 불일치 케이스)
+  if (!data) {
+    const supabase = await createAdminServerClient()
+    const { data: authData } = await supabase.auth.getUser()
+    const email = authData?.user?.email
+    if (email) {
+      const r = await service
+        .from('User')
+        .select('id, email, role')
+        .eq('email', email)
+        .maybeSingle()
+      data = r.data
+    }
+  }
+
+  if (!data) return null
 
   const role = data.role as string
   const safeRole: AdminRole = ADMIN_ROLES.includes(role as AdminRole)

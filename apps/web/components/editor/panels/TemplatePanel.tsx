@@ -256,7 +256,7 @@ export function TemplatePanel({ canvas }: TemplatePanelProps) {
       </div>
 
       {/* 본문 */}
-      <div className="flex-1 overflow-y-auto p-4">
+      <div className="flex-1 overflow-y-auto px-5 py-4">
         {loading ? (
           // 로딩
           <div className="flex flex-col gap-3" aria-live="polite" aria-busy="true">

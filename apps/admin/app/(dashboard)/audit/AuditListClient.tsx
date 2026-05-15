@@ -368,10 +368,10 @@ export function AuditListClient({ initialData, initialTotalCount }: AuditListCli
         {/* ── 필터 사이드바 ── */}
         <aside className="w-full lg:w-56 shrink-0" aria-label="감사 로그 필터">
           <div
-            className="flex flex-col gap-6 p-5"
+            className="flex flex-col gap-6 p-6"
             style={{
               borderRadius: 'var(--nike-admin-rounded-lg)',
-              border: '1px solid var(--nike-hairline)',
+              border: '1px solid var(--nike-hairline-soft)',
               backgroundColor: 'var(--nike-canvas)',
             }}
           >
