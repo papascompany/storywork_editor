@@ -292,7 +292,8 @@ body {
   display: flex;
   align-items: center;
   gap: 10px;
-  padding: 12px 16px; /* 호흡감: 10/12 → 12/16 */
+  padding: 12px 16px;
+  margin: 0 4px; /* 사이드바 좌우 여백 — outline border 가 사이드바 끝까지 안 차게 */
   border-radius: 8px;
   font-family: var(--nike-font-text);
   font-size: 14px;
@@ -460,6 +461,40 @@ body {
 .nike-main-outer table th,
 .nike-main-outer table td {
   padding: 18px 20px;
+}
+
+/* nike-page 직계 자식 사이 자동 32px gap (제목 ↔ 필터 ↔ 본문 등 다닥다닥 해소) */
+.nike-page > * + * {
+  margin-top: 32px;
+}
+/* nike-page 의 첫 자식(헤더 영역) 다음은 더 큰 48px (제목 + 부제 + 버튼 영역 강조) */
+.nike-page > :first-child + * {
+  margin-top: 48px;
+}
+@media (min-width: 1024px) {
+  .nike-page > :first-child + * {
+    margin-top: 56px;
+  }
+}
+
+/* nike-page 안 모든 헤더 (제목 + 부제 + 액션 그룹) 자체에도 충분한 padding-bottom */
+.nike-page > header {
+  padding-bottom: 8px; /* 시각적 hairline 없이도 분리감 */
+}
+
+/* dashboard 카드 grid (4개 통계 카드) 다음 섹션 헤더 사이 — 자동 32 보다 더 명확 */
+.nike-page > .grid + * {
+  margin-top: 56px;
+}
+@media (min-width: 1024px) {
+  .nike-page > .grid + * {
+    margin-top: 64px;
+  }
+}
+
+/* 섹션 헤더 (h2 + p 묶음) 다음 본문 사이 24px */
+.nike-page section > :first-child + * {
+  margin-top: 24px;
 }
 
 /* ══════════════════════════════════════════════════════════════════════════
