@@ -106,7 +106,7 @@ export function BackgroundPanel({ canvas, history, layerTree }: BackgroundPanelP
         <h3 className="mb-3 text-[12px] font-semibold uppercase tracking-wide text-[var(--editor-text-muted)]">
           단색
         </h3>
-        <div className="grid grid-cols-7 gap-2">
+        <div className="grid grid-cols-7 gap-2.5">
           {BG_COLORS.map(({ label, fill, bg }) => (
             <button
               key={fill}

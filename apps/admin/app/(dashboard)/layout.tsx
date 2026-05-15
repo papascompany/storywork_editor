@@ -171,9 +171,9 @@ export default async function DashboardLayout({ children }: { children: React.Re
         userEmail={user.email}
       />
 
-      {/* ─── 메인 콘텐츠 ─── */}
+      {/* ─── 메인 콘텐츠 — 외곽 회색 배경 (사이드바와 시각 분리) ─── */}
       <div className="flex flex-1 flex-col overflow-hidden">
-        <main className="flex-1 overflow-auto">{children}</main>
+        <main className="nike-main-outer flex-1 overflow-auto">{children}</main>
       </div>
     </div>
   )

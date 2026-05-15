@@ -322,39 +322,62 @@ body {
 }
 
 /* ══════════════════════════════════════════════════════════════════════════
+   Nike 메인 영역 외곽 (사이드바 우측 — 회색 배경으로 컨텐츠 영역 분리)
+   ══════════════════════════════════════════════════════════════════════════ */
+.nike-main-outer {
+  background-color: var(--nike-soft-cloud);
+  min-height: 100dvh;
+  padding: 24px;
+}
+@media (min-width: 768px) {
+  .nike-main-outer {
+    padding: 32px;
+  }
+}
+@media (min-width: 1280px) {
+  .nike-main-outer {
+    padding: 40px;
+  }
+}
+
+/* ══════════════════════════════════════════════════════════════════════════
    Nike 페이지 컨테이너 (모든 dashboard 페이지에 적용)
-   호흡감: 좌우 충분한 padding + 최대 너비 제한 + 상하 여백
+   카드 스타일: 흰 배경 + hairline + 충분한 내부 padding
    ══════════════════════════════════════════════════════════════════════════ */
 .nike-page {
   max-width: 1440px;
   margin: 0 auto;
-  padding: 40px 32px;
+  padding: 32px 28px;
+  background-color: var(--nike-canvas);
+  border-radius: 12px;
+  border: 1px solid var(--nike-hairline-soft);
 }
 @media (min-width: 768px) {
   .nike-page {
-    padding: 48px 48px;
+    padding: 40px 36px;
   }
 }
 @media (min-width: 1280px) {
   .nike-page {
-    padding: 56px 64px;
+    padding: 48px 56px;
   }
 }
 
-/* 페이지 헤더 — 헤더 → 본문 사이 호흡감 충분히 */
+/* 페이지 헤더 — 헤더 → 본문 사이 충분한 호흡감 */
 .nike-page-header {
   display: flex;
   align-items: flex-end;
   justify-content: space-between;
   flex-wrap: wrap;
   gap: 24px;
-  margin-bottom: 40px; /* 헤더 → 다음 섹션 */
+  margin-bottom: 40px;
   padding-bottom: 24px;
   border-bottom: 1px solid var(--nike-hairline-soft);
 }
 @media (min-width: 1024px) {
   .nike-page-header {
-    margin-bottom: 56px;
+    margin-bottom: 48px;
+    padding-bottom: 28px;
   }
 }
 
@@ -416,11 +439,11 @@ body {
   color: var(--nike-mute);
   text-transform: uppercase;
   letter-spacing: 0.4px;
-  padding: 12px 16px;
+  padding: 16px 20px; /* 12/16 → 16/20 호흡감 */
   border-bottom: 1px solid var(--nike-hairline);
 }
 .nike-table td {
-  padding: 14px 16px;
+  padding: 20px 20px; /* 14/16 → 20/20 행 사이 공간 강화 */
   border-bottom: 1px solid var(--nike-hairline-soft);
   font-family: var(--nike-font-text);
   font-size: 14px;
@@ -428,6 +451,15 @@ body {
 }
 .nike-table tbody tr:hover {
   background-color: var(--nike-soft-cloud);
+}
+
+/* ══════════════════════════════════════════════════════════════════════════
+   범용 spacing 유틸 — DataTable 안 쓰는 페이지에도 호흡감 강제
+   ══════════════════════════════════════════════════════════════════════════ */
+/* dashboard 영역 안 모든 테이블 행에 padding 보강 (테이블만, 회귀 없음) */
+.nike-main-outer table th,
+.nike-main-outer table td {
+  padding: 18px 20px;
 }
 
 /* ══════════════════════════════════════════════════════════════════════════

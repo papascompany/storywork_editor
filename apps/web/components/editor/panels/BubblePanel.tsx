@@ -192,7 +192,7 @@ export function BubblePanel({ canvas, history }: BubblePanelProps) {
         <h3 className="mb-2 text-[11px] font-semibold uppercase tracking-wider text-[var(--editor-text-muted)]">
           모양
         </h3>
-        <div className="grid grid-cols-2 gap-2">
+        <div className="grid grid-cols-2 gap-3">
           {BUBBLE_SHAPE_DEFS.map((def) => (
             <button
               key={def.id}

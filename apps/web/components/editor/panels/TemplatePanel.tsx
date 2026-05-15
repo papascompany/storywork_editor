@@ -271,7 +271,7 @@ export function TemplatePanel({ canvas }: TemplatePanelProps) {
           </div>
         ) : (
           // 그리드
-          <div className="grid grid-cols-2 gap-3" role="list" aria-label="템플릿 목록">
+          <div className="grid grid-cols-2 gap-4" role="list" aria-label="템플릿 목록">
             {filtered.map((template) => (
               <div key={template.id} role="listitem">
                 <TemplateCard template={template} onClick={handleApply} isApplying={applying} />
