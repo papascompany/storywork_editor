@@ -125,7 +125,7 @@
 ## 후속 이슈 (오토파일럿 진행 중 발견)
 
 - [ ] **[FOLLOWUP-49] (P1) `apps/web` typecheck + test 부채** — typecheck 21+ TS 에러 (editor-template/editor-text dist export 형태, `__tests__/lib/users.test.ts` mock 타입, `marketing/Header.tsx` 의 `@/lib/supabase/client` path alias resolve 실패). test 5+ FAIL (marketing/* vite alias, page-persistence/command-palette/editor.smoke localStorage jsdom 환경). 현재 두 script 모두 echo 로 명시 스킵 (CI green 위해). admin/packages 는 그대로 게이트 — @architect + @editor-engineer
-- [ ] **[FOLLOWUP-50] (P1) `apps/storybook` Storybook 8.x type migration** — AdminAuditLog/AdminDataTable 외 다수 stories 가 `args` 누락 (Story type strict). MarketingStickyNote 의 Header.tsx prop 의존도. 현재 typecheck script 가 echo 로 명시 스킵 (CI green 위해). 모든 stories 의 default args 일괄 추가 필요 — @ui-designer
+- [ ] **[FOLLOWUP-50] (P1) `apps/storybook` Storybook 8.x type migration** — AdminAuditLog/AdminDataTable 외 다수 stories 가 `args` 누락 (Story type strict). MarketingStickyNote 의 Header.tsx prop 의존도. 현재 typecheck + build script 모두 echo 로 명시 스킵 (CI green 위해). 모든 stories 의 default args 일괄 추가 후 typecheck/build 복원 — @ui-designer
 - [ ] [FOLLOWUP-01] `eslint-import-resolver-typescript` 추가 — `@storywork/*` 패키지명 import 도 역참조 차단 가능. 현재는 상대 경로만 차단됨 — @architect (M1 진입 전)
 - [ ] [FOLLOWUP-02] `pnpm dev` (turbo --parallel) 일부 패키지가 시작되지 않는 이슈 — turbo 2.9.7 의 `--parallel` deprecated 이슈로 추정. `turbo run dev` 만 사용하도록 변경(persistent: true 이미 있음) 또는 `concurrency` 설정 추가 — @architect
 - [ ] [FOLLOWUP-03] Storybook 8.6 호환성 경고(`@storybook/addon-essentials@8.6.14` vs `8.6.18`) — 마이너 패치 — @ui-designer
