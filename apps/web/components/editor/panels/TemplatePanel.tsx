@@ -98,10 +98,10 @@ function TemplateCard({ template, onClick, isApplying }: TemplateCardProps) {
       disabled={isApplying}
       onClick={() => onClick(template)}
       className={cn(
-        // C.4 fix: 카드 높이 고정 (grid 내 균일 정렬)
-        'flex flex-col gap-1.5 rounded-[var(--radius-md)]',
+        // C.4 fix: 카드 높이 고정 (grid 내 균일 정렬). 호흡감: gap-1.5→2.5, p-2→3
+        'flex flex-col gap-2.5 rounded-[var(--radius-md)]',
         'border border-[var(--editor-border)]',
-        'p-2 text-left w-full',
+        'p-3 text-left w-full',
         'bg-[var(--color-surface)]',
         'hover:bg-[var(--editor-hover)] hover:border-[var(--editor-border-strong)]',
         'transition-colors duration-[var(--duration-fast)]',
@@ -137,8 +137,8 @@ function TemplateCard({ template, onClick, isApplying }: TemplateCardProps) {
         {template.name}
       </span>
 
-      {/* 슬롯 종류 뱃지 */}
-      <div className="flex flex-wrap gap-0.5" aria-label="슬롯 구성">
+      {/* 슬롯 종류 뱃지 — gap-1.5 호흡감 (이모지 사이 답답함 해소) */}
+      <div className="flex flex-wrap gap-1.5" aria-label="슬롯 구성">
         {Object.entries(kindCounts).map(([kind, count]) => (
           <span
             key={kind}

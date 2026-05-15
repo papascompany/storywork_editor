@@ -198,12 +198,12 @@ export function ToolBar() {
       className={cn(
         // 모바일: 숨김 (MobileBottomSheet 의 Tools 탭으로 대체)
         'hidden md:flex',
-        // 레이아웃 — 폭 76px, 호흡감 보강
-        'w-[76px] shrink-0 flex-col items-center',
+        // 레이아웃 — 폭 80px (호흡감 추가 +4)
+        'w-20 shrink-0 flex-col items-center',
         'border-r border-[var(--editor-border)]',
         'bg-[var(--editor-panel)]',
-        // 상하 패딩 12→20px, 버튼 간 gap 6→10px — 호흡감 강화
-        'py-5 gap-2.5',
+        // 상하 패딩 24px, 버튼 간 gap 14px — 다닥다닥 회피, 호흡감 풀 강화
+        'py-6 gap-3.5',
         'overflow-y-auto',
         // z-index (FeatureSidebar 보다 위)
         'z-[101]',
@@ -218,8 +218,8 @@ export function ToolBar() {
         onClick={() => handleToolClick(SELECT_DEF)}
       />
 
-      {/* 구분선 — my-3 호흡감 */}
-      <div aria-hidden="true" className="my-3 h-px w-10 bg-[var(--editor-border)]" />
+      {/* 구분선 — my-4 호흡감 (select 와 도구 그룹 명확 분리) */}
+      <div aria-hidden="true" className="my-4 h-px w-10 bg-[var(--editor-border)]" />
 
       {/* 나머지 10종 도구 */}
       {TOOL_DEFS.map((def) => (

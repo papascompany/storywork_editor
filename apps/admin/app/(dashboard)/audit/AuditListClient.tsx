@@ -334,11 +334,14 @@ export function AuditListClient({ initialData, initialTotalCount }: AuditListCli
     (filter.search ? 1 : 0)
 
   // ── 사이드바 버튼 스타일 헬퍼 ──
+  // 호흡감: padding 5/8 → 8/12 + line-height 1.5 + min-height 32 → 클릭 영역 확보
   const sidebarBtnStyle = (isActive: boolean): React.CSSProperties => ({
     display: 'block',
     width: '100%',
     textAlign: 'left',
-    padding: '5px 8px',
+    padding: '8px 12px',
+    minHeight: '32px',
+    lineHeight: 1.5,
     borderRadius: 'var(--nike-admin-rounded-sm)',
     fontFamily: 'var(--nike-font-text)',
     fontSize: '13px',
@@ -365,7 +368,7 @@ export function AuditListClient({ initialData, initialTotalCount }: AuditListCli
         {/* ── 필터 사이드바 ── */}
         <aside className="w-full lg:w-56 shrink-0" aria-label="감사 로그 필터">
           <div
-            className="flex flex-col gap-4 p-4"
+            className="flex flex-col gap-6 p-5"
             style={{
               borderRadius: 'var(--nike-admin-rounded-lg)',
               border: '1px solid var(--nike-hairline)',
@@ -385,7 +388,7 @@ export function AuditListClient({ initialData, initialTotalCount }: AuditListCli
                   textTransform: 'uppercase',
                   color: 'var(--nike-ink)',
                   opacity: 0.4,
-                  marginBottom: '6px',
+                  marginBottom: '10px',
                 }}
               >
                 검색
@@ -430,12 +433,12 @@ export function AuditListClient({ initialData, initialTotalCount }: AuditListCli
                   textTransform: 'uppercase',
                   color: 'var(--nike-ink)',
                   opacity: 0.4,
-                  marginBottom: '6px',
+                  marginBottom: '10px',
                 }}
               >
                 기간
               </div>
-              <div className="flex flex-col gap-0.5">
+              <div className="flex flex-col gap-1.5">
                 {(Object.keys(PRESET_LABELS) as FilterState['preset'][]).map((preset) => (
                   <button
                     key={preset}
@@ -464,12 +467,12 @@ export function AuditListClient({ initialData, initialTotalCount }: AuditListCli
                   textTransform: 'uppercase',
                   color: 'var(--nike-ink)',
                   opacity: 0.4,
-                  marginBottom: '6px',
+                  marginBottom: '10px',
                 }}
               >
                 대상 유형
               </div>
-              <div className="flex flex-col gap-0.5">
+              <div className="flex flex-col gap-1.5">
                 {['format', 'resource', 'template', 'templateset', 'user'].map((et) => {
                   const isActive = filter.entityTypes.includes(et)
                   return (
@@ -504,12 +507,12 @@ export function AuditListClient({ initialData, initialTotalCount }: AuditListCli
                   textTransform: 'uppercase',
                   color: 'var(--nike-ink)',
                   opacity: 0.4,
-                  marginBottom: '6px',
+                  marginBottom: '10px',
                 }}
               >
                 액션
               </div>
-              <div className="flex flex-col gap-0.5">
+              <div className="flex flex-col gap-1.5">
                 {['create', 'update', 'delete', 'publish', 'reject'].map((action) => {
                   const isActive = filter.actions.includes(action)
                   const badge = ACTION_BADGE_COLORS[action]
