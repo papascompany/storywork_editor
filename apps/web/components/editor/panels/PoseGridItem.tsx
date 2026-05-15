@@ -80,10 +80,8 @@ export function PoseGridItem({ pose, onAddToCanvas }: PoseGridItemProps): React.
       onKeyDown={handleKeyDown}
       onDragStart={handleDragStart}
       className={cn(
-        // 정사각형
+        // 정사각형 — grid column 전체 채움 (max-w 제거: column 여분 공간이 사이 spacing 불균형 유발)
         'group relative aspect-square w-full',
-        // 최대 크기
-        'max-w-[132px]',
         // 형태
         'overflow-hidden rounded-[var(--radius-md)]',
         // 테두리
