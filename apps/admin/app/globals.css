@@ -1,113 +1,429 @@
 /**
  * StoryWork Admin — 전역 CSS
  *
- * shared-ui 의 디자인 토큰 + 기본 스타일을 가져옵니다.
- * 마케팅 디자인 시스템(DESIGN.md) 토큰도 포함하여
- * web과 admin 전체에서 일관된 시각 언어를 유지합니다.
+ * Nike 디자인 시스템 (DESIGN-nike.md SSOT) 기반.
+ * 기존 --mkt-* 토큰은 DataTable/BulkActionBar 등 하위 호환성을 위해 유지.
  */
 @import '../../../packages/shared-ui/src/styles/globals.css';
 
-/**
- * ── 마케팅 디자인 시스템 토큰 (DESIGN.md 기반) ────────────────────────────────
- *
- * apps/web/app/globals.css 와 동일한 --mkt-* 토큰.
- * 단일 진실 원천: DESIGN.md → 양쪽 앱에서 동일 토큰 사용.
- */
+/* ══════════════════════════════════════════════════════════════════════════
+   Nike 토큰 (DESIGN-nike.md)
+   ══════════════════════════════════════════════════════════════════════════ */
 :root {
-  /* ── 마케팅 컬러 (DESIGN.md colors) ──────────────────────────────────── */
-  --mkt-primary: #000000;
-  --mkt-on-primary: #ffffff;
-  --mkt-ink: #000000;
-  --mkt-canvas: #ffffff;
+  /* ── 컬러 ─────────────────────────────────────────────────────────────── */
+  --nike-ink: #111111;
+  --nike-on-primary: #ffffff;
+  --nike-canvas: #ffffff;
+  --nike-soft-cloud: #f5f5f5;
+  --nike-charcoal: #39393b;
+  --nike-ash: #4b4b4d;
+  --nike-mute: #707072;
+  --nike-stone: #9e9ea0;
+  --nike-hairline: #cacacb;
+  --nike-hairline-soft: #e5e5e5;
+  --nike-sale: #d30005;
+  --nike-sale-deep: #780700;
+  --nike-success: #007d48;
+  --nike-success-bright: #1eaa52;
+  --nike-info: #1151ff;
+  --nike-info-deep: #0034e3;
+
+  /* ── 파스텔 카드 (100p Admin 레퍼런스) ──────────────────────────────── */
+  --nike-card-pink: #fde7ec;
+  --nike-card-cream: #fef3d8;
+  --nike-card-mint: #e3f2e6;
+  --nike-card-lilac: #e8e4f8;
+  --nike-card-lavender: #f0ecff;
+
+  /* ── 간격 (8px 그리드) ───────────────────────────────────────────────── */
+  --nike-space-xxs: 2px;
+  --nike-space-xs: 4px;
+  --nike-space-sm: 8px;
+  --nike-space-md: 12px;
+  --nike-space-lg: 18px;
+  --nike-space-xl: 24px;
+  --nike-space-xxl: 30px;
+  --nike-space-section: 48px;
+
+  /* ── 둥근 모서리 ────────────────────────────────────────────────────── */
+  --nike-rounded-none: 0px;
+  --nike-rounded-sm: 18px;
+  --nike-rounded-md: 24px;
+  --nike-rounded-lg: 30px;
+  --nike-rounded-full: 9999px;
+
+  /* ── 타이포그래피 ────────────────────────────────────────────────────── */
+  --nike-font-display:
+    'Helvetica Now Display Medium', 'Helvetica Now', var(--font-pretendard, 'Pretendard Variable'),
+    system-ui, sans-serif;
+  --nike-font-text:
+    'Helvetica Now Text', var(--font-pretendard, 'Pretendard Variable'), system-ui, sans-serif;
+}
+
+/* ══════════════════════════════════════════════════════════════════════════
+   body 기본 스타일 — Nike canvas + ink
+   ══════════════════════════════════════════════════════════════════════════ */
+body {
+  font-family: var(--nike-font-text);
+  background-color: var(--nike-soft-cloud);
+  color: var(--nike-ink);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* ══════════════════════════════════════════════════════════════════════════
+   Nike 타이포그래피 유틸리티
+   ══════════════════════════════════════════════════════════════════════════ */
+.nike-heading-xl {
+  font-family: var(--nike-font-display);
+  font-size: 32px;
+  font-weight: 500;
+  line-height: 1.2;
+  letter-spacing: 0;
+  color: var(--nike-ink);
+}
+
+.nike-heading-lg {
+  font-family: var(--nike-font-display);
+  font-size: 24px;
+  font-weight: 500;
+  line-height: 1.25;
+  color: var(--nike-ink);
+}
+
+.nike-heading-md {
+  font-family: var(--nike-font-display);
+  font-size: 16px;
+  font-weight: 500;
+  line-height: 1.75;
+  color: var(--nike-ink);
+}
+
+.nike-body-md {
+  font-family: var(--nike-font-text);
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 1.5;
+}
+
+.nike-body-strong {
+  font-family: var(--nike-font-text);
+  font-size: 16px;
+  font-weight: 500;
+  line-height: 1.5;
+}
+
+.nike-button-md {
+  font-family: var(--nike-font-text);
+  font-size: 16px;
+  font-weight: 500;
+  line-height: 1.5;
+}
+
+.nike-button-sm {
+  font-family: var(--nike-font-text);
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 1.5;
+}
+
+.nike-caption-md {
+  font-family: var(--nike-font-text);
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 1.5;
+  color: var(--nike-mute);
+}
+
+.nike-caption-sm {
+  font-family: var(--nike-font-text);
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 1.5;
+  color: var(--nike-mute);
+}
+
+/* 대시보드 통계 카드 숫자 */
+.nike-card-number {
+  font-family: var(--nike-font-display);
+  font-size: 40px;
+  font-weight: 500;
+  line-height: 1.1;
+  color: var(--nike-ink);
+}
+
+/* ══════════════════════════════════════════════════════════════════════════
+   Nike 버튼 (모두 pill — border-radius 9999px)
+   ══════════════════════════════════════════════════════════════════════════ */
+
+/* Primary — 검정 배경 / 흰 글씨 */
+.nike-btn-primary {
+  background-color: var(--nike-ink);
+  color: var(--nike-on-primary);
+  font-family: var(--nike-font-text);
+  font-size: 14px;
+  font-weight: 500;
+  border-radius: 9999px;
+  padding: 10px 20px;
+  height: 40px;
+  border: none;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  transition: opacity 100ms;
+  text-decoration: none;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+.nike-btn-primary:hover {
+  opacity: 0.82;
+}
+.nike-btn-primary:active {
+  transform: scale(0.97);
+}
+.nike-btn-primary:disabled {
+  opacity: 0.38;
+  cursor: not-allowed;
+}
+.nike-btn-primary:focus-visible {
+  outline: 2px solid var(--nike-ink);
+  outline-offset: 3px;
+}
+
+/* Secondary — 흰 배경 / 검정 1px outline */
+.nike-btn-secondary {
+  background-color: var(--nike-canvas);
+  color: var(--nike-ink);
+  font-family: var(--nike-font-text);
+  font-size: 14px;
+  font-weight: 500;
+  border: 1px solid var(--nike-ink);
+  border-radius: 9999px;
+  padding: 10px 20px;
+  height: 40px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  transition: background-color 100ms;
+  text-decoration: none;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+.nike-btn-secondary:hover {
+  background-color: var(--nike-soft-cloud);
+}
+.nike-btn-secondary:disabled {
+  opacity: 0.38;
+  cursor: not-allowed;
+}
+.nike-btn-secondary:focus-visible {
+  outline: 2px solid var(--nike-ink);
+  outline-offset: 3px;
+}
+
+/* Soft — soft-cloud 배경 / 검정 글씨 */
+.nike-btn-soft {
+  background-color: var(--nike-soft-cloud);
+  color: var(--nike-ink);
+  font-family: var(--nike-font-text);
+  font-size: 14px;
+  font-weight: 500;
+  border: none;
+  border-radius: 9999px;
+  padding: 10px 20px;
+  height: 40px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  transition: background-color 100ms;
+  text-decoration: none;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+.nike-btn-soft:hover {
+  background-color: var(--nike-hairline-soft);
+}
+.nike-btn-soft:focus-visible {
+  outline: 2px solid var(--nike-ink);
+  outline-offset: 3px;
+}
+
+/* ══════════════════════════════════════════════════════════════════════════
+   Nike 카드
+   ══════════════════════════════════════════════════════════════════════════ */
+
+/* 일반 카드 — 흰 배경 + hairline 테두리 */
+.nike-card {
+  background-color: var(--nike-canvas);
+  border: 1px solid var(--nike-hairline-soft);
+  border-radius: var(--nike-rounded-md);
+  padding: var(--nike-space-xl);
+}
+
+/* 파스텔 통계 카드 (100p Admin 레퍼런스) */
+.nike-card-pastel {
+  border-radius: var(--nike-rounded-md);
+  padding: var(--nike-space-xl);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.nike-card-pastel.pink {
+  background-color: var(--nike-card-pink);
+}
+.nike-card-pastel.cream {
+  background-color: var(--nike-card-cream);
+}
+.nike-card-pastel.mint {
+  background-color: var(--nike-card-mint);
+}
+.nike-card-pastel.lilac {
+  background-color: var(--nike-card-lilac);
+}
+
+/* ══════════════════════════════════════════════════════════════════════════
+   Nike 사이드바 메뉴 링크
+   (100p Admin 패턴: 활성 = 검정 1px outline border + sale red 텍스트)
+   ══════════════════════════════════════════════════════════════════════════ */
+.nike-nav-link {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  border-radius: 8px;
+  font-family: var(--nike-font-text);
+  font-size: 14px;
+  font-weight: 400;
+  color: var(--nike-ink);
+  text-decoration: none;
+  transition: background-color 100ms;
+  border: 1px solid transparent;
+}
+.nike-nav-link:hover {
+  background-color: var(--nike-soft-cloud);
+}
+.nike-nav-link:focus-visible {
+  outline: 2px solid var(--nike-ink);
+  outline-offset: 2px;
+}
+
+/* 활성 상태: 검정 1px outline + sale red 텍스트 (100p Admin 정확 모방) */
+.nike-nav-link[aria-current='page'] {
+  border-color: var(--nike-ink);
+  color: var(--nike-sale);
+  font-weight: 500;
+  background-color: transparent;
+}
+.nike-nav-link[aria-current='page'] svg {
+  color: var(--nike-sale);
+}
+
+/* ══════════════════════════════════════════════════════════════════════════
+   Nike 테이블
+   ══════════════════════════════════════════════════════════════════════════ */
+.nike-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+.nike-table th {
+  text-align: left;
+  font-family: var(--nike-font-text);
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--nike-mute);
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--nike-hairline);
+}
+.nike-table td {
+  padding: 14px 16px;
+  border-bottom: 1px solid var(--nike-hairline-soft);
+  font-family: var(--nike-font-text);
+  font-size: 14px;
+  color: var(--nike-ink);
+}
+.nike-table tbody tr:hover {
+  background-color: var(--nike-soft-cloud);
+}
+
+/* ══════════════════════════════════════════════════════════════════════════
+   Nike 폼 입력 요소
+   ══════════════════════════════════════════════════════════════════════════ */
+.nike-input {
+  width: 100%;
+  background-color: var(--nike-canvas);
+  border: 1px solid var(--nike-hairline);
+  border-radius: var(--nike-rounded-md);
+  padding: 12px 16px;
+  height: 48px;
+  font-family: var(--nike-font-text);
+  font-size: 16px;
+  color: var(--nike-ink);
+  transition:
+    border-color 100ms,
+    box-shadow 100ms;
+  outline: none;
+}
+.nike-input:focus {
+  border-color: var(--nike-ink);
+  box-shadow: 0 0 0 4px var(--nike-soft-cloud);
+}
+.nike-input::placeholder {
+  color: var(--nike-stone);
+}
+
+.nike-label {
+  font-family: var(--nike-font-text);
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--nike-ink);
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+  display: block;
+  margin-bottom: 8px;
+}
+
+/* ══════════════════════════════════════════════════════════════════════════
+   하위 호환 — mkt-* 토큰 (DataTable, BulkActionBar 등 기존 컴포넌트)
+   ══════════════════════════════════════════════════════════════════════════ */
+:root {
+  /* mkt-* → nike-* 매핑 */
+  --mkt-primary: var(--nike-ink);
+  --mkt-on-primary: var(--nike-on-primary);
+  --mkt-ink: var(--nike-ink);
+  --mkt-canvas: var(--nike-canvas);
   --mkt-inverse-canvas: #000000;
   --mkt-inverse-ink: #ffffff;
   --mkt-on-inverse-soft: #ffffff;
-  --mkt-hairline: #e6e6e6;
-  --mkt-hairline-soft: #f1f1f1;
-  --mkt-surface-soft: #f7f7f5;
+  --mkt-hairline: var(--nike-hairline);
+  --mkt-hairline-soft: var(--nike-hairline-soft);
+  --mkt-surface-soft: var(--nike-soft-cloud);
 
-  /* 파스텔 컬러블록 */
+  /* 파스텔 블록 — nike 카드 색상으로 리맵 */
   --mkt-block-lime: #dceeb1;
-  --mkt-block-lilac: #c5b0f4;
-  --mkt-block-cream: #f4ecd6;
-  --mkt-block-pink: #efd4d4;
-  --mkt-block-mint: #c8e6cd;
+  --mkt-block-lilac: var(--nike-card-lilac);
+  --mkt-block-cream: var(--nike-card-cream);
+  --mkt-block-pink: var(--nike-card-pink);
+  --mkt-block-mint: var(--nike-card-mint);
   --mkt-block-coral: #f3c9b6;
   --mkt-block-navy: #1f1d3d;
 
   /* 시맨틱 */
   --mkt-accent-magenta: #ff3d8b;
-  --mkt-semantic-success: #1ea64a;
+  --mkt-semantic-success: var(--nike-success);
   --mkt-overlay-scrim: #000000;
 
-  /* ── 마케팅 타이포그래피 스케일 ───────────────────────────────────────── */
-  /* Pretendard: 한/영 균형, 가변 폰트. weight 축: 100~900 */
+  /* 타이포그래피 */
   --mkt-font-sans:
     var(--font-pretendard, 'Pretendard Variable'), Pretendard, 'Apple SD Gothic Neo', -apple-system,
     BlinkMacSystemFont, system-ui, sans-serif;
   --mkt-font-mono: 'JetBrains Mono', 'SF Mono', Menlo, monospace;
 
-  /* display-xl */
-  --mkt-display-xl-size: 86px;
-  --mkt-display-xl-weight: 340;
-  --mkt-display-xl-lh: 1;
-  --mkt-display-xl-ls: -1.72px;
-
-  /* display-lg */
-  --mkt-display-lg-size: 64px;
-  --mkt-display-lg-weight: 340;
-  --mkt-display-lg-lh: 1.1;
-  --mkt-display-lg-ls: -0.96px;
-
-  /* headline */
-  --mkt-headline-size: 26px;
-  --mkt-headline-weight: 540;
-  --mkt-headline-lh: 1.35;
-  --mkt-headline-ls: -0.26px;
-
-  /* subhead */
-  --mkt-subhead-size: 26px;
-  --mkt-subhead-weight: 340;
-  --mkt-subhead-lh: 1.35;
-  --mkt-subhead-ls: -0.26px;
-
-  /* body-lg */
-  --mkt-body-lg-size: 20px;
-  --mkt-body-lg-weight: 330;
-  --mkt-body-lg-lh: 1.4;
-  --mkt-body-lg-ls: -0.14px;
-
-  /* body */
-  --mkt-body-size: 18px;
-  --mkt-body-weight: 320;
-  --mkt-body-lh: 1.45;
-  --mkt-body-ls: -0.26px;
-
-  /* body-sm */
-  --mkt-body-sm-size: 16px;
-  --mkt-body-sm-weight: 330;
-  --mkt-body-sm-lh: 1.45;
-  --mkt-body-sm-ls: -0.14px;
-
-  /* button / link */
-  --mkt-button-size: 20px;
-  --mkt-button-weight: 480;
-  --mkt-button-lh: 1.4;
-  --mkt-button-ls: -0.1px;
-
-  /* eyebrow (mono) */
-  --mkt-eyebrow-size: 18px;
-  --mkt-eyebrow-weight: 400;
-  --mkt-eyebrow-lh: 1.3;
-  --mkt-eyebrow-ls: 0.54px;
-
-  /* caption (mono) */
-  --mkt-caption-size: 12px;
-  --mkt-caption-weight: 400;
-  --mkt-caption-lh: 1;
-  --mkt-caption-ls: 0.6px;
-
-  /* ── 마케팅 간격 토큰 (DESIGN.md spacing) ────────────────────────────── */
+  /* 간격 */
   --mkt-space-hair: 1px;
   --mkt-space-xxs: 4px;
   --mkt-space-xs: 8px;
@@ -118,7 +434,7 @@
   --mkt-space-xxl: 48px;
   --mkt-space-section: 96px;
 
-  /* ── 마케팅 둥근 모서리 (DESIGN.md rounded) ──────────────────────────── */
+  /* 둥근 모서리 */
   --mkt-rounded-xs: 2px;
   --mkt-rounded-sm: 6px;
   --mkt-rounded-md: 8px;
@@ -127,51 +443,96 @@
   --mkt-rounded-pill: 50px;
   --mkt-rounded-full: 9999px;
 
-  /* ── 마케팅 컴포넌트 치수 ────────────────────────────────────────────── */
+  /* 컴포넌트 치수 */
   --mkt-nav-height: 56px;
   --mkt-marquee-height: 36px;
   --mkt-max-width: 1280px;
+
+  /* 타이포 스케일 — DataTable 헤더 등 내부 사용 */
+  --mkt-display-xl-size: 86px;
+  --mkt-display-xl-weight: 340;
+  --mkt-display-xl-lh: 1;
+  --mkt-display-xl-ls: -1.72px;
+  --mkt-display-lg-size: 64px;
+  --mkt-display-lg-weight: 340;
+  --mkt-display-lg-lh: 1.1;
+  --mkt-display-lg-ls: -0.96px;
+  --mkt-headline-size: 26px;
+  --mkt-headline-weight: 540;
+  --mkt-headline-lh: 1.35;
+  --mkt-headline-ls: -0.26px;
+  --mkt-subhead-size: 26px;
+  --mkt-subhead-weight: 340;
+  --mkt-subhead-lh: 1.35;
+  --mkt-subhead-ls: -0.26px;
+  --mkt-body-lg-size: 20px;
+  --mkt-body-lg-weight: 330;
+  --mkt-body-lg-lh: 1.4;
+  --mkt-body-lg-ls: -0.14px;
+  --mkt-body-size: 18px;
+  --mkt-body-weight: 320;
+  --mkt-body-lh: 1.45;
+  --mkt-body-ls: -0.26px;
+  --mkt-body-sm-size: 16px;
+  --mkt-body-sm-weight: 330;
+  --mkt-body-sm-lh: 1.45;
+  --mkt-body-sm-ls: -0.14px;
+  --mkt-button-size: 20px;
+  --mkt-button-weight: 480;
+  --mkt-button-lh: 1.4;
+  --mkt-button-ls: -0.1px;
+  --mkt-eyebrow-size: 18px;
+  --mkt-eyebrow-weight: 400;
+  --mkt-eyebrow-lh: 1.3;
+  --mkt-eyebrow-ls: 0.54px;
+  --mkt-caption-size: 12px;
+  --mkt-caption-weight: 400;
+  --mkt-caption-lh: 1;
+  --mkt-caption-ls: 0.6px;
+
+  /* DataTable 내부 변수 매핑 */
+  --color-surface-muted: var(--nike-hairline-soft);
+  --color-surface-raised: var(--nike-canvas);
+  --color-border: var(--nike-hairline);
+  --color-text: var(--nike-ink);
+  --color-text-muted: color-mix(in srgb, var(--nike-ink) 50%, transparent);
+  --color-brand-500: var(--nike-ink);
+  --color-brand-200: var(--nike-hairline);
+  --color-brand-50: var(--nike-hairline-soft);
+  --radius-lg: 8px;
+  --radius-sm: 2px;
+  --duration-fast: 100ms;
 }
 
-/* ── 마케팅 타이포그래피 유틸리티 클래스 ────────────────────────────────── */
+/* ── mkt-* 유틸리티 클래스 (기존 컴포넌트 하위 호환) ─────────────────────── */
 .mkt-display-xl {
   font-family: var(--mkt-font-sans);
   font-size: clamp(48px, 6.7vw, var(--mkt-display-xl-size));
   font-weight: var(--mkt-display-xl-weight);
   line-height: var(--mkt-display-xl-lh);
   letter-spacing: var(--mkt-display-xl-ls);
-  font-feature-settings: 'kern' 1;
-  word-break: keep-all;
 }
-
 .mkt-display-lg {
   font-family: var(--mkt-font-sans);
   font-size: clamp(36px, 5vw, var(--mkt-display-lg-size));
   font-weight: var(--mkt-display-lg-weight);
   line-height: var(--mkt-display-lg-lh);
   letter-spacing: var(--mkt-display-lg-ls);
-  font-feature-settings: 'kern' 1;
-  word-break: keep-all;
 }
-
 .mkt-headline {
   font-family: var(--mkt-font-sans);
   font-size: var(--mkt-headline-size);
   font-weight: var(--mkt-headline-weight);
   line-height: var(--mkt-headline-lh);
   letter-spacing: var(--mkt-headline-ls);
-  font-feature-settings: 'kern' 1;
 }
-
 .mkt-subhead {
   font-family: var(--mkt-font-sans);
   font-size: var(--mkt-subhead-size);
   font-weight: var(--mkt-subhead-weight);
   line-height: var(--mkt-subhead-lh);
   letter-spacing: var(--mkt-subhead-ls);
-  font-feature-settings: 'kern' 1;
 }
-
 .mkt-body-lg {
   font-family: var(--mkt-font-sans);
   font-size: var(--mkt-body-lg-size);
@@ -179,7 +540,6 @@
   line-height: var(--mkt-body-lg-lh);
   letter-spacing: var(--mkt-body-lg-ls);
 }
-
 .mkt-body {
   font-family: var(--mkt-font-sans);
   font-size: var(--mkt-body-size);
@@ -187,7 +547,6 @@
   line-height: var(--mkt-body-lh);
   letter-spacing: var(--mkt-body-ls);
 }
-
 .mkt-body-sm {
   font-family: var(--mkt-font-sans);
   font-size: var(--mkt-body-sm-size);
@@ -195,7 +554,6 @@
   line-height: var(--mkt-body-sm-lh);
   letter-spacing: var(--mkt-body-sm-ls);
 }
-
 .mkt-eyebrow {
   font-family: var(--mkt-font-mono);
   font-size: var(--mkt-eyebrow-size);
@@ -204,7 +562,6 @@
   letter-spacing: var(--mkt-eyebrow-ls);
   text-transform: uppercase;
 }
-
 .mkt-caption {
   font-family: var(--mkt-font-mono);
   font-size: var(--mkt-caption-size);
@@ -214,34 +571,30 @@
   text-transform: uppercase;
 }
 
-/* ── 마케팅 버튼 pill ────────────────────────────────────────────────────── */
+/* mkt-btn-* (DataTable 페이지네이션 등 하위 호환) */
 .mkt-btn-primary {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  background-color: var(--mkt-primary);
-  color: var(--mkt-on-primary);
+  background-color: var(--nike-ink);
+  color: var(--nike-on-primary);
   font-family: var(--mkt-font-sans);
-  font-size: var(--mkt-button-size);
-  font-weight: var(--mkt-button-weight);
-  line-height: var(--mkt-button-lh);
-  letter-spacing: var(--mkt-button-ls);
-  padding: 10px 28px;
-  border-radius: var(--mkt-rounded-pill);
-  border: 2px solid transparent;
+  font-size: 14px;
+  font-weight: 500;
+  padding: 10px 20px;
+  border-radius: 9999px;
+  border: none;
   cursor: pointer;
-  transition: opacity 150ms ease;
-  min-height: 44px;
+  transition: opacity 100ms;
+  min-height: 40px;
   white-space: nowrap;
   text-decoration: none;
 }
-
 .mkt-btn-primary:hover {
-  opacity: 0.85;
+  opacity: 0.82;
 }
-
 .mkt-btn-primary:focus-visible {
-  outline: 2px solid var(--mkt-primary);
+  outline: 2px solid var(--nike-ink);
   outline-offset: 3px;
 }
 
@@ -249,46 +602,38 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  background-color: var(--mkt-canvas);
-  color: var(--mkt-ink);
+  background-color: var(--nike-canvas);
+  color: var(--nike-ink);
   font-family: var(--mkt-font-sans);
-  font-size: var(--mkt-button-size);
-  font-weight: var(--mkt-button-weight);
-  line-height: var(--mkt-button-lh);
-  letter-spacing: var(--mkt-button-ls);
-  padding: 8px 26px 10px;
-  border-radius: var(--mkt-rounded-pill);
-  border: 2px solid var(--mkt-ink);
+  font-size: 14px;
+  font-weight: 500;
+  padding: 10px 20px;
+  border-radius: 9999px;
+  border: 1px solid var(--nike-ink);
   cursor: pointer;
-  transition: opacity 150ms ease;
-  min-height: 44px;
+  transition: background-color 100ms;
+  min-height: 40px;
   white-space: nowrap;
   text-decoration: none;
 }
-
 .mkt-btn-secondary:hover {
-  opacity: 0.75;
+  background-color: var(--nike-soft-cloud);
 }
-
 .mkt-btn-secondary:focus-visible {
-  outline: 2px solid var(--mkt-primary);
+  outline: 2px solid var(--nike-ink);
   outline-offset: 3px;
 }
-
-/* ── inverse secondary 버튼 (navy 등 어두운 배경 위) ──────────────────────── */
 .mkt-btn-secondary-inverse {
   background-color: transparent;
-  color: var(--mkt-inverse-ink);
-  border-color: var(--mkt-inverse-ink);
+  color: #ffffff;
+  border-color: #ffffff;
 }
 
-/* ── 마케팅 컬러블록 섹션 ────────────────────────────────────────────────── */
+/* mkt-block (기존 카드) */
 .mkt-block {
   border-radius: var(--mkt-rounded-lg);
   padding: var(--mkt-space-xxl);
 }
-
-/* 768px 아래: full-bleed (모서리 제거) */
 @media (max-width: 768px) {
   .mkt-block {
     border-radius: 0;
@@ -298,61 +643,31 @@
     padding-right: var(--mkt-space-lg);
   }
 }
-
 .mkt-block-lime {
-  background-color: var(--mkt-block-lime);
-  color: var(--mkt-ink);
+  background-color: #dceeb1;
+  color: var(--nike-ink);
 }
 .mkt-block-lilac {
-  background-color: var(--mkt-block-lilac);
-  color: var(--mkt-ink);
+  background-color: var(--nike-card-lilac);
+  color: var(--nike-ink);
 }
 .mkt-block-cream {
-  background-color: var(--mkt-block-cream);
-  color: var(--mkt-ink);
+  background-color: var(--nike-card-cream);
+  color: var(--nike-ink);
 }
 .mkt-block-pink {
-  background-color: var(--mkt-block-pink);
-  color: var(--mkt-ink);
+  background-color: var(--nike-card-pink);
+  color: var(--nike-ink);
 }
 .mkt-block-mint {
-  background-color: var(--mkt-block-mint);
-  color: var(--mkt-ink);
+  background-color: var(--nike-card-mint);
+  color: var(--nike-ink);
 }
 .mkt-block-coral {
-  background-color: var(--mkt-block-coral);
-  color: var(--mkt-ink);
+  background-color: #f3c9b6;
+  color: var(--nike-ink);
 }
 .mkt-block-navy {
-  background-color: var(--mkt-block-navy);
-  color: var(--mkt-inverse-ink);
-}
-
-/* ── body 기본 스타일 ────────────────────────────────────────────────────── */
-/* 마케팅 페이지와 동일한 폰트/배경/색상 기본값 */
-body {
-  font-family: var(--mkt-font-sans);
-  color: var(--mkt-ink);
-  background-color: var(--mkt-surface-soft);
-  font-feature-settings: 'kern' 1;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-}
-
-/* ── admin 전용 DataTable — mkt 토큰 매핑 ──────────────────────────────────
- * DataTable 이 사용하는 --color-* 변수를 --mkt-* 로 연결.
- * shadcn 기본 변수를 덮어쓰지 않고 추가 매핑만.
- */
-:root {
-  --color-surface-muted: var(--mkt-hairline-soft);
-  --color-surface-raised: var(--mkt-canvas);
-  --color-border: var(--mkt-hairline);
-  --color-text: var(--mkt-ink);
-  --color-text-muted: color-mix(in srgb, var(--mkt-ink) 50%, transparent);
-  --color-brand-500: var(--mkt-ink);
-  --color-brand-200: var(--mkt-hairline);
-  --color-brand-50: var(--mkt-hairline-soft);
-  --radius-lg: var(--mkt-rounded-md);
-  --radius-sm: var(--mkt-rounded-xs);
-  --duration-fast: 100ms;
+  background-color: #1f1d3d;
+  color: #ffffff;
 }

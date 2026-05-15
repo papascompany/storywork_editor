@@ -173,11 +173,9 @@ export default function NewFormatPage() {
         href="/formats"
         className="mb-6 inline-flex items-center gap-1.5 focus-visible:outline-none focus-visible:ring-2 rounded"
         style={{
-          fontFamily: 'var(--mkt-font-sans)',
           fontSize: '14px',
-          fontWeight: 330,
-          color: 'var(--mkt-ink)',
-          opacity: 0.5,
+          fontWeight: 400,
+          color: 'var(--nike-mute)',
           textDecoration: 'none',
         }}
       >
@@ -185,33 +183,9 @@ export default function NewFormatPage() {
         판형 목록
       </Link>
 
-      <header
-        className="mb-8"
-        style={{
-          paddingBottom: 'var(--mkt-space-lg)',
-          borderBottom: '1px solid var(--mkt-hairline)',
-        }}
-      >
-        <p
-          className="mkt-eyebrow"
-          style={{
-            color: 'var(--mkt-ink)',
-            opacity: 0.4,
-            marginBottom: 'var(--mkt-space-xs)',
-            fontSize: '12px',
-          }}
-        >
-          ADMIN / FORMATS / NEW
-        </p>
-        <h1
-          className="mkt-display-lg"
-          style={{ color: 'var(--mkt-ink)', marginBottom: 'var(--mkt-space-xs)' }}
-        >
-          새 판형 등록
-        </h1>
-        <p className="mkt-body" style={{ color: 'var(--mkt-ink)', opacity: 0.55 }}>
-          프리셋을 선택하거나 직접 입력해 판형을 등록합니다.
-        </p>
+      <header className="mb-8">
+        <h1 className="nike-heading-xl">새 판형 등록</h1>
+        <p className="nike-caption-md mt-1">프리셋을 선택하거나 직접 입력해 판형을 등록합니다.</p>
       </header>
 
       {/* 프리셋 카드 — mkt-block-cream 섹션 */}

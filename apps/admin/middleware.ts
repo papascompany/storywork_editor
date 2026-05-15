@@ -55,9 +55,6 @@ export async function middleware(request: NextRequest): Promise<NextResponse> {
   // 사용자 요구 (2026-05-14): 이메일 인증만으로 로그인 가능
   // — admin role 체크 완전 제거. 인증된 사용자는 모두 통과.
   // (role 기반 세분화 권한은 별도 PR 에서 RLS 또는 페이지별 가드로 재도입)
-  // eslint-disable-next-line no-console
-  console.log(`[mw] path=${pathname} email=${user.email} → 통과`)
-
   return response
 }
 

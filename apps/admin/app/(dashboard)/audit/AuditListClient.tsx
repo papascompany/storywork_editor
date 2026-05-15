@@ -352,35 +352,13 @@ export function AuditListClient({ initialData, initialTotalCount }: AuditListCli
   })
 
   return (
-    <div className="p-6 lg:p-10" style={{ fontFamily: 'var(--mkt-font-sans)' }}>
-      {/* 헤더 */}
-      <header
-        className="mb-10"
-        style={{
-          paddingBottom: 'var(--mkt-space-lg)',
-          borderBottom: '1px solid var(--mkt-hairline)',
-        }}
-      >
-        <p
-          className="mkt-eyebrow"
-          style={{
-            color: 'var(--mkt-ink)',
-            opacity: 0.4,
-            marginBottom: 'var(--mkt-space-sm)',
-            fontSize: '12px',
-          }}
-        >
-          ADMIN / AUDIT / 05
-        </p>
-        <h1
-          className="mkt-display-lg"
-          style={{ color: 'var(--mkt-ink)', marginBottom: 'var(--mkt-space-sm)' }}
-        >
-          감사 로그
-        </h1>
-        <p className="mkt-body" style={{ color: 'var(--mkt-ink)', opacity: 0.55 }}>
-          관리자 액션 이력을 조회합니다. 수정·삭제 불가.
-        </p>
+    <div className="p-6 lg:p-10">
+      {/* ── Nike 헤더 (100p Admin 패턴) ── */}
+      <header className="mb-8 flex items-end justify-between gap-4 flex-wrap">
+        <div>
+          <h1 className="nike-heading-xl">감사 로그</h1>
+          <p className="nike-caption-md mt-1">관리자 액션 이력을 조회합니다. 수정·삭제 불가.</p>
+        </div>
       </header>
 
       <div className="flex flex-col lg:flex-row gap-6">

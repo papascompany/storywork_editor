@@ -1,212 +1,142 @@
-'use client'
-
 /**
- * (dashboard)/layout.tsx
+ * (dashboard)/layout.tsx — 관리자 콘솔 셸 레이아웃
  *
- * 인증 통과 후 관리자 콘솔 셸 레이아웃.
- * 마케팅 디자인 시스템: 좌측 사이드바(데스크톱) + 상단 헤더(모바일).
- * 시각 언어: 마케팅 Header 와 동일 — Sparkles 아이콘 + mkt-font-sans/mono.
+ * Server Component (성능 최적화 — usePathname 은 SidebarNavClient 에만 격리).
+ * 100p Admin 레퍼런스 정확 모방:
+ *   - 좌측 사이드바 240px, nike-canvas 배경, 우측 hairline-soft 테두리
+ *   - 상단 로고: "StoryWork Admin" (nike-font-display 18px w500) + 사용자 이메일 (12px mute)
+ *   - 메뉴: .nike-nav-link (활성 = ink outline + sale red 텍스트)
+ *   - 로그아웃: 사이드바 하단 sticky
  */
 
-import { cn } from '@storywork/ui'
-import {
-  FileText,
-  Layers,
-  Layers2,
-  LayoutDashboard,
-  List,
-  LogOut,
-  Menu,
-  ScrollText,
-  Sparkles,
-  X,
-} from 'lucide-react'
+import { LogOut } from 'lucide-react'
 import Link from 'next/link'
-import { usePathname } from 'next/navigation'
 import * as React from 'react'
+
+import { requireRole } from '../../src/lib/auth'
+
+import type { NavItemDef } from './SidebarNavClient'
+import { MobileSidebarDrawer, SidebarNavClient } from './SidebarNavClient'
 
 // ─── 메뉴 정의 ───────────────────────────────────────────────────────────────
 
-const NAV_ITEMS = [
-  { href: '/', label: '대시보드', icon: LayoutDashboard, exact: true },
-  { href: '/formats', label: '판형', icon: Layers, exact: false },
-  { href: '/resources', label: '리소스', icon: FileText, exact: false },
-  { href: '/templates', label: '템플릿', icon: List, exact: false },
-  { href: '/template-sets', label: '템플릿 세트', icon: Layers2, exact: false },
-  { href: '/audit', label: '감사 로그', icon: ScrollText, exact: false },
+const NAV_ITEMS: NavItemDef[] = [
+  { href: '/', label: '대시보드', exact: true },
+  { href: '/formats', label: '판형', exact: false },
+  { href: '/resources', label: '리소스', exact: false },
+  { href: '/templates', label: '템플릿', exact: false },
+  { href: '/template-sets', label: '템플릿 세트', exact: false },
+  { href: '/audit', label: '감사 로그', exact: false },
 ]
 
-// ─── NavItem ─────────────────────────────────────────────────────────────────
+// ─── 로고 슬롯 (서버 렌더, Link 포함) ───────────────────────────────────────
 
-function NavItem({
-  href,
-  label,
-  icon: Icon,
-  exact,
-  onClick,
-}: {
-  href: string
-  label: string
-  icon: React.ElementType
-  exact: boolean
-  onClick?: () => void
-}) {
-  const pathname = usePathname()
-  const isActive = exact ? pathname === href : pathname.startsWith(href)
-
+function SidebarLogo({ email }: { email: string }) {
   return (
-    <Link
-      href={href}
-      onClick={onClick}
-      className={cn(
-        'flex items-center gap-3 px-4 py-2.5 transition-colors duration-100',
-        'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-1',
-      )}
-      style={{
-        borderRadius: 'var(--mkt-rounded-md)',
-        fontFamily: 'var(--mkt-font-sans)',
-        fontSize: '15px',
-        fontWeight: isActive ? 540 : 330,
-        letterSpacing: '-0.10px',
-        color: 'var(--mkt-ink)',
-        opacity: isActive ? 1 : 0.55,
-        // 활성 메뉴: mkt-block-cream 파스텔 배경
-        backgroundColor: isActive ? 'var(--mkt-block-cream)' : 'transparent',
-        textDecoration: 'none',
-      }}
-      aria-current={isActive ? 'page' : undefined}
-    >
-      <Icon
-        style={{ width: '16px', height: '16px', flexShrink: 0, opacity: isActive ? 1 : 0.65 }}
-        aria-hidden="true"
-        strokeWidth={isActive ? 2 : 1.5}
-      />
-      {label}
-    </Link>
+    <div style={{ borderBottom: '1px solid var(--nike-hairline-soft)', padding: '20px 16px 16px' }}>
+      <Link
+        href="/"
+        prefetch={true}
+        style={{ textDecoration: 'none', display: 'block' }}
+        aria-label="StoryWork Admin 홈"
+      >
+        <div
+          style={{
+            fontFamily: 'var(--nike-font-display)',
+            fontSize: '18px',
+            fontWeight: 500,
+            color: 'var(--nike-ink)',
+            lineHeight: 1.3,
+          }}
+        >
+          StoryWork Admin
+        </div>
+      </Link>
+      {/* 사용자 이메일 — 100p Admin 참조 */}
+      <p
+        style={{
+          marginTop: '4px',
+          fontFamily: 'var(--nike-font-text)',
+          fontSize: '12px',
+          fontWeight: 400,
+          color: 'var(--nike-mute)',
+          overflow: 'hidden',
+          textOverflow: 'ellipsis',
+          whiteSpace: 'nowrap',
+        }}
+      >
+        {email}
+      </p>
+    </div>
   )
 }
 
-// ─── Sidebar 본체 ─────────────────────────────────────────────────────────────
+// ─── 로그아웃 슬롯 ───────────────────────────────────────────────────────────
 
-function Sidebar({ onClose }: { onClose?: () => void }) {
+function SidebarLogout() {
   return (
-    <nav aria-label="관리자 메뉴" className="flex flex-col h-full">
-      {/* 로고 영역 */}
-      <div
-        className="flex items-center justify-between px-4 py-5"
-        style={{ borderBottom: '1px solid var(--mkt-hairline)' }}
-      >
-        <Link
-          href="/"
-          className="flex items-center gap-2 focus-visible:outline-none focus-visible:ring-2 rounded"
-          style={{ textDecoration: 'none' }}
+    <div style={{ borderTop: '1px solid var(--nike-hairline-soft)', padding: '12px 8px' }}>
+      <form action="/api/auth/logout" method="post">
+        <button
+          type="submit"
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: '10px',
+            width: '100%',
+            padding: '10px 12px',
+            borderRadius: '8px',
+            border: 'none',
+            background: 'none',
+            cursor: 'pointer',
+            fontFamily: 'var(--nike-font-text)',
+            fontSize: '14px',
+            fontWeight: 400,
+            color: 'var(--nike-mute)',
+            textAlign: 'left',
+            transition: 'background-color 100ms',
+          }}
+          onMouseEnter={(e) => {
+            ;(e.currentTarget as HTMLButtonElement).style.backgroundColor = 'var(--nike-soft-cloud)'
+          }}
+          onMouseLeave={(e) => {
+            ;(e.currentTarget as HTMLButtonElement).style.backgroundColor = 'transparent'
+          }}
         >
-          <Sparkles
-            style={{ width: '20px', height: '20px', color: 'var(--mkt-ink)' }}
+          <LogOut
+            style={{ width: '16px', height: '16px', flexShrink: 0 }}
             aria-hidden="true"
             strokeWidth={1.5}
           />
-          <div>
-            <span
-              style={{
-                fontFamily: 'var(--mkt-font-sans)',
-                fontSize: '16px',
-                fontWeight: 540,
-                letterSpacing: '-0.26px',
-                color: 'var(--mkt-ink)',
-              }}
-            >
-              StoryWork
-            </span>{' '}
-            <span className="mkt-caption" style={{ color: 'var(--mkt-ink)', opacity: 0.4 }}>
-              Admin
-            </span>
-          </div>
-        </Link>
-
-        {onClose && (
-          <button
-            type="button"
-            onClick={onClose}
-            aria-label="메뉴 닫기"
-            className="rounded-md p-1 focus-visible:outline-none focus-visible:ring-2"
-            style={{
-              color: 'var(--mkt-ink)',
-              opacity: 0.45,
-              background: 'none',
-              border: 'none',
-              cursor: 'pointer',
-            }}
-          >
-            <X style={{ width: '20px', height: '20px' }} aria-hidden="true" />
-          </button>
-        )}
-      </div>
-
-      {/* 섹션 헤더 */}
-      <div className="px-4 pt-5 pb-2">
-        <p className="mkt-caption" style={{ color: 'var(--mkt-ink)', opacity: 0.35 }}>
-          Navigation
-        </p>
-      </div>
-
-      {/* 메뉴 링크 */}
-      <div className="flex flex-col gap-0.5 px-2 flex-1">
-        {NAV_ITEMS.map((item) => (
-          <NavItem key={item.href} {...item} onClick={onClose} />
-        ))}
-      </div>
-
-      {/* 로그아웃 */}
-      <div className="px-2 py-4" style={{ borderTop: '1px solid var(--mkt-hairline)' }}>
-        <form action="/api/auth/logout" method="post">
-          <button
-            type="submit"
-            className="flex w-full items-center gap-3 px-4 py-2.5 transition-opacity hover:opacity-70 focus-visible:outline-none focus-visible:ring-2"
-            style={{
-              borderRadius: 'var(--mkt-rounded-md)',
-              fontFamily: 'var(--mkt-font-sans)',
-              fontSize: '15px',
-              fontWeight: 330,
-              letterSpacing: '-0.10px',
-              color: 'var(--mkt-ink)',
-              opacity: 0.45,
-              background: 'none',
-              border: 'none',
-              cursor: 'pointer',
-              textAlign: 'left',
-            }}
-          >
-            <LogOut
-              style={{ width: '16px', height: '16px', flexShrink: 0 }}
-              aria-hidden="true"
-              strokeWidth={1.5}
-            />
-            로그아웃
-          </button>
-        </form>
-      </div>
-    </nav>
+          로그아웃
+        </button>
+      </form>
+    </div>
   )
 }
 
 // ─── 레이아웃 ─────────────────────────────────────────────────────────────────
 
-export default function DashboardLayout({ children }: { children: React.ReactNode }) {
-  const [mobileOpen, setMobileOpen] = React.useState(false)
+export default async function DashboardLayout({ children }: { children: React.ReactNode }) {
+  // 서버에서 사용자 정보 조회 — 사이드바 헤더에 이메일 표시용
+  const user = await requireRole()
+
+  const logoSlot = <SidebarLogo email={user.email} />
+  const logoutSlot = <SidebarLogout />
 
   return (
     <div
       className="flex min-h-dvh"
-      style={{ backgroundColor: 'var(--mkt-surface-soft)', fontFamily: 'var(--mkt-font-sans)' }}
+      style={{ backgroundColor: 'var(--nike-soft-cloud)', fontFamily: 'var(--nike-font-text)' }}
     >
-      {/* ─── 데스크톱 사이드바 ─── */}
+      {/* ─── 데스크톱 사이드바 (240px, sticky) ─── */}
       <aside
-        className="hidden w-64 shrink-0 md:flex md:flex-col"
-        aria-label="사이드바"
+        className="hidden md:flex md:flex-col shrink-0"
+        aria-label="관리자 메뉴"
         style={{
-          backgroundColor: 'var(--mkt-canvas)',
-          borderRight: '1px solid var(--mkt-hairline)',
+          width: '240px',
+          backgroundColor: 'var(--nike-canvas)',
+          borderRight: '1px solid var(--nike-hairline-soft)',
           minHeight: '100dvh',
           position: 'sticky',
           top: 0,
@@ -214,84 +144,44 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           overflowY: 'auto',
         }}
       >
-        <Sidebar />
-      </aside>
+        {/* 로고 + 이메일 */}
+        {logoSlot}
 
-      {/* ─── 모바일 오버레이 ─── */}
-      {mobileOpen && (
-        <div
-          role="dialog"
-          aria-modal="true"
-          aria-label="모바일 메뉴"
-          className="fixed inset-0 z-50 md:hidden"
-        >
-          {/* 백드롭 */}
-          <div
-            className="absolute inset-0"
-            style={{ backgroundColor: 'rgba(0,0,0,0.45)' }}
-            onClick={() => setMobileOpen(false)}
-            aria-hidden="true"
-          />
-          {/* 드로어 */}
-          <div
-            className="absolute left-0 top-0 bottom-0 w-72 shadow-xl"
-            style={{ backgroundColor: 'var(--mkt-canvas)' }}
-          >
-            <Sidebar onClose={() => setMobileOpen(false)} />
-          </div>
-        </div>
-      )}
-
-      {/* ─── 메인 영역 ─── */}
-      <div className="flex flex-1 flex-col overflow-hidden">
-        {/* 모바일 헤더 */}
-        <header
-          className="flex items-center gap-3 px-4 py-3 md:hidden"
-          style={{
-            backgroundColor: 'var(--mkt-canvas)',
-            borderBottom: '1px solid var(--mkt-hairline)',
-          }}
-        >
-          <button
-            type="button"
-            onClick={() => setMobileOpen(true)}
-            aria-label="메뉴 열기"
-            aria-expanded={mobileOpen}
-            className="flex items-center justify-center rounded-md p-1.5 focus-visible:outline-none focus-visible:ring-2"
+        {/* 메뉴 레이블 */}
+        <div style={{ padding: '16px 16px 6px' }}>
+          <p
             style={{
-              color: 'var(--mkt-ink)',
-              opacity: 0.6,
-              background: 'none',
-              border: 'none',
-              cursor: 'pointer',
+              fontFamily: 'var(--nike-font-text)',
+              fontSize: '11px',
+              fontWeight: 500,
+              color: 'var(--nike-stone)',
+              textTransform: 'uppercase',
+              letterSpacing: '0.5px',
             }}
           >
-            <Menu style={{ width: '20px', height: '20px' }} aria-hidden="true" strokeWidth={1.5} />
-          </button>
-          <div className="flex items-center gap-2">
-            <Sparkles
-              style={{ width: '16px', height: '16px', color: 'var(--mkt-ink)' }}
-              aria-hidden="true"
-              strokeWidth={1.5}
-            />
-            <span
-              style={{
-                fontFamily: 'var(--mkt-font-sans)',
-                fontSize: '15px',
-                fontWeight: 540,
-                letterSpacing: '-0.26px',
-                color: 'var(--mkt-ink)',
-              }}
-            >
-              StoryWork{' '}
-              <span className="mkt-caption" style={{ color: 'var(--mkt-ink)', opacity: 0.4 }}>
-                Admin
-              </span>
-            </span>
-          </div>
-        </header>
+            Navigation
+          </p>
+        </div>
 
-        {/* 페이지 콘텐츠 */}
+        {/* 네비게이션 링크 (클라이언트 컴포넌트 — usePathname 격리) */}
+        <nav className="flex-1 py-1" aria-label="주요 메뉴">
+          <SidebarNavClient items={NAV_ITEMS} />
+        </nav>
+
+        {/* 로그아웃 */}
+        {logoutSlot}
+      </aside>
+
+      {/* ─── 모바일 헤더 + 드로어 (클라이언트, 상태 격리) ─── */}
+      <MobileSidebarDrawer
+        items={NAV_ITEMS}
+        logoSlot={logoSlot}
+        logoutSlot={logoutSlot}
+        userEmail={user.email}
+      />
+
+      {/* ─── 메인 콘텐츠 ─── */}
+      <div className="flex flex-1 flex-col overflow-hidden">
         <main className="flex-1 overflow-auto">{children}</main>
       </div>
     </div>

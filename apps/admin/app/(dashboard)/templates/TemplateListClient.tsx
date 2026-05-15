@@ -150,44 +150,20 @@ export function TemplateListClient({ initialData, formats, userRole }: TemplateL
   }, [selectedIds, router])
 
   return (
-    <div className="p-6 lg:p-10" style={{ fontFamily: 'var(--mkt-font-sans)' }}>
-      {/* 헤더 */}
-      <header
-        className="mb-10 flex items-end justify-between gap-6 flex-wrap"
-        style={{
-          paddingBottom: 'var(--mkt-space-lg)',
-          borderBottom: '1px solid var(--mkt-hairline)',
-        }}
-      >
+    <div className="p-6 lg:p-10">
+      {/* ── Nike 헤더 (100p Admin 패턴) ── */}
+      <header className="mb-8 flex items-end justify-between gap-4 flex-wrap">
         <div>
-          <p
-            className="mkt-eyebrow"
-            style={{
-              color: 'var(--mkt-ink)',
-              opacity: 0.4,
-              marginBottom: 'var(--mkt-space-sm)',
-              fontSize: '12px',
-            }}
-          >
-            ADMIN / TEMPLATES / 03
-          </p>
-          <h1
-            className="mkt-display-lg"
-            style={{ color: 'var(--mkt-ink)', marginBottom: 'var(--mkt-space-sm)' }}
-          >
-            템플릿 관리
-          </h1>
-          <p className="mkt-body" style={{ color: 'var(--mkt-ink)', opacity: 0.55 }}>
+          <h1 className="nike-heading-xl">템플릿 관리</h1>
+          <p className="nike-caption-md mt-1">
             페이지 레이아웃 템플릿과 슬롯을 등록하고 관리합니다.
           </p>
         </div>
-        <Link
-          href="/templates/new"
-          className="mkt-btn-primary"
-          style={{ gap: '8px', display: 'inline-flex', alignItems: 'center', flexShrink: 0 }}
-        >
-          <Plus className="size-4" aria-hidden="true" />새 템플릿
-        </Link>
+        <div className="flex gap-2">
+          <Link href="/templates/new" className="nike-btn-primary">
+            <Plus className="size-4" aria-hidden="true" />새 템플릿
+          </Link>
+        </div>
       </header>
 
       {/* 필터 */}

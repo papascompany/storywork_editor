@@ -134,17 +134,15 @@ export function FormatEditClient({ format, userRole }: FormatEditClientProps) {
   }
 
   return (
-    <div className="p-6 lg:p-10 max-w-2xl" style={{ fontFamily: 'var(--mkt-font-sans)' }}>
+    <div className="p-6 lg:p-10 max-w-2xl">
       {/* 뒤로 가기 */}
       <Link
         href="/formats"
         className="mb-6 inline-flex items-center gap-1.5 focus-visible:outline-none focus-visible:ring-2 rounded"
         style={{
-          fontFamily: 'var(--mkt-font-sans)',
           fontSize: '14px',
-          fontWeight: 330,
-          color: 'var(--mkt-ink)',
-          opacity: 0.5,
+          fontWeight: 400,
+          color: 'var(--nike-mute)',
           textDecoration: 'none',
         }}
       >
@@ -152,33 +150,11 @@ export function FormatEditClient({ format, userRole }: FormatEditClientProps) {
         판형 목록
       </Link>
 
-      {/* 헤더 */}
-      <div
-        className="flex items-start justify-between gap-4 mb-8"
-        style={{
-          paddingBottom: 'var(--mkt-space-lg)',
-          borderBottom: '1px solid var(--mkt-hairline)',
-        }}
-      >
+      {/* ── Nike 헤더 ── */}
+      <div className="flex items-start justify-between gap-4 mb-8">
         <div>
-          <p
-            className="mkt-eyebrow"
-            style={{
-              color: 'var(--mkt-ink)',
-              opacity: 0.4,
-              marginBottom: 'var(--mkt-space-xs)',
-              fontSize: '12px',
-            }}
-          >
-            ADMIN / FORMATS / EDIT
-          </p>
-          <h1
-            className="mkt-display-lg"
-            style={{ color: 'var(--mkt-ink)', marginBottom: 'var(--mkt-space-xs)' }}
-          >
-            {format.name}
-          </h1>
-          <p className="mkt-body-sm" style={{ color: 'var(--mkt-ink)', opacity: 0.55 }}>
+          <h1 className="nike-heading-xl">{format.name}</h1>
+          <p className="nike-caption-md mt-1">
             템플릿 {format.templateCount}개 · 프로젝트 {format.projectCount}개 연결됨
           </p>
         </div>
@@ -187,7 +163,7 @@ export function FormatEditClient({ format, userRole }: FormatEditClientProps) {
         {isSuperadmin && (
           <button
             type="button"
-            className="mkt-btn-secondary"
+            className="nike-btn-secondary"
             onClick={() => setDeleteDialogOpen(true)}
             disabled={usageCount > 0}
             title={
@@ -196,12 +172,9 @@ export function FormatEditClient({ format, userRole }: FormatEditClientProps) {
                 : '판형 삭제'
             }
             style={{
-              gap: '8px',
-              display: 'inline-flex',
-              alignItems: 'center',
-              borderColor: '#dc2626',
-              color: '#dc2626',
-              opacity: usageCount > 0 ? 0.4 : undefined,
+              borderColor: 'var(--nike-sale)',
+              color: 'var(--nike-sale)',
+              opacity: usageCount > 0 ? 0.38 : undefined,
             }}
           >
             <Trash2 className="size-4" aria-hidden="true" />
@@ -248,7 +221,7 @@ export function FormatEditClient({ format, userRole }: FormatEditClientProps) {
           <DialogFooter>
             <button
               type="button"
-              className="mkt-btn-secondary"
+              className="nike-btn-secondary"
               onClick={() => setDeleteDialogOpen(false)}
               disabled={isDeleting}
             >
@@ -256,10 +229,10 @@ export function FormatEditClient({ format, userRole }: FormatEditClientProps) {
             </button>
             <button
               type="button"
-              className="mkt-btn-primary"
+              className="nike-btn-primary"
               onClick={() => void handleDelete()}
               disabled={isDeleting}
-              style={{ backgroundColor: '#dc2626', opacity: isDeleting ? 0.6 : undefined }}
+              style={{ backgroundColor: 'var(--nike-sale)', opacity: isDeleting ? 0.6 : undefined }}
             >
               {isDeleting ? '삭제 중...' : '삭제'}
             </button>

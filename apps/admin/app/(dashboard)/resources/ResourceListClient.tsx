@@ -469,43 +469,17 @@ export function ResourceListClient({
   }
 
   return (
-    <div className="p-6 lg:p-10" style={{ fontFamily: 'var(--mkt-font-sans)' }}>
-      {/* 헤더 */}
-      <header
-        className="mb-10 flex items-end justify-between gap-6 flex-wrap"
-        style={{
-          paddingBottom: 'var(--mkt-space-lg)',
-          borderBottom: '1px solid var(--mkt-hairline)',
-        }}
-      >
+    <div className="p-6 lg:p-10">
+      {/* ── Nike 헤더 (100p Admin 패턴) ── */}
+      <header className="mb-8 flex items-end justify-between gap-4 flex-wrap">
         <div>
-          <p
-            className="mkt-eyebrow"
-            style={{
-              color: 'var(--mkt-ink)',
-              opacity: 0.4,
-              marginBottom: 'var(--mkt-space-sm)',
-              fontSize: '12px',
-            }}
-          >
-            ADMIN / RESOURCES / 02
-          </p>
-          <h1
-            className="mkt-display-lg"
-            style={{ color: 'var(--mkt-ink)', marginBottom: 'var(--mkt-space-sm)' }}
-          >
-            리소스 관리
-          </h1>
-          <p className="mkt-body" style={{ color: 'var(--mkt-ink)', opacity: 0.55 }}>
+          <h1 className="nike-heading-xl">리소스 관리</h1>
+          <p className="nike-caption-md mt-1">
             포즈/배경/소품 등 관리자 등록 리소스를 검수하고 관리합니다.
           </p>
         </div>
-        <div className="flex items-center gap-3 flex-wrap">
-          <Link
-            href="/resources/review"
-            className="mkt-btn-secondary"
-            style={{ gap: '8px', display: 'inline-flex', alignItems: 'center' }}
-          >
+        <div className="flex gap-2">
+          <Link href="/resources/review" className="nike-btn-secondary">
             검수 큐
             {(facets.byStatus['draft'] ?? 0) + (facets.byStatus['review'] ?? 0) > 0 && (
               <span
@@ -515,12 +489,11 @@ export function ResourceListClient({
                   justifyContent: 'center',
                   width: '20px',
                   height: '20px',
-                  borderRadius: 'var(--mkt-rounded-full)',
-                  backgroundColor: 'var(--mkt-block-coral)',
-                  fontFamily: 'var(--mkt-font-sans)',
+                  borderRadius: '9999px',
+                  backgroundColor: '#f3c9b6',
                   fontSize: '11px',
-                  fontWeight: 540,
-                  color: 'var(--mkt-ink)',
+                  fontWeight: 500,
+                  color: 'var(--nike-ink)',
                 }}
               >
                 {(facets.byStatus['draft'] ?? 0) + (facets.byStatus['review'] ?? 0)}
@@ -528,11 +501,7 @@ export function ResourceListClient({
             )}
           </Link>
           {canEdit && (
-            <Link
-              href="/resources/upload"
-              className="mkt-btn-primary"
-              style={{ gap: '8px', display: 'inline-flex', alignItems: 'center' }}
-            >
+            <Link href="/resources/upload" className="nike-btn-primary">
               <Plus className="size-4" aria-hidden="true" />
               신규 업로드
             </Link>

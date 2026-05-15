@@ -1,192 +1,274 @@
 /**
  * (dashboard)/page.tsx — 대시보드 홈
  *
- * 인증 + admin role 검증 후 접근 가능.
- * 마케팅 디자인 시스템: oversized display 헤더 + pastel block 카드 그리드.
+ * 100p Admin 레퍼런스 정확 모방:
+ *   - 좌측 nike-heading-xl + 타임스탬프 / 우상단 pill 버튼 2개 (secondary + primary)
+ *   - 파스텔 카드 4개 grid (pink/cream/mint/lilac) + nike-card-number (40px)
+ *   - 섹션 헤더 + "전체 보기 →" sale red 링크
+ *   - 빈 상태: 옅은 회색 박스 + 중앙 텍스트
  */
-import { FileText, Layers, Layers2, List, ScrollText } from 'lucide-react'
 import Link from 'next/link'
 
 import { requireRole } from '../../src/lib/auth'
+import { prisma } from '../../src/lib/prisma'
 
-// ─── 메뉴 카드 정의 ──────────────────────────────────────────────────────────
+// ─── 날짜 포매터 ─────────────────────────────────────────────────────────────
 
-interface MenuCard {
-  href: string
-  label: string
-  description: string
-  eyebrow: string
-  icon: React.ElementType
-  blockClass: string
-  available: boolean
+function formatKoreanDate(d: Date): string {
+  const pad2 = (n: number) => String(n).padStart(2, '0')
+  const month = pad2(d.getMonth() + 1)
+  const day = pad2(d.getDate())
+  const hour = d.getHours()
+  const ampm = hour < 12 ? 'AM' : 'PM'
+  const h12 = hour % 12 === 0 ? 12 : hour % 12
+  const min = pad2(d.getMinutes())
+  return `오늘 ${month}. ${day}. ${ampm} ${h12}:${min} 기준`
 }
 
-const MENU_CARDS: MenuCard[] = [
-  {
-    href: '/formats',
-    label: '판형 관리',
-    description: '인쇄 판형(B5, A4 등) 등록 및 편집. bleed·safe·DPI 설정.',
-    eyebrow: 'FORMATS / 01',
-    icon: Layers,
-    blockClass: 'mkt-block-lime',
-    available: true,
-  },
-  {
-    href: '/resources',
-    label: '리소스 관리',
-    description: '포즈·배경·소품 등 리소스 검수 및 관리. 일괄 업로드 지원.',
-    eyebrow: 'RESOURCES / 02',
-    icon: FileText,
-    blockClass: 'mkt-block-lilac',
-    available: true,
-  },
-  {
-    href: '/templates',
-    label: '템플릿 관리',
-    description: '페이지 레이아웃 템플릿 등록 및 슬롯 편집.',
-    eyebrow: 'TEMPLATES / 03',
-    icon: List,
-    blockClass: 'mkt-block-mint',
-    available: true,
-  },
-  {
-    href: '/template-sets',
-    label: '템플릿 세트',
-    description: '여러 템플릿을 묶은 세트 관리. 커버 인덱스 지정.',
-    eyebrow: 'SETS / 04',
-    icon: Layers2,
-    blockClass: 'mkt-block-cream',
-    available: true,
-  },
-  {
-    href: '/audit',
-    label: '감사 로그',
-    description: '누가·언제·무엇을 변경했는지 이력 조회. 수정·삭제 불가.',
-    eyebrow: 'AUDIT / 05',
-    icon: ScrollText,
-    blockClass: 'mkt-block-coral',
-    available: true,
-  },
-]
+// ─── 페이지 ──────────────────────────────────────────────────────────────────
+
+export const dynamic = 'force-dynamic'
 
 export default async function DashboardPage() {
-  const user = await requireRole()
+  await requireRole()
+
+  const now = new Date()
+
+  // 통계 병렬 조회
+  const [resourceCount, formatCount, templateCount, templateSetCount] = await Promise.all([
+    prisma.resource.count({ where: { status: 'published' } }),
+    prisma.format.count(),
+    prisma.template.count(),
+    prisma.templateSet.count(),
+  ])
+
+  // 오늘 등록 리소스
+  const todayStart = new Date(now)
+  todayStart.setHours(0, 0, 0, 0)
+  const todayResourceCount = await prisma.resource.count({
+    where: { createdAt: { gte: todayStart }, status: 'published' },
+  })
 
   return (
-    <div
-      className="p-6 lg:p-10"
-      style={{
-        maxWidth: 'var(--mkt-max-width)',
-        fontFamily: 'var(--mkt-font-sans)',
-      }}
-    >
-      {/* ─── 페이지 헤더 ─── */}
-      <header style={{ marginBottom: 'var(--mkt-space-xxl)' }}>
-        <p
-          className="mkt-eyebrow"
-          style={{ color: 'var(--mkt-ink)', opacity: 0.45, marginBottom: 'var(--mkt-space-sm)' }}
-        >
-          ADMIN CONSOLE
-        </p>
-        <h1
-          className="mkt-display-lg"
-          style={{ color: 'var(--mkt-ink)', marginBottom: 'var(--mkt-space-md)' }}
-        >
-          대시보드
-        </h1>
-        <div className="flex items-center gap-3 flex-wrap">
-          <p className="mkt-body-sm" style={{ color: 'var(--mkt-ink)', opacity: 0.55 }}>
-            {user.email}
+    <div className="p-6 lg:p-10" style={{ maxWidth: '1280px' }}>
+      {/* ─── 페이지 헤더 (100p Admin 패턴) ─── */}
+      <header className="flex items-end justify-between gap-4 mb-10 flex-wrap">
+        <div>
+          <h1 className="nike-heading-xl">대시보드</h1>
+          <p className="nike-caption-md mt-1" style={{ color: 'var(--nike-mute)' }}>
+            {formatKoreanDate(now)}
           </p>
-          <span
-            className="mkt-caption"
-            style={{
-              backgroundColor: 'var(--mkt-block-lime)',
-              color: 'var(--mkt-ink)',
-              borderRadius: 'var(--mkt-rounded-full)',
-              padding: '2px 10px',
-            }}
-          >
-            {user.role}
-          </span>
+        </div>
+        {/* 우상단 pill 버튼 2개 */}
+        <div className="flex gap-2 flex-shrink-0">
+          <Link href="/resources/review" className="nike-btn-secondary">
+            검수 큐
+          </Link>
+          <Link href="/resources/upload" className="nike-btn-primary">
+            리소스 업로드
+          </Link>
         </div>
       </header>
 
-      {/* ─── 메뉴 카드 그리드 — oversized pastel block ─── */}
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-        {MENU_CARDS.filter((c) => c.available).map((card) => {
-          const Icon = card.icon
-          return (
-            <Link
-              key={card.href}
-              href={card.href}
-              className={`mkt-block ${card.blockClass} group block transition-transform duration-150 hover:-translate-y-0.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2`}
-              style={{
-                textDecoration: 'none',
-                display: 'block',
-              }}
-              aria-label={card.label}
-            >
-              {/* eyebrow */}
-              <p
-                className="mkt-eyebrow"
-                style={{
-                  color: 'var(--mkt-ink)',
-                  opacity: 0.45,
-                  marginBottom: 'var(--mkt-space-lg)',
-                  fontSize: '12px',
-                }}
-              >
-                {card.eyebrow}
-              </p>
+      {/* ─── 파스텔 통계 카드 4개 (100p Admin 패턴) ─── */}
+      <section
+        className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-12"
+        aria-label="주요 지표"
+      >
+        {/* 카드 1 — pink */}
+        <article className="nike-card-pastel pink">
+          <span className="nike-caption-sm" style={{ color: 'var(--nike-ink)', opacity: 0.6 }}>
+            오늘 등록 리소스
+          </span>
+          <span className="nike-card-number">{todayResourceCount.toLocaleString()}</span>
+          <span className="nike-caption-sm">published 기준</span>
+        </article>
 
-              {/* 아이콘 */}
-              <div
-                style={{
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  width: '48px',
-                  height: '48px',
-                  borderRadius: 'var(--mkt-rounded-md)',
-                  backgroundColor: 'rgba(0,0,0,0.07)',
-                  marginBottom: 'var(--mkt-space-lg)',
-                }}
-              >
-                <Icon className="size-6" aria-hidden="true" style={{ color: 'var(--mkt-ink)' }} />
-              </div>
+        {/* 카드 2 — cream */}
+        <article className="nike-card-pastel cream">
+          <span className="nike-caption-sm" style={{ color: 'var(--nike-ink)', opacity: 0.6 }}>
+            전체 리소스
+          </span>
+          <span className="nike-card-number">{resourceCount.toLocaleString()}</span>
+          <span className="nike-caption-sm">게시됨 기준</span>
+        </article>
 
-              {/* 제목 */}
-              <h2
-                className="mkt-headline"
-                style={{ color: 'var(--mkt-ink)', marginBottom: 'var(--mkt-space-xs)' }}
-              >
-                {card.label}
-              </h2>
+        {/* 카드 3 — mint */}
+        <article className="nike-card-pastel mint">
+          <span className="nike-caption-sm" style={{ color: 'var(--nike-ink)', opacity: 0.6 }}>
+            템플릿
+          </span>
+          <span className="nike-card-number">{templateCount.toLocaleString()}</span>
+          <span className="nike-caption-sm">전체 등록</span>
+        </article>
 
-              {/* 설명 */}
-              <p className="mkt-body-sm" style={{ color: 'var(--mkt-ink)', opacity: 0.65 }}>
-                {card.description}
-              </p>
+        {/* 카드 4 — lilac */}
+        <article className="nike-card-pastel lilac">
+          <span className="nike-caption-sm" style={{ color: 'var(--nike-ink)', opacity: 0.6 }}>
+            판형
+          </span>
+          <span className="nike-card-number">{formatCount.toLocaleString()}</span>
+          <span className="nike-caption-sm">등록됨 / 세트 {templateSetCount}</span>
+        </article>
+      </section>
 
-              {/* 화살표 */}
-              <div
-                style={{
-                  marginTop: 'var(--mkt-space-lg)',
-                  fontFamily: 'var(--mkt-font-sans)',
-                  fontSize: '20px',
-                  fontWeight: 340,
-                  color: 'var(--mkt-ink)',
-                  opacity: 0.4,
-                }}
-                aria-hidden="true"
-              >
-                →
-              </div>
-            </Link>
-          )
-        })}
-      </div>
+      {/* ─── 리소스 섹션 ─── */}
+      <section className="mb-10">
+        {/* 섹션 헤더 + "전체 보기 →" sale red 링크 (100p Admin 패턴) */}
+        <div className="flex items-center justify-between mb-4">
+          <h2 className="nike-heading-md">리소스 관리</h2>
+          <Link
+            href="/resources"
+            style={{
+              fontFamily: 'var(--nike-font-text)',
+              fontSize: '14px',
+              fontWeight: 500,
+              color: 'var(--nike-sale)',
+              textDecoration: 'none',
+            }}
+          >
+            전체 보기 →
+          </Link>
+        </div>
+        {/* 빈 상태 박스 (100p Admin — 옅은 회색 + 중앙 텍스트) */}
+        <div
+          style={{
+            backgroundColor: 'var(--nike-canvas)',
+            border: '1px solid var(--nike-hairline-soft)',
+            borderRadius: '12px',
+            padding: '40px',
+            display: 'grid',
+            gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))',
+            gap: '16px',
+          }}
+        >
+          <QuickLinkCard
+            href="/resources"
+            label="리소스 목록"
+            sub="포즈·배경·소품 관리"
+            accent="lilac"
+          />
+          <QuickLinkCard
+            href="/resources/upload"
+            label="일괄 업로드"
+            sub="PNG ZIP 업로드"
+            accent="cream"
+          />
+          <QuickLinkCard
+            href="/resources/review"
+            label="검수 큐"
+            sub="draft → published"
+            accent="mint"
+          />
+          <QuickLinkCard href="/formats" label="판형 관리" sub="인쇄 규격 등록" accent="pink" />
+          <QuickLinkCard href="/templates" label="템플릿" sub="레이아웃 등록" accent="lilac" />
+          <QuickLinkCard
+            href="/template-sets"
+            label="템플릿 세트"
+            sub="세트 묶음 관리"
+            accent="cream"
+          />
+        </div>
+      </section>
+
+      {/* ─── 감사 로그 섹션 ─── */}
+      <section>
+        <div className="flex items-center justify-between mb-4">
+          <h2 className="nike-heading-md">최근 활동</h2>
+          <Link
+            href="/audit"
+            style={{
+              fontFamily: 'var(--nike-font-text)',
+              fontSize: '14px',
+              fontWeight: 500,
+              color: 'var(--nike-sale)',
+              textDecoration: 'none',
+            }}
+          >
+            전체 보기 →
+          </Link>
+        </div>
+        {/* 빈 상태 */}
+        <div
+          style={{
+            backgroundColor: 'var(--nike-canvas)',
+            border: '1px solid var(--nike-hairline-soft)',
+            borderRadius: '12px',
+            padding: '48px 24px',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+          }}
+        >
+          <p
+            style={{
+              fontFamily: 'var(--nike-font-text)',
+              fontSize: '14px',
+              color: 'var(--nike-stone)',
+              textAlign: 'center',
+            }}
+          >
+            최근 변경 사항이 여기 표시됩니다
+          </p>
+        </div>
+      </section>
     </div>
+  )
+}
+
+// ─── 빠른 링크 카드 ───────────────────────────────────────────────────────────
+
+function QuickLinkCard({
+  href,
+  label,
+  sub,
+  accent,
+}: {
+  href: string
+  label: string
+  sub: string
+  accent: 'pink' | 'cream' | 'mint' | 'lilac'
+}) {
+  const accentBg: Record<string, string> = {
+    pink: 'var(--nike-card-pink)',
+    cream: 'var(--nike-card-cream)',
+    mint: 'var(--nike-card-mint)',
+    lilac: 'var(--nike-card-lilac)',
+  }
+  return (
+    <Link
+      href={href}
+      prefetch={true}
+      style={{
+        display: 'flex',
+        flexDirection: 'column',
+        gap: '6px',
+        padding: '16px',
+        borderRadius: '12px',
+        backgroundColor: accentBg[accent],
+        textDecoration: 'none',
+        transition: 'opacity 100ms',
+      }}
+    >
+      <span
+        style={{
+          fontFamily: 'var(--nike-font-display)',
+          fontSize: '15px',
+          fontWeight: 500,
+          color: 'var(--nike-ink)',
+        }}
+      >
+        {label}
+      </span>
+      <span
+        style={{
+          fontFamily: 'var(--nike-font-text)',
+          fontSize: '12px',
+          color: 'var(--nike-mute)',
+        }}
+      >
+        {sub}
+      </span>
+    </Link>
   )
 }
