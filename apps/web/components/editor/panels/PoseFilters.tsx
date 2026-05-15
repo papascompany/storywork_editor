@@ -138,7 +138,7 @@ export function PoseFilters({ value, onChange }: PoseFiltersProps): React.JSX.El
         onClick={() => setExpanded((v) => !v)}
         className={cn(
           'flex w-full items-center justify-between',
-          'px-6 py-3',
+          'px-3 py-3',
           'text-[12px] font-semibold uppercase tracking-wide',
           'text-[var(--editor-text-muted)]',
           'hover:bg-[var(--editor-hover)]',
@@ -177,7 +177,7 @@ export function PoseFilters({ value, onChange }: PoseFiltersProps): React.JSX.El
           expanded ? 'max-h-[400px] opacity-100' : 'max-h-0 opacity-0',
         )}
       >
-        <div className="flex flex-col gap-4 px-6 pb-5 pt-2">
+        <div className="flex flex-col gap-4 px-3 pb-5 pt-2">
           {/* bodyType */}
           <div>
             <p className="mb-1.5 text-[11px] font-medium text-[var(--editor-text-muted)]">체형</p>

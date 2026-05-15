@@ -19,7 +19,7 @@ type PlaceholderPanelProps = {
 
 export function PlaceholderPanel({ label, icon, milestone, description }: PlaceholderPanelProps) {
   return (
-    <div className="flex flex-col gap-5 px-6 py-5">
+    <div className="flex flex-col gap-6 px-3 py-5">
       <div
         className={cn(
           'flex flex-col items-center gap-3 rounded-[var(--radius-lg)]',

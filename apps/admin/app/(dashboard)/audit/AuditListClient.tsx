@@ -368,7 +368,7 @@ export function AuditListClient({ initialData, initialTotalCount }: AuditListCli
         {/* ── 필터 사이드바 ── */}
         <aside className="w-full lg:w-56 shrink-0" aria-label="감사 로그 필터">
           <div
-            className="flex flex-col gap-7 p-7"
+            className="flex flex-col gap-7 p-4"
             style={{
               borderRadius: 'var(--nike-admin-rounded-lg)',
               border: '1px solid var(--nike-hairline-soft)',
@@ -438,7 +438,7 @@ export function AuditListClient({ initialData, initialTotalCount }: AuditListCli
               >
                 기간
               </div>
-              <div className="flex flex-col gap-1.5">
+              <div className="flex flex-col gap-3">
                 {(Object.keys(PRESET_LABELS) as FilterState['preset'][]).map((preset) => (
                   <button
                     key={preset}
@@ -472,7 +472,7 @@ export function AuditListClient({ initialData, initialTotalCount }: AuditListCli
               >
                 대상 유형
               </div>
-              <div className="flex flex-col gap-1.5">
+              <div className="flex flex-col gap-3">
                 {['format', 'resource', 'template', 'templateset', 'user'].map((et) => {
                   const isActive = filter.entityTypes.includes(et)
                   return (
@@ -512,7 +512,7 @@ export function AuditListClient({ initialData, initialTotalCount }: AuditListCli
               >
                 액션
               </div>
-              <div className="flex flex-col gap-1.5">
+              <div className="flex flex-col gap-3">
                 {['create', 'update', 'delete', 'publish', 'reject'].map((action) => {
                   const isActive = filter.actions.includes(action)
                   const badge = ACTION_BADGE_COLORS[action]

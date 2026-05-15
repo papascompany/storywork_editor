@@ -101,7 +101,7 @@ export function BackgroundPanel({ canvas, history, layerTree }: BackgroundPanelP
   )
 
   return (
-    <div className="flex flex-col gap-5 px-6 py-5">
+    <div className="flex flex-col gap-6 px-3 py-5">
       <section>
         <h3 className="mb-3 text-[12px] font-semibold uppercase tracking-wide text-[var(--editor-text-muted)]">
           단색
