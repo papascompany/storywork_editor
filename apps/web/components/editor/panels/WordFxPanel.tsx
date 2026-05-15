@@ -345,7 +345,7 @@ export function WordFxPanel({ canvas, history }: WordFxPanelProps) {
       )}
 
       {/* 효과 그리드 */}
-      <div className="flex-1 overflow-y-auto px-5 py-4">
+      <div className="flex-1 overflow-y-auto px-6 py-5">
         {displayedEffects.length === 0 ? (
           <p className="text-[12px] text-[var(--editor-text-muted)] text-center py-8">
             검색 결과가 없습니다.

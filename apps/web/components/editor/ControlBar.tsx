@@ -244,14 +244,14 @@ function PositionSizeSection({ props, canvas, history }: PositionSizeSectionProp
       <SectionLabel>위치 / 크기</SectionLabel>
       <div className="flex flex-col gap-3.5">
         {/* X / Y */}
-        <div className="grid grid-cols-2 gap-2.5">
+        <div className="grid grid-cols-2 gap-3">
           <NumberInput label="X" value={props.x} onCommit={handleX} aria-label="X 위치 (mm)" />
           <NumberInput label="Y" value={props.y} onCommit={handleY} aria-label="Y 위치 (mm)" />
         </div>
 
         {/* Width / Height + 비율 잠금 */}
         <div className="flex items-end gap-1.5">
-          <div className="grid flex-1 grid-cols-2 gap-2.5">
+          <div className="grid flex-1 grid-cols-2 gap-3">
             <NumberInput
               label="너비"
               value={props.width}

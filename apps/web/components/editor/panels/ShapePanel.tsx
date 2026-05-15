@@ -119,7 +119,7 @@ export function ShapePanel({ canvas, history }: ShapePanelProps) {
   )
 
   return (
-    <div className="flex flex-col gap-4 px-5 py-4">
+    <div className="flex flex-col gap-5 px-6 py-5">
       <div className="grid grid-cols-2 gap-4">
         {SHAPE_DEFS.map(({ id, label, Icon }) => (
           <button

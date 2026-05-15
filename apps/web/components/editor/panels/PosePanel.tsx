@@ -93,7 +93,7 @@ export function PosePanel({ onAddToCanvas }: PosePanelProps): React.JSX.Element 
   return (
     <div className="flex h-full flex-col">
       {/* 검색창 */}
-      <div className={cn('shrink-0 border-b border-[var(--editor-border)]', 'px-5 py-3')}>
+      <div className={cn('shrink-0 border-b border-[var(--editor-border)]', 'px-6 py-4')}>
         <div className="relative">
           <Search
             className="absolute left-2.5 top-1/2 size-4 -translate-y-1/2 text-[var(--editor-text-muted)] pointer-events-none"
@@ -153,7 +153,7 @@ export function PosePanel({ onAddToCanvas }: PosePanelProps): React.JSX.Element 
         role="status"
         aria-live="polite"
         aria-atomic="true"
-        className="shrink-0 px-5 py-2 text-[11px] text-[var(--editor-text-muted)]"
+        className="shrink-0 px-6 py-2 text-[11px] text-[var(--editor-text-muted)]"
       >
         {!isLoading && !isError && total > 0 && `${total.toLocaleString()}개 결과`}
         {!isLoading && !isError && total === 0 && query && '결과 없음'}
@@ -222,7 +222,7 @@ export function PosePanel({ onAddToCanvas }: PosePanelProps): React.JSX.Element 
         {/* 그리드 */}
         {results.length > 0 && (
           <div
-            className="grid grid-cols-2 gap-3 px-5 py-4"
+            className="grid grid-cols-2 gap-4 px-6 py-5"
             role="list"
             aria-label={`포즈 ${results.length}개`}
           >

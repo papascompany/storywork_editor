@@ -255,8 +255,8 @@ export function FeatureSidebar({
       aria-hidden={!isVisible}
       data-testid="feature-sidebar"
       style={{
-        width: isVisible ? '290px' : '0px',
-        minWidth: isVisible ? '290px' : '0px',
+        width: isVisible ? '328px' : '0px',
+        minWidth: isVisible ? '328px' : '0px',
       }}
       className={cn(
         // 모바일: 숨김
@@ -279,7 +279,7 @@ export function FeatureSidebar({
       {/* 콘텐츠 — isVisible 일 때만 렌더 (w-0 상태에서 overflow-hidden 으로 가림) */}
       <div
         className={cn(
-          'flex flex-col w-[290px] h-full',
+          'flex flex-col w-[328px] h-full',
           'transition-opacity duration-200',
           isVisible ? 'opacity-100' : 'opacity-0 pointer-events-none',
         )}

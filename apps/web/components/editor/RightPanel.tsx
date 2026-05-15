@@ -108,7 +108,7 @@ export function RightPanel({
       data-testid="right-panel"
       className={cn(
         'hidden md:flex md:flex-col',
-        'w-[280px] shrink-0',
+        'w-[308px] shrink-0',
         // editor-border 사용으로 토큰 통일
         'border-l border-[var(--editor-border,var(--color-border))]',
         'bg-[var(--editor-panel,var(--color-surface))]',
