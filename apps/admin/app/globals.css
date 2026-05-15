@@ -637,15 +637,12 @@ body {
   --mkt-caption-lh: 1;
   --mkt-caption-ls: 0.6px;
 
-  /* DataTable 내부 변수 매핑 */
+  /* DataTable 내부 변수 매핑 (brand-* 는 절대 override 금지 — nav-link 활성 색상 충돌 유발) */
   --color-surface-muted: var(--nike-hairline-soft);
   --color-surface-raised: var(--nike-canvas);
   --color-border: var(--nike-hairline);
   --color-text: var(--nike-ink);
   --color-text-muted: color-mix(in srgb, var(--nike-ink) 50%, transparent);
-  --color-brand-500: var(--nike-ink);
-  --color-brand-200: var(--nike-hairline);
-  --color-brand-50: var(--nike-hairline-soft);
   --radius-lg: 8px;
   --radius-sm: 2px;
   --duration-fast: 100ms;
