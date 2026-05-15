@@ -344,8 +344,8 @@ export function TopBar({
         // 배경/보더
         'bg-[var(--editor-panel,var(--color-surface))]',
         'border-b border-[var(--editor-border,var(--color-border))]',
-        // 패딩 — 호흡감 개선: 모바일 16px / 데스크톱 20px
-        'px-4 md:px-5',
+        // 패딩 — 호흡감 강화: 모바일 20px / 데스크톱 24px (로고 영역 안쪽 여백)
+        'px-5 md:px-6',
         // z-index (panel 레이어)
         'z-[20]',
       )}

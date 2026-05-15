@@ -311,15 +311,15 @@ body {
   outline-offset: 2px;
 }
 
-/* 활성 상태: 검정 1px outline + sale red 텍스트 (100p Admin 정확 모방) */
+/* 활성 상태: brand 보라 outline + 보라 텍스트 (편집기 brand 컬러와 통일) */
 .nike-nav-link[aria-current='page'] {
-  border-color: var(--nike-ink);
-  color: var(--nike-sale);
+  border-color: var(--color-brand-500, #6366f1);
+  color: var(--color-brand-600, #4f46e5);
   font-weight: 500;
-  background-color: transparent;
+  background-color: rgba(99, 102, 241, 0.06);
 }
 .nike-nav-link[aria-current='page'] svg {
-  color: var(--nike-sale);
+  color: var(--color-brand-600, #4f46e5);
 }
 
 /* ══════════════════════════════════════════════════════════════════════════
