@@ -16,8 +16,10 @@ if (typeof globalThis.cancelAnimationFrame === 'undefined') {
 }
 
 // HTMLCanvasElement.getContext mock — jsdom 은 canvas API 를 완전 지원하지 않는다
+// overloaded 시그너처를 Wrapping 하므로 함수 전체를 prototype 의 원본 타입으로 cast.
 const OriginalGetContext = HTMLCanvasElement.prototype.getContext
 HTMLCanvasElement.prototype.getContext = function (
+  this: HTMLCanvasElement,
   contextId: string,
   ...args: unknown[]
 ): RenderingContext | null {
@@ -117,4 +119,4 @@ HTMLCanvasElement.prototype.getContext = function (
     } as unknown as CanvasRenderingContext2D
   }
   return OriginalGetContext.call(this, contextId, ...(args as [])) as RenderingContext | null
-}
+} as typeof HTMLCanvasElement.prototype.getContext
