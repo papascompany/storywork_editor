@@ -81,5 +81,12 @@ supabase/.temp
 # 빌드 산출물이 src 안에 잘못 emit 되었을 때 (tsc rootDir 미스 방어)
 packages/*/src/**/*.d.ts
 packages/*/src/**/*.d.ts.map
+packages/*/src/**/*.js
 packages/*/src/**/*.js.map
 package-lock.json
+
+# 에이전트/도구 메타 (사용자별 환경, 공유 금지)
+.codex/
+.claire/
+.agents/
+.claude/worktrees/

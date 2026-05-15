@@ -67,6 +67,15 @@
 - [ ] [M4-04] 사용자 흐름: 대본 → 자동 페이지 N개 — E2E 통과 — @layout-composer + @editor-engineer
 - [ ] [M4-05] alternatives UI(한 클릭 교체) — 모바일에서도 동작 — @ui-designer
 
+## DESIGN-SYS — Admin/Editor Nike 안정화 (2026-05-15)
+
+- [x] [DESIGN-01] 루트 `DESIGN-nike.md` SSOT 추가 — admin/editor 작업자가 같은 디자인 기준을 읽음 — @ui-designer
+- [x] [DESIGN-02] admin `mkt-*` 직접 사용 제거 — `rg -n "mkt-|--mkt-" apps/admin` 0건 — @admin-builder
+- [x] [DESIGN-03] editor chrome Nike-neutral bridge — `/editor` scope `--editor-*` 가 ink/canvas/soft-cloud/hairline 기준으로 동작 — @editor-engineer
+- [x] [PERF-ADMIN-01] admin navigation 4초 지연 1차 개선 — auth cache + query payload 축소 + route loading skeleton — @architect
+- [ ] [DESIGN-04] 시각 회귀 자동화 — `/login`, `/reset-password`, `/403`, admin nav, `/editor` desktop/mobile snapshots — @qa-tester
+- [ ] [PERF-ADMIN-02] 실제 navigation timing 측정 — local/prod waterfall 로 P75 목표 수립 — @qa-tester + @architect
+
 ## M5 — Text/Bubble/Effects/Templates
 
 - [x] [M5-01] `editor-text` 한글 줄바꿈/금칙어 + textbox 변형 — `0243653` + `d17f923` — Pretendard webfont + 금칙어 73자 + splitByGrapheme + TextSection ControlBar

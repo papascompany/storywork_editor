@@ -16,16 +16,13 @@
 
 순서대로 꼭 먼저 읽어주세요. 자기 분량을 넘지 말고 핵심만:
 
-1. **`CLAUDE.md`** — 프로젝트 마스터 사양 (단일 진실 원천 SSOT). 도메인/기술 스택/모듈 규칙
-2. **`docs/handoff/SESSION_HANDOFF_2026-05-11.md`** — 직전 세션 (마케팅 강화 + 편집기 Phase 1+2 흡수) FOLLOWUP-34~38
-3. **`docs/handoff/SESSION_HANDOFF_2026-05-10.md`** — 그 이전 (마케팅 4 페이지 + DESIGN.md) FOLLOWUP-30~33
-4. **`docs/handoff/SESSION_HANDOFF_2026-05-07.md`** — 그 이전 (M3 100% 완료) FOLLOWUP-19~29
-5. **`docs/handoff/SESSION_HANDOFF_2026-05-06.md`** — 그 이전 (M0~M2 완료) FOLLOWUP-01~18
-6. **`DESIGN.md`** (루트) — Figma 마케팅 캔버스 디자인 시스템 토큰
-7. **`docs/reference/FABRIC_EDITOR_GUIDE.md`** (3,106줄) — Bookmoa Storige Fabric.js 운영 백서 (편집기 작업 시 필수)
-4. **`docs/architecture/roadmap.md`** — 53건 작업의 체크박스 (위에서 아래로 미완 픽)
-5. **`docs/architecture/decisions.md`** — ADR 11건 (특히 ADR-0011 포즈 자산 정책)
-6. **`.claude/agents/orchestrator.md`** — 본인이 루틴 진행자 역할일 때의 가드레일
+1. **`CLAUDE.md` 또는 `AGENTS.md`** — 프로젝트 마스터 사양(SSOT). 도메인/기술 스택/모듈 규칙
+2. **`docs/handoff/SESSION_HANDOFF_2026-05-15.md`** — 최신 세션. admin/editor Nike 정렬, 인증, 슬롯 좌표, navigation 성능 이슈의 실제 상태
+3. **`DESIGN-nike.md`** — admin dashboard + editor chrome 의 현재 디자인 기준
+4. **`DESIGN.md`** — web marketing 전용 Figma/sticky-note 디자인 기준. admin/editor 에 혼용 금지
+5. **`docs/handoff/SESSION_HANDOFF_2026-05-11.md`** — 이전 세션(마케팅 강화 + 편집기 Phase 1+2 흡수)
+6. **`docs/reference/FABRIC_EDITOR_GUIDE.md`** — 편집기/fabric 작업 시 필수 운영 백서
+7. **`docs/architecture/roadmap.md`** + **`docs/architecture/decisions.md`** — 오토파일럿 큐와 ADR
 
 > 다른 문서(modules/index.md, erd.md, plan.html, reference/* 등)는 작업 종류 정해진 후 필요시 그 시점에 열어보세요.
 
@@ -49,42 +46,24 @@ pnpm test && pnpm build
 ```
 
 기대 상태:
-- 마지막 커밋이 `feat(editor): followup-42 format remount + followup-46 모바일 pagepanel` 또는 `docs(handoff): ...`
+- `main` 은 `origin/main` 이상이어야 합니다. 2026-05-15 기준 최소 최신 커밋은 `56a0cd2 style(admin): 인증 페이지 nike 토큰 일관 적용`.
+- 그 직전 필수 커밋:
+  - `2d2b03c fix(editor): 템플릿 적용 후 슬롯이 좌상단에 겹쳐 보이는 P0 버그 수정`
+  - `01f8cf2 perf(admin): 메뉴 전환 4초 지연 개선 — requireRole cache + templates select`
 - DB Resource 카운트: **1,270건**
-- admin 328 + web **386** + editor-text 41 + editor-bubble 33 + editor-template 46 + editor-effects 81 + editor-history 66 + editor-core 78 + 기타 = **1000+ tests green**
-- Vercel admin `e220aa5` + web `e8b6815` 모두 READY ✅
+- web/admin production 도메인 READY 기대
 
 ### 📊 현재 진행 위치 (한 줄 요약)
 
-> **M0~M3 + 마케팅 + 편집기 Phase 1+2 + M5 100% + Templates API + ESLint 통일 (ADR-0012) + ★ 페이지 시스템 풀 구현 (8/8)**.
-> Vercel 두 도메인 모두 READY. Supabase Cloud PNG 1,270.
-> 사용자 web 풀: 마케팅 4 페이지 + 편집기 (FormatPicker → 다중 페이지 → 자동저장 → 복구 토스트 → 모든 도구 + 워드효과 45 + 말풍선 5 + 템플릿 5 + 한글/Pretendard + 모바일 PagePanel + Format remount + Storige UX 흡수).
-> admin: 로그인 + 2FA + 풀 CRUD + Templates API.
-> **다음 우선순위**: M4 (ANTHROPIC 키 게이트) 또는 M6 POD PDF (페이지 시스템과 자연 연결).
+> **M0~M3 + 마케팅 + 편집기 Phase 1+2 + M5 100% + 페이지 시스템 + 사용자 인증 + admin Nike 1차 정렬 완료**.
+> 2026-05-15 이후의 우선순위는 AI 마일스톤 진입 전 **디자인 시스템 안정화와 admin navigation 성능 체감 개선**입니다.
+> admin 은 `DESIGN-nike.md`, marketing web 은 `DESIGN.md`, editor 는 `DESIGN-nike.md` 를 tool chrome 으로 번역한 `--editor-*` 토큰을 기준으로 합니다.
 
-### 🎯 권장 다음 작업 (사용자 결정 후 진행)
+### 🎯 권장 다음 작업
 
-남은 마일스톤 진입 옵션:
-
-| 옵션 | 마일스톤 | 시간 | 가치 | 권장 |
-|---|---|---|---|---|
-| **A** | **M4 AI 파이프라인** (5 sub-task — ai-script 분석 / 추천 / 자동배치 / E2E / alternatives UI) | 8~12h | ★★★★ 핵심 사용자 가치 ("대본만 넣으면 페이지 자동 생성") | **권장** |
-| B | M5 텍스트/말풍선/효과/템플릿 (4 sub-task — 한글 줄바꿈/꼬리 추적/워드효과/템플릿 적용) | 6~8h | ★★★ M4 결과를 다듬는 데 필요 | M4 후 |
-| C | M2 마무리 (M2-07 ai-layout lowDpi / M2-09 tintMaskUrl) — 작은 작업 | 1~1.5h | ★★ M4 진입 전 사전 정리 | |
-| D | FOLLOWUP 정리 (특히 23 admin lint 통일 / 24 AuditLog 인덱스 / 27 SlotCanvas 썸네일) | 2~3h | ★★ 부채 정리 | |
-| E | M6 POD PDF (4 sub-task) — `pdf-engine` + 인쇄 사양 + 프리플라이트 | 8~10h | ★★ 출판 흐름 | M4/M5 후 |
-| F | FOLLOWUP-16 (Storige P0 핫픽스 8건 — 모바일 안정성) | 2~3h | ★★ | |
-
-**A (M4) 가 가장 권장** — M3 자산 운영 도구가 갖춰졌으니 이제 그 자산을 사용자 가치로 연결할 차례. 다음과 같이 진행하면 5 sub-task 가 자연스럽게 흐릅니다:
-- M4-01 `ai-script` 분석 (대본 → 장면/대사) — `@scene-analyzer`
-- M4-02 `ai-recommend` 포즈/배경/말풍선 추천 — `@scene-analyzer`
-- M4-03 `ai-layout` compose() 결정론 시드 — `@layout-composer`
-- M4-04 사용자 흐름 (대본 → 자동 페이지 N개) E2E — `@layout-composer + @editor-engineer`
-- M4-05 alternatives UI (한 클릭 교체) — `@ui-designer`
-
-**M4 진입 전 휴먼 게이트**:
-- 🚦 **ANTHROPIC API 키 발급** + Vercel env 등록 (M4 핵심 의존성)
-- 🚦 **VOYAGE 또는 OPENAI embedding 키** 발급 (M2-04 mock → 실 임베딩, 추천 정확도 측정)
+1. **DESIGN-SYS 검증** — admin `mkt-*` 0건 유지, editor Nike-neutral chrome 시각 확인, visual regression 추가.
+2. **PERF-ADMIN navigation 측정** — local/prod waterfall 로 4초 지연 개선 효과와 남은 병목 확인.
+3. **M4 AI 파이프라인** — 위 1~2가 안정되면 진입. ANTHROPIC/VOYAGE 또는 OPENAI 키가 필요합니다.
 
 ### 🔧 핵심 환경 정보 (반복 질문 방지용)
 
@@ -164,12 +143,11 @@ pnpm db:generate
 
 위 내용을 빠르게 검토했다고 알려주신 후, 다음 중 어디로 갈지 확인:
 
-1. **A — M3 관리자 콘솔 풀 진행** (권장)
-2. B — M2 마무리 / FOLLOWUP-16 / M4 등 다른 우선순위
-3. 다른 특정 작업이 있으시면 말씀
-
-진행 옵션 선택 후 해당 마일스톤의 sub-task 1번을 적절한 서브에이전트에 자기완결 프롬프트로 위임하세요.
+1. **DESIGN-SYS 검증 이어가기** — admin/editor Nike 기준 시각 확인, snapshots/visual regression 추가
+2. **PERF-ADMIN navigation 측정/개선** — 4초 이동 지연의 실제 waterfall 확인과 추가 최적화
+3. **M4 AI 파이프라인 시작** — API 키 휴먼 게이트 확인 후 진행
+4. 다른 특정 작업
 
 ---
 
-**핸드오프 문서**: `docs/handoff/SESSION_HANDOFF_2026-05-06.md` 에 모든 환경/완료작업/이슈/통계가 정리되어 있습니다.
+**최신 핸드오프 문서**: `docs/handoff/SESSION_HANDOFF_2026-05-15.md`
