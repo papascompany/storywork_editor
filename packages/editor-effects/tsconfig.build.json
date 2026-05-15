@@ -10,7 +10,12 @@
     "composite": false,
     "rootDir": "./src",
     "paths": {
-      "@storywork/editor-core": ["../editor-core/dist/index.d.ts"]
+      "@storywork/editor-core": ["../editor-core/dist/index.d.ts"],
+      "@storywork/schema": ["../shared-schema/dist/index.d.ts"],
+      "@storywork/schema/editor": ["../shared-schema/dist/editor/v1.d.ts"],
+      "@storywork/schema/prisma": ["../shared-schema/dist/prisma.d.ts"],
+      "@storywork/schema/license": ["../shared-schema/dist/license/index.d.ts"],
+      "@storywork/utils": ["../shared-utils/dist/index.d.ts"]
     },
     "skipLibCheck": true
   },
