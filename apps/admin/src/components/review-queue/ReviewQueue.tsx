@@ -469,10 +469,11 @@ export function ReviewQueue<T>({
                     {/* 카드 컨텐츠 (외부 renderCard) */}
                     <div className="flex-1">{renderCard(item, { isFocused })}</div>
 
-                    {/* 액션 버튼 */}
+                    {/* 액션 버튼 — gap-2 p-3 → gap-2.5 p-4 호흡감,
+                        모든 버튼에 flex-1 + min-w-0 으로 균등 분배 (키포인트 편집 들러붙음 fix) */}
                     <div
-                      className="flex items-center gap-2 p-3"
-                      style={{ borderTop: '1px solid var(--nike-hairline)' }}
+                      className="flex items-center gap-2.5 p-4"
+                      style={{ borderTop: '1px solid var(--nike-hairline-soft)' }}
                     >
                       <Button
                         variant="default"
@@ -483,7 +484,7 @@ export function ReviewQueue<T>({
                           void handleApprove(item, idx)
                         }}
                         aria-label="승인"
-                        className="flex-1"
+                        className="flex-1 min-w-0"
                       >
                         승인
                       </Button>
@@ -497,7 +498,7 @@ export function ReviewQueue<T>({
                           setRejectDialogOpen(true)
                         }}
                         aria-label="거절"
-                        className="flex-1"
+                        className="flex-1 min-w-0"
                       >
                         거절
                       </Button>
@@ -513,6 +514,7 @@ export function ReviewQueue<T>({
                           }}
                           aria-label={ea.label}
                           title={ea.key ? `단축키: ${ea.key}` : undefined}
+                          className="flex-1 min-w-0"
                         >
                           {ea.label}
                         </Button>

@@ -314,7 +314,8 @@ body {
   align-items: center;
   gap: 10px;
   padding: 12px 16px;
-  margin: 0 4px; /* 사이드바 좌우 여백 — outline border 가 사이드바 끝까지 안 차게 */
+  /* 사이드바 좌우 여백 12px — active outline 이 sidebar 외곽 border 와 붙지 않도록 호흡감 확보 */
+  margin: 2px 12px;
   border-radius: 8px;
   font-family: var(--nike-font-text);
   font-size: 14px;
