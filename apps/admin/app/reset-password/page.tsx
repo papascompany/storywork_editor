@@ -11,26 +11,26 @@ import { createAdminBrowserClient } from '../../src/lib/supabase/client'
 type PageState = 'loading' | 'ready' | 'error' | 'success'
 
 const INPUT_STYLE: CSSProperties = {
-  backgroundColor: 'var(--mkt-canvas)',
-  border: '1px solid var(--mkt-hairline)',
-  borderRadius: 'var(--mkt-rounded-md)',
-  padding: '12px 14px',
-  fontFamily: 'var(--mkt-font-sans)',
+  backgroundColor: 'var(--nike-canvas)',
+  border: '1px solid var(--nike-hairline)',
+  borderRadius: 'var(--nike-rounded-md)',
+  padding: '12px 16px',
+  fontFamily: 'var(--nike-font-text)',
   fontSize: '16px',
-  fontWeight: 320,
-  color: 'var(--mkt-ink)',
+  fontWeight: 400,
+  color: 'var(--nike-ink)',
   outline: 'none',
   width: '100%',
   transition: 'border-color 150ms ease',
 }
 
 function handleInputFocus(e: FocusEvent<HTMLInputElement>) {
-  e.currentTarget.style.borderColor = 'var(--mkt-ink)'
-  e.currentTarget.style.boxShadow = '0 0 0 3px rgba(0,0,0,0.08)'
+  e.currentTarget.style.borderColor = 'var(--nike-ink)'
+  e.currentTarget.style.boxShadow = '0 0 0 4px var(--nike-soft-cloud)'
 }
 
 function handleInputBlur(e: FocusEvent<HTMLInputElement>) {
-  e.currentTarget.style.borderColor = 'var(--mkt-hairline)'
+  e.currentTarget.style.borderColor = 'var(--nike-hairline)'
   e.currentTarget.style.boxShadow = 'none'
 }
 
@@ -115,29 +115,29 @@ export default function ResetPasswordPage() {
   return (
     <main
       className="flex min-h-dvh flex-col items-center justify-center px-4 py-16"
-      style={{ backgroundColor: 'var(--mkt-surface-soft)', fontFamily: 'var(--mkt-font-sans)' }}
+      style={{ backgroundColor: 'var(--nike-soft-cloud)', fontFamily: 'var(--nike-font-text)' }}
     >
       {/* 카드 컨테이너 */}
       <div
         className="w-full max-w-md"
         style={{
-          backgroundColor: 'var(--mkt-canvas)',
-          borderRadius: 'var(--mkt-rounded-lg)',
-          border: '1px solid var(--mkt-hairline)',
+          backgroundColor: 'var(--nike-canvas)',
+          borderRadius: 'var(--nike-rounded-lg)',
+          border: '1px solid var(--nike-hairline-soft)',
           padding: '48px 40px',
         }}
       >
         {/* 로고 영역 */}
         <div className="mb-8 flex flex-col items-start gap-1">
           <div className="flex items-center gap-2 mb-4">
-            <Sparkles className="size-6" aria-hidden="true" style={{ color: 'var(--mkt-ink)' }} />
+            <Sparkles className="size-6" aria-hidden="true" style={{ color: 'var(--nike-ink)' }} />
             <span
               style={{
-                fontFamily: 'var(--mkt-font-sans)',
+                fontFamily: 'var(--nike-font-text)',
                 fontSize: '18px',
-                fontWeight: 540,
+                fontWeight: 500,
                 letterSpacing: '-0.26px',
-                color: 'var(--mkt-ink)',
+                color: 'var(--nike-ink)',
               }}
             >
               StoryWork Admin
@@ -145,25 +145,24 @@ export default function ResetPasswordPage() {
           </div>
           <h1
             style={{
-              fontFamily: 'var(--mkt-font-sans)',
+              fontFamily: 'var(--nike-font-display)',
               fontSize: 'clamp(28px, 4vw, 36px)',
-              fontWeight: 340,
+              fontWeight: 500,
               lineHeight: 1.1,
               letterSpacing: '-0.96px',
-              color: 'var(--mkt-ink)',
+              color: 'var(--nike-ink)',
             }}
           >
             비밀번호 재설정
           </h1>
           <p
             style={{
-              fontFamily: 'var(--mkt-font-sans)',
+              fontFamily: 'var(--nike-font-text)',
               fontSize: '16px',
-              fontWeight: 330,
+              fontWeight: 400,
               lineHeight: 1.45,
               letterSpacing: '-0.14px',
-              color: 'var(--mkt-ink)',
-              opacity: 0.6,
+              color: 'var(--nike-mute)',
               marginTop: '4px',
             }}
           >
@@ -177,10 +176,9 @@ export default function ResetPasswordPage() {
         {pageState === 'loading' && (
           <p
             style={{
-              fontFamily: 'var(--mkt-font-sans)',
+              fontFamily: 'var(--nike-font-text)',
               fontSize: '14px',
-              color: 'var(--mkt-ink)',
-              opacity: 0.5,
+              color: 'var(--nike-stone)',
             }}
           >
             링크 확인 중...
@@ -193,13 +191,13 @@ export default function ResetPasswordPage() {
             <div
               role="alert"
               style={{
-                borderRadius: 'var(--mkt-rounded-md)',
-                backgroundColor: 'var(--mkt-block-pink)',
+                borderRadius: 'var(--nike-rounded-sm)',
+                backgroundColor: 'var(--nike-card-pink)',
                 border: '1px solid #e0b0b0',
                 padding: '10px 14px',
-                fontFamily: 'var(--mkt-font-sans)',
+                fontFamily: 'var(--nike-font-text)',
                 fontSize: '14px',
-                fontWeight: 330,
+                fontWeight: 400,
                 color: '#8b2222',
               }}
             >
@@ -208,10 +206,10 @@ export default function ResetPasswordPage() {
             <Link
               href="/login"
               style={{
-                fontFamily: 'var(--mkt-font-sans)',
+                fontFamily: 'var(--nike-font-text)',
                 fontSize: '14px',
-                fontWeight: 480,
-                color: 'var(--mkt-ink)',
+                fontWeight: 500,
+                color: 'var(--nike-ink)',
                 textDecoration: 'underline',
                 textUnderlineOffset: '3px',
               }}
@@ -226,13 +224,13 @@ export default function ResetPasswordPage() {
           <div
             role="status"
             style={{
-              borderRadius: 'var(--mkt-rounded-md)',
-              backgroundColor: '#f0fdf4',
+              borderRadius: 'var(--nike-rounded-sm)',
+              backgroundColor: 'var(--nike-card-mint)',
               border: '1px solid #a7f3c0',
               padding: '10px 14px',
-              fontFamily: 'var(--mkt-font-sans)',
+              fontFamily: 'var(--nike-font-text)',
               fontSize: '14px',
-              fontWeight: 330,
+              fontWeight: 400,
               color: '#166534',
             }}
           >
@@ -248,13 +246,13 @@ export default function ResetPasswordPage() {
               <div
                 role="alert"
                 style={{
-                  borderRadius: 'var(--mkt-rounded-md)',
-                  backgroundColor: 'var(--mkt-block-pink)',
+                  borderRadius: 'var(--nike-rounded-sm)',
+                  backgroundColor: 'var(--nike-card-pink)',
                   border: '1px solid #e0b0b0',
                   padding: '10px 14px',
-                  fontFamily: 'var(--mkt-font-sans)',
+                  fontFamily: 'var(--nike-font-text)',
                   fontSize: '14px',
-                  fontWeight: 330,
+                  fontWeight: 400,
                   color: '#8b2222',
                 }}
               >
@@ -264,16 +262,7 @@ export default function ResetPasswordPage() {
 
             {/* 새 비밀번호 */}
             <div className="flex flex-col gap-1.5">
-              <label
-                htmlFor="new-password"
-                style={{
-                  fontFamily: 'var(--mkt-font-sans)',
-                  fontSize: '14px',
-                  fontWeight: 480,
-                  letterSpacing: '-0.10px',
-                  color: 'var(--mkt-ink)',
-                }}
-              >
+              <label htmlFor="new-password" className="nike-label">
                 새 비밀번호
               </label>
               <input
@@ -293,16 +282,7 @@ export default function ResetPasswordPage() {
 
             {/* 비밀번호 확인 */}
             <div className="flex flex-col gap-1.5">
-              <label
-                htmlFor="confirm-password"
-                style={{
-                  fontFamily: 'var(--mkt-font-sans)',
-                  fontSize: '14px',
-                  fontWeight: 480,
-                  letterSpacing: '-0.10px',
-                  color: 'var(--mkt-ink)',
-                }}
-              >
+              <label htmlFor="confirm-password" className="nike-label">
                 비밀번호 확인
               </label>
               <input
@@ -324,8 +304,13 @@ export default function ResetPasswordPage() {
             <button
               type="submit"
               disabled={loading}
-              className="mkt-btn-primary"
-              style={{ width: '100%', marginTop: '8px', opacity: loading ? 0.6 : undefined }}
+              className="nike-btn-primary"
+              style={{
+                width: '100%',
+                marginTop: '8px',
+                justifyContent: 'center',
+                opacity: loading ? 0.6 : undefined,
+              }}
             >
               {loading ? '변경 중...' : '비밀번호 변경'}
             </button>
@@ -334,21 +319,19 @@ export default function ResetPasswordPage() {
             <p
               style={{
                 textAlign: 'center',
-                fontFamily: 'var(--mkt-font-sans)',
+                fontFamily: 'var(--nike-font-text)',
                 fontSize: '13px',
-                fontWeight: 330,
-                color: 'var(--mkt-ink)',
-                opacity: 0.5,
+                fontWeight: 400,
+                color: 'var(--nike-stone)',
               }}
             >
               <Link
                 href="/login"
                 style={{
-                  color: 'var(--mkt-ink)',
-                  fontWeight: 480,
+                  color: 'var(--nike-ink)',
+                  fontWeight: 500,
                   textDecoration: 'underline',
                   textUnderlineOffset: '3px',
-                  opacity: 1,
                 }}
               >
                 로그인으로 돌아가기
@@ -361,13 +344,12 @@ export default function ResetPasswordPage() {
       <p
         style={{
           marginTop: '24px',
-          fontFamily: 'var(--mkt-font-mono)',
+          fontFamily: 'var(--nike-font-text)',
           fontSize: '11px',
-          fontWeight: 400,
+          fontWeight: 500,
           letterSpacing: '0.6px',
           textTransform: 'uppercase',
-          color: 'var(--mkt-ink)',
-          opacity: 0.3,
+          color: 'var(--nike-stone)',
         }}
       >
         StoryWork Admin Console — 권한 없는 접근 시 자동 차단

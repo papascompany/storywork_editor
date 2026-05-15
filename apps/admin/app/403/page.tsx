@@ -4,14 +4,15 @@ export default function ForbiddenPage() {
   return (
     <main
       className="flex min-h-dvh flex-col items-center justify-center px-4 py-16"
-      style={{ backgroundColor: 'var(--mkt-surface-soft)', fontFamily: 'var(--mkt-font-sans)' }}
+      style={{ backgroundColor: 'var(--nike-soft-cloud)', fontFamily: 'var(--nike-font-text)' }}
     >
-      {/* 컬러블록 강조 영역 */}
+      {/* 강조 영역 — Nike 시스템: canvas 카드 + hairline border */}
       <div
         className="w-full max-w-lg text-center"
         style={{
-          backgroundColor: 'var(--mkt-block-pink)',
-          borderRadius: 'var(--mkt-rounded-lg)',
+          backgroundColor: 'var(--nike-canvas)',
+          borderRadius: 'var(--nike-rounded-lg)',
+          border: '1px solid var(--nike-hairline-soft)',
           padding: '48px 40px',
           marginBottom: '32px',
         }}
@@ -19,13 +20,12 @@ export default function ForbiddenPage() {
         {/* 에러 코드 eyebrow */}
         <p
           style={{
-            fontFamily: 'var(--mkt-font-mono)',
+            fontFamily: 'var(--nike-font-text)',
             fontSize: '12px',
-            fontWeight: 400,
+            fontWeight: 500,
             letterSpacing: '0.6px',
             textTransform: 'uppercase',
-            color: 'var(--mkt-ink)',
-            opacity: 0.5,
+            color: 'var(--nike-stone)',
             marginBottom: '16px',
           }}
         >
@@ -34,12 +34,12 @@ export default function ForbiddenPage() {
 
         <h1
           style={{
-            fontFamily: 'var(--mkt-font-sans)',
+            fontFamily: 'var(--nike-font-display)',
             fontSize: 'clamp(36px, 5vw, 56px)',
-            fontWeight: 340,
+            fontWeight: 500,
             lineHeight: 1.1,
             letterSpacing: '-0.96px',
-            color: 'var(--mkt-ink)',
+            color: 'var(--nike-ink)',
             marginBottom: '16px',
             wordBreak: 'keep-all',
           }}
@@ -49,13 +49,12 @@ export default function ForbiddenPage() {
 
         <p
           style={{
-            fontFamily: 'var(--mkt-font-sans)',
+            fontFamily: 'var(--nike-font-text)',
             fontSize: '18px',
-            fontWeight: 320,
+            fontWeight: 400,
             lineHeight: 1.45,
             letterSpacing: '-0.26px',
-            color: 'var(--mkt-ink)',
-            opacity: 0.7,
+            color: 'var(--nike-mute)',
             maxWidth: '340px',
             margin: '0 auto',
             wordBreak: 'keep-all',
@@ -69,14 +68,14 @@ export default function ForbiddenPage() {
       <div className="flex flex-col items-center gap-3 w-full max-w-xs">
         <Link
           href="/login"
-          className="mkt-btn-primary"
+          className="nike-btn-primary"
           style={{ width: '100%', justifyContent: 'center' }}
         >
           로그인 페이지로
         </Link>
         <a
           href="mailto:yohan73@gmail.com"
-          className="mkt-btn-secondary"
+          className="nike-btn-secondary"
           style={{ width: '100%', justifyContent: 'center' }}
         >
           권한 요청하기

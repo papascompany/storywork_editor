@@ -8,26 +8,26 @@ import { type CSSProperties, type FocusEvent, type FormEvent, Suspense, useState
 import { createAdminBrowserClient } from '../../src/lib/supabase/client'
 
 const INPUT_STYLE: CSSProperties = {
-  backgroundColor: 'var(--mkt-canvas)',
-  border: '1px solid var(--mkt-hairline)',
-  borderRadius: 'var(--mkt-rounded-md)',
-  padding: '12px 14px',
-  fontFamily: 'var(--mkt-font-sans)',
+  backgroundColor: 'var(--nike-canvas)',
+  border: '1px solid var(--nike-hairline)',
+  borderRadius: 'var(--nike-rounded-md)',
+  padding: '12px 16px',
+  fontFamily: 'var(--nike-font-text)',
   fontSize: '16px',
-  fontWeight: 320,
-  color: 'var(--mkt-ink)',
+  fontWeight: 400,
+  color: 'var(--nike-ink)',
   outline: 'none',
   width: '100%',
   transition: 'border-color 150ms ease',
 }
 
 function handleInputFocus(e: FocusEvent<HTMLInputElement>) {
-  e.currentTarget.style.borderColor = 'var(--mkt-ink)'
-  e.currentTarget.style.boxShadow = '0 0 0 3px rgba(0,0,0,0.08)'
+  e.currentTarget.style.borderColor = 'var(--nike-ink)'
+  e.currentTarget.style.boxShadow = '0 0 0 4px var(--nike-soft-cloud)'
 }
 
 function handleInputBlur(e: FocusEvent<HTMLInputElement>) {
-  e.currentTarget.style.borderColor = 'var(--mkt-hairline)'
+  e.currentTarget.style.borderColor = 'var(--nike-hairline)'
   e.currentTarget.style.boxShadow = 'none'
 }
 
@@ -123,29 +123,29 @@ function LoginForm() {
   return (
     <main
       className="flex min-h-dvh flex-col items-center justify-center px-4 py-16"
-      style={{ backgroundColor: 'var(--mkt-surface-soft)', fontFamily: 'var(--mkt-font-sans)' }}
+      style={{ backgroundColor: 'var(--nike-soft-cloud)', fontFamily: 'var(--nike-font-text)' }}
     >
       {/* 카드 컨테이너 */}
       <div
         className="w-full max-w-md"
         style={{
-          backgroundColor: 'var(--mkt-canvas)',
-          borderRadius: 'var(--mkt-rounded-lg)',
-          border: '1px solid var(--mkt-hairline)',
+          backgroundColor: 'var(--nike-canvas)',
+          borderRadius: 'var(--nike-rounded-lg)',
+          border: '1px solid var(--nike-hairline-soft)',
           padding: '48px 40px',
         }}
       >
         {/* 로고 영역 */}
         <div className="mb-8 flex flex-col items-start gap-1">
           <div className="flex items-center gap-2 mb-4">
-            <Sparkles className="size-6" aria-hidden="true" style={{ color: 'var(--mkt-ink)' }} />
+            <Sparkles className="size-6" aria-hidden="true" style={{ color: 'var(--nike-ink)' }} />
             <span
               style={{
-                fontFamily: 'var(--mkt-font-sans)',
+                fontFamily: 'var(--nike-font-text)',
                 fontSize: '18px',
-                fontWeight: 540,
+                fontWeight: 500,
                 letterSpacing: '-0.26px',
-                color: 'var(--mkt-ink)',
+                color: 'var(--nike-ink)',
               }}
             >
               StoryWork Admin
@@ -153,25 +153,24 @@ function LoginForm() {
           </div>
           <h1
             style={{
-              fontFamily: 'var(--mkt-font-sans)',
+              fontFamily: 'var(--nike-font-display)',
               fontSize: 'clamp(28px, 4vw, 36px)',
-              fontWeight: 340,
+              fontWeight: 500,
               lineHeight: 1.1,
               letterSpacing: '-0.96px',
-              color: 'var(--mkt-ink)',
+              color: 'var(--nike-ink)',
             }}
           >
             {forgotMode ? '비밀번호 찾기' : '관리자 로그인'}
           </h1>
           <p
             style={{
-              fontFamily: 'var(--mkt-font-sans)',
+              fontFamily: 'var(--nike-font-text)',
               fontSize: '16px',
-              fontWeight: 330,
+              fontWeight: 400,
               lineHeight: 1.45,
               letterSpacing: '-0.14px',
-              color: 'var(--mkt-ink)',
-              opacity: 0.6,
+              color: 'var(--nike-mute)',
               marginTop: '4px',
             }}
           >
@@ -189,13 +188,13 @@ function LoginForm() {
               <div
                 role="alert"
                 style={{
-                  borderRadius: 'var(--mkt-rounded-md)',
-                  backgroundColor: 'var(--mkt-block-pink)',
+                  borderRadius: 'var(--nike-rounded-sm)',
+                  backgroundColor: 'var(--nike-card-pink)',
                   border: '1px solid #e0b0b0',
                   padding: '10px 14px',
-                  fontFamily: 'var(--mkt-font-sans)',
+                  fontFamily: 'var(--nike-font-text)',
                   fontSize: '14px',
-                  fontWeight: 330,
+                  fontWeight: 400,
                   color: '#8b2222',
                 }}
               >
@@ -208,13 +207,13 @@ function LoginForm() {
               <div
                 role="status"
                 style={{
-                  borderRadius: 'var(--mkt-rounded-md)',
-                  backgroundColor: '#f0fdf4',
+                  borderRadius: 'var(--nike-rounded-sm)',
+                  backgroundColor: 'var(--nike-card-mint)',
                   border: '1px solid #a7f3c0',
                   padding: '10px 14px',
-                  fontFamily: 'var(--mkt-font-sans)',
+                  fontFamily: 'var(--nike-font-text)',
                   fontSize: '14px',
-                  fontWeight: 330,
+                  fontWeight: 400,
                   color: '#166534',
                 }}
               >
@@ -224,16 +223,7 @@ function LoginForm() {
 
             {/* 이메일 */}
             <div className="flex flex-col gap-1.5">
-              <label
-                htmlFor="forgot-email"
-                style={{
-                  fontFamily: 'var(--mkt-font-sans)',
-                  fontSize: '14px',
-                  fontWeight: 480,
-                  letterSpacing: '-0.10px',
-                  color: 'var(--mkt-ink)',
-                }}
-              >
+              <label htmlFor="forgot-email" className="nike-label">
                 이메일
               </label>
               <input
@@ -256,10 +246,11 @@ function LoginForm() {
               <button
                 type="submit"
                 disabled={forgotLoading}
-                className="mkt-btn-primary"
+                className="nike-btn-primary"
                 style={{
                   width: '100%',
                   marginTop: '8px',
+                  justifyContent: 'center',
                   opacity: forgotLoading ? 0.6 : undefined,
                 }}
               >
@@ -271,11 +262,10 @@ function LoginForm() {
             <p
               style={{
                 textAlign: 'center',
-                fontFamily: 'var(--mkt-font-sans)',
+                fontFamily: 'var(--nike-font-text)',
                 fontSize: '13px',
-                fontWeight: 330,
-                color: 'var(--mkt-ink)',
-                opacity: 0.5,
+                fontWeight: 400,
+                color: 'var(--nike-stone)',
               }}
             >
               <button
@@ -290,14 +280,13 @@ function LoginForm() {
                   background: 'none',
                   border: 'none',
                   cursor: 'pointer',
-                  color: 'var(--mkt-ink)',
-                  fontFamily: 'var(--mkt-font-sans)',
+                  color: 'var(--nike-ink)',
+                  fontFamily: 'var(--nike-font-text)',
                   fontSize: '13px',
-                  fontWeight: 480,
+                  fontWeight: 500,
                   textDecoration: 'underline',
                   textUnderlineOffset: '3px',
                   padding: 0,
-                  opacity: 1,
                 }}
               >
                 로그인으로 돌아가기
@@ -312,13 +301,13 @@ function LoginForm() {
               <div
                 role="alert"
                 style={{
-                  borderRadius: 'var(--mkt-rounded-md)',
-                  backgroundColor: 'var(--mkt-block-pink)',
+                  borderRadius: 'var(--nike-rounded-sm)',
+                  backgroundColor: 'var(--nike-card-pink)',
                   border: '1px solid #e0b0b0',
                   padding: '10px 14px',
-                  fontFamily: 'var(--mkt-font-sans)',
+                  fontFamily: 'var(--nike-font-text)',
                   fontSize: '14px',
-                  fontWeight: 330,
+                  fontWeight: 400,
                   color: '#8b2222',
                 }}
               >
@@ -328,16 +317,7 @@ function LoginForm() {
 
             {/* 이메일 */}
             <div className="flex flex-col gap-1.5">
-              <label
-                htmlFor="email"
-                style={{
-                  fontFamily: 'var(--mkt-font-sans)',
-                  fontSize: '14px',
-                  fontWeight: 480,
-                  letterSpacing: '-0.10px',
-                  color: 'var(--mkt-ink)',
-                }}
-              >
+              <label htmlFor="email" className="nike-label">
                 이메일
               </label>
               <input
@@ -358,16 +338,7 @@ function LoginForm() {
             {/* 비밀번호 */}
             <div className="flex flex-col gap-1.5">
               <div className="flex items-center justify-between">
-                <label
-                  htmlFor="password"
-                  style={{
-                    fontFamily: 'var(--mkt-font-sans)',
-                    fontSize: '14px',
-                    fontWeight: 480,
-                    letterSpacing: '-0.10px',
-                    color: 'var(--mkt-ink)',
-                  }}
-                >
+                <label htmlFor="password" className="nike-label" style={{ marginBottom: 0 }}>
                   비밀번호
                 </label>
                 <button
@@ -381,11 +352,10 @@ function LoginForm() {
                     background: 'none',
                     border: 'none',
                     cursor: 'pointer',
-                    fontFamily: 'var(--mkt-font-sans)',
+                    fontFamily: 'var(--nike-font-text)',
                     fontSize: '13px',
-                    fontWeight: 330,
-                    color: 'var(--mkt-ink)',
-                    opacity: 0.5,
+                    fontWeight: 400,
+                    color: 'var(--nike-stone)',
                     padding: 0,
                     textDecoration: 'underline',
                     textUnderlineOffset: '3px',
@@ -413,8 +383,13 @@ function LoginForm() {
             <button
               type="submit"
               disabled={loading}
-              className="mkt-btn-primary"
-              style={{ width: '100%', marginTop: '8px', opacity: loading ? 0.6 : undefined }}
+              className="nike-btn-primary"
+              style={{
+                width: '100%',
+                marginTop: '8px',
+                justifyContent: 'center',
+                opacity: loading ? 0.6 : undefined,
+              }}
             >
               {loading ? '로그인 중...' : '로그인'}
             </button>
@@ -423,22 +398,20 @@ function LoginForm() {
             <p
               style={{
                 textAlign: 'center',
-                fontFamily: 'var(--mkt-font-sans)',
+                fontFamily: 'var(--nike-font-text)',
                 fontSize: '13px',
-                fontWeight: 330,
-                color: 'var(--mkt-ink)',
-                opacity: 0.5,
+                fontWeight: 400,
+                color: 'var(--nike-stone)',
               }}
             >
               계정이 없으신가요?{' '}
               <a
                 href="mailto:yohan73@gmail.com"
                 style={{
-                  color: 'var(--mkt-ink)',
-                  fontWeight: 480,
+                  color: 'var(--nike-ink)',
+                  fontWeight: 500,
                   textDecoration: 'underline',
                   textUnderlineOffset: '3px',
-                  opacity: 1,
                 }}
               >
                 문의하기
@@ -453,18 +426,17 @@ function LoginForm() {
         <Link
           href="/"
           style={{
-            fontFamily: 'var(--mkt-font-sans)',
+            fontFamily: 'var(--nike-font-text)',
             fontSize: '14px',
-            fontWeight: 330,
-            color: 'var(--mkt-ink)',
-            opacity: 0.5,
+            fontWeight: 400,
+            color: 'var(--nike-stone)',
             textDecoration: 'none',
           }}
           onMouseEnter={(e) => {
-            e.currentTarget.style.opacity = '0.8'
+            e.currentTarget.style.color = 'var(--nike-ink)'
           }}
           onMouseLeave={(e) => {
-            e.currentTarget.style.opacity = '0.5'
+            e.currentTarget.style.color = 'var(--nike-stone)'
           }}
         >
           ← 사용자 페이지로 돌아가기
@@ -474,13 +446,12 @@ function LoginForm() {
       <p
         style={{
           marginTop: '24px',
-          fontFamily: 'var(--mkt-font-mono)',
+          fontFamily: 'var(--nike-font-text)',
           fontSize: '11px',
-          fontWeight: 400,
+          fontWeight: 500,
           letterSpacing: '0.6px',
           textTransform: 'uppercase',
-          color: 'var(--mkt-ink)',
-          opacity: 0.3,
+          color: 'var(--nike-stone)',
         }}
       >
         StoryWork Admin Console — 권한 없는 접근 시 자동 차단
@@ -495,14 +466,13 @@ export default function LoginPage() {
       fallback={
         <div
           className="flex min-h-dvh items-center justify-center"
-          style={{ backgroundColor: 'var(--mkt-surface-soft)' }}
+          style={{ backgroundColor: 'var(--nike-soft-cloud)' }}
         >
           <span
             style={{
-              fontFamily: 'var(--mkt-font-sans)',
+              fontFamily: 'var(--nike-font-text)',
               fontSize: '14px',
-              color: 'var(--mkt-ink)',
-              opacity: 0.5,
+              color: 'var(--nike-stone)',
             }}
           >
             로딩 중...
