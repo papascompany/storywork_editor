@@ -84,10 +84,12 @@ export function PoseGridItem({ pose, onAddToCanvas }: PoseGridItemProps): React.
         'group relative aspect-square w-full',
         // 형태
         'overflow-hidden rounded-[var(--radius-md)]',
-        // 테두리
-        'border border-[var(--editor-border)]',
-        // 배경
-        'bg-[var(--color-surface-muted)]',
+        // 테두리 — 2px 진한 border 로 panel ↔ 카드 boundary 명확
+        'border-2 border-[var(--editor-hairline,var(--color-border))]',
+        // 배경 — 흰색 (panel 의 muted 배경과 명확 분리)
+        'bg-white dark:bg-[var(--color-surface-raised)]',
+        // 카드 자체 그림자로 visual depth
+        'shadow-sm',
         // 포커스
         'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-brand-500)]',
         // 트랜지션
