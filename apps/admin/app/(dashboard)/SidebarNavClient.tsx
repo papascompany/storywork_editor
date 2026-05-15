@@ -31,7 +31,7 @@ export function SidebarNavClient({ items, onItemClick }: SidebarNavClientProps) 
   const pathname = usePathname()
 
   return (
-    <div className="flex flex-col gap-0.5 px-2">
+    <div className="flex flex-col gap-1 px-3">
       {items.map((item) => {
         const isActive = item.exact ? pathname === item.href : pathname.startsWith(item.href)
         return (

@@ -292,7 +292,7 @@ body {
   display: flex;
   align-items: center;
   gap: 10px;
-  padding: 10px 12px;
+  padding: 12px 16px; /* 호흡감: 10/12 → 12/16 */
   border-radius: 8px;
   font-family: var(--nike-font-text);
   font-size: 14px;
@@ -319,6 +319,86 @@ body {
 }
 .nike-nav-link[aria-current='page'] svg {
   color: var(--nike-sale);
+}
+
+/* ══════════════════════════════════════════════════════════════════════════
+   Nike 페이지 컨테이너 (모든 dashboard 페이지에 적용)
+   호흡감: 좌우 충분한 padding + 최대 너비 제한 + 상하 여백
+   ══════════════════════════════════════════════════════════════════════════ */
+.nike-page {
+  max-width: 1440px;
+  margin: 0 auto;
+  padding: 40px 32px;
+}
+@media (min-width: 768px) {
+  .nike-page {
+    padding: 48px 48px;
+  }
+}
+@media (min-width: 1280px) {
+  .nike-page {
+    padding: 56px 64px;
+  }
+}
+
+/* 페이지 헤더 — 헤더 → 본문 사이 호흡감 충분히 */
+.nike-page-header {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 24px;
+  margin-bottom: 40px; /* 헤더 → 다음 섹션 */
+  padding-bottom: 24px;
+  border-bottom: 1px solid var(--nike-hairline-soft);
+}
+@media (min-width: 1024px) {
+  .nike-page-header {
+    margin-bottom: 56px;
+  }
+}
+
+/* 페이지 부제(설명) — 헤드라인 아래 충분한 spacing */
+.nike-page-subtitle {
+  margin-top: 12px;
+  color: var(--nike-mute);
+}
+
+/* 페이지 내 섹션 간격 (필터 → 테이블, 빈상태 등 사이) */
+.nike-page-section {
+  margin-bottom: 32px;
+}
+
+/* 빈 상태 카드 — 적절한 max-width + 충분한 padding */
+.nike-empty-state {
+  max-width: 720px;
+  margin: 56px auto 0;
+  padding: 64px 48px;
+  text-align: center;
+  border-radius: var(--nike-rounded-md);
+  background-color: var(--nike-canvas);
+  border: 1px solid var(--nike-hairline-soft);
+}
+.nike-empty-state-pastel {
+  max-width: 720px;
+  margin: 56px auto 0;
+  padding: 64px 48px;
+  text-align: center;
+  border-radius: var(--nike-rounded-md);
+  background-color: var(--nike-card-mint);
+}
+.nike-empty-state-title {
+  font-family: var(--nike-font-display);
+  font-size: 24px;
+  font-weight: 500;
+  color: var(--nike-ink);
+  margin-bottom: 12px;
+}
+.nike-empty-state-desc {
+  font-family: var(--nike-font-text);
+  font-size: 16px;
+  color: var(--nike-mute);
+  margin-bottom: 32px;
 }
 
 /* ══════════════════════════════════════════════════════════════════════════

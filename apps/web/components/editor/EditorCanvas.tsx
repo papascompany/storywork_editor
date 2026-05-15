@@ -382,8 +382,12 @@ export function EditorCanvas({
         isDragging && 'ring-2 ring-inset ring-[var(--color-brand-500)] ring-dashed',
       )}
     >
-      {/* fabric 캔버스 마운트 포인트 — 뷰포트 전체를 채움 */}
-      <div ref={containerRef} aria-label="fabric 캔버스 마운트" className="absolute inset-0" />
+      {/* fabric 캔버스 마운트 포인트 — workspace 외곽 padding 으로 회색 여백 노출 */}
+      <div
+        ref={containerRef}
+        aria-label="fabric 캔버스 마운트"
+        className="absolute inset-4 md:inset-6 lg:inset-8"
+      />
 
       {/* B.3: 페이지 경계 오버레이 (pointer-events-none — 클릭 투과) */}
       {pageBox && (

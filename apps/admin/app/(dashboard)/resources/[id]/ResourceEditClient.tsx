@@ -264,7 +264,7 @@ export function ResourceEditClient({ resource, userRole }: ResourceEditClientPro
   const statusInfo = STATUS_INFO[currentStatus]
 
   return (
-    <div className="p-6 lg:p-10" style={{ fontFamily: 'var(--mkt-font-sans)' }}>
+    <div className="nike-page" style={{ fontFamily: 'var(--mkt-font-sans)' }}>
       {/* 헤더 */}
       <div className="mb-8 flex items-start justify-between gap-4 flex-wrap">
         <div>

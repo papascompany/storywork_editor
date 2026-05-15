@@ -150,7 +150,7 @@ export function TemplateListClient({ initialData, formats, userRole }: TemplateL
   }, [selectedIds, router])
 
   return (
-    <div className="p-6 lg:p-10">
+    <div className="nike-page">
       {/* ── Nike 헤더 (100p Admin 패턴) ── */}
       <header className="mb-8 flex items-end justify-between gap-4 flex-wrap">
         <div>
@@ -194,32 +194,15 @@ export function TemplateListClient({ initialData, formats, userRole }: TemplateL
         </select>
       </div>
 
-      {/* 빈 상태 — pastel block */}
+      {/* 빈 상태 — Nike empty-state (max-width 720px, 중앙 정렬) */}
       {data.length === 0 && (
-        <section
-          className="mkt-block mkt-block-mint flex flex-col items-center justify-center text-center"
-          style={{ minHeight: '240px' }}
-        >
-          <p
-            className="mkt-headline"
-            style={{ color: 'var(--mkt-ink)', marginBottom: 'var(--mkt-space-xs)' }}
-          >
-            등록된 템플릿이 없습니다
-          </p>
-          <p
-            className="mkt-body-sm"
-            style={{ color: 'var(--mkt-ink)', opacity: 0.55, marginBottom: 'var(--mkt-space-xl)' }}
-          >
-            새 템플릿을 추가해 슬롯을 정의해 보세요.
-          </p>
-          <Link
-            href="/templates/new"
-            className="mkt-btn-primary"
-            style={{ gap: '8px', display: 'inline-flex', alignItems: 'center' }}
-          >
+        <div className="nike-empty-state">
+          <p className="nike-empty-state-title">등록된 템플릿이 없습니다</p>
+          <p className="nike-empty-state-desc">새 템플릿을 추가해 슬롯을 정의해 보세요.</p>
+          <Link href="/templates/new" className="nike-btn-primary">
             <Plus className="size-4" aria-hidden="true" />새 템플릿 추가
           </Link>
-        </section>
+        </div>
       )}
 
       {/* 테이블 */}

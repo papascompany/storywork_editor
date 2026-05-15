@@ -142,7 +142,7 @@ export function FormatListClient({ initialData, userRole }: FormatListClientProp
   }, [selectedIds, data, router])
 
   return (
-    <div className="p-6 lg:p-10">
+    <div className="nike-page">
       {/* ── Nike 헤더 (100p Admin 패턴) ── */}
       <header className="mb-8 flex items-end justify-between gap-4 flex-wrap">
         <div>

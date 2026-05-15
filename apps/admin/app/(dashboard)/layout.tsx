@@ -120,12 +120,12 @@ export default async function DashboardLayout({ children }: { children: React.Re
       className="flex min-h-dvh"
       style={{ backgroundColor: 'var(--nike-soft-cloud)', fontFamily: 'var(--nike-font-text)' }}
     >
-      {/* ─── 데스크톱 사이드바 (240px, sticky) ─── */}
+      {/* ─── 데스크톱 사이드바 (260px, sticky, 호흡감 보강) ─── */}
       <aside
         className="hidden md:flex md:flex-col shrink-0"
         aria-label="관리자 메뉴"
         style={{
-          width: '240px',
+          width: '260px',
           backgroundColor: 'var(--nike-canvas)',
           borderRight: '1px solid var(--nike-hairline-soft)',
           minHeight: '100dvh',
@@ -138,8 +138,8 @@ export default async function DashboardLayout({ children }: { children: React.Re
         {/* 로고 + 이메일 */}
         {logoSlot}
 
-        {/* 메뉴 레이블 */}
-        <div style={{ padding: '16px 16px 6px' }}>
+        {/* 메뉴 레이블 — 위 24px / 아래 12px 호흡감 */}
+        <div style={{ padding: '28px 20px 12px' }}>
           <p
             style={{
               fontFamily: 'var(--nike-font-text)',
@@ -147,7 +147,7 @@ export default async function DashboardLayout({ children }: { children: React.Re
               fontWeight: 500,
               color: 'var(--nike-stone)',
               textTransform: 'uppercase',
-              letterSpacing: '0.5px',
+              letterSpacing: '0.6px',
             }}
           >
             Navigation
@@ -155,7 +155,7 @@ export default async function DashboardLayout({ children }: { children: React.Re
         </div>
 
         {/* 네비게이션 링크 (클라이언트 컴포넌트 — usePathname 격리) */}
-        <nav className="flex-1 py-1" aria-label="주요 메뉴">
+        <nav className="flex-1 py-2" aria-label="주요 메뉴">
           <SidebarNavClient items={NAV_ITEMS} />
         </nav>
 

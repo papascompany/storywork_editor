@@ -50,7 +50,7 @@ export default async function DashboardPage() {
   })
 
   return (
-    <div className="p-6 lg:p-10" style={{ maxWidth: '1280px' }}>
+    <div className="nike-page">
       {/* ─── 페이지 헤더 (100p Admin 패턴) ─── */}
       <header className="flex items-end justify-between gap-4 mb-10 flex-wrap">
         <div>
