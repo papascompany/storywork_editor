@@ -101,12 +101,12 @@ export function BackgroundPanel({ canvas, history, layerTree }: BackgroundPanelP
   )
 
   return (
-    <div className="flex flex-col gap-6 px-3 py-5">
+    <div className="flex flex-col gap-[28px] px-[10px] py-5">
       <section>
         <h3 className="mb-3 text-[12px] font-semibold uppercase tracking-wide text-[var(--editor-text-muted)]">
           단색
         </h3>
-        <div className="grid grid-cols-7 gap-2.5">
+        <div className="grid grid-cols-7 gap-[14px]">
           {BG_COLORS.map(({ label, fill, bg }) => (
             <button
               key={fill}

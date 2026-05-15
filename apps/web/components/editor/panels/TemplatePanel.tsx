@@ -256,7 +256,7 @@ export function TemplatePanel({ canvas }: TemplatePanelProps) {
       </div>
 
       {/* 본문 */}
-      <div className="flex-1 overflow-y-auto px-3 py-5">
+      <div className="flex-1 overflow-y-auto px-[10px] py-5">
         {loading ? (
           // 로딩
           <div className="flex flex-col gap-3" aria-live="polite" aria-busy="true">
@@ -278,7 +278,7 @@ export function TemplatePanel({ canvas }: TemplatePanelProps) {
           </div>
         ) : (
           // 그리드
-          <div className="grid grid-cols-2 gap-6" role="list" aria-label="템플릿 목록">
+          <div className="grid grid-cols-2 gap-[36px]" role="list" aria-label="템플릿 목록">
             {filtered.map((template) => (
               <div key={template.id} role="listitem">
                 <TemplateCard template={template} onClick={handleApply} isApplying={applying} />

@@ -222,7 +222,7 @@ export function PosePanel({ onAddToCanvas }: PosePanelProps): React.JSX.Element 
         {/* 그리드 */}
         {results.length > 0 && (
           <div
-            className="grid grid-cols-2 gap-6 px-3 py-5"
+            className="grid grid-cols-2 gap-[36px] px-[10px] py-5"
             role="list"
             aria-label={`포즈 ${results.length}개`}
           >

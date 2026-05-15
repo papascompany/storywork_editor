@@ -179,7 +179,7 @@ export function BubblePanel({ canvas, history }: BubblePanelProps) {
   )
 
   return (
-    <div className="flex flex-col h-full overflow-y-auto px-3 py-5 gap-6">
+    <div className="flex flex-col h-full overflow-y-auto px-[10px] py-5 gap-[28px]">
       {/* 설명 */}
       <p className="text-[12px] text-[var(--editor-text-muted)] leading-relaxed">
         모양을 선택하면 캔버스 중앙에 말풍선이 추가됩니다.
