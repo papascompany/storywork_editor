@@ -9,7 +9,9 @@
     "tsBuildInfoFile": "./dist/.tsbuildinfo",
     "composite": false,
     "rootDir": "./src",
-    "paths": {},
+    "paths": {
+      "@storywork/editor-core": ["../editor-core/dist/index.d.ts"]
+    },
     "skipLibCheck": true
   },
   "include": ["src/**/*.ts"],
