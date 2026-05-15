@@ -30,6 +30,7 @@ function formatKoreanDate(d: Date): string {
 export const dynamic = 'force-dynamic'
 
 export default async function DashboardPage() {
+  // layout.tsx 의 requireRole() 과 동일 요청 내 React cache 로 메모이즈됨 — 추가 I/O 없음.
   await requireRole()
 
   const now = new Date()

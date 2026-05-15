@@ -60,7 +60,12 @@ export async function middleware(request: NextRequest): Promise<NextResponse> {
 
 export const config = {
   matcher: [
-    // 정적 자산 제외한 모든 경로
-    '/((?!_next/static|_next/image|favicon.ico).*)',
+    /*
+     * 정적 자산, 이미지 최적화, favicon, robots, sitemap,
+     * Next 내부 경로를 제외한 모든 경로에 미들웨어 적용.
+     * 이 matcher 를 좁혀두면 Edge Runtime 에서 middleware 함수 자체가
+     * 호출되지 않아 불필요한 await getUser() 왕복을 원천 차단한다.
+     */
+    '/((?!_next/static|_next/image|favicon\\.ico|robots\\.txt|sitemap\\.xml|.*\\.(?:png|jpg|jpeg|gif|svg|webp|ico|woff2?|ttf|otf|eot|css|js|map)).*)',
   ],
 }

@@ -9,6 +9,7 @@
  * — role 미존재 시에도 readonly 로 통과 (관리자 콘솔 진입은 미들웨어가 통제).
  */
 import { redirect } from 'next/navigation'
+import { cache } from 'react'
 
 import { createAdminServerClient, createAdminServiceClient } from './supabase/server'
 
@@ -62,7 +63,9 @@ export async function getSession() {
  *   두 값이 일치하지 않는다. email 은 양쪽 모두 unique key 로 보존되므로
  *   조인 키로 안정적이다.
  */
-export async function getAdminUserByEmail(email: string): Promise<AdminUser | null> {
+export const getAdminUserByEmail = cache(async function getAdminUserByEmailImpl(
+  email: string,
+): Promise<AdminUser | null> {
   const service = createAdminServiceClient()
   const { data, error } = await service
     .from('User')
@@ -84,7 +87,7 @@ export async function getAdminUserByEmail(email: string): Promise<AdminUser | nu
     totpVerified: true,
     totpSetup: true,
   }
-}
+})
 
 /**
  * @deprecated `getAdminUserByEmail` 사용 권장.
@@ -129,7 +132,9 @@ export async function getAdminUser(userId: string): Promise<AdminUser | null> {
  *   3. requiredRole 지정 시 계층 비교 — 부족하면 /403
  *      (단, requiredRole 미지정 호출은 인증만 확인하므로 /403 없음)
  */
-export async function requireRole(requiredRole?: AdminRole): Promise<AdminUser> {
+export const requireRole = cache(async function requireRoleImpl(
+  requiredRole?: AdminRole,
+): Promise<AdminUser> {
   const supabase = await createAdminServerClient()
   const {
     data: { user },
@@ -156,7 +161,7 @@ export async function requireRole(requiredRole?: AdminRole): Promise<AdminUser> 
   }
 
   return adminUser
-}
+})
 
 // ─────────────────────────────────────────────
 // 역할 계층

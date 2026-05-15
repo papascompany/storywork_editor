@@ -14,7 +14,13 @@ export default async function TemplatesPage() {
   const [templates, formats] = await Promise.all([
     prisma.template.findMany({
       orderBy: { createdAt: 'desc' },
-      include: {
+      select: {
+        id: true,
+        name: true,
+        formatId: true,
+        thumbnail: true,
+        slots: true,
+        createdAt: true,
         format: { select: { id: true, name: true } },
       },
     }),
