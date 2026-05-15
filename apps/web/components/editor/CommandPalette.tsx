@@ -89,7 +89,7 @@ function CommandItem({
       className={cn(
         'flex cursor-pointer items-center gap-3 rounded-[var(--radius-md)] px-3 py-2.5',
         'transition-colors',
-        isActive && 'bg-[var(--color-brand-50)] dark:bg-[var(--color-brand-950)]',
+        isActive && 'bg-[var(--editor-active)]',
         !isActive && 'hover:bg-[var(--color-surface-muted)]',
         isDisabled && 'pointer-events-none opacity-40',
       )}
@@ -100,8 +100,7 @@ function CommandItem({
           'flex size-8 shrink-0 items-center justify-center rounded-[var(--radius-sm)]',
           'border border-[var(--color-border)]',
           'bg-[var(--color-surface)]',
-          isActive &&
-            'border-[var(--color-brand-300)] bg-[var(--color-brand-100)] dark:border-[var(--color-brand-700)] dark:bg-[var(--color-brand-900)]',
+          isActive && 'border-[var(--editor-border-strong)] bg-[var(--editor-selected-bg)]',
         )}
         aria-hidden="true"
       >
@@ -109,9 +108,7 @@ function CommandItem({
           <Icon
             className={cn(
               'size-4',
-              isActive
-                ? 'text-[var(--color-brand-600)] dark:text-[var(--color-brand-400)]'
-                : 'text-[var(--color-text-muted)]',
+              isActive ? 'text-[var(--editor-selected-fg)]' : 'text-[var(--color-text-muted)]',
             )}
           />
         ) : (
@@ -123,9 +120,7 @@ function CommandItem({
       <span
         className={cn(
           'flex-1 text-sm',
-          isActive
-            ? 'text-[var(--color-brand-700)] dark:text-[var(--color-brand-300)]'
-            : 'text-[var(--color-text)]',
+          isActive ? 'text-[var(--editor-selected-fg)]' : 'text-[var(--color-text)]',
         )}
       >
         {command.label}

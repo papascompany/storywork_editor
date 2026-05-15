@@ -17,7 +17,7 @@ export const viewport: Viewport = {
 /**
  * Pretendard Variable — 한/영 균형 가변 폰트.
  * apps/web 의 fonts.ts 와 동일한 패턴.
- * CSS 변수: --font-pretendard (globals.css 의 --mkt-font-sans 에서 참조)
+ * CSS 변수: --font-pretendard (globals.css 의 --nike-font-text 에서 참조)
  */
 const pretendard = localFont({
   src: [

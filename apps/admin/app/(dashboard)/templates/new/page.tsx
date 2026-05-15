@@ -67,15 +67,15 @@ export default function NewTemplatePage() {
   }
 
   return (
-    <div className="p-6 lg:p-10 max-w-lg" style={{ fontFamily: 'var(--mkt-font-sans)' }}>
+    <div className="p-6 lg:p-10 max-w-lg" style={{ fontFamily: 'var(--nike-font-text)' }}>
       <Link
         href="/templates"
         className="mb-6 inline-flex items-center gap-1.5 focus-visible:outline-none focus-visible:ring-2 rounded"
         style={{
-          fontFamily: 'var(--mkt-font-sans)',
+          fontFamily: 'var(--nike-font-text)',
           fontSize: '14px',
           fontWeight: 330,
-          color: 'var(--mkt-ink)',
+          color: 'var(--nike-ink)',
           opacity: 0.5,
           textDecoration: 'none',
         }}
@@ -86,12 +86,12 @@ export default function NewTemplatePage() {
 
       <p
         style={{
-          fontFamily: 'var(--mkt-font-mono)',
+          fontFamily: 'var(--nike-font-mono)',
           fontSize: '11px',
           fontWeight: 400,
           letterSpacing: '0.6px',
           textTransform: 'uppercase',
-          color: 'var(--mkt-ink)',
+          color: 'var(--nike-ink)',
           opacity: 0.4,
           marginBottom: '6px',
         }}
@@ -100,12 +100,12 @@ export default function NewTemplatePage() {
       </p>
       <h1
         style={{
-          fontFamily: 'var(--mkt-font-sans)',
+          fontFamily: 'var(--nike-font-text)',
           fontSize: 'clamp(24px, 3.5vw, 32px)',
           fontWeight: 340,
           lineHeight: 1.1,
           letterSpacing: '-0.96px',
-          color: 'var(--mkt-ink)',
+          color: 'var(--nike-ink)',
           marginBottom: '6px',
         }}
       >
@@ -113,10 +113,10 @@ export default function NewTemplatePage() {
       </h1>
       <p
         style={{
-          fontFamily: 'var(--mkt-font-sans)',
+          fontFamily: 'var(--nike-font-text)',
           fontSize: '15px',
           fontWeight: 330,
-          color: 'var(--mkt-ink)',
+          color: 'var(--nike-ink)',
           opacity: 0.55,
           marginBottom: '32px',
         }}
@@ -130,12 +130,12 @@ export default function NewTemplatePage() {
           <label
             htmlFor="template-format"
             style={{
-              fontFamily: 'var(--mkt-font-mono)',
+              fontFamily: 'var(--nike-font-mono)',
               fontSize: '11px',
               fontWeight: 400,
               letterSpacing: '0.6px',
               textTransform: 'uppercase',
-              color: 'var(--mkt-ink)',
+              color: 'var(--nike-ink)',
               opacity: 0.55,
             }}
           >
@@ -148,14 +148,14 @@ export default function NewTemplatePage() {
             required
             style={{
               height: '44px',
-              borderRadius: 'var(--mkt-rounded-md)',
-              border: '1px solid var(--mkt-hairline)',
-              backgroundColor: 'var(--mkt-canvas)',
+              borderRadius: 'var(--nike-admin-rounded-md)',
+              border: '1px solid var(--nike-hairline)',
+              backgroundColor: 'var(--nike-canvas)',
               padding: '0 12px',
-              fontFamily: 'var(--mkt-font-sans)',
+              fontFamily: 'var(--nike-font-text)',
               fontSize: '14px',
               fontWeight: 330,
-              color: 'var(--mkt-ink)',
+              color: 'var(--nike-ink)',
               outline: 'none',
             }}
           >
@@ -169,9 +169,9 @@ export default function NewTemplatePage() {
           {formats.length === 0 && (
             <p
               style={{
-                fontFamily: 'var(--mkt-font-sans)',
+                fontFamily: 'var(--nike-font-text)',
                 fontSize: '12px',
-                color: 'var(--mkt-ink)',
+                color: 'var(--nike-ink)',
                 opacity: 0.55,
               }}
             >
@@ -188,12 +188,12 @@ export default function NewTemplatePage() {
           <label
             htmlFor="template-name"
             style={{
-              fontFamily: 'var(--mkt-font-mono)',
+              fontFamily: 'var(--nike-font-mono)',
               fontSize: '11px',
               fontWeight: 400,
               letterSpacing: '0.6px',
               textTransform: 'uppercase',
-              color: 'var(--mkt-ink)',
+              color: 'var(--nike-ink)',
               opacity: 0.55,
             }}
           >
@@ -211,14 +211,14 @@ export default function NewTemplatePage() {
             autoFocus
             style={{
               height: '44px',
-              borderRadius: 'var(--mkt-rounded-md)',
-              border: '1px solid var(--mkt-hairline)',
-              backgroundColor: 'var(--mkt-canvas)',
+              borderRadius: 'var(--nike-admin-rounded-md)',
+              border: '1px solid var(--nike-hairline)',
+              backgroundColor: 'var(--nike-canvas)',
               padding: '0 12px',
-              fontFamily: 'var(--mkt-font-sans)',
+              fontFamily: 'var(--nike-font-text)',
               fontSize: '14px',
               fontWeight: 330,
-              color: 'var(--mkt-ink)',
+              color: 'var(--nike-ink)',
               outline: 'none',
             }}
           />
@@ -229,11 +229,11 @@ export default function NewTemplatePage() {
           <p
             role="alert"
             style={{
-              fontFamily: 'var(--mkt-font-sans)',
+              fontFamily: 'var(--nike-font-text)',
               fontSize: '13px',
-              color: 'var(--mkt-ink)',
-              backgroundColor: 'var(--mkt-block-pink)',
-              borderRadius: 'var(--mkt-rounded-md)',
+              color: 'var(--nike-ink)',
+              backgroundColor: 'var(--nike-card-pink)',
+              borderRadius: 'var(--nike-admin-rounded-md)',
               padding: '10px 14px',
             }}
           >
@@ -243,10 +243,10 @@ export default function NewTemplatePage() {
 
         {/* 버튼 */}
         <div className="flex items-center gap-3">
-          <button type="submit" disabled={isLoading} className="mkt-btn-primary">
+          <button type="submit" disabled={isLoading} className="nike-btn-primary">
             {isLoading ? '생성 중...' : '템플릿 만들기 및 슬롯 편집'}
           </button>
-          <Link href="/templates" className="mkt-btn-secondary">
+          <Link href="/templates" className="nike-btn-secondary">
             취소
           </Link>
         </div>

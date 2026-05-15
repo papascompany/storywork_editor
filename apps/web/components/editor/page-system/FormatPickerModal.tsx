@@ -101,8 +101,8 @@ function AspectPreview({ widthMm, heightMm }: { widthMm: number; heightMm: numbe
       <div
         className={cn(
           'rounded-[var(--radius-sm)]',
-          'border-2 border-[var(--color-brand-500)]',
-          'bg-[var(--color-brand-100,oklch(0.95_0.02_250))]',
+          'border-2 border-[var(--editor-focus)]',
+          'bg-[var(--editor-selected-bg)]',
           'opacity-70',
         )}
         style={{ width: Math.round(w), height: Math.round(h) }}
@@ -185,10 +185,10 @@ export function FormatPickerModal({
                   'cursor-pointer text-left',
                   'hover:shadow-md hover:-translate-y-0.5',
                   'focus-visible:outline-none focus-visible:ring-2',
-                  'focus-visible:ring-[var(--color-brand-500)] focus-visible:ring-offset-2',
+                  'focus-visible:ring-[var(--editor-focus)] focus-visible:ring-offset-2',
                   isSelected
-                    ? 'border-[var(--color-brand-500)] bg-[var(--color-brand-50,oklch(0.97_0.01_250))] shadow-md'
-                    : 'border-[var(--color-border)] bg-[var(--color-surface)] hover:border-[var(--color-brand-300,oklch(0.75_0.1_250))]',
+                    ? 'border-[var(--editor-focus)] bg-[var(--editor-selected-bg)] shadow-md'
+                    : 'border-[var(--color-border)] bg-[var(--color-surface)] hover:border-[var(--editor-border-strong)]',
                 )}
                 data-testid={`format-preset-${preset.id}`}
               >
@@ -201,7 +201,7 @@ export function FormatPickerModal({
                 </div>
                 {isSelected && (
                   <div
-                    className="absolute top-2 right-2 size-4 rounded-full bg-[var(--color-brand-500)] flex items-center justify-center"
+                    className="absolute top-2 right-2 size-4 rounded-full bg-[var(--editor-accent)] flex items-center justify-center"
                     aria-hidden="true"
                   >
                     <svg
@@ -244,7 +244,7 @@ export function FormatPickerModal({
                 'px-3 py-2 text-sm text-[var(--color-text)]',
                 'placeholder:text-[var(--color-text-muted)]',
                 'focus-visible:outline-none focus-visible:ring-2',
-                'focus-visible:ring-[var(--color-brand-500)] focus-visible:ring-offset-1',
+                'focus-visible:ring-[var(--editor-focus)] focus-visible:ring-offset-1',
                 'transition-shadow',
               )}
               maxLength={50}

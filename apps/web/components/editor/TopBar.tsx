@@ -324,7 +324,7 @@ export function TopBar({
           'cursor-pointer select-none',
           'hover:bg-[var(--color-surface)] hover:text-[var(--color-text)]',
           'transition-colors',
-          'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-brand-500)]',
+          'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--editor-focus)]',
         )}
       >
         ⌘K
@@ -361,19 +361,16 @@ export function TopBar({
               'rounded-[var(--radius-sm)] px-1 py-0.5',
               'font-bold text-[var(--editor-text,var(--color-text))]',
               'transition-colors duration-[var(--duration-fast)]',
-              'hover:text-[var(--editor-accent,var(--color-brand-500))]',
+              'hover:text-[var(--editor-accent)]',
               'focus-visible:outline-none focus-visible:ring-2',
-              'focus-visible:ring-[var(--color-brand-500)] focus-visible:ring-offset-1',
+              'focus-visible:ring-[var(--editor-focus)] focus-visible:ring-offset-1',
               'focus-visible:ring-offset-[var(--color-surface)]',
               // 터치 타겟
               'min-h-[2.75rem] min-w-[2.75rem] inline-flex items-center',
             )}
             aria-label="StoryWork 홈으로 이동"
           >
-            <Sparkles
-              className="size-4 text-[var(--editor-accent,var(--color-brand-500))]"
-              aria-hidden="true"
-            />
+            <Sparkles className="size-4 text-[var(--editor-accent)]" aria-hidden="true" />
             <span className="hidden text-sm sm:inline">StoryWork</span>
           </Link>
         </Tooltip>

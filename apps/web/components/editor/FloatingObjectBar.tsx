@@ -303,7 +303,7 @@ export function FloatingObjectBar({
           onClick={handleLock}
           aria-label={isLocked ? '잠금 해제' : '잠금'}
           aria-pressed={isLocked}
-          className={cn('size-7 [&_svg]:size-3.5', isLocked && 'text-[var(--color-brand-500)]')}
+          className={cn('size-7 [&_svg]:size-3.5', isLocked && 'text-[var(--editor-accent)]')}
         >
           {isLocked ? <Lock aria-hidden="true" /> : <LockOpen aria-hidden="true" />}
         </Button>

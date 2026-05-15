@@ -40,8 +40,8 @@ const columns: ColumnDef<TemplateSetRow>[] = [
         <div
           className="relative h-10 w-10 overflow-hidden"
           style={{
-            borderRadius: 'var(--mkt-rounded-sm)',
-            border: '1px solid var(--mkt-hairline)',
+            borderRadius: 'var(--nike-admin-rounded-sm)',
+            border: '1px solid var(--nike-hairline)',
           }}
         >
           <Image
@@ -56,12 +56,12 @@ const columns: ColumnDef<TemplateSetRow>[] = [
         <div
           className="h-10 w-10 flex items-center justify-center"
           style={{
-            borderRadius: 'var(--mkt-rounded-sm)',
-            border: '1px solid var(--mkt-hairline)',
-            backgroundColor: 'var(--mkt-surface-soft)',
-            fontFamily: 'var(--mkt-font-mono)',
+            borderRadius: 'var(--nike-admin-rounded-sm)',
+            border: '1px solid var(--nike-hairline)',
+            backgroundColor: 'var(--nike-soft-cloud)',
+            fontFamily: 'var(--nike-font-mono)',
             fontSize: '11px',
-            color: 'var(--mkt-ink)',
+            color: 'var(--nike-ink)',
             opacity: 0.4,
           }}
         >
@@ -185,10 +185,10 @@ export function TemplateSetListClient({ initialData, userRole }: TemplateSetList
             <div className="flex flex-col items-center gap-2 py-8">
               <p
                 style={{
-                  fontFamily: 'var(--mkt-font-sans)',
+                  fontFamily: 'var(--nike-font-text)',
                   fontSize: '14px',
                   fontWeight: 540,
-                  color: 'var(--mkt-ink)',
+                  color: 'var(--nike-ink)',
                   opacity: 0.55,
                 }}
               >

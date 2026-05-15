@@ -89,14 +89,14 @@ function ToolButton({ def, isActive, isEnabled, onClick }: ToolButtonProps) {
           // 전환
           'transition-colors duration-[var(--duration-fast)]',
           // 포커스
-          'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-brand-500)]',
+          'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--editor-focus)]',
           // 비활성 도구 스타일
           !isEnabled && 'opacity-50',
           // 호버 (비활성이어도 호버는 동작 — 클릭 시 Toast 표시)
           'hover:bg-[var(--editor-hover)]',
           // 활성 도구 스타일
           isActive
-            ? 'bg-[var(--editor-active)] text-[var(--color-brand-600)] dark:text-[var(--color-brand-400)]'
+            ? 'bg-[var(--editor-active)] text-[var(--editor-selected-fg)]'
             : 'text-[var(--color-text-muted)] hover:text-[var(--color-text)]',
         )}
       >
@@ -104,7 +104,7 @@ function ToolButton({ def, isActive, isEnabled, onClick }: ToolButtonProps) {
         {isActive && (
           <span
             aria-hidden="true"
-            className="absolute left-0 top-1/2 h-8 w-[3px] -translate-y-1/2 rounded-r-full bg-[var(--color-brand-500)]"
+            className="absolute left-0 top-1/2 h-8 w-[3px] -translate-y-1/2 rounded-r-full bg-[var(--editor-accent)]"
           />
         )}
 

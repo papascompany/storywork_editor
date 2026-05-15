@@ -45,8 +45,8 @@ const columns: ColumnDef<TemplateRow>[] = [
         <div
           className="relative h-10 w-10 overflow-hidden"
           style={{
-            borderRadius: 'var(--mkt-rounded-sm)',
-            border: '1px solid var(--mkt-hairline)',
+            borderRadius: 'var(--nike-admin-rounded-sm)',
+            border: '1px solid var(--nike-hairline)',
           }}
         >
           <Image
@@ -61,12 +61,12 @@ const columns: ColumnDef<TemplateRow>[] = [
         <div
           className="h-10 w-10 flex items-center justify-center"
           style={{
-            borderRadius: 'var(--mkt-rounded-sm)',
-            border: '1px solid var(--mkt-hairline)',
-            backgroundColor: 'var(--mkt-surface-soft)',
-            fontFamily: 'var(--mkt-font-mono)',
+            borderRadius: 'var(--nike-admin-rounded-sm)',
+            border: '1px solid var(--nike-hairline)',
+            backgroundColor: 'var(--nike-soft-cloud)',
+            fontFamily: 'var(--nike-font-mono)',
             fontSize: '11px',
-            color: 'var(--mkt-ink)',
+            color: 'var(--nike-ink)',
             opacity: 0.4,
           }}
         >
@@ -91,11 +91,11 @@ const columns: ColumnDef<TemplateRow>[] = [
           display: 'inline-flex',
           alignItems: 'center',
           padding: '2px 8px',
-          borderRadius: 'var(--mkt-rounded-full)',
-          backgroundColor: 'var(--mkt-block-lilac)',
-          fontFamily: 'var(--mkt-font-mono)',
+          borderRadius: 'var(--nike-rounded-full)',
+          backgroundColor: 'var(--nike-card-lilac)',
+          fontFamily: 'var(--nike-font-mono)',
           fontSize: '11px',
-          color: 'var(--mkt-ink)',
+          color: 'var(--nike-ink)',
         }}
       >
         {row.original.formatName}
@@ -172,14 +172,14 @@ export function TemplateListClient({ initialData, formats, userRole }: TemplateL
           value={filterFormatId}
           onChange={(e) => setFilterFormatId(e.target.value)}
           style={{
-            borderRadius: 'var(--mkt-rounded-md)',
-            border: '1px solid var(--mkt-hairline)',
-            backgroundColor: 'var(--mkt-canvas)',
+            borderRadius: 'var(--nike-admin-rounded-md)',
+            border: '1px solid var(--nike-hairline)',
+            backgroundColor: 'var(--nike-canvas)',
             padding: '8px 12px',
-            fontFamily: 'var(--mkt-font-sans)',
+            fontFamily: 'var(--nike-font-text)',
             fontSize: '14px',
             fontWeight: 330,
-            color: 'var(--mkt-ink)',
+            color: 'var(--nike-ink)',
             outline: 'none',
             cursor: 'pointer',
           }}
@@ -220,10 +220,10 @@ export function TemplateListClient({ initialData, formats, userRole }: TemplateL
             <div className="flex flex-col items-center gap-2 py-8">
               <p
                 style={{
-                  fontFamily: 'var(--mkt-font-sans)',
+                  fontFamily: 'var(--nike-font-text)',
                   fontSize: '14px',
                   fontWeight: 540,
-                  color: 'var(--mkt-ink)',
+                  color: 'var(--nike-ink)',
                   opacity: 0.55,
                 }}
               >

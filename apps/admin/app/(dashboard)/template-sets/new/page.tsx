@@ -127,15 +127,15 @@ export default function NewTemplateSetPage() {
   }
 
   return (
-    <div className="p-6 lg:p-10 max-w-3xl" style={{ fontFamily: 'var(--mkt-font-sans)' }}>
+    <div className="p-6 lg:p-10 max-w-3xl" style={{ fontFamily: 'var(--nike-font-text)' }}>
       <Link
         href="/template-sets"
         className="mb-6 inline-flex items-center gap-1.5 focus-visible:outline-none focus-visible:ring-2 rounded"
         style={{
-          fontFamily: 'var(--mkt-font-sans)',
+          fontFamily: 'var(--nike-font-text)',
           fontSize: '14px',
           fontWeight: 330,
-          color: 'var(--mkt-ink)',
+          color: 'var(--nike-ink)',
           opacity: 0.5,
           textDecoration: 'none',
         }}
@@ -146,12 +146,12 @@ export default function NewTemplateSetPage() {
 
       <p
         style={{
-          fontFamily: 'var(--mkt-font-mono)',
+          fontFamily: 'var(--nike-font-mono)',
           fontSize: '11px',
           fontWeight: 400,
           letterSpacing: '0.6px',
           textTransform: 'uppercase',
-          color: 'var(--mkt-ink)',
+          color: 'var(--nike-ink)',
           opacity: 0.4,
           marginBottom: '6px',
         }}
@@ -160,12 +160,12 @@ export default function NewTemplateSetPage() {
       </p>
       <h1
         style={{
-          fontFamily: 'var(--mkt-font-sans)',
+          fontFamily: 'var(--nike-font-text)',
           fontSize: 'clamp(24px, 3.5vw, 32px)',
           fontWeight: 340,
           lineHeight: 1.1,
           letterSpacing: '-0.96px',
-          color: 'var(--mkt-ink)',
+          color: 'var(--nike-ink)',
           marginBottom: '6px',
         }}
       >
@@ -173,10 +173,10 @@ export default function NewTemplateSetPage() {
       </h1>
       <p
         style={{
-          fontFamily: 'var(--mkt-font-sans)',
+          fontFamily: 'var(--nike-font-text)',
           fontSize: '15px',
           fontWeight: 330,
-          color: 'var(--mkt-ink)',
+          color: 'var(--nike-ink)',
           opacity: 0.55,
           marginBottom: '32px',
         }}
@@ -190,12 +190,12 @@ export default function NewTemplateSetPage() {
           <label
             htmlFor="set-name"
             style={{
-              fontFamily: 'var(--mkt-font-mono)',
+              fontFamily: 'var(--nike-font-mono)',
               fontSize: '11px',
               fontWeight: 400,
               letterSpacing: '0.6px',
               textTransform: 'uppercase',
-              color: 'var(--mkt-ink)',
+              color: 'var(--nike-ink)',
               opacity: 0.55,
             }}
           >
@@ -213,14 +213,14 @@ export default function NewTemplateSetPage() {
             autoFocus
             style={{
               height: '44px',
-              borderRadius: 'var(--mkt-rounded-md)',
-              border: '1px solid var(--mkt-hairline)',
-              backgroundColor: 'var(--mkt-canvas)',
+              borderRadius: 'var(--nike-admin-rounded-md)',
+              border: '1px solid var(--nike-hairline)',
+              backgroundColor: 'var(--nike-canvas)',
               padding: '0 12px',
-              fontFamily: 'var(--mkt-font-sans)',
+              fontFamily: 'var(--nike-font-text)',
               fontSize: '14px',
               fontWeight: 330,
-              color: 'var(--mkt-ink)',
+              color: 'var(--nike-ink)',
               outline: 'none',
             }}
           />
@@ -230,12 +230,12 @@ export default function NewTemplateSetPage() {
         <div className="flex flex-col gap-2">
           <span
             style={{
-              fontFamily: 'var(--mkt-font-mono)',
+              fontFamily: 'var(--nike-font-mono)',
               fontSize: '11px',
               fontWeight: 400,
               letterSpacing: '0.6px',
               textTransform: 'uppercase',
-              color: 'var(--mkt-ink)',
+              color: 'var(--nike-ink)',
               opacity: 0.55,
             }}
           >
@@ -245,9 +245,9 @@ export default function NewTemplateSetPage() {
           {templates.length === 0 && (
             <p
               style={{
-                fontFamily: 'var(--mkt-font-sans)',
+                fontFamily: 'var(--nike-font-text)',
                 fontSize: '13px',
-                color: 'var(--mkt-ink)',
+                color: 'var(--nike-ink)',
                 opacity: 0.55,
               }}
             >
@@ -260,8 +260,8 @@ export default function NewTemplateSetPage() {
           <div
             className="grid grid-cols-2 sm:grid-cols-3 gap-2 max-h-64 overflow-y-auto p-2"
             style={{
-              border: '1px solid var(--mkt-hairline)',
-              borderRadius: 'var(--mkt-rounded-lg)',
+              border: '1px solid var(--nike-hairline)',
+              borderRadius: 'var(--nike-admin-rounded-lg)',
             }}
           >
             {templates.map((t) => {
@@ -276,9 +276,9 @@ export default function NewTemplateSetPage() {
                   className="relative flex flex-col items-start gap-1 text-left focus-visible:outline-none focus-visible:ring-2 rounded"
                   style={{
                     padding: '8px',
-                    borderRadius: 'var(--mkt-rounded-md)',
-                    border: `1px solid ${isSelected ? 'var(--mkt-ink)' : 'var(--mkt-hairline)'}`,
-                    backgroundColor: isSelected ? 'var(--mkt-block-lime)' : 'var(--mkt-canvas)',
+                    borderRadius: 'var(--nike-admin-rounded-md)',
+                    border: `1px solid ${isSelected ? 'var(--nike-ink)' : 'var(--nike-hairline)'}`,
+                    backgroundColor: isSelected ? 'var(--nike-card-lime)' : 'var(--nike-canvas)',
                     transition: 'background-color 100ms ease, border-color 100ms ease',
                     cursor: 'pointer',
                   }}
@@ -294,8 +294,8 @@ export default function NewTemplateSetPage() {
                     <div
                       className="relative w-full h-16 overflow-hidden"
                       style={{
-                        borderRadius: 'var(--mkt-rounded-sm)',
-                        border: '1px solid var(--mkt-hairline)',
+                        borderRadius: 'var(--nike-admin-rounded-sm)',
+                        border: '1px solid var(--nike-hairline)',
                       }}
                     >
                       <Image
@@ -310,12 +310,12 @@ export default function NewTemplateSetPage() {
                     <div
                       className="w-full h-16 flex items-center justify-center"
                       style={{
-                        borderRadius: 'var(--mkt-rounded-sm)',
-                        border: '1px solid var(--mkt-hairline)',
-                        backgroundColor: 'var(--mkt-surface-soft)',
-                        fontFamily: 'var(--mkt-font-mono)',
+                        borderRadius: 'var(--nike-admin-rounded-sm)',
+                        border: '1px solid var(--nike-hairline)',
+                        backgroundColor: 'var(--nike-soft-cloud)',
+                        fontFamily: 'var(--nike-font-mono)',
                         fontSize: '11px',
-                        color: 'var(--mkt-ink)',
+                        color: 'var(--nike-ink)',
                         opacity: 0.4,
                       }}
                     >
@@ -325,19 +325,19 @@ export default function NewTemplateSetPage() {
                   <span
                     className="truncate w-full"
                     style={{
-                      fontFamily: 'var(--mkt-font-sans)',
+                      fontFamily: 'var(--nike-font-text)',
                       fontSize: '12px',
                       fontWeight: 540,
-                      color: 'var(--mkt-ink)',
+                      color: 'var(--nike-ink)',
                     }}
                   >
                     {t.name}
                   </span>
                   <span
                     style={{
-                      fontFamily: 'var(--mkt-font-mono)',
+                      fontFamily: 'var(--nike-font-mono)',
                       fontSize: '10px',
-                      color: 'var(--mkt-ink)',
+                      color: 'var(--nike-ink)',
                       opacity: 0.55,
                     }}
                   >
@@ -354,12 +354,12 @@ export default function NewTemplateSetPage() {
           <div className="flex flex-col gap-2">
             <span
               style={{
-                fontFamily: 'var(--mkt-font-mono)',
+                fontFamily: 'var(--nike-font-mono)',
                 fontSize: '11px',
                 fontWeight: 400,
                 letterSpacing: '0.6px',
                 textTransform: 'uppercase',
-                color: 'var(--mkt-ink)',
+                color: 'var(--nike-ink)',
                 opacity: 0.55,
               }}
             >
@@ -368,8 +368,8 @@ export default function NewTemplateSetPage() {
             <div
               className="flex flex-col gap-1 p-2"
               style={{
-                border: '1px solid var(--mkt-hairline)',
-                borderRadius: 'var(--mkt-rounded-lg)',
+                border: '1px solid var(--nike-hairline)',
+                borderRadius: 'var(--nike-admin-rounded-lg)',
               }}
             >
               {selectedIds.map((id, idx) => {
@@ -381,16 +381,16 @@ export default function NewTemplateSetPage() {
                     key={id}
                     className="flex items-center gap-2 px-2 py-1.5"
                     style={{
-                      borderRadius: 'var(--mkt-rounded-md)',
-                      backgroundColor: 'var(--mkt-surface-soft)',
+                      borderRadius: 'var(--nike-admin-rounded-md)',
+                      backgroundColor: 'var(--nike-soft-cloud)',
                     }}
                   >
                     <span
                       className="w-5 text-right shrink-0"
                       style={{
-                        fontFamily: 'var(--mkt-font-mono)',
+                        fontFamily: 'var(--nike-font-mono)',
                         fontSize: '11px',
-                        color: 'var(--mkt-ink)',
+                        color: 'var(--nike-ink)',
                         opacity: 0.4,
                       }}
                     >
@@ -399,10 +399,10 @@ export default function NewTemplateSetPage() {
                     <span
                       className="flex-1 min-w-0 truncate"
                       style={{
-                        fontFamily: 'var(--mkt-font-sans)',
+                        fontFamily: 'var(--nike-font-text)',
                         fontSize: '13px',
                         fontWeight: 330,
-                        color: 'var(--mkt-ink)',
+                        color: 'var(--nike-ink)',
                       }}
                     >
                       {t.name}
@@ -413,7 +413,7 @@ export default function NewTemplateSetPage() {
                       title="커버로 지정"
                       className="rounded p-0.5 focus-visible:outline-none focus-visible:ring-2"
                       style={{
-                        color: isCover ? '#eab308' : 'var(--mkt-ink)',
+                        color: isCover ? '#eab308' : 'var(--nike-ink)',
                         opacity: isCover ? 1 : 0.4,
                       }}
                     >
@@ -428,10 +428,10 @@ export default function NewTemplateSetPage() {
                       disabled={idx === 0}
                       className="rounded focus-visible:outline-none focus-visible:ring-2"
                       style={{
-                        fontFamily: 'var(--mkt-font-mono)',
+                        fontFamily: 'var(--nike-font-mono)',
                         fontSize: '12px',
                         padding: '0 4px',
-                        color: 'var(--mkt-ink)',
+                        color: 'var(--nike-ink)',
                         opacity: idx === 0 ? 0.2 : 0.6,
                         cursor: idx === 0 ? 'not-allowed' : 'pointer',
                         border: 'none',
@@ -447,10 +447,10 @@ export default function NewTemplateSetPage() {
                       disabled={idx === selectedIds.length - 1}
                       className="rounded focus-visible:outline-none focus-visible:ring-2"
                       style={{
-                        fontFamily: 'var(--mkt-font-mono)',
+                        fontFamily: 'var(--nike-font-mono)',
                         fontSize: '12px',
                         padding: '0 4px',
-                        color: 'var(--mkt-ink)',
+                        color: 'var(--nike-ink)',
                         opacity: idx === selectedIds.length - 1 ? 0.2 : 0.6,
                         cursor: idx === selectedIds.length - 1 ? 'not-allowed' : 'pointer',
                         border: 'none',
@@ -465,10 +465,10 @@ export default function NewTemplateSetPage() {
                       onClick={() => toggleSelect(id)}
                       className="rounded focus-visible:outline-none focus-visible:ring-2"
                       style={{
-                        fontFamily: 'var(--mkt-font-mono)',
+                        fontFamily: 'var(--nike-font-mono)',
                         fontSize: '13px',
                         padding: '0 4px',
-                        color: 'var(--mkt-ink)',
+                        color: 'var(--nike-ink)',
                         opacity: 0.5,
                         border: 'none',
                         background: 'none',
@@ -490,11 +490,11 @@ export default function NewTemplateSetPage() {
           <p
             role="alert"
             style={{
-              fontFamily: 'var(--mkt-font-sans)',
+              fontFamily: 'var(--nike-font-text)',
               fontSize: '13px',
-              color: 'var(--mkt-ink)',
-              backgroundColor: 'var(--mkt-block-pink)',
-              borderRadius: 'var(--mkt-rounded-md)',
+              color: 'var(--nike-ink)',
+              backgroundColor: 'var(--nike-card-pink)',
+              borderRadius: 'var(--nike-admin-rounded-md)',
               padding: '10px 14px',
             }}
           >
@@ -504,10 +504,10 @@ export default function NewTemplateSetPage() {
 
         {/* 버튼 */}
         <div className="flex items-center gap-3">
-          <button type="submit" disabled={isLoading} className="mkt-btn-primary">
+          <button type="submit" disabled={isLoading} className="nike-btn-primary">
             {isLoading ? '저장 중...' : '세트 만들기'}
           </button>
-          <Link href="/template-sets" className="mkt-btn-secondary">
+          <Link href="/template-sets" className="nike-btn-secondary">
             취소
           </Link>
         </div>

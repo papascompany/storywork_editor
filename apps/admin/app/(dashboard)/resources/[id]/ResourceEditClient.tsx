@@ -45,10 +45,10 @@ interface ResourceEditClientProps {
 // ─── 상태 배지 ───────────────────────────────────────────────────────────────
 
 const STATUS_INFO: Record<string, { label: string; blockColor: string }> = {
-  draft: { label: '초안', blockColor: 'var(--mkt-hairline-soft)' },
-  review: { label: '검수중', blockColor: 'var(--mkt-block-cream)' },
-  published: { label: '게시됨', blockColor: 'var(--mkt-block-mint)' },
-  rejected: { label: '거절됨', blockColor: 'var(--mkt-block-pink)' },
+  draft: { label: '초안', blockColor: 'var(--nike-hairline-soft)' },
+  review: { label: '검수중', blockColor: 'var(--nike-card-cream)' },
+  published: { label: '게시됨', blockColor: 'var(--nike-card-mint)' },
+  rejected: { label: '거절됨', blockColor: 'var(--nike-card-pink)' },
 }
 
 const KIND_LABELS: Record<string, string> = {
@@ -63,25 +63,25 @@ const KIND_LABELS: Record<string, string> = {
 
 const INPUT_STYLE: React.CSSProperties = {
   height: '40px',
-  borderRadius: 'var(--mkt-rounded-md)',
-  border: '1px solid var(--mkt-hairline)',
-  backgroundColor: 'var(--mkt-canvas)',
+  borderRadius: 'var(--nike-admin-rounded-md)',
+  border: '1px solid var(--nike-hairline)',
+  backgroundColor: 'var(--nike-canvas)',
   padding: '0 12px',
-  fontFamily: 'var(--mkt-font-sans)',
+  fontFamily: 'var(--nike-font-text)',
   fontSize: '14px',
   fontWeight: 320,
-  color: 'var(--mkt-ink)',
+  color: 'var(--nike-ink)',
   outline: 'none',
   width: '100%',
 }
 
 const LABEL_STYLE: React.CSSProperties = {
-  fontFamily: 'var(--mkt-font-mono)',
+  fontFamily: 'var(--nike-font-mono)',
   fontSize: '11px',
   fontWeight: 400,
   letterSpacing: '0.5px',
   textTransform: 'uppercase',
-  color: 'var(--mkt-ink)',
+  color: 'var(--nike-ink)',
   opacity: 0.55,
   marginBottom: '6px',
   display: 'block',
@@ -264,7 +264,7 @@ export function ResourceEditClient({ resource, userRole }: ResourceEditClientPro
   const statusInfo = STATUS_INFO[currentStatus]
 
   return (
-    <div className="nike-page" style={{ fontFamily: 'var(--mkt-font-sans)' }}>
+    <div className="nike-page" style={{ fontFamily: 'var(--nike-font-text)' }}>
       {/* 헤더 */}
       <div className="mb-8 flex items-start justify-between gap-4 flex-wrap">
         <div>
@@ -272,10 +272,10 @@ export function ResourceEditClient({ resource, userRole }: ResourceEditClientPro
             href="/resources"
             className="mb-4 inline-flex items-center gap-1.5 focus-visible:outline-none focus-visible:ring-2 rounded"
             style={{
-              fontFamily: 'var(--mkt-font-sans)',
+              fontFamily: 'var(--nike-font-text)',
               fontSize: '14px',
               fontWeight: 330,
-              color: 'var(--mkt-ink)',
+              color: 'var(--nike-ink)',
               opacity: 0.5,
               textDecoration: 'none',
             }}
@@ -284,22 +284,22 @@ export function ResourceEditClient({ resource, userRole }: ResourceEditClientPro
             리소스 목록
           </Link>
           <p
-            className="mkt-eyebrow"
+            className="nike-eyebrow"
             style={{
-              color: 'var(--mkt-ink)',
+              color: 'var(--nike-ink)',
               opacity: 0.4,
-              marginBottom: 'var(--mkt-space-xs)',
+              marginBottom: 'var(--nike-admin-space-xs)',
               fontSize: '12px',
             }}
           >
             ADMIN / RESOURCES / EDIT
           </p>
           <h1
-            className="mkt-headline"
+            className="nike-heading-lg"
             style={{
-              color: 'var(--mkt-ink)',
-              marginBottom: 'var(--mkt-space-xs)',
-              fontFamily: 'var(--mkt-font-mono)',
+              color: 'var(--nike-ink)',
+              marginBottom: 'var(--nike-admin-space-xs)',
+              fontFamily: 'var(--nike-font-mono)',
             }}
           >
             {resource.slug}
@@ -307,27 +307,27 @@ export function ResourceEditClient({ resource, userRole }: ResourceEditClientPro
           <div className="flex items-center gap-2 flex-wrap">
             <span
               style={{
-                fontFamily: 'var(--mkt-font-sans)',
+                fontFamily: 'var(--nike-font-text)',
                 fontSize: '13px',
                 fontWeight: 330,
-                color: 'var(--mkt-ink)',
+                color: 'var(--nike-ink)',
                 opacity: 0.55,
               }}
             >
               {KIND_LABELS[resource.kind] ?? resource.kind}
             </span>
-            <span style={{ color: 'var(--mkt-hairline)' }}>·</span>
+            <span style={{ color: 'var(--nike-hairline)' }}>·</span>
             <span
               style={{
                 display: 'inline-flex',
                 alignItems: 'center',
                 padding: '2px 8px',
-                borderRadius: 'var(--mkt-rounded-full)',
-                backgroundColor: statusInfo?.blockColor ?? 'var(--mkt-hairline-soft)',
-                fontFamily: 'var(--mkt-font-sans)',
+                borderRadius: 'var(--nike-rounded-full)',
+                backgroundColor: statusInfo?.blockColor ?? 'var(--nike-hairline-soft)',
+                fontFamily: 'var(--nike-font-text)',
                 fontSize: '12px',
                 fontWeight: 480,
-                color: 'var(--mkt-ink)',
+                color: 'var(--nike-ink)',
               }}
             >
               {statusInfo?.label ?? currentStatus}
@@ -338,11 +338,11 @@ export function ResourceEditClient({ resource, userRole }: ResourceEditClientPro
                   display: 'inline-flex',
                   alignItems: 'center',
                   padding: '2px 8px',
-                  borderRadius: 'var(--mkt-rounded-full)',
-                  backgroundColor: 'var(--mkt-block-coral)',
-                  fontFamily: 'var(--mkt-font-mono)',
+                  borderRadius: 'var(--nike-rounded-full)',
+                  backgroundColor: 'var(--nike-card-coral)',
+                  fontFamily: 'var(--nike-font-mono)',
                   fontSize: '11px',
-                  color: 'var(--mkt-ink)',
+                  color: 'var(--nike-ink)',
                 }}
               >
                 저해상도
@@ -359,12 +359,12 @@ export function ResourceEditClient({ resource, userRole }: ResourceEditClientPro
                 type="button"
                 onClick={() => void handlePublish()}
                 disabled={isPublishing}
-                className="mkt-btn-primary focus-visible:outline-none focus-visible:ring-2"
+                className="nike-btn-primary focus-visible:outline-none focus-visible:ring-2"
                 style={{
                   gap: '8px',
                   display: 'inline-flex',
                   alignItems: 'center',
-                  backgroundColor: 'var(--mkt-semantic-success)',
+                  backgroundColor: 'var(--nike-success)',
                   opacity: isPublishing ? 0.6 : undefined,
                 }}
               >
@@ -374,13 +374,13 @@ export function ResourceEditClient({ resource, userRole }: ResourceEditClientPro
               <button
                 type="button"
                 onClick={() => setShowRejectModal(true)}
-                className="mkt-btn-secondary focus-visible:outline-none focus-visible:ring-2"
+                className="nike-btn-secondary focus-visible:outline-none focus-visible:ring-2"
                 style={{
                   gap: '8px',
                   display: 'inline-flex',
                   alignItems: 'center',
-                  borderColor: '#dc2626',
-                  color: '#dc2626',
+                  borderColor: 'var(--nike-sale)',
+                  color: 'var(--nike-sale)',
                 }}
               >
                 <X className="size-4" aria-hidden="true" />
@@ -393,13 +393,13 @@ export function ResourceEditClient({ resource, userRole }: ResourceEditClientPro
               type="button"
               onClick={() => void handleDelete()}
               disabled={isDeleting}
-              className="mkt-btn-secondary focus-visible:outline-none focus-visible:ring-2"
+              className="nike-btn-secondary focus-visible:outline-none focus-visible:ring-2"
               style={{
                 gap: '8px',
                 display: 'inline-flex',
                 alignItems: 'center',
-                borderColor: '#dc2626',
-                color: '#dc2626',
+                borderColor: 'var(--nike-sale)',
+                color: 'var(--nike-sale)',
                 opacity: isDeleting ? 0.6 : undefined,
               }}
             >
@@ -417,14 +417,17 @@ export function ResourceEditClient({ resource, userRole }: ResourceEditClientPro
           style={{
             marginBottom: '16px',
             padding: '10px 14px',
-            borderRadius: 'var(--mkt-rounded-md)',
+            borderRadius: 'var(--nike-admin-rounded-md)',
             backgroundColor:
-              message.type === 'success' ? 'var(--mkt-block-mint)' : 'var(--mkt-block-pink)',
-            border: message.type === 'success' ? '1px solid #a7c4af' : '1px solid #e0b0b0',
-            fontFamily: 'var(--mkt-font-sans)',
+              message.type === 'success' ? 'var(--nike-card-mint)' : 'var(--nike-card-pink)',
+            border:
+              message.type === 'success'
+                ? '1px solid color-mix(in srgb, var(--nike-success) 28%, var(--nike-canvas))'
+                : '1px solid color-mix(in srgb, var(--nike-sale) 28%, var(--nike-canvas))',
+            fontFamily: 'var(--nike-font-text)',
             fontSize: '14px',
             fontWeight: 330,
-            color: message.type === 'success' ? '#166534' : '#8b2222',
+            color: message.type === 'success' ? 'var(--nike-success)' : 'var(--nike-sale-deep)',
           }}
         >
           {message.text}
@@ -437,13 +440,13 @@ export function ResourceEditClient({ resource, userRole }: ResourceEditClientPro
           style={{
             marginBottom: '16px',
             padding: '10px 14px',
-            borderRadius: 'var(--mkt-rounded-md)',
-            backgroundColor: 'var(--mkt-block-pink)',
-            border: '1px solid #e0b0b0',
-            fontFamily: 'var(--mkt-font-sans)',
+            borderRadius: 'var(--nike-admin-rounded-md)',
+            backgroundColor: 'var(--nike-card-pink)',
+            border: '1px solid color-mix(in srgb, var(--nike-sale) 28%, var(--nike-canvas))',
+            fontFamily: 'var(--nike-font-text)',
             fontSize: '14px',
             fontWeight: 330,
-            color: '#8b2222',
+            color: 'var(--nike-sale-deep)',
           }}
         >
           거절 사유: {poseMeta.rejectionReason}
@@ -456,12 +459,12 @@ export function ResourceEditClient({ resource, userRole }: ResourceEditClientPro
           <div>
             <h2
               style={{
-                fontFamily: 'var(--mkt-font-mono)',
+                fontFamily: 'var(--nike-font-mono)',
                 fontSize: '11px',
                 fontWeight: 400,
                 letterSpacing: '0.5px',
                 textTransform: 'uppercase',
-                color: 'var(--mkt-ink)',
+                color: 'var(--nike-ink)',
                 opacity: 0.55,
                 marginBottom: '12px',
               }}
@@ -482,7 +485,7 @@ export function ResourceEditClient({ resource, userRole }: ResourceEditClientPro
                   type="button"
                   onClick={() => void handleSaveKeypoints()}
                   disabled={isSavingKp}
-                  className="mkt-btn-primary focus-visible:outline-none focus-visible:ring-2"
+                  className="nike-btn-primary focus-visible:outline-none focus-visible:ring-2"
                   style={{
                     gap: '8px',
                     display: 'inline-flex',
@@ -499,20 +502,20 @@ export function ResourceEditClient({ resource, userRole }: ResourceEditClientPro
           {/* 파일 정보 */}
           <div
             style={{
-              borderRadius: 'var(--mkt-rounded-lg)',
-              border: '1px solid var(--mkt-hairline)',
+              borderRadius: 'var(--nike-admin-rounded-lg)',
+              border: '1px solid var(--nike-hairline)',
               padding: '16px',
-              backgroundColor: 'var(--mkt-canvas)',
+              backgroundColor: 'var(--nike-canvas)',
             }}
           >
             <h3
               style={{
-                fontFamily: 'var(--mkt-font-mono)',
+                fontFamily: 'var(--nike-font-mono)',
                 fontSize: '11px',
                 fontWeight: 400,
                 letterSpacing: '0.5px',
                 textTransform: 'uppercase',
-                color: 'var(--mkt-ink)',
+                color: 'var(--nike-ink)',
                 opacity: 0.55,
                 marginBottom: '12px',
               }}
@@ -544,10 +547,10 @@ export function ResourceEditClient({ resource, userRole }: ResourceEditClientPro
                 <React.Fragment key={label}>
                   <dt
                     style={{
-                      fontFamily: 'var(--mkt-font-sans)',
+                      fontFamily: 'var(--nike-font-text)',
                       fontSize: '12px',
                       fontWeight: 330,
-                      color: 'var(--mkt-ink)',
+                      color: 'var(--nike-ink)',
                       opacity: 0.45,
                     }}
                   >
@@ -555,10 +558,10 @@ export function ResourceEditClient({ resource, userRole }: ResourceEditClientPro
                   </dt>
                   <dd
                     style={{
-                      fontFamily: mono ? 'var(--mkt-font-mono)' : 'var(--mkt-font-sans)',
+                      fontFamily: mono ? 'var(--nike-font-mono)' : 'var(--nike-font-text)',
                       fontSize: '12px',
                       fontWeight: mono ? 400 : 330,
-                      color: 'var(--mkt-ink)',
+                      color: 'var(--nike-ink)',
                       overflow: 'hidden',
                       textOverflow: 'ellipsis',
                       whiteSpace: 'nowrap',
@@ -576,12 +579,12 @@ export function ResourceEditClient({ resource, userRole }: ResourceEditClientPro
         <div className="flex flex-col gap-6">
           <h2
             style={{
-              fontFamily: 'var(--mkt-font-mono)',
+              fontFamily: 'var(--nike-font-mono)',
               fontSize: '11px',
               fontWeight: 400,
               letterSpacing: '0.5px',
               textTransform: 'uppercase',
-              color: 'var(--mkt-ink)',
+              color: 'var(--nike-ink)',
               opacity: 0.55,
             }}
           >
@@ -595,9 +598,9 @@ export function ResourceEditClient({ resource, userRole }: ResourceEditClientPro
               className="flex flex-wrap gap-1.5 focus-within:ring-2"
               style={{
                 minHeight: '44px',
-                borderRadius: 'var(--mkt-rounded-md)',
-                border: '1px solid var(--mkt-hairline)',
-                backgroundColor: 'var(--mkt-canvas)',
+                borderRadius: 'var(--nike-admin-rounded-md)',
+                border: '1px solid var(--nike-hairline)',
+                backgroundColor: 'var(--nike-canvas)',
                 padding: '8px 12px',
                 opacity: !canEdit ? 0.6 : 1,
               }}
@@ -610,12 +613,12 @@ export function ResourceEditClient({ resource, userRole }: ResourceEditClientPro
                     alignItems: 'center',
                     gap: '4px',
                     padding: '2px 8px',
-                    borderRadius: 'var(--mkt-rounded-full)',
-                    backgroundColor: 'var(--mkt-block-lime)',
-                    fontFamily: 'var(--mkt-font-sans)',
+                    borderRadius: 'var(--nike-rounded-full)',
+                    backgroundColor: 'var(--nike-card-lime)',
+                    fontFamily: 'var(--nike-font-text)',
                     fontSize: '12px',
                     fontWeight: 480,
-                    color: 'var(--mkt-ink)',
+                    color: 'var(--nike-ink)',
                   }}
                 >
                   {tag}
@@ -628,7 +631,7 @@ export function ResourceEditClient({ resource, userRole }: ResourceEditClientPro
                         background: 'none',
                         border: 'none',
                         cursor: 'pointer',
-                        color: 'var(--mkt-ink)',
+                        color: 'var(--nike-ink)',
                         opacity: 0.6,
                         padding: 0,
                         lineHeight: 1,
@@ -660,10 +663,10 @@ export function ResourceEditClient({ resource, userRole }: ResourceEditClientPro
                     background: 'transparent',
                     border: 'none',
                     outline: 'none',
-                    fontFamily: 'var(--mkt-font-sans)',
+                    fontFamily: 'var(--nike-font-text)',
                     fontSize: '14px',
                     fontWeight: 320,
-                    color: 'var(--mkt-ink)',
+                    color: 'var(--nike-ink)',
                   }}
                 />
               )}
@@ -678,19 +681,19 @@ export function ResourceEditClient({ resource, userRole }: ResourceEditClientPro
                 flexDirection: 'column',
                 gap: '16px',
                 padding: '20px',
-                borderRadius: 'var(--mkt-rounded-lg)',
-                border: '1px solid var(--mkt-hairline)',
-                backgroundColor: 'var(--mkt-surface-soft)',
+                borderRadius: 'var(--nike-admin-rounded-lg)',
+                border: '1px solid var(--nike-hairline)',
+                backgroundColor: 'var(--nike-soft-cloud)',
               }}
             >
               <legend
                 style={{
-                  fontFamily: 'var(--mkt-font-mono)',
+                  fontFamily: 'var(--nike-font-mono)',
                   fontSize: '11px',
                   fontWeight: 400,
                   letterSpacing: '0.5px',
                   textTransform: 'uppercase',
-                  color: 'var(--mkt-ink)',
+                  color: 'var(--nike-ink)',
                   opacity: 0.55,
                   padding: '0 4px',
                 }}
@@ -766,9 +769,9 @@ export function ResourceEditClient({ resource, userRole }: ResourceEditClientPro
                     display: 'inline-flex',
                     height: '24px',
                     width: '44px',
-                    borderRadius: 'var(--mkt-rounded-full)',
+                    borderRadius: 'var(--nike-rounded-full)',
                     border: '2px solid transparent',
-                    backgroundColor: flippable ? 'var(--mkt-ink)' : 'var(--mkt-hairline)',
+                    backgroundColor: flippable ? 'var(--nike-ink)' : 'var(--nike-hairline)',
                     transition: 'background-color 150ms ease',
                     cursor: canEdit ? 'pointer' : 'not-allowed',
                     flexShrink: 0,
@@ -780,8 +783,8 @@ export function ResourceEditClient({ resource, userRole }: ResourceEditClientPro
                       display: 'inline-block',
                       width: '20px',
                       height: '20px',
-                      borderRadius: 'var(--mkt-rounded-full)',
-                      backgroundColor: 'var(--mkt-canvas)',
+                      borderRadius: 'var(--nike-rounded-full)',
+                      backgroundColor: 'var(--nike-canvas)',
                       boxShadow: '0 1px 3px rgba(0,0,0,0.2)',
                       transform: flippable ? 'translateX(20px)' : 'translateX(0)',
                       transition: 'transform 150ms ease',
@@ -790,10 +793,10 @@ export function ResourceEditClient({ resource, userRole }: ResourceEditClientPro
                 </button>
                 <span
                   style={{
-                    fontFamily: 'var(--mkt-font-sans)',
+                    fontFamily: 'var(--nike-font-text)',
                     fontSize: '14px',
                     fontWeight: 330,
-                    color: 'var(--mkt-ink)',
+                    color: 'var(--nike-ink)',
                     opacity: 0.7,
                   }}
                 >
@@ -809,7 +812,7 @@ export function ResourceEditClient({ resource, userRole }: ResourceEditClientPro
                 type="button"
                 onClick={() => void handleSaveMeta()}
                 disabled={isSaving}
-                className="mkt-btn-primary focus-visible:outline-none focus-visible:ring-2"
+                className="nike-btn-primary focus-visible:outline-none focus-visible:ring-2"
                 style={{
                   gap: '8px',
                   display: 'inline-flex',
@@ -835,8 +838,8 @@ export function ResourceEditClient({ resource, userRole }: ResourceEditClientPro
         >
           <div
             style={{
-              backgroundColor: 'var(--mkt-canvas)',
-              borderRadius: 'var(--mkt-rounded-lg)',
+              backgroundColor: 'var(--nike-canvas)',
+              borderRadius: 'var(--nike-admin-rounded-lg)',
               padding: '24px',
               boxShadow: '0 8px 32px rgba(0,0,0,0.18)',
               width: '100%',
@@ -846,11 +849,11 @@ export function ResourceEditClient({ resource, userRole }: ResourceEditClientPro
           >
             <h3
               style={{
-                fontFamily: 'var(--mkt-font-sans)',
+                fontFamily: 'var(--nike-font-text)',
                 fontSize: '18px',
                 fontWeight: 540,
                 letterSpacing: '-0.26px',
-                color: 'var(--mkt-ink)',
+                color: 'var(--nike-ink)',
                 marginBottom: '16px',
               }}
             >
@@ -868,14 +871,14 @@ export function ResourceEditClient({ resource, userRole }: ResourceEditClientPro
               autoFocus
               style={{
                 width: '100%',
-                borderRadius: 'var(--mkt-rounded-md)',
-                border: '1px solid var(--mkt-hairline)',
-                backgroundColor: 'var(--mkt-canvas)',
+                borderRadius: 'var(--nike-admin-rounded-md)',
+                border: '1px solid var(--nike-hairline)',
+                backgroundColor: 'var(--nike-canvas)',
                 padding: '10px 12px',
-                fontFamily: 'var(--mkt-font-sans)',
+                fontFamily: 'var(--nike-font-text)',
                 fontSize: '14px',
                 fontWeight: 320,
-                color: 'var(--mkt-ink)',
+                color: 'var(--nike-ink)',
                 outline: 'none',
                 resize: 'vertical',
                 minHeight: '112px',
@@ -884,9 +887,9 @@ export function ResourceEditClient({ resource, userRole }: ResourceEditClientPro
             />
             <p
               style={{
-                fontFamily: 'var(--mkt-font-mono)',
+                fontFamily: 'var(--nike-font-mono)',
                 fontSize: '11px',
-                color: 'var(--mkt-ink)',
+                color: 'var(--nike-ink)',
                 opacity: 0.4,
                 marginTop: '4px',
                 letterSpacing: '0.3px',
@@ -898,7 +901,7 @@ export function ResourceEditClient({ resource, userRole }: ResourceEditClientPro
               <button
                 type="button"
                 onClick={() => setShowRejectModal(false)}
-                className="mkt-btn-secondary focus-visible:outline-none focus-visible:ring-2"
+                className="nike-btn-secondary focus-visible:outline-none focus-visible:ring-2"
               >
                 취소
               </button>
@@ -906,9 +909,9 @@ export function ResourceEditClient({ resource, userRole }: ResourceEditClientPro
                 type="button"
                 onClick={() => void handleRejectConfirm()}
                 disabled={isRejecting || rejectReason.trim().length < 5}
-                className="mkt-btn-primary focus-visible:outline-none focus-visible:ring-2"
+                className="nike-btn-primary focus-visible:outline-none focus-visible:ring-2"
                 style={{
-                  backgroundColor: '#dc2626',
+                  backgroundColor: 'var(--nike-sale)',
                   opacity: isRejecting || rejectReason.trim().length < 5 ? 0.5 : undefined,
                 }}
               >

@@ -8,25 +8,41 @@ import { TemplateSetListClient } from './TemplateSetListClient'
 
 export const dynamic = 'force-dynamic'
 
+type TemplateSetListRow = {
+  id: string
+  name: string
+  templateCount: number | bigint
+  coverIdx: number
+  coverThumbnail: string | null
+  createdAt: Date
+}
+
 export default async function TemplateSetsPage() {
   const user = await requireRole()
 
-  const sets = await prisma.templateSet.findMany({
-    orderBy: { createdAt: 'desc' },
-    include: {
-      templates: {
-        select: { id: true, name: true, thumbnail: true },
-        orderBy: { createdAt: 'asc' },
-      },
-    },
-  })
+  const sets = await prisma.$queryRaw<TemplateSetListRow[]>`
+    SELECT
+      s.id,
+      s.name,
+      s."coverIdx",
+      s."createdAt",
+      COUNT(t.id) AS "templateCount",
+      COALESCE(
+        (ARRAY_AGG(t.thumbnail ORDER BY t."createdAt" ASC))[s."coverIdx" + 1],
+        (ARRAY_AGG(t.thumbnail ORDER BY t."createdAt" ASC))[1]
+      ) AS "coverThumbnail"
+    FROM "TemplateSet" s
+    LEFT JOIN "Template" t ON t."setId" = s.id
+    GROUP BY s.id
+    ORDER BY s."createdAt" DESC
+  `
 
   const data = sets.map((s) => ({
     id: s.id,
     name: s.name,
-    templateCount: s.templates.length,
+    templateCount: Number(s.templateCount),
     coverIdx: s.coverIdx,
-    coverThumbnail: s.templates[s.coverIdx]?.thumbnail ?? s.templates[0]?.thumbnail ?? null,
+    coverThumbnail: s.coverThumbnail,
     createdAt: s.createdAt.toISOString(),
   }))
 

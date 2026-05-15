@@ -80,15 +80,18 @@ function AddKpModal({ open, existingNames, onAdd, onClose }: AddKpModalProps) {
     >
       <div
         className="p-6 shadow-xl min-w-[260px]"
-        style={{ borderRadius: 'var(--mkt-rounded-lg)', backgroundColor: 'var(--mkt-canvas)' }}
+        style={{
+          borderRadius: 'var(--nike-admin-rounded-lg)',
+          backgroundColor: 'var(--nike-canvas)',
+        }}
         onClick={(e) => e.stopPropagation()}
       >
         <h3
           style={{
-            fontFamily: 'var(--mkt-font-sans)',
+            fontFamily: 'var(--nike-font-text)',
             fontSize: '16px',
             fontWeight: 540,
-            color: 'var(--mkt-ink)',
+            color: 'var(--nike-ink)',
             marginBottom: '16px',
           }}
         >
@@ -97,9 +100,9 @@ function AddKpModal({ open, existingNames, onAdd, onClose }: AddKpModalProps) {
         {available.length === 0 ? (
           <p
             style={{
-              fontFamily: 'var(--mkt-font-sans)',
+              fontFamily: 'var(--nike-font-text)',
               fontSize: '13px',
-              color: 'var(--mkt-ink)',
+              color: 'var(--nike-ink)',
               opacity: 0.55,
             }}
           >
@@ -114,17 +117,17 @@ function AddKpModal({ open, existingNames, onAdd, onClose }: AddKpModalProps) {
                 onClick={() => onAdd(name)}
                 className="flex items-center gap-3 px-3 py-2 text-left focus-visible:outline-none focus-visible:ring-2 rounded"
                 style={{
-                  borderRadius: 'var(--mkt-rounded-md)',
-                  fontFamily: 'var(--mkt-font-sans)',
+                  borderRadius: 'var(--nike-admin-rounded-md)',
+                  fontFamily: 'var(--nike-font-text)',
                   fontSize: '13px',
-                  color: 'var(--mkt-ink)',
+                  color: 'var(--nike-ink)',
                   backgroundColor: 'transparent',
                   border: 'none',
                   cursor: 'pointer',
                 }}
                 onMouseEnter={(e) => {
                   ;(e.currentTarget as HTMLButtonElement).style.backgroundColor =
-                    'var(--mkt-surface-soft)'
+                    'var(--nike-soft-cloud)'
                 }}
                 onMouseLeave={(e) => {
                   ;(e.currentTarget as HTMLButtonElement).style.backgroundColor = 'transparent'
@@ -378,9 +381,9 @@ export function KeypointEditor({
       <div
         className="flex flex-wrap gap-2"
         style={{
-          fontFamily: 'var(--mkt-font-mono)',
+          fontFamily: 'var(--nike-font-mono)',
           fontSize: '11px',
-          color: 'var(--mkt-ink)',
+          color: 'var(--nike-ink)',
           opacity: 0.55,
         }}
       >
@@ -405,9 +408,9 @@ export function KeypointEditor({
       {!readonly && (
         <p
           style={{
-            fontFamily: 'var(--mkt-font-mono)',
+            fontFamily: 'var(--nike-font-mono)',
             fontSize: '11px',
-            color: 'var(--mkt-ink)',
+            color: 'var(--nike-ink)',
             opacity: 0.4,
           }}
         >
@@ -438,9 +441,9 @@ export function KeypointEditor({
           aria-label="키포인트 메뉴"
           className="fixed z-50 py-1 shadow-lg"
           style={{
-            backgroundColor: 'var(--mkt-canvas)',
-            border: '1px solid var(--mkt-hairline)',
-            borderRadius: 'var(--mkt-rounded-md)',
+            backgroundColor: 'var(--nike-canvas)',
+            border: '1px solid var(--nike-hairline)',
+            borderRadius: 'var(--nike-admin-rounded-md)',
             left: contextMenu.x,
             top: contextMenu.y,
           }}
@@ -451,7 +454,7 @@ export function KeypointEditor({
             type="button"
             className="w-full px-4 py-2 text-left focus-visible:outline-none"
             style={{
-              fontFamily: 'var(--mkt-font-sans)',
+              fontFamily: 'var(--nike-font-text)',
               fontSize: '13px',
               color: '#dc2626',
               backgroundColor: 'transparent',
@@ -460,7 +463,7 @@ export function KeypointEditor({
             }}
             onMouseEnter={(e) => {
               ;(e.currentTarget as HTMLButtonElement).style.backgroundColor =
-                'var(--mkt-surface-soft)'
+                'var(--nike-soft-cloud)'
             }}
             onMouseLeave={(e) => {
               ;(e.currentTarget as HTMLButtonElement).style.backgroundColor = 'transparent'
@@ -483,9 +486,9 @@ export function KeypointEditor({
               key={kp.name}
               className="flex items-center gap-2 px-2 py-1"
               style={{
-                borderRadius: 'var(--mkt-rounded-sm)',
-                backgroundColor: 'var(--mkt-surface-soft)',
-                fontFamily: 'var(--mkt-font-mono)',
+                borderRadius: 'var(--nike-admin-rounded-sm)',
+                backgroundColor: 'var(--nike-soft-cloud)',
+                fontFamily: 'var(--nike-font-mono)',
                 fontSize: '11px',
               }}
             >
@@ -493,10 +496,10 @@ export function KeypointEditor({
                 className="size-2 rounded-full shrink-0"
                 style={{ backgroundColor: KP_COLORS[kp.name] }}
               />
-              <span className="min-w-[3.5rem]" style={{ color: 'var(--mkt-ink)', opacity: 0.55 }}>
+              <span className="min-w-[3.5rem]" style={{ color: 'var(--nike-ink)', opacity: 0.55 }}>
                 {KP_LABELS[kp.name]}
               </span>
-              <span className="tabular-nums ml-auto" style={{ color: 'var(--mkt-ink)' }}>
+              <span className="tabular-nums ml-auto" style={{ color: 'var(--nike-ink)' }}>
                 ({(kp.x * 100).toFixed(1)}%, {(kp.y * 100).toFixed(1)}%)
               </span>
               {kp.inferred && (

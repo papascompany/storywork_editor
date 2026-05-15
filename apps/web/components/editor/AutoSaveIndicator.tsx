@@ -104,11 +104,11 @@ export function AutoSaveIndicator({
               aria-label="저장 재시도"
               className={cn(
                 'hidden md:inline-flex items-center gap-0.5',
-                'text-xs text-[var(--color-brand-500)]',
+                'text-xs text-[var(--editor-accent)]',
                 'rounded-[var(--radius-sm)] px-1 py-0.5',
                 'hover:underline',
                 'focus-visible:outline-none focus-visible:ring-1',
-                'focus-visible:ring-[var(--color-brand-500)]',
+                'focus-visible:ring-[var(--editor-focus)]',
                 // 터치 타겟 최소 확보
                 'min-h-[1.5rem]',
               )}

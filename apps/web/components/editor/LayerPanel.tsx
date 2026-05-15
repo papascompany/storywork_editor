@@ -150,9 +150,9 @@ function InlineEdit({ value, onCommit, onCancel }: InlineEditProps) {
       aria-label="레이어 이름 편집"
       className={cn(
         'h-5 w-full min-w-0 rounded-[var(--radius-sm,2px)] px-1 text-xs',
-        'border border-[var(--color-brand-400)]',
+        'border border-[var(--editor-border-strong)]',
         'bg-[var(--color-surface)] text-[var(--color-text)]',
-        'focus:outline-none focus:ring-1 focus:ring-[var(--color-brand-500)]',
+        'focus:outline-none focus:ring-1 focus:ring-[var(--editor-focus)]',
       )}
     />
   )
@@ -217,7 +217,7 @@ function LayerRow({
         'border-b border-[var(--color-border)]',
         'transition-colors motion-reduce:transition-none',
         isSelected
-          ? 'bg-[var(--editor-active,var(--color-brand-50))] text-[var(--color-brand-700)] dark:text-[var(--color-brand-300)]'
+          ? 'bg-[var(--editor-active)] text-[var(--editor-selected-fg)]'
           : 'text-[var(--color-text)] hover:bg-[var(--color-surface-muted)]',
         node.hidden && 'opacity-50',
       )}

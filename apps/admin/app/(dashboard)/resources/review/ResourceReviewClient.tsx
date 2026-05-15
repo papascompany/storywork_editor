@@ -54,8 +54,8 @@ function ReviewCard({ item, isFocused }: { item: ReviewItem; isFocused: boolean 
         <div
           className="relative w-full aspect-square overflow-hidden"
           style={{
-            borderRadius: 'var(--mkt-rounded-md)',
-            backgroundColor: 'var(--mkt-surface-soft)',
+            borderRadius: 'var(--nike-admin-rounded-md)',
+            backgroundColor: 'var(--nike-soft-cloud)',
           }}
         >
           <Image
@@ -70,11 +70,11 @@ function ReviewCard({ item, isFocused }: { item: ReviewItem; isFocused: boolean 
         <div
           className="w-full aspect-square flex items-center justify-center"
           style={{
-            borderRadius: 'var(--mkt-rounded-md)',
-            backgroundColor: 'var(--mkt-surface-soft)',
-            fontFamily: 'var(--mkt-font-sans)',
+            borderRadius: 'var(--nike-admin-rounded-md)',
+            backgroundColor: 'var(--nike-soft-cloud)',
+            fontFamily: 'var(--nike-font-text)',
             fontSize: '14px',
-            color: 'var(--mkt-ink)',
+            color: 'var(--nike-ink)',
             opacity: 0.4,
           }}
         >
@@ -87,10 +87,10 @@ function ReviewCard({ item, isFocused }: { item: ReviewItem; isFocused: boolean 
         <p
           className="truncate"
           style={{
-            fontFamily: 'var(--mkt-font-mono)',
+            fontFamily: 'var(--nike-font-mono)',
             fontSize: '12px',
             fontWeight: 400,
-            color: 'var(--mkt-ink)',
+            color: 'var(--nike-ink)',
           }}
         >
           {item.slug}
@@ -101,11 +101,11 @@ function ReviewCard({ item, isFocused }: { item: ReviewItem; isFocused: boolean 
               display: 'inline-flex',
               alignItems: 'center',
               padding: '2px 8px',
-              borderRadius: 'var(--mkt-rounded-full)',
-              backgroundColor: 'var(--mkt-block-lilac)',
-              fontFamily: 'var(--mkt-font-mono)',
+              borderRadius: 'var(--nike-rounded-full)',
+              backgroundColor: 'var(--nike-card-lilac)',
+              fontFamily: 'var(--nike-font-mono)',
               fontSize: '11px',
-              color: 'var(--mkt-ink)',
+              color: 'var(--nike-ink)',
             }}
           >
             {(KIND_LABELS as Record<string, string>)[item.kind] ?? item.kind}
@@ -116,11 +116,11 @@ function ReviewCard({ item, isFocused }: { item: ReviewItem; isFocused: boolean 
                 display: 'inline-flex',
                 alignItems: 'center',
                 padding: '2px 8px',
-                borderRadius: 'var(--mkt-rounded-full)',
-                backgroundColor: 'var(--mkt-surface-soft)',
-                fontFamily: 'var(--mkt-font-sans)',
+                borderRadius: 'var(--nike-rounded-full)',
+                backgroundColor: 'var(--nike-soft-cloud)',
+                fontFamily: 'var(--nike-font-text)',
                 fontSize: '11px',
-                color: 'var(--mkt-ink)',
+                color: 'var(--nike-ink)',
                 opacity: 0.7,
               }}
             >
@@ -133,11 +133,11 @@ function ReviewCard({ item, isFocused }: { item: ReviewItem; isFocused: boolean 
                 display: 'inline-flex',
                 alignItems: 'center',
                 padding: '2px 8px',
-                borderRadius: 'var(--mkt-rounded-full)',
-                backgroundColor: 'var(--mkt-surface-soft)',
-                fontFamily: 'var(--mkt-font-sans)',
+                borderRadius: 'var(--nike-rounded-full)',
+                backgroundColor: 'var(--nike-soft-cloud)',
+                fontFamily: 'var(--nike-font-text)',
                 fontSize: '11px',
-                color: 'var(--mkt-ink)',
+                color: 'var(--nike-ink)',
                 opacity: 0.7,
               }}
             >
@@ -150,11 +150,11 @@ function ReviewCard({ item, isFocused }: { item: ReviewItem; isFocused: boolean 
                 display: 'inline-flex',
                 alignItems: 'center',
                 padding: '2px 8px',
-                borderRadius: 'var(--mkt-rounded-full)',
-                backgroundColor: 'var(--mkt-block-coral)',
-                fontFamily: 'var(--mkt-font-mono)',
+                borderRadius: 'var(--nike-rounded-full)',
+                backgroundColor: 'var(--nike-card-coral)',
+                fontFamily: 'var(--nike-font-mono)',
                 fontSize: '11px',
-                color: 'var(--mkt-ink)',
+                color: 'var(--nike-ink)',
               }}
             >
               저해상도
@@ -163,9 +163,9 @@ function ReviewCard({ item, isFocused }: { item: ReviewItem; isFocused: boolean 
         </div>
         <p
           style={{
-            fontFamily: 'var(--mkt-font-sans)',
+            fontFamily: 'var(--nike-font-text)',
             fontSize: '12px',
-            color: 'var(--mkt-ink)',
+            color: 'var(--nike-ink)',
             opacity: 0.4,
           }}
         >
@@ -230,21 +230,21 @@ export function ResourceReviewClient({
         <div className="flex flex-col items-center gap-3">
           <p
             style={{
-              fontFamily: 'var(--mkt-font-sans)',
+              fontFamily: 'var(--nike-font-text)',
               fontSize: '17px',
               fontWeight: 540,
               letterSpacing: '-0.26px',
-              color: 'var(--mkt-ink)',
+              color: 'var(--nike-ink)',
             }}
           >
             검수 대기 항목이 없습니다
           </p>
           <p
             style={{
-              fontFamily: 'var(--mkt-font-sans)',
+              fontFamily: 'var(--nike-font-text)',
               fontSize: '14px',
               fontWeight: 330,
-              color: 'var(--mkt-ink)',
+              color: 'var(--nike-ink)',
               opacity: 0.55,
             }}
           >
@@ -252,7 +252,7 @@ export function ResourceReviewClient({
           </p>
           <Link
             href="/resources/upload"
-            className="mkt-btn-primary"
+            className="nike-btn-primary"
             style={{ marginTop: '8px', display: 'inline-flex', alignItems: 'center', gap: '8px' }}
           >
             신규 업로드 →

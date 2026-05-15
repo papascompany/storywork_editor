@@ -20,8 +20,91 @@
 
 /* ── /editor body ────────────────────────────────────────────────────────── */
 body[data-route='editor'] {
+  /* DESIGN bridge: neutral editor chrome, scoped to /editor only. */
+  --editor-ink: #111111;
+  --editor-canvas: #ffffff;
+  --editor-soft-cloud: #f5f5f5;
+  --editor-cloud: #eeeeee;
+  --editor-hairline: #cacacb;
+  --editor-hairline-soft: #e5e5e5;
+  --editor-hairline-strong: var(--editor-hairline);
+  --editor-muted-ink: #6f6f6f;
+  --editor-focus: #111111;
+  --editor-selected-bg: #eeeeee;
+  --editor-selected-fg: #111111;
+  --editor-dropzone-bg: rgb(17 17 17 / 0.06);
+
+  --editor-workspace: var(--editor-soft-cloud);
+  --editor-workspace-bg: var(--editor-soft-cloud);
+  --editor-panel: var(--editor-canvas);
+  --editor-panel-hover: var(--editor-soft-cloud);
+  --editor-text: var(--editor-ink);
+  --editor-text-muted: var(--editor-muted-ink);
+  --editor-accent: var(--editor-focus);
+  --editor-border: var(--editor-hairline-soft);
+  --editor-border-strong: var(--editor-hairline-strong);
+  --editor-hover: var(--editor-cloud);
+  --editor-active: var(--editor-selected-bg);
+
+  --color-surface: var(--editor-canvas);
+  --color-surface-raised: #fafafa;
+  --color-surface-muted: var(--editor-soft-cloud);
+  --color-text: var(--editor-ink);
+  --color-text-muted: var(--editor-muted-ink);
+  --color-text-inverse: #ffffff;
+  --color-border: var(--editor-hairline);
+  --color-border-focus: var(--editor-focus);
+
+  --color-brand-50: #f7f7f7;
+  --color-brand-100: #eeeeee;
+  --color-brand-200: #dedede;
+  --color-brand-300: #c9c9c9;
+  --color-brand-400: #8a8a8a;
+  --color-brand-500: #111111;
+  --color-brand-600: #000000;
+  --color-brand-700: #000000;
+  --color-brand-800: #000000;
+  --color-brand-900: #000000;
+  --color-brand-950: #050505;
+
   overscroll-behavior: none;
   /* iOS 모멘텀 스크롤 — 편집기에서는 필요 없음 */
   -webkit-overflow-scrolling: touch;
   -webkit-tap-highlight-color: transparent;
+}
+
+.dark body[data-route='editor'] {
+  --editor-ink: #f5f5f5;
+  --editor-canvas: #151515;
+  --editor-soft-cloud: #1f1f1f;
+  --editor-cloud: #272727;
+  --editor-hairline: #4a4a4a;
+  --editor-hairline-soft: #303030;
+  --editor-hairline-strong: var(--editor-hairline);
+  --editor-muted-ink: #a3a3a3;
+  --editor-focus: #f5f5f5;
+  --editor-selected-bg: #2b2b2b;
+  --editor-selected-fg: #ffffff;
+  --editor-dropzone-bg: rgb(245 245 245 / 0.08);
+
+  --color-surface: var(--editor-canvas);
+  --color-surface-raised: #1b1b1b;
+  --color-surface-muted: var(--editor-soft-cloud);
+  --color-text: var(--editor-ink);
+  --color-text-muted: var(--editor-muted-ink);
+  --color-text-inverse: #111111;
+  --color-border: var(--editor-hairline);
+  --color-border-focus: var(--editor-focus);
+
+  --color-brand-50: #202020;
+  --color-brand-100: #2b2b2b;
+  --color-brand-200: #3a3a3a;
+  --color-brand-300: #555555;
+  --color-brand-400: #cfcfcf;
+  --color-brand-500: #f5f5f5;
+  --color-brand-600: #ffffff;
+  --color-brand-700: #ffffff;
+  --color-brand-800: #ffffff;
+  --color-brand-900: #ffffff;
+  --color-brand-950: #101010;
 }

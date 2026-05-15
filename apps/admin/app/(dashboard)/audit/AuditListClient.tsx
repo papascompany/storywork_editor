@@ -18,11 +18,11 @@ import type { AuditListResponse, AuditLogRow } from '../../api/audit/route'
 // ─── 배지 스타일 ──────────────────────────────────────────────────────────────
 
 const ACTION_BADGE_COLORS: Record<string, { bg: string; label: string }> = {
-  create: { label: '생성', bg: 'var(--mkt-block-mint)' },
-  update: { label: '수정', bg: 'var(--mkt-block-cream)' },
-  delete: { label: '삭제', bg: 'var(--mkt-block-pink)' },
-  publish: { label: '게시', bg: 'var(--mkt-block-lime)' },
-  reject: { label: '거절', bg: 'var(--mkt-block-coral)' },
+  create: { label: '생성', bg: 'var(--nike-card-mint)' },
+  update: { label: '수정', bg: 'var(--nike-card-cream)' },
+  delete: { label: '삭제', bg: 'var(--nike-card-pink)' },
+  publish: { label: '게시', bg: 'var(--nike-card-lime)' },
+  reject: { label: '거절', bg: 'var(--nike-card-coral)' },
 }
 
 const ENTITY_TYPE_LABELS: Record<string, string> = {
@@ -34,18 +34,18 @@ const ENTITY_TYPE_LABELS: Record<string, string> = {
 }
 
 function ActionBadge({ action }: { action: string }) {
-  const badge = ACTION_BADGE_COLORS[action] ?? { label: action, bg: 'var(--mkt-surface-soft)' }
+  const badge = ACTION_BADGE_COLORS[action] ?? { label: action, bg: 'var(--nike-soft-cloud)' }
   return (
     <span
       style={{
         display: 'inline-flex',
         alignItems: 'center',
         padding: '2px 8px',
-        borderRadius: 'var(--mkt-rounded-full)',
+        borderRadius: 'var(--nike-rounded-full)',
         backgroundColor: badge.bg,
-        fontFamily: 'var(--mkt-font-mono)',
+        fontFamily: 'var(--nike-font-mono)',
         fontSize: '11px',
-        color: 'var(--mkt-ink)',
+        color: 'var(--nike-ink)',
       }}
     >
       {badge.label}
@@ -211,7 +211,7 @@ export function AuditListClient({ initialData, initialTotalCount }: AuditListCli
               setExpandedId(isExpanded ? null : row.original.id)
             }}
             className="p-1 rounded focus-visible:outline-none focus-visible:ring-2"
-            style={{ color: 'var(--mkt-ink)', opacity: 0.5 }}
+            style={{ color: 'var(--nike-ink)', opacity: 0.5 }}
             aria-label={isExpanded ? '접기' : '펼치기'}
             aria-expanded={isExpanded}
           >
@@ -233,9 +233,9 @@ export function AuditListClient({ initialData, initialTotalCount }: AuditListCli
       cell: ({ row }) => (
         <span
           style={{
-            fontFamily: 'var(--mkt-font-mono)',
+            fontFamily: 'var(--nike-font-mono)',
             fontSize: '11px',
-            color: 'var(--mkt-ink)',
+            color: 'var(--nike-ink)',
             opacity: 0.55,
             whiteSpace: 'nowrap',
           }}
@@ -259,9 +259,9 @@ export function AuditListClient({ initialData, initialTotalCount }: AuditListCli
           <span
             className="truncate max-w-[10rem] block"
             style={{
-              fontFamily: 'var(--mkt-font-mono)',
+              fontFamily: 'var(--nike-font-mono)',
               fontSize: '12px',
-              color: 'var(--mkt-ink)',
+              color: 'var(--nike-ink)',
             }}
           >
             {label}
@@ -290,14 +290,14 @@ export function AuditListClient({ initialData, initialTotalCount }: AuditListCli
         return (
           <span
             style={{
-              fontFamily: 'var(--mkt-font-sans)',
+              fontFamily: 'var(--nike-font-text)',
               fontSize: '13px',
-              color: 'var(--mkt-ink)',
+              color: 'var(--nike-ink)',
             }}
             title={`${et}:${row.original.entityId}`}
           >
             <span style={{ fontWeight: 540 }}>{et}</span>
-            <span style={{ opacity: 0.5, fontFamily: 'var(--mkt-font-mono)', fontSize: '11px' }}>
+            <span style={{ opacity: 0.5, fontFamily: 'var(--nike-font-mono)', fontSize: '11px' }}>
               {' '}
               {shortId}
             </span>
@@ -314,9 +314,9 @@ export function AuditListClient({ initialData, initialTotalCount }: AuditListCli
         <span
           className="truncate max-w-[14rem] block"
           style={{
-            fontFamily: 'var(--mkt-font-sans)',
+            fontFamily: 'var(--nike-font-text)',
             fontSize: '13px',
-            color: 'var(--mkt-ink)',
+            color: 'var(--nike-ink)',
             opacity: 0.55,
           }}
         >
@@ -339,12 +339,12 @@ export function AuditListClient({ initialData, initialTotalCount }: AuditListCli
     width: '100%',
     textAlign: 'left',
     padding: '5px 8px',
-    borderRadius: 'var(--mkt-rounded-sm)',
-    fontFamily: 'var(--mkt-font-sans)',
+    borderRadius: 'var(--nike-admin-rounded-sm)',
+    fontFamily: 'var(--nike-font-text)',
     fontSize: '13px',
     fontWeight: isActive ? 540 : 330,
-    color: 'var(--mkt-ink)',
-    backgroundColor: isActive ? 'var(--mkt-block-lime)' : 'transparent',
+    color: 'var(--nike-ink)',
+    backgroundColor: isActive ? 'var(--nike-card-lime)' : 'transparent',
     border: 'none',
     cursor: 'pointer',
     transition: 'background-color 100ms ease',
@@ -367,9 +367,9 @@ export function AuditListClient({ initialData, initialTotalCount }: AuditListCli
           <div
             className="flex flex-col gap-4 p-4"
             style={{
-              borderRadius: 'var(--mkt-rounded-lg)',
-              border: '1px solid var(--mkt-hairline)',
-              backgroundColor: 'var(--mkt-canvas)',
+              borderRadius: 'var(--nike-admin-rounded-lg)',
+              border: '1px solid var(--nike-hairline)',
+              backgroundColor: 'var(--nike-canvas)',
             }}
           >
             {/* 검색 */}
@@ -378,12 +378,12 @@ export function AuditListClient({ initialData, initialTotalCount }: AuditListCli
                 htmlFor="audit-search"
                 style={{
                   display: 'block',
-                  fontFamily: 'var(--mkt-font-mono)',
+                  fontFamily: 'var(--nike-font-mono)',
                   fontSize: '10px',
                   fontWeight: 400,
                   letterSpacing: '0.6px',
                   textTransform: 'uppercase',
-                  color: 'var(--mkt-ink)',
+                  color: 'var(--nike-ink)',
                   opacity: 0.4,
                   marginBottom: '6px',
                 }}
@@ -393,7 +393,7 @@ export function AuditListClient({ initialData, initialTotalCount }: AuditListCli
               <div className="relative">
                 <Search
                   className="absolute left-2.5 top-1/2 -translate-y-1/2 size-3.5"
-                  style={{ color: 'var(--mkt-ink)', opacity: 0.35 }}
+                  style={{ color: 'var(--nike-ink)', opacity: 0.35 }}
                   aria-hidden="true"
                 />
                 <input
@@ -405,14 +405,14 @@ export function AuditListClient({ initialData, initialTotalCount }: AuditListCli
                   style={{
                     width: '100%',
                     height: '36px',
-                    borderRadius: 'var(--mkt-rounded-md)',
-                    border: '1px solid var(--mkt-hairline)',
-                    backgroundColor: 'var(--mkt-surface-soft)',
+                    borderRadius: 'var(--nike-admin-rounded-md)',
+                    border: '1px solid var(--nike-hairline)',
+                    backgroundColor: 'var(--nike-soft-cloud)',
                     paddingLeft: '32px',
                     paddingRight: '12px',
-                    fontFamily: 'var(--mkt-font-sans)',
+                    fontFamily: 'var(--nike-font-text)',
                     fontSize: '13px',
-                    color: 'var(--mkt-ink)',
+                    color: 'var(--nike-ink)',
                     outline: 'none',
                   }}
                 />
@@ -423,12 +423,12 @@ export function AuditListClient({ initialData, initialTotalCount }: AuditListCli
             <div>
               <div
                 style={{
-                  fontFamily: 'var(--mkt-font-mono)',
+                  fontFamily: 'var(--nike-font-mono)',
                   fontSize: '10px',
                   fontWeight: 400,
                   letterSpacing: '0.6px',
                   textTransform: 'uppercase',
-                  color: 'var(--mkt-ink)',
+                  color: 'var(--nike-ink)',
                   opacity: 0.4,
                   marginBottom: '6px',
                 }}
@@ -457,12 +457,12 @@ export function AuditListClient({ initialData, initialTotalCount }: AuditListCli
             <div>
               <div
                 style={{
-                  fontFamily: 'var(--mkt-font-mono)',
+                  fontFamily: 'var(--nike-font-mono)',
                   fontSize: '10px',
                   fontWeight: 400,
                   letterSpacing: '0.6px',
                   textTransform: 'uppercase',
-                  color: 'var(--mkt-ink)',
+                  color: 'var(--nike-ink)',
                   opacity: 0.4,
                   marginBottom: '6px',
                 }}
@@ -497,12 +497,12 @@ export function AuditListClient({ initialData, initialTotalCount }: AuditListCli
             <div>
               <div
                 style={{
-                  fontFamily: 'var(--mkt-font-mono)',
+                  fontFamily: 'var(--nike-font-mono)',
                   fontSize: '10px',
                   fontWeight: 400,
                   letterSpacing: '0.6px',
                   textTransform: 'uppercase',
-                  color: 'var(--mkt-ink)',
+                  color: 'var(--nike-ink)',
                   opacity: 0.4,
                   marginBottom: '6px',
                 }}
@@ -532,11 +532,11 @@ export function AuditListClient({ initialData, initialTotalCount }: AuditListCli
                         style={{
                           display: 'inline-flex',
                           padding: '1px 6px',
-                          borderRadius: 'var(--mkt-rounded-full)',
-                          backgroundColor: badge?.bg ?? 'var(--mkt-surface-soft)',
-                          fontFamily: 'var(--mkt-font-mono)',
+                          borderRadius: 'var(--nike-rounded-full)',
+                          backgroundColor: badge?.bg ?? 'var(--nike-soft-cloud)',
+                          fontFamily: 'var(--nike-font-mono)',
                           fontSize: '10px',
-                          color: 'var(--mkt-ink)',
+                          color: 'var(--nike-ink)',
                         }}
                       >
                         {badge?.label ?? action}
@@ -557,9 +557,9 @@ export function AuditListClient({ initialData, initialTotalCount }: AuditListCli
                 }}
                 className="flex items-center gap-1.5"
                 style={{
-                  fontFamily: 'var(--mkt-font-mono)',
+                  fontFamily: 'var(--nike-font-mono)',
                   fontSize: '11px',
-                  color: 'var(--mkt-ink)',
+                  color: 'var(--nike-ink)',
                   opacity: 0.5,
                   background: 'none',
                   border: 'none',
@@ -581,9 +581,9 @@ export function AuditListClient({ initialData, initialTotalCount }: AuditListCli
           <div
             className="mb-3"
             style={{
-              fontFamily: 'var(--mkt-font-sans)',
+              fontFamily: 'var(--nike-font-text)',
               fontSize: '13px',
-              color: 'var(--mkt-ink)',
+              color: 'var(--nike-ink)',
               opacity: 0.55,
             }}
           >
@@ -613,10 +613,10 @@ export function AuditListClient({ initialData, initialTotalCount }: AuditListCli
               <div className="flex flex-col items-center gap-2 py-8">
                 <p
                   style={{
-                    fontFamily: 'var(--mkt-font-sans)',
+                    fontFamily: 'var(--nike-font-text)',
                     fontSize: '14px',
                     fontWeight: 540,
-                    color: 'var(--mkt-ink)',
+                    color: 'var(--nike-ink)',
                     opacity: 0.55,
                   }}
                 >
@@ -624,10 +624,10 @@ export function AuditListClient({ initialData, initialTotalCount }: AuditListCli
                 </p>
                 <p
                   style={{
-                    fontFamily: 'var(--mkt-font-sans)',
+                    fontFamily: 'var(--nike-font-text)',
                     fontSize: '13px',
                     fontWeight: 330,
-                    color: 'var(--mkt-ink)',
+                    color: 'var(--nike-ink)',
                     opacity: 0.4,
                   }}
                 >
@@ -651,9 +651,9 @@ export function AuditListClient({ initialData, initialTotalCount }: AuditListCli
                   key={expandedId}
                   className="mt-3 p-4"
                   style={{
-                    borderRadius: 'var(--mkt-rounded-lg)',
-                    border: '1px solid var(--mkt-hairline)',
-                    backgroundColor: 'var(--mkt-canvas)',
+                    borderRadius: 'var(--nike-admin-rounded-lg)',
+                    border: '1px solid var(--nike-hairline)',
+                    backgroundColor: 'var(--nike-canvas)',
                   }}
                   role="region"
                   aria-label={`${row.entityType}:${row.entityId} 변경 상세`}
@@ -661,16 +661,16 @@ export function AuditListClient({ initialData, initialTotalCount }: AuditListCli
                   <div className="flex items-center justify-between mb-3">
                     <div
                       style={{
-                        fontFamily: 'var(--mkt-font-sans)',
+                        fontFamily: 'var(--nike-font-text)',
                         fontSize: '13px',
                         fontWeight: 540,
-                        color: 'var(--mkt-ink)',
+                        color: 'var(--nike-ink)',
                       }}
                     >
                       변경 상세 —{' '}
                       <span
                         style={{
-                          fontFamily: 'var(--mkt-font-mono)',
+                          fontFamily: 'var(--nike-font-mono)',
                           fontSize: '11px',
                           opacity: 0.55,
                         }}
@@ -683,7 +683,7 @@ export function AuditListClient({ initialData, initialTotalCount }: AuditListCli
                       onClick={() => setExpandedId(null)}
                       className="rounded focus-visible:outline-none focus-visible:ring-2 p-1"
                       style={{
-                        color: 'var(--mkt-ink)',
+                        color: 'var(--nike-ink)',
                         opacity: 0.4,
                         border: 'none',
                         background: 'none',

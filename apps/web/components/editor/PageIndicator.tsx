@@ -81,9 +81,9 @@ export function PageIndicator({
                 className={cn(
                   'rounded-full transition-all duration-[var(--duration-fast)]',
                   'focus-visible:outline-none focus-visible:ring-2',
-                  'focus-visible:ring-[var(--color-brand-500)] focus-visible:ring-offset-1',
+                  'focus-visible:ring-[var(--editor-focus)] focus-visible:ring-offset-1',
                   isCurrent
-                    ? 'size-2 bg-[var(--color-brand-500)]'
+                    ? 'size-2 bg-[var(--editor-accent)]'
                     : 'size-1.5 bg-[var(--color-border)] hover:bg-[var(--color-text-muted)]',
                 )}
                 data-testid={`page-dot-${pageNum}`}
@@ -104,7 +104,7 @@ export function PageIndicator({
             'transition-colors duration-[var(--duration-fast)]',
             'hover:bg-[var(--color-surface-muted)] hover:text-[var(--color-text)]',
             'focus-visible:outline-none focus-visible:ring-2',
-            'focus-visible:ring-[var(--color-brand-500)] focus-visible:ring-offset-1',
+            'focus-visible:ring-[var(--editor-focus)] focus-visible:ring-offset-1',
             'focus-visible:ring-offset-[var(--color-surface)]',
             'min-h-[1.75rem] inline-flex items-center justify-center',
           )}

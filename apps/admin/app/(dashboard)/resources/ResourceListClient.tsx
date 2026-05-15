@@ -25,10 +25,10 @@ import type {
 // ─── 상태 배지 ───────────────────────────────────────────────────────────────
 
 const STATUS_STYLE: Record<string, { label: string; blockColor: string; textOpacity: number }> = {
-  draft: { label: '초안', blockColor: 'var(--mkt-hairline-soft)', textOpacity: 0.6 },
-  review: { label: '검수중', blockColor: 'var(--mkt-block-cream)', textOpacity: 1 },
-  published: { label: '게시됨', blockColor: 'var(--mkt-block-mint)', textOpacity: 1 },
-  rejected: { label: '거절됨', blockColor: 'var(--mkt-block-pink)', textOpacity: 1 },
+  draft: { label: '초안', blockColor: 'var(--nike-hairline-soft)', textOpacity: 0.6 },
+  review: { label: '검수중', blockColor: 'var(--nike-card-cream)', textOpacity: 1 },
+  published: { label: '게시됨', blockColor: 'var(--nike-card-mint)', textOpacity: 1 },
+  rejected: { label: '거절됨', blockColor: 'var(--nike-card-pink)', textOpacity: 1 },
 }
 
 export const KIND_LABELS: Record<string, string> = {
@@ -42,19 +42,19 @@ export const KIND_LABELS: Record<string, string> = {
 }
 
 const KIND_BLOCK_COLORS: Record<string, string> = {
-  pose: 'var(--mkt-block-lilac)',
-  background: 'var(--mkt-block-mint)',
-  'mise-en-scene': 'var(--mkt-block-lime)',
-  prop: 'var(--mkt-block-cream)',
-  'speech-bubble': 'var(--mkt-block-coral)',
-  'word-fx': 'var(--mkt-block-pink)',
-  decoration: 'var(--mkt-block-lilac)',
+  pose: 'var(--nike-card-lilac)',
+  background: 'var(--nike-card-mint)',
+  'mise-en-scene': 'var(--nike-card-lime)',
+  prop: 'var(--nike-card-cream)',
+  'speech-bubble': 'var(--nike-card-coral)',
+  'word-fx': 'var(--nike-card-pink)',
+  decoration: 'var(--nike-card-lilac)',
 }
 
 function StatusBadge({ status }: { status: string }) {
   const style = STATUS_STYLE[status] ?? {
     label: status,
-    blockColor: 'var(--mkt-hairline-soft)',
+    blockColor: 'var(--nike-hairline-soft)',
     textOpacity: 0.6,
   }
   return (
@@ -63,12 +63,12 @@ function StatusBadge({ status }: { status: string }) {
         display: 'inline-flex',
         alignItems: 'center',
         padding: '2px 8px',
-        borderRadius: 'var(--mkt-rounded-full)',
+        borderRadius: 'var(--nike-rounded-full)',
         backgroundColor: style.blockColor,
-        fontFamily: 'var(--mkt-font-sans)',
+        fontFamily: 'var(--nike-font-text)',
         fontSize: '12px',
         fontWeight: 480,
-        color: 'var(--mkt-ink)',
+        color: 'var(--nike-ink)',
         opacity: style.textOpacity,
         whiteSpace: 'nowrap',
       }}
@@ -80,20 +80,20 @@ function StatusBadge({ status }: { status: string }) {
 
 function KindBadge({ kind }: { kind: string }) {
   const label = KIND_LABELS[kind] ?? kind
-  const blockColor = KIND_BLOCK_COLORS[kind] ?? 'var(--mkt-surface-soft)'
+  const blockColor = KIND_BLOCK_COLORS[kind] ?? 'var(--nike-soft-cloud)'
   return (
     <span
       style={{
         display: 'inline-flex',
         alignItems: 'center',
         padding: '2px 8px',
-        borderRadius: 'var(--mkt-rounded-full)',
+        borderRadius: 'var(--nike-rounded-full)',
         backgroundColor: blockColor,
-        fontFamily: 'var(--mkt-font-mono)',
+        fontFamily: 'var(--nike-font-mono)',
         fontSize: '11px',
         fontWeight: 400,
         letterSpacing: '0.3px',
-        color: 'var(--mkt-ink)',
+        color: 'var(--nike-ink)',
       }}
     >
       {label}
@@ -120,8 +120,8 @@ const columns: ColumnDef<ResourceRow>[] = [
         <div
           className="relative size-16 overflow-hidden"
           style={{
-            borderRadius: 'var(--mkt-rounded-md)',
-            backgroundColor: 'var(--mkt-block-lilac)',
+            borderRadius: 'var(--nike-admin-rounded-md)',
+            backgroundColor: 'var(--nike-card-lilac)',
           }}
         >
           {/* eslint-disable-next-line @next/next/no-img-element -- Supabase Storage URL이 다양한 서브도메인을 가질 수 있어 next/image remotePatterns 커버 불가 시 fallback */}
@@ -136,11 +136,11 @@ const columns: ColumnDef<ResourceRow>[] = [
         <div
           className="size-16 flex items-center justify-center"
           style={{
-            borderRadius: 'var(--mkt-rounded-md)',
-            backgroundColor: 'var(--mkt-block-lilac)',
-            fontFamily: 'var(--mkt-font-mono)',
+            borderRadius: 'var(--nike-admin-rounded-md)',
+            backgroundColor: 'var(--nike-card-lilac)',
+            fontFamily: 'var(--nike-font-mono)',
             fontSize: '10px',
-            color: 'var(--mkt-ink)',
+            color: 'var(--nike-ink)',
             opacity: 0.45,
             letterSpacing: '0.3px',
             textTransform: 'uppercase',
@@ -159,9 +159,9 @@ const columns: ColumnDef<ResourceRow>[] = [
     cell: ({ row }) => (
       <span
         style={{
-          fontFamily: 'var(--mkt-font-mono)',
+          fontFamily: 'var(--nike-font-mono)',
           fontSize: '12px',
-          color: 'var(--mkt-ink)',
+          color: 'var(--nike-ink)',
           display: 'block',
           maxWidth: '180px',
           overflow: 'hidden',
@@ -199,9 +199,9 @@ const columns: ColumnDef<ResourceRow>[] = [
       return action ? (
         <span
           style={{
-            fontFamily: 'var(--mkt-font-sans)',
+            fontFamily: 'var(--nike-font-text)',
             fontSize: '13px',
-            color: 'var(--mkt-ink)',
+            color: 'var(--nike-ink)',
           }}
         >
           {action}
@@ -209,9 +209,9 @@ const columns: ColumnDef<ResourceRow>[] = [
       ) : (
         <span
           style={{
-            fontFamily: 'var(--mkt-font-sans)',
+            fontFamily: 'var(--nike-font-text)',
             fontSize: '13px',
-            color: 'var(--mkt-ink)',
+            color: 'var(--nike-ink)',
             opacity: 0.3,
           }}
         >
@@ -233,12 +233,12 @@ const columns: ColumnDef<ResourceRow>[] = [
             display: 'inline-flex',
             alignItems: 'center',
             padding: '2px 8px',
-            borderRadius: 'var(--mkt-rounded-full)',
-            backgroundColor: 'var(--mkt-block-coral)',
-            fontFamily: 'var(--mkt-font-mono)',
+            borderRadius: 'var(--nike-rounded-full)',
+            backgroundColor: 'var(--nike-card-coral)',
+            fontFamily: 'var(--nike-font-mono)',
             fontSize: '11px',
             fontWeight: 400,
-            color: 'var(--mkt-ink)',
+            color: 'var(--nike-ink)',
             whiteSpace: 'nowrap',
           }}
         >
@@ -254,9 +254,9 @@ const columns: ColumnDef<ResourceRow>[] = [
     cell: ({ row }) => (
       <span
         style={{
-          fontFamily: 'var(--mkt-font-sans)',
+          fontFamily: 'var(--nike-font-text)',
           fontSize: '13px',
-          color: 'var(--mkt-ink)',
+          color: 'var(--nike-ink)',
           opacity: 0.55,
           whiteSpace: 'nowrap',
         }}
@@ -449,22 +449,22 @@ export function ResourceListClient({
     alignItems: 'center',
     gap: '6px',
     padding: '4px 12px',
-    borderRadius: 'var(--mkt-rounded-full)',
-    border: '1px solid var(--mkt-hairline)',
-    backgroundColor: 'var(--mkt-canvas)',
-    fontFamily: 'var(--mkt-font-sans)',
+    borderRadius: 'var(--nike-rounded-full)',
+    border: '1px solid var(--nike-hairline)',
+    backgroundColor: 'var(--nike-canvas)',
+    fontFamily: 'var(--nike-font-text)',
     fontSize: '12px',
     fontWeight: 330,
-    color: 'var(--mkt-ink)',
+    color: 'var(--nike-ink)',
     cursor: 'pointer',
     transition: 'all 100ms ease',
   }
 
   const chipActive: React.CSSProperties = {
     ...chipBase,
-    backgroundColor: 'var(--mkt-ink)',
-    color: 'var(--mkt-canvas)',
-    borderColor: 'var(--mkt-ink)',
+    backgroundColor: 'var(--nike-ink)',
+    color: 'var(--nike-canvas)',
+    borderColor: 'var(--nike-ink)',
     fontWeight: 480,
   }
 
@@ -490,7 +490,7 @@ export function ResourceListClient({
                   width: '20px',
                   height: '20px',
                   borderRadius: '9999px',
-                  backgroundColor: '#f3c9b6',
+                  backgroundColor: 'var(--nike-card-coral)',
                   fontSize: '11px',
                   fontWeight: 500,
                   color: 'var(--nike-ink)',
@@ -516,7 +516,7 @@ export function ResourceListClient({
           <Search
             className="absolute left-3 top-1/2 -translate-y-1/2 size-4"
             aria-hidden="true"
-            style={{ color: 'var(--mkt-ink)', opacity: 0.4 }}
+            style={{ color: 'var(--nike-ink)', opacity: 0.4 }}
           />
           <input
             type="search"
@@ -530,13 +530,13 @@ export function ResourceListClient({
               paddingRight: '16px',
               paddingTop: '10px',
               paddingBottom: '10px',
-              borderRadius: 'var(--mkt-rounded-md)',
-              border: '1px solid var(--mkt-hairline)',
-              backgroundColor: 'var(--mkt-canvas)',
-              fontFamily: 'var(--mkt-font-sans)',
+              borderRadius: 'var(--nike-admin-rounded-md)',
+              border: '1px solid var(--nike-hairline)',
+              backgroundColor: 'var(--nike-canvas)',
+              fontFamily: 'var(--nike-font-text)',
               fontSize: '15px',
               fontWeight: 320,
-              color: 'var(--mkt-ink)',
+              color: 'var(--nike-ink)',
               outline: 'none',
             }}
           />
@@ -547,7 +547,7 @@ export function ResourceListClient({
           <Filter
             className="size-4 shrink-0"
             aria-hidden="true"
-            style={{ color: 'var(--mkt-ink)', opacity: 0.4 }}
+            style={{ color: 'var(--nike-ink)', opacity: 0.4 }}
           />
 
           {/* 상태 */}
@@ -573,7 +573,7 @@ export function ResourceListClient({
             style={{
               width: '1px',
               height: '20px',
-              backgroundColor: 'var(--mkt-hairline)',
+              backgroundColor: 'var(--nike-hairline)',
               alignSelf: 'center',
             }}
             role="separator"
@@ -602,7 +602,7 @@ export function ResourceListClient({
             style={{
               width: '1px',
               height: '20px',
-              backgroundColor: 'var(--mkt-hairline)',
+              backgroundColor: 'var(--nike-hairline)',
               alignSelf: 'center',
             }}
             role="separator"
@@ -621,8 +621,8 @@ export function ResourceListClient({
               filterLowDpi === true
                 ? {
                     ...chipActive,
-                    backgroundColor: 'var(--mkt-block-coral)',
-                    color: 'var(--mkt-ink)',
+                    backgroundColor: 'var(--nike-card-coral)',
+                    color: 'var(--nike-ink)',
                     borderColor: 'transparent',
                   }
                 : chipBase
@@ -639,15 +639,15 @@ export function ResourceListClient({
       <p
         style={{
           marginBottom: '12px',
-          fontFamily: 'var(--mkt-font-sans)',
+          fontFamily: 'var(--nike-font-text)',
           fontSize: '14px',
           fontWeight: 330,
-          color: 'var(--mkt-ink)',
+          color: 'var(--nike-ink)',
           opacity: 0.55,
         }}
       >
         총{' '}
-        <strong style={{ fontWeight: 540, opacity: 1, color: 'var(--mkt-ink)' }}>
+        <strong style={{ fontWeight: 540, opacity: 1, color: 'var(--nike-ink)' }}>
           {totalCount.toLocaleString()}
         </strong>
         건
@@ -683,10 +683,10 @@ export function ResourceListClient({
         keyboardNavigation
         emptyState={
           <div className="flex flex-col items-center gap-3 py-12">
-            <p className="mkt-headline" style={{ color: 'var(--mkt-ink)' }}>
+            <p className="nike-heading-lg" style={{ color: 'var(--nike-ink)' }}>
               리소스가 없습니다
             </p>
-            <p className="mkt-body-sm" style={{ color: 'var(--mkt-ink)', opacity: 0.55 }}>
+            <p className="nike-caption-md" style={{ color: 'var(--nike-ink)', opacity: 0.55 }}>
               필터를 초기화하거나 새 리소스를 업로드하세요.
             </p>
           </div>

@@ -103,9 +103,9 @@ function TemplateCard({ template, onClick, isApplying }: TemplateCardProps) {
         'border border-[var(--editor-border)]',
         'p-2 text-left w-full',
         'bg-[var(--color-surface)]',
-        'hover:bg-[var(--editor-hover)] hover:border-[var(--color-brand-400)]',
+        'hover:bg-[var(--editor-hover)] hover:border-[var(--editor-border-strong)]',
         'transition-colors duration-[var(--duration-fast)]',
-        'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-brand-500)]',
+        'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--editor-focus)]',
         isApplying && 'opacity-50 cursor-not-allowed',
       )}
     >
@@ -249,7 +249,7 @@ export function TemplatePanel({ canvas }: TemplatePanelProps) {
             'pl-8 pr-3 py-1.5',
             'text-[13px] text-[var(--editor-text)]',
             'placeholder:text-[var(--editor-text-muted)]',
-            'focus:outline-none focus:ring-2 focus:ring-[var(--color-brand-500)] focus:border-transparent',
+            'focus:outline-none focus:ring-2 focus:ring-[var(--editor-focus)] focus:border-transparent',
             'transition-colors duration-[var(--duration-fast)]',
           )}
         />

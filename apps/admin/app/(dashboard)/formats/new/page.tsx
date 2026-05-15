@@ -59,30 +59,30 @@ function PresetCard({
       )}
       style={{
         padding: '14px',
-        borderRadius: 'var(--mkt-rounded-md)',
-        border: selected ? '2px solid var(--mkt-ink)' : '1.5px solid var(--mkt-hairline)',
-        backgroundColor: selected ? 'var(--mkt-block-lime)' : 'var(--mkt-canvas)',
+        borderRadius: 'var(--nike-admin-rounded-md)',
+        border: selected ? '2px solid var(--nike-ink)' : '1.5px solid var(--nike-hairline)',
+        backgroundColor: selected ? 'var(--nike-card-lime)' : 'var(--nike-canvas)',
         cursor: 'pointer',
       }}
       aria-pressed={selected}
     >
       <span
         style={{
-          fontFamily: 'var(--mkt-font-sans)',
+          fontFamily: 'var(--nike-font-text)',
           fontSize: '14px',
           fontWeight: 540,
           letterSpacing: '-0.10px',
-          color: 'var(--mkt-ink)',
+          color: 'var(--nike-ink)',
         }}
       >
         {preset.name}
       </span>
       <span
         style={{
-          fontFamily: 'var(--mkt-font-sans)',
+          fontFamily: 'var(--nike-font-text)',
           fontSize: '12px',
           fontWeight: 330,
-          color: 'var(--mkt-ink)',
+          color: 'var(--nike-ink)',
           opacity: 0.55,
           lineHeight: 1.4,
         }}
@@ -91,10 +91,10 @@ function PresetCard({
       </span>
       <span
         style={{
-          fontFamily: 'var(--mkt-font-mono)',
+          fontFamily: 'var(--nike-font-mono)',
           fontSize: '11px',
           fontWeight: 400,
-          color: 'var(--mkt-ink)',
+          color: 'var(--nike-ink)',
           opacity: 0.4,
           marginTop: '4px',
         }}
@@ -167,7 +167,7 @@ export default function NewFormatPage() {
   }
 
   return (
-    <div className="p-6 lg:p-10 max-w-2xl" style={{ fontFamily: 'var(--mkt-font-sans)' }}>
+    <div className="p-6 lg:p-10 max-w-2xl" style={{ fontFamily: 'var(--nike-font-text)' }}>
       {/* 뒤로 가기 */}
       <Link
         href="/formats"
@@ -188,14 +188,14 @@ export default function NewFormatPage() {
         <p className="nike-caption-md mt-1">프리셋을 선택하거나 직접 입력해 판형을 등록합니다.</p>
       </header>
 
-      {/* 프리셋 카드 — mkt-block-cream 섹션 */}
-      <section aria-label="프리셋에서 시작" className="mkt-block mkt-block-cream mb-8">
+      {/* 프리셋 카드 — nike-block-cream 섹션 */}
+      <section aria-label="프리셋에서 시작" className="nike-block nike-block-cream mb-8">
         <h2
-          className="mkt-eyebrow"
+          className="nike-eyebrow"
           style={{
-            color: 'var(--mkt-ink)',
+            color: 'var(--nike-ink)',
             opacity: 0.55,
-            marginBottom: 'var(--mkt-space-md)',
+            marginBottom: 'var(--nike-admin-space-md)',
             fontSize: '12px',
           }}
         >

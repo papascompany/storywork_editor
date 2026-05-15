@@ -9,7 +9,6 @@
  */
 import Link from 'next/link'
 
-import { requireRole } from '../../src/lib/auth'
 import { prisma } from '../../src/lib/prisma'
 
 // ─── 날짜 포매터 ─────────────────────────────────────────────────────────────
@@ -30,25 +29,21 @@ function formatKoreanDate(d: Date): string {
 export const dynamic = 'force-dynamic'
 
 export default async function DashboardPage() {
-  // layout.tsx 의 requireRole() 과 동일 요청 내 React cache 로 메모이즈됨 — 추가 I/O 없음.
-  await requireRole()
-
   const now = new Date()
-
-  // 통계 병렬 조회
-  const [resourceCount, formatCount, templateCount, templateSetCount] = await Promise.all([
-    prisma.resource.count({ where: { status: 'published' } }),
-    prisma.format.count(),
-    prisma.template.count(),
-    prisma.templateSet.count(),
-  ])
-
-  // 오늘 등록 리소스
   const todayStart = new Date(now)
   todayStart.setHours(0, 0, 0, 0)
-  const todayResourceCount = await prisma.resource.count({
-    where: { createdAt: { gte: todayStart }, status: 'published' },
-  })
+
+  // 통계 병렬 조회
+  const [resourceCount, formatCount, templateCount, templateSetCount, todayResourceCount] =
+    await Promise.all([
+      prisma.resource.count({ where: { status: 'published' } }),
+      prisma.format.count(),
+      prisma.template.count(),
+      prisma.templateSet.count(),
+      prisma.resource.count({
+        where: { createdAt: { gte: todayStart }, status: 'published' },
+      }),
+    ])
 
   return (
     <div className="nike-page">

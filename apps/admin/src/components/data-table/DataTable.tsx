@@ -8,9 +8,9 @@
  * 키보드 네비게이션: j/k(행 이동), x(선택 토글), Space(선택), Enter(디테일)
  * 반응형: ≥768px 테이블 / <768px 카드 리스트 자동 전환
  *
- * 마케팅 디자인 시스템 토큰(--mkt-*) 직접 사용.
- * 테이블 헤더: mkt-eyebrow 스타일 (mono uppercase tracking-wide opacity 0.5)
- * 페이지네이션: mkt-btn-secondary (pill)
+ * Nike 디자인 시스템 토큰(--nike-*) 직접 사용.
+ * 테이블 헤더: nike-eyebrow 스타일 (mono uppercase tracking-wide opacity 0.5)
+ * 페이지네이션: nike-btn-secondary (pill)
  */
 
 import { Checkbox, cn } from '@storywork/ui'
@@ -79,8 +79,8 @@ function SkeletonRow({ columnCount }: { columnCount: number }) {
           <div
             className="h-4 w-full animate-pulse"
             style={{
-              borderRadius: 'var(--mkt-rounded-xs)',
-              backgroundColor: 'var(--mkt-hairline-soft)',
+              borderRadius: 'var(--nike-admin-rounded-xs)',
+              backgroundColor: 'var(--nike-hairline-soft)',
             }}
           />
         </td>
@@ -93,7 +93,7 @@ function SkeletonRow({ columnCount }: { columnCount: number }) {
 
 function SortIcon({ direction }: { direction: 'asc' | 'desc' | false }) {
   const style: React.CSSProperties = {
-    color: 'var(--mkt-ink)',
+    color: 'var(--nike-ink)',
     opacity: 0.4,
     width: '14px',
     height: '14px',
@@ -133,10 +133,10 @@ function MobileCard<T>({
         onRowClick && 'cursor-pointer',
       )}
       style={{
-        borderRadius: 'var(--mkt-rounded-md)',
-        border: `1px solid ${isSelected ? 'var(--mkt-ink)' : 'var(--mkt-hairline)'}`,
-        backgroundColor: isSelected ? 'var(--mkt-hairline-soft)' : 'var(--mkt-canvas)',
-        padding: 'var(--mkt-space-md)',
+        borderRadius: 'var(--nike-admin-rounded-md)',
+        border: `1px solid ${isSelected ? 'var(--nike-ink)' : 'var(--nike-hairline)'}`,
+        backgroundColor: isSelected ? 'var(--nike-hairline-soft)' : 'var(--nike-canvas)',
+        padding: 'var(--nike-admin-space-md)',
         transition: 'background-color 100ms ease, border-color 100ms ease',
       }}
       onClick={() => onRowClick?.(row.original)}
@@ -159,12 +159,12 @@ function MobileCard<T>({
           <div key={cell.id} className="flex items-start gap-2">
             <span
               style={{
-                fontFamily: 'var(--mkt-font-mono)',
+                fontFamily: 'var(--nike-font-mono)',
                 fontSize: '10px',
                 fontWeight: 400,
                 letterSpacing: '0.4px',
                 textTransform: 'uppercase',
-                color: 'var(--mkt-ink)',
+                color: 'var(--nike-ink)',
                 opacity: 0.45,
                 minWidth: '5rem',
                 flexShrink: 0,
@@ -175,10 +175,10 @@ function MobileCard<T>({
             </span>
             <span
               style={{
-                fontFamily: 'var(--mkt-font-sans)',
+                fontFamily: 'var(--nike-font-text)',
                 fontSize: '14px',
                 fontWeight: 330,
-                color: 'var(--mkt-ink)',
+                color: 'var(--nike-ink)',
                 wordBreak: 'break-all',
               }}
             >
@@ -389,9 +389,9 @@ export function DataTable<T>({
       <div
         className="hidden md:block overflow-x-auto"
         style={{
-          borderRadius: 'var(--mkt-rounded-md)',
-          border: '1px solid var(--mkt-hairline)',
-          backgroundColor: 'var(--mkt-canvas)',
+          borderRadius: 'var(--nike-admin-rounded-md)',
+          border: '1px solid var(--nike-hairline)',
+          backgroundColor: 'var(--nike-canvas)',
         }}
       >
         <table
@@ -400,11 +400,11 @@ export function DataTable<T>({
           aria-colcount={columnCount}
           className="w-full text-sm border-collapse"
         >
-          {/* 테이블 헤더: mkt-eyebrow 스타일 — mono uppercase tracking-wide */}
+          {/* 테이블 헤더: nike-eyebrow 스타일 — mono uppercase tracking-wide */}
           <thead
             style={{
-              backgroundColor: 'var(--mkt-hairline-soft)',
-              borderBottom: '1px solid var(--mkt-hairline)',
+              backgroundColor: 'var(--nike-hairline-soft)',
+              borderBottom: '1px solid var(--nike-hairline)',
             }}
           >
             {table.getHeaderGroups().map((headerGroup) => (
@@ -430,13 +430,13 @@ export function DataTable<T>({
                         canSort && 'cursor-pointer select-none',
                       )}
                       style={{
-                        // mkt-eyebrow 스타일 (mono uppercase tracking)
-                        fontFamily: 'var(--mkt-font-mono)',
+                        // nike-eyebrow 스타일 (mono uppercase tracking)
+                        fontFamily: 'var(--nike-font-mono)',
                         fontSize: '10px',
                         fontWeight: 400,
                         letterSpacing: '0.5px',
                         textTransform: 'uppercase',
-                        color: 'var(--mkt-ink)',
+                        color: 'var(--nike-ink)',
                         opacity: 0.5,
                         width: header.getSize() !== 150 ? header.getSize() : undefined,
                       }}
@@ -471,16 +471,16 @@ export function DataTable<T>({
                 <td
                   colSpan={columnCount}
                   className="px-4 py-16 text-center"
-                  style={{ color: 'var(--mkt-ink)', opacity: 0.45 }}
+                  style={{ color: 'var(--nike-ink)', opacity: 0.45 }}
                 >
                   {emptyState ?? (
                     <div className="flex flex-col items-center gap-2">
                       <p
                         style={{
-                          fontFamily: 'var(--mkt-font-sans)',
+                          fontFamily: 'var(--nike-font-text)',
                           fontSize: '16px',
                           fontWeight: 540,
-                          color: 'var(--mkt-ink)',
+                          color: 'var(--nike-ink)',
                         }}
                       >
                         데이터가 없습니다
@@ -505,15 +505,15 @@ export function DataTable<T>({
                       else rowRefs.current.delete(idx)
                     }}
                     style={{
-                      borderBottom: '1px solid var(--mkt-hairline)',
-                      backgroundColor: isSelected ? 'var(--mkt-hairline-soft)' : 'transparent',
+                      borderBottom: '1px solid var(--nike-hairline)',
+                      backgroundColor: isSelected ? 'var(--nike-hairline-soft)' : 'transparent',
                       transition: 'background-color 100ms ease',
                       cursor: onRowClick ? 'pointer' : undefined,
-                      outline: isFocused ? `2px solid var(--mkt-ink)` : undefined,
+                      outline: isFocused ? `2px solid var(--nike-ink)` : undefined,
                       outlineOffset: isFocused ? '-2px' : undefined,
                     }}
                     className={cn(
-                      'hover:bg-[var(--mkt-hairline-soft)]',
+                      'hover:bg-[var(--nike-hairline-soft)]',
                       'focus-visible:outline-none',
                     )}
                     onClick={() => onRowClick?.(row.original)}
@@ -546,10 +546,10 @@ export function DataTable<T>({
               key={i}
               aria-hidden="true"
               style={{
-                borderRadius: 'var(--mkt-rounded-md)',
-                border: '1px solid var(--mkt-hairline)',
-                backgroundColor: 'var(--mkt-canvas)',
-                padding: 'var(--mkt-space-md)',
+                borderRadius: 'var(--nike-admin-rounded-md)',
+                border: '1px solid var(--nike-hairline)',
+                backgroundColor: 'var(--nike-canvas)',
+                padding: 'var(--nike-admin-space-md)',
               }}
             >
               <div className="flex flex-col gap-3">
@@ -558,8 +558,8 @@ export function DataTable<T>({
                     key={j}
                     className="h-4 w-full animate-pulse"
                     style={{
-                      borderRadius: 'var(--mkt-rounded-xs)',
-                      backgroundColor: 'var(--mkt-hairline-soft)',
+                      borderRadius: 'var(--nike-admin-rounded-xs)',
+                      backgroundColor: 'var(--nike-hairline-soft)',
                     }}
                   />
                 ))}
@@ -567,15 +567,15 @@ export function DataTable<T>({
             </div>
           ))
         ) : rows.length === 0 ? (
-          <div className="py-16 text-center" style={{ color: 'var(--mkt-ink)', opacity: 0.45 }}>
+          <div className="py-16 text-center" style={{ color: 'var(--nike-ink)', opacity: 0.45 }}>
             {emptyState ?? (
               <div className="flex flex-col items-center gap-2">
                 <p
                   style={{
-                    fontFamily: 'var(--mkt-font-sans)',
+                    fontFamily: 'var(--nike-font-text)',
                     fontSize: '16px',
                     fontWeight: 540,
-                    color: 'var(--mkt-ink)',
+                    color: 'var(--nike-ink)',
                   }}
                 >
                   데이터가 없습니다
@@ -616,7 +616,7 @@ export function DataTable<T>({
         )}
       </div>
 
-      {/* ─── 페이지네이션 — mkt-btn-secondary pill ─── */}
+      {/* ─── 페이지네이션 — nike-btn-secondary pill ─── */}
       {totalPages > 1 && (
         <nav
           aria-label="페이지 네비게이션"
@@ -624,10 +624,10 @@ export function DataTable<T>({
         >
           <span
             style={{
-              fontFamily: 'var(--mkt-font-sans)',
+              fontFamily: 'var(--nike-font-text)',
               fontSize: '14px',
               fontWeight: 330,
-              color: 'var(--mkt-ink)',
+              color: 'var(--nike-ink)',
               opacity: 0.55,
             }}
           >
@@ -638,7 +638,7 @@ export function DataTable<T>({
           <div className="flex items-center gap-2">
             <button
               type="button"
-              className="mkt-btn-secondary"
+              className="nike-btn-secondary"
               style={{ minHeight: '36px', padding: '6px 18px', fontSize: '14px' }}
               disabled={currentPage === 0}
               onClick={() => {
@@ -654,9 +654,9 @@ export function DataTable<T>({
             </button>
             <span
               style={{
-                fontFamily: 'var(--mkt-font-mono)',
+                fontFamily: 'var(--nike-font-mono)',
                 fontSize: '13px',
-                color: 'var(--mkt-ink)',
+                color: 'var(--nike-ink)',
                 opacity: 0.55,
               }}
             >
@@ -664,7 +664,7 @@ export function DataTable<T>({
             </span>
             <button
               type="button"
-              className="mkt-btn-secondary"
+              className="nike-btn-secondary"
               style={{ minHeight: '36px', padding: '6px 18px', fontSize: '14px' }}
               disabled={currentPage >= totalPages - 1}
               onClick={() => {

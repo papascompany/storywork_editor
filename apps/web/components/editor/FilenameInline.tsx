@@ -75,13 +75,13 @@ export function FilenameInline({ value, onChange, className }: FilenameInlinePro
             'min-w-0 flex-1',
             // 모양
             'rounded-[var(--radius-sm)]',
-            'border border-[var(--color-brand-500)]',
+            'border border-[var(--editor-focus)]',
             'bg-[var(--color-surface)]',
             'px-1.5 py-0.5',
             // 타이포
             'text-sm font-medium text-[var(--color-text)]',
             // 포커스
-            'outline-none ring-2 ring-[var(--color-brand-500)] ring-offset-1',
+            'outline-none ring-2 ring-[var(--editor-focus)] ring-offset-1',
             'ring-offset-[var(--color-surface)]',
             // 너비 제한
             'max-w-[200px] md:max-w-[280px]',
@@ -107,7 +107,7 @@ export function FilenameInline({ value, onChange, className }: FilenameInlinePro
         'transition-colors duration-[var(--duration-fast)]',
         'hover:bg-[var(--color-surface-muted)]',
         'focus-visible:outline-none focus-visible:ring-2',
-        'focus-visible:ring-[var(--color-brand-500)] focus-visible:ring-offset-1',
+        'focus-visible:ring-[var(--editor-focus)] focus-visible:ring-offset-1',
         'focus-visible:ring-offset-[var(--color-surface)]',
         className,
       )}

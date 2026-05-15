@@ -375,11 +375,11 @@ export function EditorCanvas({
       className={cn(
         // B.3: 전체 workspace 를 회색으로 (페이지 경계 인지)
         'relative flex flex-1 overflow-hidden',
-        'bg-[var(--editor-workspace-bg,#e5e7eb)]',
+        'bg-[var(--editor-workspace-bg,var(--editor-soft-cloud))]',
         // 포커스 링
-        'outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[var(--color-brand-500)]',
+        'outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[var(--editor-focus)]',
         // 드래그 활성 시 보라색 dashed outline
-        isDragging && 'ring-2 ring-inset ring-[var(--color-brand-500)] ring-dashed',
+        isDragging && 'ring-2 ring-inset ring-[var(--editor-focus)] ring-dashed',
       )}
     >
       {/* fabric 캔버스 마운트 포인트 — workspace 외곽 padding 으로 회색 여백 노출 */}
@@ -418,9 +418,9 @@ export function EditorCanvas({
         >
           <div
             className={cn(
-              'rounded-xl border-2 border-dashed border-[var(--color-brand-500)]',
-              'bg-[var(--color-brand-500)]/10 px-8 py-5',
-              'text-sm font-semibold text-[var(--color-brand-500)]',
+              'rounded-xl border-2 border-dashed border-[var(--editor-focus)]',
+              'bg-[var(--editor-dropzone-bg)] px-8 py-5',
+              'text-sm font-semibold text-[var(--editor-focus)]',
             )}
           >
             이미지를 놓으면 캔버스에 추가됩니다

@@ -378,7 +378,7 @@ export function SlotCanvas({
           y1={0}
           x2={i * step * canvasW}
           y2={canvasH}
-          stroke="var(--mkt-hairline)"
+          stroke="var(--nike-hairline)"
           strokeWidth={0.5}
           strokeDasharray="4 4"
         />,
@@ -388,7 +388,7 @@ export function SlotCanvas({
           y1={i * step * canvasH}
           x2={canvasW}
           y2={i * step * canvasH}
-          stroke="var(--mkt-hairline)"
+          stroke="var(--nike-hairline)"
           strokeWidth={0.5}
           strokeDasharray="4 4"
         />,
@@ -407,7 +407,7 @@ export function SlotCanvas({
     <div
       ref={containerRef}
       className={`relative overflow-hidden flex items-center justify-center ${className ?? ''}`}
-      style={{ minHeight: 300, backgroundColor: 'var(--mkt-surface-soft)' }}
+      style={{ minHeight: 300, backgroundColor: 'var(--nike-soft-cloud)' }}
     >
       <svg
         ref={svgRef}
@@ -566,7 +566,7 @@ export function SlotCanvas({
           width={canvasW}
           height={canvasH}
           fill="none"
-          stroke="var(--mkt-hairline)"
+          stroke="var(--nike-hairline)"
           strokeWidth={1}
         />
       </svg>

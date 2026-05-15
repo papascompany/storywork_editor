@@ -212,10 +212,10 @@ export function FormatListClient({ initialData, userRole }: FormatListClientProp
             <div className="flex flex-col items-center gap-2 py-8">
               <p
                 style={{
-                  fontFamily: 'var(--mkt-font-sans)',
+                  fontFamily: 'var(--nike-font-text)',
                   fontSize: '14px',
                   fontWeight: 540,
-                  color: 'var(--mkt-ink)',
+                  color: 'var(--nike-ink)',
                   opacity: 0.55,
                 }}
               >

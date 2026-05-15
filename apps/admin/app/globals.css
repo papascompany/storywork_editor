@@ -2,7 +2,7 @@
  * StoryWork Admin — 전역 CSS
  *
  * Nike 디자인 시스템 (DESIGN-nike.md SSOT) 기반.
- * 기존 --mkt-* 토큰은 DataTable/BulkActionBar 등 하위 호환성을 위해 유지.
+ * Admin 표면은 --nike-* 토큰과 .nike-* 유틸리티만 사용합니다.
  */
 @import '../../../packages/shared-ui/src/styles/globals.css';
 
@@ -58,6 +58,27 @@
     system-ui, sans-serif;
   --nike-font-text:
     'Helvetica Now Text', var(--font-pretendard, 'Pretendard Variable'), system-ui, sans-serif;
+  --nike-font-mono: 'JetBrains Mono', 'SF Mono', Menlo, monospace;
+
+  /* Admin-specific aliases for components migrated from the older marketing surface. */
+  --nike-admin-space-hair: 1px;
+  --nike-admin-space-xxs: 4px;
+  --nike-admin-space-xs: 8px;
+  --nike-admin-space-sm: 12px;
+  --nike-admin-space-md: 16px;
+  --nike-admin-space-lg: 24px;
+  --nike-admin-space-xl: 32px;
+  --nike-admin-space-xxl: 48px;
+  --nike-admin-rounded-xs: 2px;
+  --nike-admin-rounded-sm: 6px;
+  --nike-admin-rounded-md: 8px;
+  --nike-admin-rounded-lg: 24px;
+  --nike-admin-rounded-xl: 32px;
+  --nike-admin-rounded-pill: 50px;
+  --nike-card-lime: #dceeb1;
+  --nike-card-coral: #f3c9b6;
+  --nike-card-navy: #1f1d3d;
+  --nike-overlay-scrim: #000000;
 }
 
 /* ══════════════════════════════════════════════════════════════════════════
@@ -534,284 +555,53 @@ body {
   margin-bottom: 8px;
 }
 
-/* ══════════════════════════════════════════════════════════════════════════
-   하위 호환 — mkt-* 토큰 (DataTable, BulkActionBar 등 기존 컴포넌트)
-   ══════════════════════════════════════════════════════════════════════════ */
-:root {
-  /* mkt-* → nike-* 매핑 */
-  --mkt-primary: var(--nike-ink);
-  --mkt-on-primary: var(--nike-on-primary);
-  --mkt-ink: var(--nike-ink);
-  --mkt-canvas: var(--nike-canvas);
-  --mkt-inverse-canvas: #000000;
-  --mkt-inverse-ink: #ffffff;
-  --mkt-on-inverse-soft: #ffffff;
-  --mkt-hairline: var(--nike-hairline);
-  --mkt-hairline-soft: var(--nike-hairline-soft);
-  --mkt-surface-soft: var(--nike-soft-cloud);
-
-  /* 파스텔 블록 — nike 카드 색상으로 리맵 */
-  --mkt-block-lime: #dceeb1;
-  --mkt-block-lilac: var(--nike-card-lilac);
-  --mkt-block-cream: var(--nike-card-cream);
-  --mkt-block-pink: var(--nike-card-pink);
-  --mkt-block-mint: var(--nike-card-mint);
-  --mkt-block-coral: #f3c9b6;
-  --mkt-block-navy: #1f1d3d;
-
-  /* 시맨틱 */
-  --mkt-accent-magenta: #ff3d8b;
-  --mkt-semantic-success: var(--nike-success);
-  --mkt-overlay-scrim: #000000;
-
-  /* 타이포그래피 */
-  --mkt-font-sans:
-    var(--font-pretendard, 'Pretendard Variable'), Pretendard, 'Apple SD Gothic Neo', -apple-system,
-    BlinkMacSystemFont, system-ui, sans-serif;
-  --mkt-font-mono: 'JetBrains Mono', 'SF Mono', Menlo, monospace;
-
-  /* 간격 */
-  --mkt-space-hair: 1px;
-  --mkt-space-xxs: 4px;
-  --mkt-space-xs: 8px;
-  --mkt-space-sm: 12px;
-  --mkt-space-md: 16px;
-  --mkt-space-lg: 24px;
-  --mkt-space-xl: 32px;
-  --mkt-space-xxl: 48px;
-  --mkt-space-section: 96px;
-
-  /* 둥근 모서리 */
-  --mkt-rounded-xs: 2px;
-  --mkt-rounded-sm: 6px;
-  --mkt-rounded-md: 8px;
-  --mkt-rounded-lg: 24px;
-  --mkt-rounded-xl: 32px;
-  --mkt-rounded-pill: 50px;
-  --mkt-rounded-full: 9999px;
-
-  /* 컴포넌트 치수 */
-  --mkt-nav-height: 56px;
-  --mkt-marquee-height: 36px;
-  --mkt-max-width: 1280px;
-
-  /* 타이포 스케일 — DataTable 헤더 등 내부 사용 */
-  --mkt-display-xl-size: 86px;
-  --mkt-display-xl-weight: 340;
-  --mkt-display-xl-lh: 1;
-  --mkt-display-xl-ls: -1.72px;
-  --mkt-display-lg-size: 64px;
-  --mkt-display-lg-weight: 340;
-  --mkt-display-lg-lh: 1.1;
-  --mkt-display-lg-ls: -0.96px;
-  --mkt-headline-size: 26px;
-  --mkt-headline-weight: 540;
-  --mkt-headline-lh: 1.35;
-  --mkt-headline-ls: -0.26px;
-  --mkt-subhead-size: 26px;
-  --mkt-subhead-weight: 340;
-  --mkt-subhead-lh: 1.35;
-  --mkt-subhead-ls: -0.26px;
-  --mkt-body-lg-size: 20px;
-  --mkt-body-lg-weight: 330;
-  --mkt-body-lg-lh: 1.4;
-  --mkt-body-lg-ls: -0.14px;
-  --mkt-body-size: 18px;
-  --mkt-body-weight: 320;
-  --mkt-body-lh: 1.45;
-  --mkt-body-ls: -0.26px;
-  --mkt-body-sm-size: 16px;
-  --mkt-body-sm-weight: 330;
-  --mkt-body-sm-lh: 1.45;
-  --mkt-body-sm-ls: -0.14px;
-  --mkt-button-size: 20px;
-  --mkt-button-weight: 480;
-  --mkt-button-lh: 1.4;
-  --mkt-button-ls: -0.1px;
-  --mkt-eyebrow-size: 18px;
-  --mkt-eyebrow-weight: 400;
-  --mkt-eyebrow-lh: 1.3;
-  --mkt-eyebrow-ls: 0.54px;
-  --mkt-caption-size: 12px;
-  --mkt-caption-weight: 400;
-  --mkt-caption-lh: 1;
-  --mkt-caption-ls: 0.6px;
-
-  /* DataTable 내부 변수 매핑 (brand-* 는 절대 override 금지 — nav-link 활성 색상 충돌 유발) */
-  --color-surface-muted: var(--nike-hairline-soft);
-  --color-surface-raised: var(--nike-canvas);
-  --color-border: var(--nike-hairline);
-  --color-text: var(--nike-ink);
-  --color-text-muted: color-mix(in srgb, var(--nike-ink) 50%, transparent);
-  --radius-lg: 8px;
-  --radius-sm: 2px;
-  --duration-fast: 100ms;
-}
-
-/* ── mkt-* 유틸리티 클래스 (기존 컴포넌트 하위 호환) ─────────────────────── */
-.mkt-display-xl {
-  font-family: var(--mkt-font-sans);
-  font-size: clamp(48px, 6.7vw, var(--mkt-display-xl-size));
-  font-weight: var(--mkt-display-xl-weight);
-  line-height: var(--mkt-display-xl-lh);
-  letter-spacing: var(--mkt-display-xl-ls);
-}
-.mkt-display-lg {
-  font-family: var(--mkt-font-sans);
-  font-size: clamp(36px, 5vw, var(--mkt-display-lg-size));
-  font-weight: var(--mkt-display-lg-weight);
-  line-height: var(--mkt-display-lg-lh);
-  letter-spacing: var(--mkt-display-lg-ls);
-}
-.mkt-headline {
-  font-family: var(--mkt-font-sans);
-  font-size: var(--mkt-headline-size);
-  font-weight: var(--mkt-headline-weight);
-  line-height: var(--mkt-headline-lh);
-  letter-spacing: var(--mkt-headline-ls);
-}
-.mkt-subhead {
-  font-family: var(--mkt-font-sans);
-  font-size: var(--mkt-subhead-size);
-  font-weight: var(--mkt-subhead-weight);
-  line-height: var(--mkt-subhead-lh);
-  letter-spacing: var(--mkt-subhead-ls);
-}
-.mkt-body-lg {
-  font-family: var(--mkt-font-sans);
-  font-size: var(--mkt-body-lg-size);
-  font-weight: var(--mkt-body-lg-weight);
-  line-height: var(--mkt-body-lg-lh);
-  letter-spacing: var(--mkt-body-lg-ls);
-}
-.mkt-body {
-  font-family: var(--mkt-font-sans);
-  font-size: var(--mkt-body-size);
-  font-weight: var(--mkt-body-weight);
-  line-height: var(--mkt-body-lh);
-  letter-spacing: var(--mkt-body-ls);
-}
-.mkt-body-sm {
-  font-family: var(--mkt-font-sans);
-  font-size: var(--mkt-body-sm-size);
-  font-weight: var(--mkt-body-sm-weight);
-  line-height: var(--mkt-body-sm-lh);
-  letter-spacing: var(--mkt-body-sm-ls);
-}
-.mkt-eyebrow {
-  font-family: var(--mkt-font-mono);
-  font-size: var(--mkt-eyebrow-size);
-  font-weight: var(--mkt-eyebrow-weight);
-  line-height: var(--mkt-eyebrow-lh);
-  letter-spacing: var(--mkt-eyebrow-ls);
-  text-transform: uppercase;
-}
-.mkt-caption {
-  font-family: var(--mkt-font-mono);
-  font-size: var(--mkt-caption-size);
-  font-weight: var(--mkt-caption-weight);
-  line-height: var(--mkt-caption-lh);
-  letter-spacing: var(--mkt-caption-ls);
+.nike-eyebrow {
+  font-family: var(--nike-font-mono);
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 1.3;
+  letter-spacing: 0.4px;
   text-transform: uppercase;
 }
 
-/* mkt-btn-* (DataTable 페이지네이션 등 하위 호환) */
-.mkt-btn-primary {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  background-color: var(--nike-ink);
-  color: var(--nike-on-primary);
-  font-family: var(--mkt-font-sans);
-  font-size: 14px;
-  font-weight: 500;
-  padding: 10px 20px;
-  border-radius: 9999px;
-  border: none;
-  cursor: pointer;
-  transition: opacity 100ms;
-  min-height: 40px;
-  white-space: nowrap;
-  text-decoration: none;
-}
-.mkt-btn-primary:hover {
-  opacity: 0.82;
-}
-.mkt-btn-primary:focus-visible {
-  outline: 2px solid var(--nike-ink);
-  outline-offset: 3px;
-}
-
-.mkt-btn-secondary {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  background-color: var(--nike-canvas);
-  color: var(--nike-ink);
-  font-family: var(--mkt-font-sans);
-  font-size: 14px;
-  font-weight: 500;
-  padding: 10px 20px;
-  border-radius: 9999px;
-  border: 1px solid var(--nike-ink);
-  cursor: pointer;
-  transition: background-color 100ms;
-  min-height: 40px;
-  white-space: nowrap;
-  text-decoration: none;
-}
-.mkt-btn-secondary:hover {
-  background-color: var(--nike-soft-cloud);
-}
-.mkt-btn-secondary:focus-visible {
-  outline: 2px solid var(--nike-ink);
-  outline-offset: 3px;
-}
-.mkt-btn-secondary-inverse {
-  background-color: transparent;
-  color: #ffffff;
-  border-color: #ffffff;
-}
-
-/* mkt-block (기존 카드) */
-.mkt-block {
-  border-radius: var(--mkt-rounded-lg);
-  padding: var(--mkt-space-xxl);
+.nike-block {
+  border-radius: var(--nike-admin-rounded-lg);
+  padding: var(--nike-admin-space-xxl);
 }
 @media (max-width: 768px) {
-  .mkt-block {
+  .nike-block {
     border-radius: 0;
-    margin-left: calc(var(--mkt-space-lg) * -1);
-    margin-right: calc(var(--mkt-space-lg) * -1);
-    padding-left: var(--mkt-space-lg);
-    padding-right: var(--mkt-space-lg);
+    margin-left: calc(var(--nike-admin-space-lg) * -1);
+    margin-right: calc(var(--nike-admin-space-lg) * -1);
+    padding-left: var(--nike-admin-space-lg);
+    padding-right: var(--nike-admin-space-lg);
   }
 }
-.mkt-block-lime {
-  background-color: #dceeb1;
+.nike-block-lime {
+  background-color: var(--nike-card-lime);
   color: var(--nike-ink);
 }
-.mkt-block-lilac {
+.nike-block-lilac {
   background-color: var(--nike-card-lilac);
   color: var(--nike-ink);
 }
-.mkt-block-cream {
+.nike-block-cream {
   background-color: var(--nike-card-cream);
   color: var(--nike-ink);
 }
-.mkt-block-pink {
+.nike-block-pink {
   background-color: var(--nike-card-pink);
   color: var(--nike-ink);
 }
-.mkt-block-mint {
+.nike-block-mint {
   background-color: var(--nike-card-mint);
   color: var(--nike-ink);
 }
-.mkt-block-coral {
-  background-color: #f3c9b6;
+.nike-block-coral {
+  background-color: var(--nike-card-coral);
   color: var(--nike-ink);
 }
-.mkt-block-navy {
-  background-color: #1f1d3d;
-  color: #ffffff;
+.nike-block-navy {
+  background-color: var(--nike-card-navy);
+  color: var(--nike-on-primary);
 }

@@ -89,6 +89,31 @@ export const getAdminUserByEmail = cache(async function getAdminUserByEmailImpl(
   }
 })
 
+const getVerifiedAdminUser = cache(async function getVerifiedAdminUserImpl(): Promise<AdminUser> {
+  const supabase = await createAdminServerClient()
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
+
+  if (!user || !user.email) {
+    redirect('/login')
+  }
+
+  const fromDb = await getAdminUserByEmail(user.email)
+
+  // DB row 가 없어도 인증된 이메일이면 readonly 로 통과
+  // (관리자 콘솔 자체 진입 가드는 미들웨어가 담당)
+  return (
+    fromDb ?? {
+      id: user.id,
+      email: user.email,
+      role: 'readonly',
+      totpVerified: true,
+      totpSetup: true,
+    }
+  )
+})
+
 /**
  * @deprecated `getAdminUserByEmail` 사용 권장.
  *   userId 가 Supabase uuid 일 경우 Prisma User(cuid) 와 매칭되지 않는다.
@@ -135,26 +160,7 @@ export async function getAdminUser(userId: string): Promise<AdminUser | null> {
 export const requireRole = cache(async function requireRoleImpl(
   requiredRole?: AdminRole,
 ): Promise<AdminUser> {
-  const supabase = await createAdminServerClient()
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
-
-  if (!user || !user.email) {
-    redirect('/login')
-  }
-
-  const fromDb = await getAdminUserByEmail(user.email)
-
-  // DB row 가 없어도 인증된 이메일이면 readonly 로 통과
-  // (관리자 콘솔 자체 진입 가드는 미들웨어가 담당)
-  const adminUser: AdminUser = fromDb ?? {
-    id: user.id,
-    email: user.email,
-    role: 'readonly',
-    totpVerified: true,
-    totpSetup: true,
-  }
+  const adminUser = await getVerifiedAdminUser()
 
   if (requiredRole && !hasRole(adminUser.role, requiredRole)) {
     redirect('/403')

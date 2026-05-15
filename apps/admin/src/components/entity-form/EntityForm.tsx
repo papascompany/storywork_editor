@@ -149,7 +149,7 @@ function FieldWidget({
             onBlur={onBlur}
             onClick={() => onChange(!value)}
             className="relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2"
-            style={{ backgroundColor: value ? 'var(--mkt-ink)' : 'var(--mkt-surface-soft)' }}
+            style={{ backgroundColor: value ? 'var(--nike-ink)' : 'var(--nike-soft-cloud)' }}
           >
             <span
               aria-hidden="true"
@@ -163,10 +163,10 @@ function FieldWidget({
           <label
             htmlFor={fieldId}
             style={{
-              fontFamily: 'var(--mkt-font-sans)',
+              fontFamily: 'var(--nike-font-text)',
               fontSize: '14px',
               fontWeight: 330,
-              color: 'var(--mkt-ink)',
+              color: 'var(--nike-ink)',
             }}
           >
             {label}
@@ -177,9 +177,9 @@ function FieldWidget({
             id={descId}
             role={error ? 'alert' : undefined}
             style={{
-              fontFamily: 'var(--mkt-font-sans)',
+              fontFamily: 'var(--nike-font-text)',
               fontSize: '12px',
-              color: error ? '#dc2626' : 'var(--mkt-ink)',
+              color: error ? 'var(--nike-sale)' : 'var(--nike-ink)',
               opacity: error ? 1 : 0.55,
             }}
           >
@@ -196,12 +196,12 @@ function FieldWidget({
         <label
           htmlFor={fieldId}
           style={{
-            fontFamily: 'var(--mkt-font-mono)',
+            fontFamily: 'var(--nike-font-mono)',
             fontSize: '11px',
             fontWeight: 400,
             letterSpacing: '0.6px',
             textTransform: 'uppercase',
-            color: 'var(--mkt-ink)',
+            color: 'var(--nike-ink)',
             opacity: 0.55,
           }}
         >
@@ -214,14 +214,14 @@ function FieldWidget({
           rows={4}
           className="flex w-full min-h-[7rem] focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50 resize-y"
           style={{
-            borderRadius: 'var(--mkt-rounded-md)',
-            border: error ? '1px solid #dc2626' : '1px solid var(--mkt-hairline)',
-            backgroundColor: 'var(--mkt-canvas)',
+            borderRadius: 'var(--nike-admin-rounded-md)',
+            border: error ? '1px solid var(--nike-sale)' : '1px solid var(--nike-hairline)',
+            backgroundColor: 'var(--nike-canvas)',
             padding: '8px 12px',
-            fontFamily: 'var(--mkt-font-sans)',
+            fontFamily: 'var(--nike-font-text)',
             fontSize: '14px',
             fontWeight: 330,
-            color: 'var(--mkt-ink)',
+            color: 'var(--nike-ink)',
           }}
         />
         {(error ?? meta.helpText) && (
@@ -229,9 +229,9 @@ function FieldWidget({
             id={descId}
             role={error ? 'alert' : undefined}
             style={{
-              fontFamily: 'var(--mkt-font-sans)',
+              fontFamily: 'var(--nike-font-text)',
               fontSize: '12px',
-              color: error ? '#dc2626' : 'var(--mkt-ink)',
+              color: error ? 'var(--nike-sale)' : 'var(--nike-ink)',
               opacity: error ? 1 : 0.55,
             }}
           >
@@ -248,12 +248,12 @@ function FieldWidget({
         <label
           htmlFor={fieldId}
           style={{
-            fontFamily: 'var(--mkt-font-mono)',
+            fontFamily: 'var(--nike-font-mono)',
             fontSize: '11px',
             fontWeight: 400,
             letterSpacing: '0.6px',
             textTransform: 'uppercase',
-            color: 'var(--mkt-ink)',
+            color: 'var(--nike-ink)',
             opacity: 0.55,
           }}
         >
@@ -266,14 +266,14 @@ function FieldWidget({
           className="flex w-full focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50"
           style={{
             height: '44px',
-            borderRadius: 'var(--mkt-rounded-md)',
-            border: error ? '1px solid #dc2626' : '1px solid var(--mkt-hairline)',
-            backgroundColor: 'var(--mkt-canvas)',
+            borderRadius: 'var(--nike-admin-rounded-md)',
+            border: error ? '1px solid var(--nike-sale)' : '1px solid var(--nike-hairline)',
+            backgroundColor: 'var(--nike-canvas)',
             padding: '0 12px',
-            fontFamily: 'var(--mkt-font-sans)',
+            fontFamily: 'var(--nike-font-text)',
             fontSize: '14px',
             fontWeight: 330,
-            color: 'var(--mkt-ink)',
+            color: 'var(--nike-ink)',
           }}
         >
           {!value && <option value="">선택하세요</option>}
@@ -288,9 +288,9 @@ function FieldWidget({
             id={descId}
             role={error ? 'alert' : undefined}
             style={{
-              fontFamily: 'var(--mkt-font-sans)',
+              fontFamily: 'var(--nike-font-text)',
               fontSize: '12px',
-              color: error ? '#dc2626' : 'var(--mkt-ink)',
+              color: error ? 'var(--nike-sale)' : 'var(--nike-ink)',
               opacity: error ? 1 : 0.55,
             }}
           >
@@ -322,12 +322,12 @@ function FieldWidget({
         <label
           htmlFor={fieldId}
           style={{
-            fontFamily: 'var(--mkt-font-mono)',
+            fontFamily: 'var(--nike-font-mono)',
             fontSize: '11px',
             fontWeight: 400,
             letterSpacing: '0.6px',
             textTransform: 'uppercase',
-            color: 'var(--mkt-ink)',
+            color: 'var(--nike-ink)',
             opacity: 0.55,
           }}
         >
@@ -336,9 +336,9 @@ function FieldWidget({
         <div
           className="flex flex-wrap gap-1.5 min-h-[2.75rem] px-3 py-2 focus-within:ring-2 focus-within:ring-offset-2"
           style={{
-            borderRadius: 'var(--mkt-rounded-md)',
-            border: error ? '1px solid #dc2626' : '1px solid var(--mkt-hairline)',
-            backgroundColor: 'var(--mkt-canvas)',
+            borderRadius: 'var(--nike-admin-rounded-md)',
+            border: error ? '1px solid var(--nike-sale)' : '1px solid var(--nike-hairline)',
+            backgroundColor: 'var(--nike-canvas)',
           }}
         >
           {tags.map((tag) => (
@@ -346,9 +346,9 @@ function FieldWidget({
               key={tag}
               className="inline-flex items-center gap-1 px-2 py-0.5 text-xs rounded-full"
               style={{
-                backgroundColor: 'var(--mkt-block-lime)',
-                color: 'var(--mkt-ink)',
-                fontFamily: 'var(--mkt-font-mono)',
+                backgroundColor: 'var(--nike-card-lime)',
+                color: 'var(--nike-ink)',
+                fontFamily: 'var(--nike-font-mono)',
               }}
             >
               {tag}
@@ -357,7 +357,7 @@ function FieldWidget({
                 onClick={() => removeTag(tag)}
                 aria-label={`태그 ${tag} 삭제`}
                 className="focus-visible:outline-none"
-                style={{ color: 'var(--mkt-ink)', opacity: 0.6 }}
+                style={{ color: 'var(--nike-ink)', opacity: 0.6 }}
               >
                 ×
               </button>
@@ -383,9 +383,9 @@ function FieldWidget({
             placeholder={tags.length === 0 ? placeholder || '태그 입력 후 Enter' : ''}
             className="flex-1 min-w-[4rem] bg-transparent focus:outline-none"
             style={{
-              fontFamily: 'var(--mkt-font-sans)',
+              fontFamily: 'var(--nike-font-text)',
               fontSize: '14px',
-              color: 'var(--mkt-ink)',
+              color: 'var(--nike-ink)',
             }}
           />
         </div>
@@ -394,9 +394,9 @@ function FieldWidget({
             id={descId}
             role={error ? 'alert' : undefined}
             style={{
-              fontFamily: 'var(--mkt-font-sans)',
+              fontFamily: 'var(--nike-font-text)',
               fontSize: '12px',
-              color: error ? '#dc2626' : 'var(--mkt-ink)',
+              color: error ? 'var(--nike-sale)' : 'var(--nike-ink)',
               opacity: error ? 1 : 0.55,
             }}
           >
@@ -413,12 +413,12 @@ function FieldWidget({
         <label
           htmlFor={fieldId}
           style={{
-            fontFamily: 'var(--mkt-font-mono)',
+            fontFamily: 'var(--nike-font-mono)',
             fontSize: '11px',
             fontWeight: 400,
             letterSpacing: '0.6px',
             textTransform: 'uppercase',
-            color: 'var(--mkt-ink)',
+            color: 'var(--nike-ink)',
             opacity: 0.55,
           }}
         >
@@ -432,15 +432,15 @@ function FieldWidget({
             onChange={(e) => onChange(e.target.value)}
             className="h-11 w-20 cursor-pointer focus-visible:outline-none focus-visible:ring-2"
             style={{
-              borderRadius: 'var(--mkt-rounded-md)',
-              border: error ? '1px solid #dc2626' : '1px solid var(--mkt-hairline)',
+              borderRadius: 'var(--nike-admin-rounded-md)',
+              border: error ? '1px solid var(--nike-sale)' : '1px solid var(--nike-hairline)',
             }}
           />
           <span
             style={{
-              fontFamily: 'var(--mkt-font-mono)',
+              fontFamily: 'var(--nike-font-mono)',
               fontSize: '12px',
-              color: 'var(--mkt-ink)',
+              color: 'var(--nike-ink)',
               opacity: 0.55,
             }}
           >
@@ -452,9 +452,9 @@ function FieldWidget({
             id={descId}
             role={error ? 'alert' : undefined}
             style={{
-              fontFamily: 'var(--mkt-font-sans)',
+              fontFamily: 'var(--nike-font-text)',
               fontSize: '12px',
-              color: error ? '#dc2626' : 'var(--mkt-ink)',
+              color: error ? 'var(--nike-sale)' : 'var(--nike-ink)',
               opacity: error ? 1 : 0.55,
             }}
           >

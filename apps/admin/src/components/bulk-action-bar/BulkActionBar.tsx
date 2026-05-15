@@ -162,9 +162,9 @@ export function BulkActionBar({ selectedCount, onClear, actions, className }: Bu
           className,
         )}
         style={{
-          borderRadius: 'var(--mkt-rounded-xl, 20px)',
-          backgroundColor: 'var(--mkt-canvas)',
-          border: '1px solid var(--mkt-hairline)',
+          borderRadius: 'var(--nike-admin-rounded-xl, 20px)',
+          backgroundColor: 'var(--nike-canvas)',
+          border: '1px solid var(--nike-hairline)',
           boxShadow: '0 8px 32px rgba(0,0,0,0.16)',
         }}
       >
@@ -173,10 +173,10 @@ export function BulkActionBar({ selectedCount, onClear, actions, className }: Bu
           <span
             className="whitespace-nowrap"
             style={{
-              fontFamily: 'var(--mkt-font-sans)',
+              fontFamily: 'var(--nike-font-text)',
               fontSize: '14px',
               fontWeight: 540,
-              color: 'var(--mkt-ink)',
+              color: 'var(--nike-ink)',
             }}
           >
             {selectedCount}개 선택됨
@@ -189,9 +189,9 @@ export function BulkActionBar({ selectedCount, onClear, actions, className }: Bu
             aria-label="선택 해제"
             className="h-7 px-2"
             style={{
-              fontFamily: 'var(--mkt-font-sans)',
+              fontFamily: 'var(--nike-font-text)',
               fontSize: '12px',
-              color: 'var(--mkt-ink)',
+              color: 'var(--nike-ink)',
               opacity: 0.5,
             }}
           >
@@ -202,7 +202,7 @@ export function BulkActionBar({ selectedCount, onClear, actions, className }: Bu
         {/* 구분선 */}
         <div
           className="w-px h-6 shrink-0"
-          style={{ backgroundColor: 'var(--mkt-hairline)' }}
+          style={{ backgroundColor: 'var(--nike-hairline)' }}
           role="separator"
           aria-orientation="vertical"
         />

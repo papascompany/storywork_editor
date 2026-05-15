@@ -81,7 +81,7 @@ function PageCard({
         'relative group rounded-[var(--radius-md)]',
         'transition-all duration-[var(--duration-fast)]',
         isDragging && 'opacity-40',
-        isDragOver && 'ring-2 ring-[var(--color-brand-500)] ring-offset-1',
+        isDragOver && 'ring-2 ring-[var(--editor-focus)] ring-offset-1',
       )}
       data-testid={`page-card-${page.id}`}
     >
@@ -96,10 +96,10 @@ function PageCard({
           'border-2 transition-all duration-[var(--duration-fast)]',
           'cursor-pointer',
           'focus-visible:outline-none focus-visible:ring-2',
-          'focus-visible:ring-[var(--color-brand-500)] focus-visible:ring-offset-2',
+          'focus-visible:ring-[var(--editor-focus)] focus-visible:ring-offset-2',
           isActive
-            ? 'border-[var(--color-brand-500)] shadow-md'
-            : 'border-[var(--color-border)] hover:border-[var(--color-brand-300,oklch(0.75_0.1_250))]',
+            ? 'border-[var(--editor-focus)] shadow-md'
+            : 'border-[var(--color-border)] hover:border-[var(--editor-border-strong)]',
         )}
         data-testid={`page-card-btn-${page.id}`}
       >
@@ -129,7 +129,7 @@ function PageCard({
             <div
               className={cn(
                 'absolute top-1.5 left-1.5',
-                'rounded-full bg-[var(--color-brand-500)]',
+                'rounded-full bg-[var(--editor-accent)]',
                 'size-2',
               )}
               aria-hidden="true"

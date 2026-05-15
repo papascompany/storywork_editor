@@ -108,22 +108,22 @@ function RejectDialog({ open, onClose, onConfirm }: RejectDialogProps) {
             aria-label="거절 사유"
             className="w-full resize-y min-h-[7rem] focus-visible:outline-none"
             style={{
-              borderRadius: 'var(--mkt-rounded-md)',
-              border: '1px solid var(--mkt-hairline)',
-              backgroundColor: 'var(--mkt-canvas)',
+              borderRadius: 'var(--nike-admin-rounded-md)',
+              border: '1px solid var(--nike-hairline)',
+              backgroundColor: 'var(--nike-canvas)',
               padding: '8px 12px',
-              fontFamily: 'var(--mkt-font-sans)',
+              fontFamily: 'var(--nike-font-text)',
               fontSize: '14px',
               fontWeight: 330,
-              color: 'var(--mkt-ink)',
+              color: 'var(--nike-ink)',
             }}
           />
           <p
             style={{
               marginTop: '4px',
-              fontFamily: 'var(--mkt-font-mono)',
+              fontFamily: 'var(--nike-font-mono)',
               fontSize: '11px',
-              color: 'var(--mkt-ink)',
+              color: 'var(--nike-ink)',
               opacity: 0.4,
             }}
           >
@@ -290,7 +290,7 @@ export function ReviewQueue<T>({
     return (
       <div
         className={cn('py-24 text-center', className)}
-        style={{ color: 'var(--mkt-ink)', opacity: 0.55, fontFamily: 'var(--mkt-font-sans)' }}
+        style={{ color: 'var(--nike-ink)', opacity: 0.55, fontFamily: 'var(--nike-font-text)' }}
       >
         {emptyState ?? (
           <div className="flex flex-col items-center gap-3">
@@ -316,7 +316,7 @@ export function ReviewQueue<T>({
           <div className="flex items-center gap-3" aria-label="검수 진행률">
             <div
               className="flex-1 h-2 rounded-full overflow-hidden"
-              style={{ backgroundColor: 'var(--mkt-surface-soft)' }}
+              style={{ backgroundColor: 'var(--nike-soft-cloud)' }}
               role="progressbar"
               aria-valuemin={0}
               aria-valuemax={displayTotal}
@@ -326,7 +326,7 @@ export function ReviewQueue<T>({
               <div
                 className="h-full transition-all duration-300"
                 style={{
-                  backgroundColor: 'var(--mkt-ink)',
+                  backgroundColor: 'var(--nike-ink)',
                   width: `${(processed / displayTotal) * 100}%`,
                 }}
               />
@@ -334,9 +334,9 @@ export function ReviewQueue<T>({
             <span
               className="whitespace-nowrap"
               style={{
-                fontFamily: 'var(--mkt-font-mono)',
+                fontFamily: 'var(--nike-font-mono)',
                 fontSize: '12px',
-                color: 'var(--mkt-ink)',
+                color: 'var(--nike-ink)',
                 opacity: 0.55,
               }}
             >
@@ -349,9 +349,9 @@ export function ReviewQueue<T>({
         <div
           className="flex flex-wrap gap-x-4 gap-y-1"
           style={{
-            fontFamily: 'var(--mkt-font-mono)',
+            fontFamily: 'var(--nike-font-mono)',
             fontSize: '11px',
-            color: 'var(--mkt-ink)',
+            color: 'var(--nike-ink)',
             opacity: 0.45,
           }}
           aria-label="키보드 단축키"
@@ -359,7 +359,7 @@ export function ReviewQueue<T>({
           <span>
             <kbd
               className="font-mono px-1 rounded"
-              style={{ backgroundColor: 'var(--mkt-surface-soft)' }}
+              style={{ backgroundColor: 'var(--nike-soft-cloud)' }}
             >
               j/k
             </kbd>{' '}
@@ -368,7 +368,7 @@ export function ReviewQueue<T>({
           <span>
             <kbd
               className="font-mono px-1 rounded"
-              style={{ backgroundColor: 'var(--mkt-surface-soft)' }}
+              style={{ backgroundColor: 'var(--nike-soft-cloud)' }}
             >
               a
             </kbd>{' '}
@@ -377,7 +377,7 @@ export function ReviewQueue<T>({
           <span>
             <kbd
               className="font-mono px-1 rounded"
-              style={{ backgroundColor: 'var(--mkt-surface-soft)' }}
+              style={{ backgroundColor: 'var(--nike-soft-cloud)' }}
             >
               r
             </kbd>{' '}
@@ -389,7 +389,7 @@ export function ReviewQueue<T>({
                 <span key={ea.id}>
                   <kbd
                     className="font-mono px-1 rounded"
-                    style={{ backgroundColor: 'var(--mkt-surface-soft)' }}
+                    style={{ backgroundColor: 'var(--nike-soft-cloud)' }}
                   >
                     {ea.key}
                   </kbd>{' '}
@@ -418,9 +418,9 @@ export function ReviewQueue<T>({
                   aria-hidden="true"
                   className="aspect-square animate-pulse"
                   style={{
-                    borderRadius: 'var(--mkt-rounded-lg)',
-                    border: '1px solid var(--mkt-hairline)',
-                    backgroundColor: 'var(--mkt-surface-soft)',
+                    borderRadius: 'var(--nike-admin-rounded-lg)',
+                    border: '1px solid var(--nike-hairline)',
+                    backgroundColor: 'var(--nike-soft-cloud)',
                   }}
                 />
               ))
@@ -458,12 +458,12 @@ export function ReviewQueue<T>({
                       isProcessing && 'opacity-60 pointer-events-none',
                     )}
                     style={{
-                      borderRadius: 'var(--mkt-rounded-lg)',
+                      borderRadius: 'var(--nike-admin-rounded-lg)',
                       border: isFocused
-                        ? '2px solid var(--mkt-ink)'
-                        : '1px solid var(--mkt-hairline)',
-                      backgroundColor: 'var(--mkt-canvas)',
-                      boxShadow: isFocused ? '0 0 0 2px var(--mkt-ink)' : undefined,
+                        ? '2px solid var(--nike-ink)'
+                        : '1px solid var(--nike-hairline)',
+                      backgroundColor: 'var(--nike-canvas)',
+                      boxShadow: isFocused ? '0 0 0 2px var(--nike-ink)' : undefined,
                     }}
                   >
                     {/* 카드 컨텐츠 (외부 renderCard) */}
@@ -472,7 +472,7 @@ export function ReviewQueue<T>({
                     {/* 액션 버튼 */}
                     <div
                       className="flex items-center gap-2 p-3"
-                      style={{ borderTop: '1px solid var(--mkt-hairline)' }}
+                      style={{ borderTop: '1px solid var(--nike-hairline)' }}
                     >
                       <Button
                         variant="default"

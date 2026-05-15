@@ -42,15 +42,18 @@ function DiffRow({ field, before, after }: { field: string; before: unknown; aft
   const isDelete = after === undefined || after === null
 
   return (
-    <div className="last:border-b-0 py-2" style={{ borderBottom: '1px solid var(--mkt-hairline)' }}>
+    <div
+      className="last:border-b-0 py-2"
+      style={{ borderBottom: '1px solid var(--nike-hairline)' }}
+    >
       <div
         style={{
-          fontFamily: 'var(--mkt-font-mono)',
+          fontFamily: 'var(--nike-font-mono)',
           fontSize: '10px',
           fontWeight: 400,
           letterSpacing: '0.6px',
           textTransform: 'uppercase',
-          color: 'var(--mkt-ink)',
+          color: 'var(--nike-ink)',
           opacity: 0.4,
           marginBottom: '4px',
         }}
@@ -65,7 +68,7 @@ function DiffRow({ field, before, after }: { field: string; before: unknown; aft
               'flex-1 px-3 py-1.5 text-xs font-mono whitespace-pre-wrap break-all',
               isDelete ? 'bg-red-50 text-red-700 line-through' : 'bg-red-50 text-red-700',
             )}
-            style={{ borderRadius: 'var(--mkt-rounded-sm)' }}
+            style={{ borderRadius: 'var(--nike-admin-rounded-sm)' }}
             aria-label={`${field} 이전 값`}
           >
             {beforeStr}
@@ -78,7 +81,7 @@ function DiffRow({ field, before, after }: { field: string; before: unknown; aft
               'flex-1 px-3 py-1.5 text-xs font-mono whitespace-pre-wrap break-all',
               isCreate ? 'bg-green-50 text-green-700' : 'bg-blue-50 text-blue-700',
             )}
-            style={{ borderRadius: 'var(--mkt-rounded-sm)' }}
+            style={{ borderRadius: 'var(--nike-admin-rounded-sm)' }}
             aria-label={`${field} 이후 값`}
           >
             {afterStr}
@@ -100,11 +103,11 @@ export function AuditDiffViewer({ diff, meta, className }: AuditDiffViewerProps)
       <div
         className={cn('px-4 py-3', className)}
         style={{
-          borderRadius: 'var(--mkt-rounded-md)',
-          border: '1px solid var(--mkt-hairline)',
-          fontFamily: 'var(--mkt-font-sans)',
+          borderRadius: 'var(--nike-admin-rounded-md)',
+          border: '1px solid var(--nike-hairline)',
+          fontFamily: 'var(--nike-font-text)',
           fontSize: '13px',
-          color: 'var(--mkt-ink)',
+          color: 'var(--nike-ink)',
           opacity: 0.55,
         }}
       >
@@ -117,8 +120,8 @@ export function AuditDiffViewer({ diff, meta, className }: AuditDiffViewerProps)
     <div
       className={cn('px-4 py-3', className)}
       style={{
-        borderRadius: 'var(--mkt-rounded-md)',
-        border: '1px solid var(--mkt-hairline)',
+        borderRadius: 'var(--nike-admin-rounded-md)',
+        border: '1px solid var(--nike-hairline)',
       }}
     >
       {hasDiff && (
@@ -126,12 +129,12 @@ export function AuditDiffViewer({ diff, meta, className }: AuditDiffViewerProps)
           <div
             className="flex items-center gap-2 mb-2"
             style={{
-              fontFamily: 'var(--mkt-font-mono)',
+              fontFamily: 'var(--nike-font-mono)',
               fontSize: '10px',
               fontWeight: 400,
               letterSpacing: '0.6px',
               textTransform: 'uppercase',
-              color: 'var(--mkt-ink)',
+              color: 'var(--nike-ink)',
               opacity: 0.4,
             }}
           >
@@ -152,12 +155,12 @@ export function AuditDiffViewer({ diff, meta, className }: AuditDiffViewerProps)
         <div>
           <div
             style={{
-              fontFamily: 'var(--mkt-font-mono)',
+              fontFamily: 'var(--nike-font-mono)',
               fontSize: '10px',
               fontWeight: 400,
               letterSpacing: '0.6px',
               textTransform: 'uppercase',
-              color: 'var(--mkt-ink)',
+              color: 'var(--nike-ink)',
               opacity: 0.4,
               marginBottom: '8px',
             }}
@@ -166,7 +169,7 @@ export function AuditDiffViewer({ diff, meta, className }: AuditDiffViewerProps)
           </div>
           <pre
             className="text-xs font-mono whitespace-pre-wrap break-all"
-            style={{ color: 'var(--mkt-ink)' }}
+            style={{ color: 'var(--nike-ink)' }}
           >
             {JSON.stringify(meta, null, 2)}
           </pre>

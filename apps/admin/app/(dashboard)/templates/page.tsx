@@ -8,22 +8,36 @@ import { TemplateListClient } from './TemplateListClient'
 
 export const dynamic = 'force-dynamic'
 
+type TemplateListRow = {
+  id: string
+  name: string
+  formatId: string
+  formatName: string
+  slotCount: number | bigint
+  thumbnail: string | null
+  createdAt: Date
+}
+
 export default async function TemplatesPage() {
   const user = await requireRole()
 
   const [templates, formats] = await Promise.all([
-    prisma.template.findMany({
-      orderBy: { createdAt: 'desc' },
-      select: {
-        id: true,
-        name: true,
-        formatId: true,
-        thumbnail: true,
-        slots: true,
-        createdAt: true,
-        format: { select: { id: true, name: true } },
-      },
-    }),
+    prisma.$queryRaw<TemplateListRow[]>`
+      SELECT
+        t.id,
+        t.name,
+        t."formatId",
+        t.thumbnail,
+        t."createdAt",
+        f.name AS "formatName",
+        CASE
+          WHEN jsonb_typeof(t.slots::jsonb) = 'array' THEN jsonb_array_length(t.slots::jsonb)
+          ELSE 0
+        END AS "slotCount"
+      FROM "Template" t
+      INNER JOIN "Format" f ON f.id = t."formatId"
+      ORDER BY t."createdAt" DESC
+    `,
     prisma.format.findMany({
       orderBy: { name: 'asc' },
       select: { id: true, name: true },
@@ -34,8 +48,8 @@ export default async function TemplatesPage() {
     id: t.id,
     name: t.name,
     formatId: t.formatId,
-    formatName: t.format.name,
-    slotCount: Array.isArray(t.slots) ? (t.slots as unknown[]).length : 0,
+    formatName: t.formatName,
+    slotCount: Number(t.slotCount),
     thumbnail: t.thumbnail ?? null,
     createdAt: t.createdAt.toISOString(),
   }))

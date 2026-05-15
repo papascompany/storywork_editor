@@ -100,7 +100,7 @@ export function EmptyCanvasHint({ canvas, onActivatePoseTool }: EmptyCanvasHintP
         )}
       >
         {/* 아이콘 */}
-        <Sparkles className="size-6 text-[var(--color-brand-500)]" aria-hidden="true" />
+        <Sparkles className="size-6 text-[var(--editor-accent)]" aria-hidden="true" />
 
         {/* 텍스트 */}
         <div className="text-center">
@@ -144,9 +144,9 @@ export function EmptyCanvasHint({ canvas, onActivatePoseTool }: EmptyCanvasHintP
               className={cn(
                 'pointer-events-auto',
                 'inline-flex h-6 items-center rounded-full px-3',
-                'bg-[var(--color-brand-500)] text-[11px] font-semibold text-white',
+                'bg-[var(--editor-accent)] text-[11px] font-semibold text-[var(--color-text-inverse)]',
                 'transition-opacity hover:opacity-90 focus-visible:outline-none',
-                'focus-visible:ring-2 focus-visible:ring-[var(--color-brand-500)] focus-visible:ring-offset-1',
+                'focus-visible:ring-2 focus-visible:ring-[var(--editor-focus)] focus-visible:ring-offset-1',
               )}
             >
               포즈 추가하기

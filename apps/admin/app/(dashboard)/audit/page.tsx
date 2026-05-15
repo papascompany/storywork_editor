@@ -5,7 +5,6 @@
  * 이후 필터/페이지 전환은 클라이언트에서 /api/audit 를 직접 호출.
  * 권한: 모든 admin role 허용.
  */
-import { requireRole } from '../../../src/lib/auth'
 import { prisma } from '../../../src/lib/prisma'
 import type { AuditLogRow } from '../../api/audit/route'
 
@@ -14,9 +13,6 @@ import { AuditListClient } from './AuditListClient'
 export const dynamic = 'force-dynamic'
 
 export default async function AuditPage() {
-  // 모든 admin role 허용 (requireRole() 인수 없음)
-  await requireRole()
-
   // 초기 데이터: 최근 50건
   const [logs, totalCount] = await Promise.all([
     prisma.auditLog.findMany({

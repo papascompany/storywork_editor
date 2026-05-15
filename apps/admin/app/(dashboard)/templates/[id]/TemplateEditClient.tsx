@@ -53,26 +53,26 @@ interface TemplateEditClientProps {
 // ─── 공통 인스펙터 스타일 ───────────────────────────────────────────────────
 
 const INSPECTOR_LABEL_STYLE: React.CSSProperties = {
-  fontFamily: 'var(--mkt-font-mono)',
+  fontFamily: 'var(--nike-font-mono)',
   fontSize: '10px',
   fontWeight: 400,
   letterSpacing: '0.6px',
   textTransform: 'uppercase',
-  color: 'var(--mkt-ink)',
+  color: 'var(--nike-ink)',
   opacity: 0.55,
 }
 
 const INSPECTOR_INPUT_STYLE: React.CSSProperties = {
   width: '100%',
   height: '36px',
-  borderRadius: 'var(--mkt-rounded-md)',
-  border: '1px solid var(--mkt-hairline)',
-  backgroundColor: 'var(--mkt-canvas)',
+  borderRadius: 'var(--nike-admin-rounded-md)',
+  border: '1px solid var(--nike-hairline)',
+  backgroundColor: 'var(--nike-canvas)',
   padding: '0 10px',
-  fontFamily: 'var(--mkt-font-sans)',
+  fontFamily: 'var(--nike-font-text)',
   fontSize: '13px',
   fontWeight: 330,
-  color: 'var(--mkt-ink)',
+  color: 'var(--nike-ink)',
   outline: 'none',
 }
 
@@ -158,13 +158,13 @@ function SlotInspector({ slot, format, onChange, onDelete, readonly }: SlotInspe
                 }}
                 style={{
                   height: '32px',
-                  borderRadius: 'var(--mkt-rounded-sm)',
-                  border: '1px solid var(--mkt-hairline)',
-                  backgroundColor: 'var(--mkt-canvas)',
+                  borderRadius: 'var(--nike-admin-rounded-sm)',
+                  border: '1px solid var(--nike-hairline)',
+                  backgroundColor: 'var(--nike-canvas)',
                   padding: '0 8px',
-                  fontFamily: 'var(--mkt-font-sans)',
+                  fontFamily: 'var(--nike-font-text)',
                   fontSize: '12px',
-                  color: 'var(--mkt-ink)',
+                  color: 'var(--nike-ink)',
                   outline: 'none',
                   opacity: readonly ? 0.6 : 1,
                   width: '100%',
@@ -187,7 +187,7 @@ function SlotInspector({ slot, format, onChange, onDelete, readonly }: SlotInspe
           disabled={readonly}
           onChange={(e) => onChange({ ...slot, rotation: Number(e.target.value) })}
           className="w-full"
-          style={{ accentColor: 'var(--mkt-ink)', opacity: readonly ? 0.6 : 1 }}
+          style={{ accentColor: 'var(--nike-ink)', opacity: readonly ? 0.6 : 1 }}
         />
       </div>
 
@@ -195,10 +195,10 @@ function SlotInspector({ slot, format, onChange, onDelete, readonly }: SlotInspe
       <label
         className="flex items-center gap-2 cursor-pointer"
         style={{
-          fontFamily: 'var(--mkt-font-sans)',
+          fontFamily: 'var(--nike-font-text)',
           fontSize: '13px',
           fontWeight: 330,
-          color: 'var(--mkt-ink)',
+          color: 'var(--nike-ink)',
         }}
       >
         <input
@@ -206,7 +206,7 @@ function SlotInspector({ slot, format, onChange, onDelete, readonly }: SlotInspe
           checked={slot.locked}
           disabled={readonly}
           onChange={(e) => onChange({ ...slot, locked: e.target.checked })}
-          style={{ accentColor: 'var(--mkt-ink)', opacity: readonly ? 0.6 : 1 }}
+          style={{ accentColor: 'var(--nike-ink)', opacity: readonly ? 0.6 : 1 }}
         />
         자동 배치 잠금
       </label>
@@ -313,18 +313,18 @@ export function TemplateEditClient({ template, userRole }: TemplateEditClientPro
       <div
         className="flex items-center gap-3 px-4 py-3 flex-wrap"
         style={{
-          borderBottom: '1px solid var(--mkt-hairline)',
-          backgroundColor: 'var(--mkt-canvas)',
+          borderBottom: '1px solid var(--nike-hairline)',
+          backgroundColor: 'var(--nike-canvas)',
         }}
       >
         <Link
           href="/templates"
           className="inline-flex items-center gap-1 focus-visible:outline-none focus-visible:ring-2 rounded"
           style={{
-            fontFamily: 'var(--mkt-font-sans)',
+            fontFamily: 'var(--nike-font-text)',
             fontSize: '13px',
             fontWeight: 330,
-            color: 'var(--mkt-ink)',
+            color: 'var(--nike-ink)',
             opacity: 0.5,
             textDecoration: 'none',
           }}
@@ -341,14 +341,14 @@ export function TemplateEditClient({ template, userRole }: TemplateEditClientPro
             disabled={!canEdit}
             style={{
               height: '36px',
-              borderRadius: 'var(--mkt-rounded-md)',
-              border: '1px solid var(--mkt-hairline)',
-              backgroundColor: 'var(--mkt-canvas)',
+              borderRadius: 'var(--nike-admin-rounded-md)',
+              border: '1px solid var(--nike-hairline)',
+              backgroundColor: 'var(--nike-canvas)',
               padding: '0 12px',
-              fontFamily: 'var(--mkt-font-sans)',
+              fontFamily: 'var(--nike-font-text)',
               fontSize: '14px',
               fontWeight: 500,
-              color: 'var(--mkt-ink)',
+              color: 'var(--nike-ink)',
               outline: 'none',
               minWidth: 0,
               flex: '1 1 0',
@@ -360,9 +360,9 @@ export function TemplateEditClient({ template, userRole }: TemplateEditClientPro
           <span
             className="shrink-0"
             style={{
-              fontFamily: 'var(--mkt-font-mono)',
+              fontFamily: 'var(--nike-font-mono)',
               fontSize: '11px',
-              color: 'var(--mkt-ink)',
+              color: 'var(--nike-ink)',
               opacity: 0.4,
             }}
           >
@@ -378,12 +378,12 @@ export function TemplateEditClient({ template, userRole }: TemplateEditClientPro
             style={{
               height: '32px',
               padding: '0 12px',
-              borderRadius: 'var(--mkt-rounded-md)',
-              fontFamily: 'var(--mkt-font-mono)',
+              borderRadius: 'var(--nike-admin-rounded-md)',
+              fontFamily: 'var(--nike-font-mono)',
               fontSize: '11px',
               fontWeight: 400,
-              color: 'var(--mkt-ink)',
-              backgroundColor: showGrid ? 'var(--mkt-block-lime)' : 'var(--mkt-surface-soft)',
+              color: 'var(--nike-ink)',
+              backgroundColor: showGrid ? 'var(--nike-card-lime)' : 'var(--nike-soft-cloud)',
               border: 'none',
               cursor: 'pointer',
               transition: 'background-color 150ms ease',
@@ -415,11 +415,11 @@ export function TemplateEditClient({ template, userRole }: TemplateEditClientPro
           role="alert"
           style={{
             padding: '10px 16px',
-            borderBottom: '1px solid var(--mkt-hairline)',
-            backgroundColor: 'var(--mkt-block-pink)',
-            fontFamily: 'var(--mkt-font-sans)',
+            borderBottom: '1px solid var(--nike-hairline)',
+            backgroundColor: 'var(--nike-card-pink)',
+            fontFamily: 'var(--nike-font-text)',
             fontSize: '13px',
-            color: 'var(--mkt-ink)',
+            color: 'var(--nike-ink)',
           }}
         >
           {saveError}
@@ -431,7 +431,7 @@ export function TemplateEditClient({ template, userRole }: TemplateEditClientPro
         {/* 캔버스 영역 */}
         <div
           className="flex-1 min-w-0 overflow-hidden p-4"
-          style={{ backgroundColor: 'var(--mkt-surface-soft)' }}
+          style={{ backgroundColor: 'var(--nike-soft-cloud)' }}
         >
           <SlotCanvas
             format={template.format}
@@ -449,8 +449,8 @@ export function TemplateEditClient({ template, userRole }: TemplateEditClientPro
         <aside
           className="w-64 shrink-0 overflow-y-auto"
           style={{
-            borderLeft: '1px solid var(--mkt-hairline)',
-            backgroundColor: 'var(--mkt-canvas)',
+            borderLeft: '1px solid var(--nike-hairline)',
+            backgroundColor: 'var(--nike-canvas)',
           }}
           aria-label="슬롯 인스펙터"
         >
@@ -459,12 +459,12 @@ export function TemplateEditClient({ template, userRole }: TemplateEditClientPro
               <>
                 <h2
                   style={{
-                    fontFamily: 'var(--mkt-font-mono)',
+                    fontFamily: 'var(--nike-font-mono)',
                     fontSize: '11px',
                     fontWeight: 400,
                     letterSpacing: '0.6px',
                     textTransform: 'uppercase',
-                    color: 'var(--mkt-ink)',
+                    color: 'var(--nike-ink)',
                     opacity: 0.55,
                     marginBottom: '16px',
                   }}
@@ -483,10 +483,10 @@ export function TemplateEditClient({ template, userRole }: TemplateEditClientPro
               <div className="flex flex-col items-center justify-center py-12 text-center">
                 <p
                   style={{
-                    fontFamily: 'var(--mkt-font-sans)',
+                    fontFamily: 'var(--nike-font-text)',
                     fontSize: '14px',
                     fontWeight: 540,
-                    color: 'var(--mkt-ink)',
+                    color: 'var(--nike-ink)',
                     marginBottom: '4px',
                   }}
                 >
@@ -495,10 +495,10 @@ export function TemplateEditClient({ template, userRole }: TemplateEditClientPro
                 {canEdit && (
                   <p
                     style={{
-                      fontFamily: 'var(--mkt-font-sans)',
+                      fontFamily: 'var(--nike-font-text)',
                       fontSize: '12px',
                       fontWeight: 330,
-                      color: 'var(--mkt-ink)',
+                      color: 'var(--nike-ink)',
                       opacity: 0.55,
                     }}
                   >
@@ -511,15 +511,15 @@ export function TemplateEditClient({ template, userRole }: TemplateEditClientPro
 
           {/* 슬롯 목록 */}
           {slots.length > 0 && (
-            <div style={{ borderTop: '1px solid var(--mkt-hairline)', padding: '16px' }}>
+            <div style={{ borderTop: '1px solid var(--nike-hairline)', padding: '16px' }}>
               <h3
                 style={{
-                  fontFamily: 'var(--mkt-font-mono)',
+                  fontFamily: 'var(--nike-font-mono)',
                   fontSize: '10px',
                   fontWeight: 400,
                   letterSpacing: '0.6px',
                   textTransform: 'uppercase',
-                  color: 'var(--mkt-ink)',
+                  color: 'var(--nike-ink)',
                   opacity: 0.4,
                   marginBottom: '12px',
                 }}
@@ -538,12 +538,12 @@ export function TemplateEditClient({ template, userRole }: TemplateEditClientPro
                       className="flex items-center gap-2 text-left focus-visible:outline-none focus-visible:ring-2 rounded"
                       style={{
                         padding: '6px 8px',
-                        borderRadius: 'var(--mkt-rounded-sm)',
-                        backgroundColor: isSelected ? 'var(--mkt-block-lime)' : 'transparent',
-                        fontFamily: 'var(--mkt-font-sans)',
+                        borderRadius: 'var(--nike-admin-rounded-sm)',
+                        backgroundColor: isSelected ? 'var(--nike-card-lime)' : 'transparent',
+                        fontFamily: 'var(--nike-font-text)',
                         fontSize: '12px',
                         fontWeight: isSelected ? 540 : 330,
-                        color: 'var(--mkt-ink)',
+                        color: 'var(--nike-ink)',
                         border: 'none',
                         cursor: 'pointer',
                         transition: 'background-color 100ms ease',

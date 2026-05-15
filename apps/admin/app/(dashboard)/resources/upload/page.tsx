@@ -26,26 +26,26 @@ const KIND_LABELS: Record<ResourceKindValue, string> = {
 
 const INPUT_STYLE: React.CSSProperties = {
   height: '44px',
-  borderRadius: 'var(--mkt-rounded-md)',
-  border: '1px solid var(--mkt-hairline)',
-  backgroundColor: 'var(--mkt-canvas)',
+  borderRadius: 'var(--nike-admin-rounded-md)',
+  border: '1px solid var(--nike-hairline)',
+  backgroundColor: 'var(--nike-canvas)',
   padding: '0 12px',
-  fontFamily: 'var(--mkt-font-sans)',
+  fontFamily: 'var(--nike-font-text)',
   fontSize: '15px',
   fontWeight: 320,
-  color: 'var(--mkt-ink)',
+  color: 'var(--nike-ink)',
   outline: 'none',
   width: '100%',
   transition: 'border-color 150ms ease',
 }
 
 const LABEL_STYLE: React.CSSProperties = {
-  fontFamily: 'var(--mkt-font-mono)',
+  fontFamily: 'var(--nike-font-mono)',
   fontSize: '11px',
   fontWeight: 400,
   letterSpacing: '0.5px',
   textTransform: 'uppercase',
-  color: 'var(--mkt-ink)',
+  color: 'var(--nike-ink)',
   opacity: 0.55,
   marginBottom: '6px',
   display: 'block',
@@ -147,16 +147,16 @@ export default function ResourceUploadPage() {
   }
 
   return (
-    <div className="p-6 lg:p-10 max-w-2xl" style={{ fontFamily: 'var(--mkt-font-sans)' }}>
+    <div className="p-6 lg:p-10 max-w-2xl" style={{ fontFamily: 'var(--nike-font-text)' }}>
       {/* 뒤로 가기 */}
       <Link
         href="/resources"
         className="mb-6 inline-flex items-center gap-1.5 focus-visible:outline-none focus-visible:ring-2 rounded"
         style={{
-          fontFamily: 'var(--mkt-font-sans)',
+          fontFamily: 'var(--nike-font-text)',
           fontSize: '14px',
           fontWeight: 330,
-          color: 'var(--mkt-ink)',
+          color: 'var(--nike-ink)',
           opacity: 0.5,
           textDecoration: 'none',
         }}
@@ -167,12 +167,12 @@ export default function ResourceUploadPage() {
 
       <p
         style={{
-          fontFamily: 'var(--mkt-font-mono)',
+          fontFamily: 'var(--nike-font-mono)',
           fontSize: '11px',
           fontWeight: 400,
           letterSpacing: '0.6px',
           textTransform: 'uppercase',
-          color: 'var(--mkt-ink)',
+          color: 'var(--nike-ink)',
           opacity: 0.4,
           marginBottom: '6px',
         }}
@@ -181,12 +181,12 @@ export default function ResourceUploadPage() {
       </p>
       <h1
         style={{
-          fontFamily: 'var(--mkt-font-sans)',
+          fontFamily: 'var(--nike-font-text)',
           fontSize: 'clamp(24px, 3.5vw, 32px)',
           fontWeight: 340,
           lineHeight: 1.1,
           letterSpacing: '-0.96px',
-          color: 'var(--mkt-ink)',
+          color: 'var(--nike-ink)',
           marginBottom: '6px',
         }}
       >
@@ -194,10 +194,10 @@ export default function ResourceUploadPage() {
       </h1>
       <p
         style={{
-          fontFamily: 'var(--mkt-font-sans)',
+          fontFamily: 'var(--nike-font-text)',
           fontSize: '15px',
           fontWeight: 330,
-          color: 'var(--mkt-ink)',
+          color: 'var(--nike-ink)',
           opacity: 0.55,
           marginBottom: '32px',
         }}
@@ -225,9 +225,9 @@ export default function ResourceUploadPage() {
           className="relative flex flex-col items-center justify-center gap-3 cursor-pointer transition-colors focus-visible:outline-none focus-visible:ring-2"
           style={{
             padding: '32px',
-            borderRadius: 'var(--mkt-rounded-lg)',
-            border: isDragging ? '2px solid var(--mkt-ink)' : '1.5px dashed var(--mkt-hairline)',
-            backgroundColor: isDragging ? 'var(--mkt-block-lime)' : 'var(--mkt-canvas)',
+            borderRadius: 'var(--nike-admin-rounded-lg)',
+            border: isDragging ? '2px solid var(--nike-ink)' : '1.5px dashed var(--nike-hairline)',
+            backgroundColor: isDragging ? 'var(--nike-card-lime)' : 'var(--nike-canvas)',
             minHeight: '180px',
           }}
         >
@@ -241,24 +241,24 @@ export default function ResourceUploadPage() {
                   maxHeight: '192px',
                   maxWidth: '100%',
                   objectFit: 'contain',
-                  borderRadius: 'var(--mkt-rounded-md)',
+                  borderRadius: 'var(--nike-admin-rounded-md)',
                 }}
               />
               <p
                 style={{
-                  fontFamily: 'var(--mkt-font-sans)',
+                  fontFamily: 'var(--nike-font-text)',
                   fontSize: '14px',
                   fontWeight: 330,
-                  color: 'var(--mkt-ink)',
+                  color: 'var(--nike-ink)',
                 }}
               >
                 {file?.name}
               </p>
               <p
                 style={{
-                  fontFamily: 'var(--mkt-font-mono)',
+                  fontFamily: 'var(--nike-font-mono)',
                   fontSize: '12px',
-                  color: 'var(--mkt-ink)',
+                  color: 'var(--nike-ink)',
                   opacity: 0.45,
                 }}
               >
@@ -271,15 +271,15 @@ export default function ResourceUploadPage() {
                 style={{
                   width: '48px',
                   height: '48px',
-                  borderRadius: 'var(--mkt-rounded-full)',
-                  backgroundColor: 'var(--mkt-surface-soft)',
+                  borderRadius: 'var(--nike-rounded-full)',
+                  backgroundColor: 'var(--nike-soft-cloud)',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
                 }}
               >
                 <svg
-                  style={{ width: '24px', height: '24px', color: 'var(--mkt-ink)', opacity: 0.5 }}
+                  style={{ width: '24px', height: '24px', color: 'var(--nike-ink)', opacity: 0.5 }}
                   fill="none"
                   viewBox="0 0 24 24"
                   stroke="currentColor"
@@ -296,10 +296,10 @@ export default function ResourceUploadPage() {
               <div className="text-center">
                 <p
                   style={{
-                    fontFamily: 'var(--mkt-font-sans)',
+                    fontFamily: 'var(--nike-font-text)',
                     fontSize: '15px',
                     fontWeight: 480,
-                    color: 'var(--mkt-ink)',
+                    color: 'var(--nike-ink)',
                     marginBottom: '4px',
                   }}
                 >
@@ -307,9 +307,9 @@ export default function ResourceUploadPage() {
                 </p>
                 <p
                   style={{
-                    fontFamily: 'var(--mkt-font-mono)',
+                    fontFamily: 'var(--nike-font-mono)',
                     fontSize: '12px',
-                    color: 'var(--mkt-ink)',
+                    color: 'var(--nike-ink)',
                     opacity: 0.4,
                     letterSpacing: '0.3px',
                   }}
@@ -358,19 +358,19 @@ export default function ResourceUploadPage() {
               flexDirection: 'column',
               gap: '16px',
               padding: '20px',
-              borderRadius: 'var(--mkt-rounded-lg)',
-              border: '1px solid var(--mkt-hairline)',
-              backgroundColor: 'var(--mkt-surface-soft)',
+              borderRadius: 'var(--nike-admin-rounded-lg)',
+              border: '1px solid var(--nike-hairline)',
+              backgroundColor: 'var(--nike-soft-cloud)',
             }}
           >
             <legend
               style={{
-                fontFamily: 'var(--mkt-font-mono)',
+                fontFamily: 'var(--nike-font-mono)',
                 fontSize: '11px',
                 fontWeight: 400,
                 letterSpacing: '0.5px',
                 textTransform: 'uppercase',
-                color: 'var(--mkt-ink)',
+                color: 'var(--nike-ink)',
                 opacity: 0.55,
                 padding: '0 4px',
               }}
@@ -442,9 +442,9 @@ export default function ResourceUploadPage() {
                   display: 'inline-flex',
                   height: '24px',
                   width: '44px',
-                  borderRadius: 'var(--mkt-rounded-full)',
+                  borderRadius: 'var(--nike-rounded-full)',
                   border: '2px solid transparent',
-                  backgroundColor: flippable ? 'var(--mkt-ink)' : 'var(--mkt-hairline)',
+                  backgroundColor: flippable ? 'var(--nike-ink)' : 'var(--nike-hairline)',
                   transition: 'background-color 150ms ease',
                   cursor: 'pointer',
                   flexShrink: 0,
@@ -455,8 +455,8 @@ export default function ResourceUploadPage() {
                     display: 'inline-block',
                     width: '20px',
                     height: '20px',
-                    borderRadius: 'var(--mkt-rounded-full)',
-                    backgroundColor: 'var(--mkt-canvas)',
+                    borderRadius: 'var(--nike-rounded-full)',
+                    backgroundColor: 'var(--nike-canvas)',
                     boxShadow: '0 1px 3px rgba(0,0,0,0.2)',
                     transform: flippable ? 'translateX(20px)' : 'translateX(0)',
                     transition: 'transform 150ms ease',
@@ -465,10 +465,10 @@ export default function ResourceUploadPage() {
               </button>
               <label
                 style={{
-                  fontFamily: 'var(--mkt-font-sans)',
+                  fontFamily: 'var(--nike-font-text)',
                   fontSize: '14px',
                   fontWeight: 330,
-                  color: 'var(--mkt-ink)',
+                  color: 'var(--nike-ink)',
                   opacity: 0.7,
                   cursor: 'default',
                 }}
@@ -486,9 +486,9 @@ export default function ResourceUploadPage() {
             className="flex flex-wrap gap-1.5 focus-within:ring-2"
             style={{
               minHeight: '44px',
-              borderRadius: 'var(--mkt-rounded-md)',
-              border: '1px solid var(--mkt-hairline)',
-              backgroundColor: 'var(--mkt-canvas)',
+              borderRadius: 'var(--nike-admin-rounded-md)',
+              border: '1px solid var(--nike-hairline)',
+              backgroundColor: 'var(--nike-canvas)',
               padding: '8px 12px',
             }}
           >
@@ -500,12 +500,12 @@ export default function ResourceUploadPage() {
                   alignItems: 'center',
                   gap: '4px',
                   padding: '2px 8px',
-                  borderRadius: 'var(--mkt-rounded-full)',
-                  backgroundColor: 'var(--mkt-block-lime)',
-                  fontFamily: 'var(--mkt-font-sans)',
+                  borderRadius: 'var(--nike-rounded-full)',
+                  backgroundColor: 'var(--nike-card-lime)',
+                  fontFamily: 'var(--nike-font-text)',
                   fontSize: '12px',
                   fontWeight: 480,
-                  color: 'var(--mkt-ink)',
+                  color: 'var(--nike-ink)',
                 }}
               >
                 {tag}
@@ -517,7 +517,7 @@ export default function ResourceUploadPage() {
                     background: 'none',
                     border: 'none',
                     cursor: 'pointer',
-                    color: 'var(--mkt-ink)',
+                    color: 'var(--nike-ink)',
                     opacity: 0.6,
                     padding: '0',
                     lineHeight: 1,
@@ -547,10 +547,10 @@ export default function ResourceUploadPage() {
                 background: 'transparent',
                 border: 'none',
                 outline: 'none',
-                fontFamily: 'var(--mkt-font-sans)',
+                fontFamily: 'var(--nike-font-text)',
                 fontSize: '14px',
                 fontWeight: 320,
-                color: 'var(--mkt-ink)',
+                color: 'var(--nike-ink)',
               }}
             />
           </div>
@@ -561,14 +561,14 @@ export default function ResourceUploadPage() {
           <div
             role="alert"
             style={{
-              borderRadius: 'var(--mkt-rounded-md)',
-              backgroundColor: 'var(--mkt-block-pink)',
-              border: '1px solid #e0b0b0',
+              borderRadius: 'var(--nike-admin-rounded-md)',
+              backgroundColor: 'var(--nike-card-pink)',
+              border: '1px solid color-mix(in srgb, var(--nike-sale) 28%, var(--nike-canvas))',
               padding: '10px 14px',
-              fontFamily: 'var(--mkt-font-sans)',
+              fontFamily: 'var(--nike-font-text)',
               fontSize: '14px',
               fontWeight: 330,
-              color: '#8b2222',
+              color: 'var(--nike-sale-deep)',
             }}
           >
             {error}
@@ -580,7 +580,7 @@ export default function ResourceUploadPage() {
           <button
             type="submit"
             disabled={!file || isUploading}
-            className="mkt-btn-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2"
+            className="nike-btn-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2"
             style={{
               gap: '8px',
               display: 'inline-flex',
@@ -595,9 +595,9 @@ export default function ResourceUploadPage() {
                   display: 'inline-block',
                   width: '16px',
                   height: '16px',
-                  border: '2px solid var(--mkt-canvas)',
+                  border: '2px solid var(--nike-canvas)',
                   borderTopColor: 'transparent',
-                  borderRadius: 'var(--mkt-rounded-full)',
+                  borderRadius: 'var(--nike-rounded-full)',
                   animation: 'spin 0.6s linear infinite',
                 }}
                 aria-hidden="true"
@@ -608,7 +608,7 @@ export default function ResourceUploadPage() {
           <button
             type="button"
             onClick={() => router.back()}
-            className="mkt-btn-secondary focus-visible:outline-none focus-visible:ring-2"
+            className="nike-btn-secondary focus-visible:outline-none focus-visible:ring-2"
           >
             취소
           </button>

@@ -3,6 +3,7 @@
  *
  * status='draft' OR status='review' 인 항목을 ReviewQueue 로 표시.
  */
+import type { Prisma } from '@prisma/client'
 import Link from 'next/link'
 
 import { requireRole } from '../../../../src/lib/auth'
@@ -15,27 +16,28 @@ export const dynamic = 'force-dynamic'
 export default async function ResourceReviewPage() {
   const user = await requireRole('curator')
 
-  const resources = await prisma.resource.findMany({
-    where: { status: { in: ['draft', 'review'] } },
-    orderBy: { createdAt: 'asc' }, // 오래된 것 먼저
-    take: 50,
-    select: {
-      id: true,
-      slug: true,
-      kind: true,
-      thumbUrl: true,
-      variants: true,
-      meta: true,
-      tags: true,
-      status: true,
-      lowDpi: true,
-      createdAt: true,
-    },
-  })
+  const pendingWhere: Prisma.ResourceWhereInput = { status: { in: ['draft', 'review'] } }
 
-  const totalPending = await prisma.resource.count({
-    where: { status: { in: ['draft', 'review'] } },
-  })
+  const [resources, totalPending] = await Promise.all([
+    prisma.resource.findMany({
+      where: pendingWhere,
+      orderBy: { createdAt: 'asc' }, // 오래된 것 먼저
+      take: 50,
+      select: {
+        id: true,
+        slug: true,
+        kind: true,
+        thumbUrl: true,
+        variants: true,
+        meta: true,
+        tags: true,
+        status: true,
+        lowDpi: true,
+        createdAt: true,
+      },
+    }),
+    prisma.resource.count({ where: pendingWhere }),
+  ])
 
   const items = resources.map((r) => ({
     id: r.id,
@@ -50,18 +52,18 @@ export default async function ResourceReviewPage() {
   }))
 
   return (
-    <div className="nike-page" style={{ fontFamily: 'var(--mkt-font-sans)' }}>
+    <div className="nike-page" style={{ fontFamily: 'var(--nike-font-text)' }}>
       {/* 헤더 */}
       <div className="mb-8 flex items-start justify-between gap-4">
         <div>
           <p
             style={{
-              fontFamily: 'var(--mkt-font-mono)',
+              fontFamily: 'var(--nike-font-mono)',
               fontSize: '11px',
               fontWeight: 400,
               letterSpacing: '0.6px',
               textTransform: 'uppercase',
-              color: 'var(--mkt-ink)',
+              color: 'var(--nike-ink)',
               opacity: 0.4,
               marginBottom: '6px',
             }}
@@ -70,12 +72,12 @@ export default async function ResourceReviewPage() {
           </p>
           <h1
             style={{
-              fontFamily: 'var(--mkt-font-sans)',
+              fontFamily: 'var(--nike-font-text)',
               fontSize: 'clamp(24px, 3.5vw, 32px)',
               fontWeight: 340,
               lineHeight: 1.1,
               letterSpacing: '-0.96px',
-              color: 'var(--mkt-ink)',
+              color: 'var(--nike-ink)',
               marginBottom: '6px',
             }}
           >
@@ -83,10 +85,10 @@ export default async function ResourceReviewPage() {
           </h1>
           <p
             style={{
-              fontFamily: 'var(--mkt-font-sans)',
+              fontFamily: 'var(--nike-font-text)',
               fontSize: '15px',
               fontWeight: 330,
-              color: 'var(--mkt-ink)',
+              color: 'var(--nike-ink)',
               opacity: 0.55,
             }}
           >
@@ -98,10 +100,10 @@ export default async function ResourceReviewPage() {
         <Link
           href="/resources"
           style={{
-            fontFamily: 'var(--mkt-font-sans)',
+            fontFamily: 'var(--nike-font-text)',
             fontSize: '14px',
             fontWeight: 330,
-            color: 'var(--mkt-ink)',
+            color: 'var(--nike-ink)',
             opacity: 0.5,
             textDecoration: 'none',
           }}

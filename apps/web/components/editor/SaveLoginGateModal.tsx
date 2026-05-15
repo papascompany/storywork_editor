@@ -125,7 +125,7 @@ export function SaveLoginGateModal({ open, onClose }: SaveLoginGateModalProps) {
             'text-[var(--color-text-muted)]',
             'hover:bg-[var(--color-surface-muted)] hover:text-[var(--color-text)]',
             'transition-colors duration-[var(--duration-fast)]',
-            'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-brand-500)]',
+            'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--editor-focus)]',
           )}
         >
           <X className="size-4" aria-hidden="true" />
@@ -136,18 +136,18 @@ export function SaveLoginGateModal({ open, onClose }: SaveLoginGateModalProps) {
           className={cn(
             'flex items-center justify-center',
             'size-16 rounded-full',
-            'bg-[var(--color-brand-50,#f0f0ff)]',
+            'bg-[var(--editor-selected-bg)]',
           )}
           aria-hidden="true"
         >
           <div className="relative">
-            <BookOpen className="size-8 text-[var(--color-brand-400,#7c7cf0)]" aria-hidden="true" />
+            <BookOpen className="size-8 text-[var(--editor-accent)]" aria-hidden="true" />
             <Lock
               className={cn(
                 'absolute -bottom-0.5 -right-1',
                 'size-4',
-                'text-[var(--color-brand-600,#5b5bd6)]',
-                'bg-[var(--color-brand-50,#f0f0ff)]',
+                'text-[var(--editor-accent)]',
+                'bg-[var(--editor-selected-bg)]',
                 'rounded-full p-0.5',
               )}
               aria-hidden="true"
@@ -188,14 +188,14 @@ export function SaveLoginGateModal({ open, onClose }: SaveLoginGateModalProps) {
             className={cn(
               'w-full',
               'rounded-full',
-              'bg-[var(--color-brand-500,#6b6bf0)]',
+              'bg-[var(--editor-accent)]',
               'px-6 py-3',
-              'text-sm font-semibold text-white',
+              'text-sm font-semibold text-[var(--color-text-inverse)]',
               'shadow-sm',
-              'hover:bg-[var(--color-brand-600,#5b5bd6)]',
+              'hover:opacity-90',
               'active:scale-[0.98]',
               'transition-all duration-[var(--duration-fast)]',
-              'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-brand-500)] focus-visible:ring-offset-2',
+              'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--editor-focus)] focus-visible:ring-offset-2',
               // 터치 타겟
               'min-h-[2.75rem]',
             )}
@@ -214,10 +214,10 @@ export function SaveLoginGateModal({ open, onClose }: SaveLoginGateModalProps) {
               'bg-[var(--color-surface-muted)]',
               'px-6 py-3',
               'text-sm font-medium text-[var(--color-text)]',
-              'hover:bg-[var(--color-surface)] hover:border-[var(--color-brand-300,#a5a5f7)]',
+              'hover:bg-[var(--color-surface)] hover:border-[var(--editor-border-strong)]',
               'active:scale-[0.98]',
               'transition-all duration-[var(--duration-fast)]',
-              'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-brand-500)] focus-visible:ring-offset-2',
+              'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--editor-focus)] focus-visible:ring-offset-2',
               'min-h-[2.75rem]',
             )}
           >
@@ -233,7 +233,7 @@ export function SaveLoginGateModal({ open, onClose }: SaveLoginGateModalProps) {
               'text-sm text-[var(--color-text-muted)]',
               'hover:text-[var(--color-text)]',
               'transition-colors duration-[var(--duration-fast)]',
-              'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-brand-500)] focus-visible:ring-offset-2 rounded',
+              'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--editor-focus)] focus-visible:ring-offset-2 rounded',
               'min-h-[2.75rem]',
             )}
           >

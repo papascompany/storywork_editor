@@ -149,7 +149,7 @@ function PanelSearch({ label, disabled = false }: PanelSearchProps) {
           'pl-8 pr-3 py-1.5',
           'text-[13px] text-[var(--editor-text)]',
           'placeholder:text-[var(--editor-text-muted)]',
-          'focus:outline-none focus:ring-2 focus:ring-[var(--color-brand-500)] focus:border-transparent',
+          'focus:outline-none focus:ring-2 focus:ring-[var(--editor-focus)] focus:border-transparent',
           'transition-colors duration-[var(--duration-fast)]',
           disabled && 'cursor-not-allowed opacity-50',
         )}
@@ -314,7 +314,7 @@ export function FeatureSidebar({
               'text-[var(--editor-text-muted)]',
               'hover:bg-[var(--editor-hover)] hover:text-[var(--editor-text)]',
               'transition-colors duration-[var(--duration-fast)]',
-              'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-brand-500)]',
+              'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--editor-focus)]',
             )}
           >
             <X className="size-4" aria-hidden="true" />

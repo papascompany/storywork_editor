@@ -16,7 +16,15 @@ export default async function FormatsPage() {
 
   const formats = await prisma.format.findMany({
     orderBy: { createdAt: 'desc' },
-    include: {
+    select: {
+      id: true,
+      name: true,
+      widthMm: true,
+      heightMm: true,
+      dpi: true,
+      bleedMm: true,
+      safeMm: true,
+      createdAt: true,
       _count: { select: { templates: true } },
     },
   })
