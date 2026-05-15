@@ -230,7 +230,7 @@ export function TemplatePanel({ canvas }: TemplatePanelProps) {
   return (
     <div className="flex flex-col h-full overflow-hidden">
       {/* 검색창 */}
-      <div className="relative px-4 py-3 border-b border-[var(--editor-border)] shrink-0">
+      <div className="relative px-5 py-3 border-b border-[var(--editor-border)] shrink-0">
         <Search
           className="absolute left-7 top-1/2 -translate-y-1/2 size-4 text-[var(--editor-text-muted)] pointer-events-none"
           aria-hidden="true"
@@ -291,7 +291,7 @@ export function TemplatePanel({ canvas }: TemplatePanelProps) {
       {/* 안내 */}
       <div
         className={cn(
-          'shrink-0 px-4 py-3 border-t border-[var(--editor-border)]',
+          'shrink-0 px-5 py-3 border-t border-[var(--editor-border)]',
           'text-[11px] text-[var(--editor-text-muted)]',
         )}
       >

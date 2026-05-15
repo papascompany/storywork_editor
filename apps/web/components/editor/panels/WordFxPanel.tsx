@@ -307,7 +307,7 @@ export function WordFxPanel({ canvas, history }: WordFxPanelProps) {
 
       {/* 선택 안내 */}
       {!hasSelection && (
-        <div className="px-4 py-2 shrink-0">
+        <div className="px-5 py-2 shrink-0">
           <p className="text-[11px] text-[var(--color-warning-600)] bg-[var(--color-warning-50)] rounded-[var(--radius-sm)] px-3 py-2">
             텍스트 객체를 먼저 선택하세요.
           </p>
@@ -370,7 +370,7 @@ export function WordFxPanel({ canvas, history }: WordFxPanelProps) {
       </div>
 
       {/* 개수 표시 */}
-      <div className="px-4 py-2 border-t border-[var(--editor-border)] shrink-0">
+      <div className="px-5 py-2 border-t border-[var(--editor-border)] shrink-0">
         <p className="text-[10px] text-[var(--editor-text-muted)]">
           {displayedEffects.length}개 효과
           {query.trim() ? ` (검색: "${query}")` : ''}
