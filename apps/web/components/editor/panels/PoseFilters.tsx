@@ -138,7 +138,7 @@ export function PoseFilters({ value, onChange }: PoseFiltersProps): React.JSX.El
         onClick={() => setExpanded((v) => !v)}
         className={cn(
           'flex w-full items-center justify-between',
-          'px-4 py-4',
+          'px-6 py-4',
           'text-[12px] font-semibold uppercase tracking-wide',
           'text-[var(--editor-text-muted)]',
           'hover:bg-[var(--editor-hover)]',
