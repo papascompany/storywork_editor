@@ -124,18 +124,18 @@
 
 ## 후속 이슈 (오토파일럿 진행 중 발견)
 
-- [x] **[FOLLOWUP-51] (P0) 시각 검증 자동화 (visual-check)** ✅ 2026-05-16 (커밋 PR#followup-infra) — 회고 §6.1-A 대응. 코드 변경 → AI 가 30초 안에 dev 화면 screenshot 으로 직접 검증. 산출물:
+- [x] **[FOLLOWUP-51] (P0) 시각 검증 자동화 (visual-check)** ✅ 2026-05-16 (커밋 b9b2f23) — 회고 §6.1-A 대응. 코드 변경 → AI 가 30초 안에 dev 화면 screenshot 으로 직접 검증. 산출물:
   1. `scripts/visual-check.sh` — headless chromium 기반. 인자로 URL/경로 + viewport 받아 `tmp/visual/{slug}.png` 저장. 서버 미기동 시 명확 에러.
   2. `scripts/visual-check.ts` — TS 래퍼 (Playwright chromium-headless). selector 영역만 캡처 지원.
   3. `.claude/commands/visual-check.md` — `/visual-check <route> [selector]` 슬래시 커맨드.
   4. `package.json` `"visual-check": "bash scripts/visual-check.sh"` 등록. `tmp/` git-ignored.
   DoD 충족: `pnpm visual-check /editor` → `tmp/visual/editor.png` 생성 + git ignored. ui-designer 에 `/visual-check` 호출 의무 추가 — @architect + @qa-tester
-- [x] **[FOLLOWUP-52] (P0) CI polling 자동화** ✅ 2026-05-16 (커밋 PR#followup-infra) — 회고 §5.2-⑦ 대응. push 직후 GitHub Actions 결과를 자동 polling, 실패 시 즉시 알림. 산출물:
+- [x] **[FOLLOWUP-52] (P0) CI polling 자동화** ✅ 2026-05-16 (커밋 b9b2f23) — 회고 §5.2-⑦ 대응. push 직후 GitHub Actions 결과를 자동 polling, 실패 시 즉시 알림. 산출물:
   1. `scripts/ci-watch.sh` — 현재 브랜치 HEAD 의 워크플로 run 을 gh CLI 로 추적. 실패 시 `gh run view --log-failed` 핵심 50줄 stdout.
   2. `.claude/commands/ci-watch.md` — `/ci-watch` 슬래시 커맨드. orchestrator PR 흐름 통합.
   3. `package.json` `"ci-watch": "bash scripts/ci-watch.sh"` 등록.
   DoD 충족: `pnpm ci-watch` 로 in-progress run 추적, success(0)/failure(1)/timeout(3) 종료 코드. gh CLI 없으면 exit 2 + 안내 (hang 없음). 실패 로그 자동 요약 — @architect
-- [x] **[FOLLOWUP-53] (P0) 의사결정 트리 워크플로우 (명세화→동의→구현→검증)** ✅ 2026-05-16 (커밋 PR#followup-infra) — 회고 §7.3 대응. UI 피드백 처리 절차를 SOP 문서 + 슬래시 커맨드로 고정. 산출물:
+- [x] **[FOLLOWUP-53] (P0) 의사결정 트리 워크플로우 (명세화→동의→구현→검증)** ✅ 2026-05-16 (커밋 b9b2f23) — 회고 §7.3 대응. UI 피드백 처리 절차를 SOP 문서 + 슬래시 커맨드로 고정. 산출물:
   1. `docs/process/ui-feedback-workflow.md` — 8단계 트리 + 책임 분담 + 시각 임계값 가이드 (4px 인식 불가 등).
   2. `.claude/commands/ui-spec.md` — `/ui-spec <issue>` 슬래시 커맨드: 사용자 직관 표현 → 명세표(측정/진단/제안) 자동 생성 → 동의 후 진행.
   3. `.claude/agents/ui-designer.md` 에 "UI 피드백 트리 (FOLLOWUP-53)" 섹션 추가 (기존 책임 유지, 트리만 추가). 2회 실패 escalate, 3회 멈춤.
