@@ -218,16 +218,12 @@
 }
 
 /* ── 기본 리셋 ────────────────────────────────────────────────────────────── */
-*,
-*::before,
-*::after {
-  box-sizing: border-box;
-}
-
-* {
-  margin: 0;
-  padding: 0;
-}
+/* Tailwind v4 preflight 가 `*, ::backdrop, ::after, ::before` 에 대해
+ * box-sizing/margin/padding/border 를 @layer base 에서 reset 하므로
+ * 별도의 universal reset 을 두면 cascade 순서상 utility(.p-N/.gap-N/.m-N)를
+ * 덮어쓴다(2026-05-16 회고 §3 13일 spacing 실패의 진짜 본질).
+ * 따라서 universal reset 은 두지 않는다.
+ */
 
 html {
   -webkit-font-smoothing: antialiased;
