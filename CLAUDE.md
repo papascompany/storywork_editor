@@ -351,6 +351,10 @@ UI 작업 시 다음 SOP 를 반드시 준수한다 (2026-05-15 회고 기반):
 | 사용자 SVG 악성 코드(향후) | XSS | DOMPurify + SVG 새니타이저, `<script>`/외부 ref 차단 |
 | PNG 색상 변경 불가능(SVG 와의 차이) | 일관된 룩 어려움 | 사이드카 `tintMaskUrl` 또는 fabric 필터(`BlendColor`)로 보조. 색 슬롯 강조 자산은 SVG 권장(향후) |
 | 1,000개 포즈 라이선스/일관성 | 법적/품질 리스크 | 사이드카 `license` 필드 강제, 누락 시 적재 거부 + 검수 큐 |
+| **Tailwind v4 monorepo utility 사일런트 누락** (2026-05-17 회고) | spacing/padding utility 자체가 CSS 에 없음 → 모든 UI 작업 무효 | `packages/shared-ui/src/styles/globals.css` `@source` directive 로 monorepo 모든 source 경로 명시 + FOLLOWUP-55 CI sanity check |
+| **Layer 밖 universal CSS reset** (`* { padding: 0 }`) | Tailwind utility cascade 덮어씀 → utility 작동 안 함 | Tailwind v4 preflight 가 layer base 에서 제공하므로 외부 universal reset 금지 + FOLLOWUP-57 ESLint 룰 |
+| **Vercel Hobby Plan + private repo + collaborator** | 모든 deploy BLOCKED, prod 가 옛 빌드 그대로 (13일 spacing 실패의 진짜 원인 중 하나) | repo public 유지 또는 Pro plan 업그레이드. visibility 변경 시 plan 호환성 사전 확인 |
+| **turbo-ignore HEAD~1 skip** | shared 변경 commit 이 BLOCKED 후 후속 commit 만 새 빌드되면 app 자동 skip | app entry CSS/code 에 trivial 변경 commit 으로 force trigger. CI 모니터링으로 admin/web 양쪽 빌드 상태 자동 확인 |
 
 ---
 

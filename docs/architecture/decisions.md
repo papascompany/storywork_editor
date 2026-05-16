@@ -120,4 +120,39 @@
 
 ---
 
+## ADR-0013 — Tailwind v4 monorepo `@source` directive 의무화
+
+- **결정**: `packages/shared-ui/src/styles/globals.css` 의 `@import 'tailwindcss'` 직후 `@source` directive 로 monorepo 의 모든 source 경로(apps/web, apps/admin, packages) 를 명시한다. 신규 패키지에 className 사용처 추가 시 `@source` 갱신 의무.
+- **맥락**: 2026-05-17 회고 (Layer 3). Tailwind v4 의 자동 source detection 은 `@import 'tailwindcss'` 가 위치한 CSS 파일의 **package** 만 scan 한다. shared-ui 안에 entry 가 있고 utility 사용처는 `apps/web/components/**`, `apps/admin/components/**`, `packages/editor-*/src/**` 에 있으므로 **utility 가 아예 생성되지 않는 사일런트 버그** 발생. prod CSS 의 `.p-N` rule count = 0. 회고 §3 spacing 12 commits 가 헛수고였던 진짜 root cause 중 하나.
+- **결정 내용**:
+  ```css
+  @import 'tailwindcss';
+  @source "../../../../apps/web";
+  @source "../../../../apps/admin";
+  @source "../../../../packages";
+  ```
+- **회귀 방지**:
+  - FOLLOWUP-55 — CI 에 빌드 산출물 CSS sanity check 추가
+  - 신규 패키지/앱 추가 시 PR 체크리스트에 `@source` 갱신 항목
+- **fix commit**: `14bdeb8` (2026-05-17)
+
+## ADR-0014 — Layer 밖 universal `*` selector reset 금지
+
+- **결정**: `* { margin: 0; padding: 0 }` 같은 layer 밖 universal box-model reset 을 두지 않는다. Tailwind v4 의 preflight (`*, ::backdrop, ::after, ::before` in `@layer base`) 만 사용한다.
+- **맥락**: 2026-05-17 회고 (Layer 2). `packages/shared-ui/src/styles/globals.css:227-230` 의 무명 `* { margin: 0; padding: 0 }` 가 Tailwind 의 `@layer utilities .p-N` 보다 **cascade 순서상 뒤**에 와서 padding utility 를 모두 0 으로 덮어씀. prod CSS 에 `.p-5{padding:calc(var(--spacing) * 5)}` rule 이 있어도 `computed paddingLeft: 0px`. gap 은 작동(padding 만 reset 됨)하는 비대칭 증상.
+- **anti-pattern**:
+  ```css
+  /* ❌ 금지 — layer 밖 universal reset */
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+  ```
+- **권장**: Tailwind v4 preflight 동일 reset 을 `@layer base` 에서 제공. 추가 reset 필요 시 명시적 `@layer base { ... }` 안에 둘 것.
+- **회귀 방지**: FOLLOWUP-57 — ESLint/stylelint custom rule 로 자동 검출
+- **fix commit**: `1900713` (2026-05-17)
+
+---
+
 신규 ADR 은 다음 번호로 추가하고 `roadmap.md` 의 관련 작업에서 링크.
