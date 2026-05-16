@@ -312,6 +312,20 @@ fabricJson 초안
 다음 작업은 **반드시** 휴먼 승인 후 진행:
 - 데이터 마이그레이션, 결제 연동 변경, 외부 API 키 발급, 프로덕션 배포, 가격/플랜 변경.
 
+### 7.4 UI 피드백 워크플로우 (FOLLOWUP-53)
+
+UI 작업 시 다음 SOP 를 반드시 준수한다 (2026-05-15 회고 기반):
+
+1. **명세화** — 사용자 직관 표현("다닥다닥") → `/ui-spec <issue>` 로 측정값+제안 명세표 생성
+2. **동의** — 사용자 동의 후 구현 시작 (추측 구현 금지)
+3. **구현**
+4. **시각 검증** — `/visual-check <route>` 로 AI 직접 screenshot 확인 후 push
+5. **CI 확인** — `/ci-watch` 로 Actions green 확인 후 PR
+
+3회 실패 시 즉시 멈추고 사용자 재확인 요청. 4px 변화는 push 하지 않는다.
+
+전체 SOP: [docs/process/ui-feedback-workflow.md](docs/process/ui-feedback-workflow.md)
+
 ---
 
 ## 8. 코딩 가이드 (요약)

@@ -31,7 +31,9 @@
     "supabase:status": "supabase status",
     "ingest:dry": "tsx --tsconfig tsconfig.scripts.json scripts/ingest-poses.ts --dry-run",
     "ingest:sample": "tsx --tsconfig tsconfig.scripts.json scripts/ingest-poses.ts --limit 5",
-    "ingest:full": "tsx --tsconfig tsconfig.scripts.json scripts/ingest-poses.ts"
+    "ingest:full": "tsx --tsconfig tsconfig.scripts.json scripts/ingest-poses.ts",
+    "visual-check": "bash scripts/visual-check.sh",
+    "ci-watch": "bash scripts/ci-watch.sh"
   },
   "devDependencies": {
     "@commitlint/cli": "^19.0.0",

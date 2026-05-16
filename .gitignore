@@ -85,6 +85,9 @@ packages/*/src/**/*.js
 packages/*/src/**/*.js.map
 package-lock.json
 
+# 시각 검증 스크린샷 (tmp/visual/) — git-ignored
+tmp/
+
 # 에이전트/도구 메타 (사용자별 환경, 공유 금지)
 .codex/
 .claire/

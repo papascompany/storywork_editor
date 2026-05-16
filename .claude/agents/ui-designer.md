@@ -71,3 +71,49 @@ pnpm --filter @storywork/admin build
 - 토큰 외부 색/간격 직접 사용
 - 새 아이콘 자체 그리기 (lucide-react 우선)
 - AI 생성 이미지를 검수 없이 즉시 published
+
+---
+
+## UI 피드백 트리 (FOLLOWUP-53)
+
+> 2026-05-15 회고 §5, §7 기반 — spacing 12연속 실패 패턴 차단.
+> 전체 SOP: [docs/process/ui-feedback-workflow.md](../../docs/process/ui-feedback-workflow.md)
+
+### 의무 절차
+
+**사용자 UI 피드백(직관 표현 포함)을 받으면 반드시 다음 순서를 따른다:**
+
+1. **명세표 작성** (`/ui-spec` 커맨드 또는 수동) — 현재 측정값 + 진단 + 제안 수치
+2. **사용자 동의** — 명세표 없이 구현 시작 금지
+3. **구현**
+4. **시각 검증** — `/visual-check <route>` 로 AI 직접 screenshot 확인
+5. **매칭 OK 시에만 push** → `/ci-watch` 로 CI 확인
+6. 사용자 부정 피드백 → Step 1 재시작
+7. **2회 실패 시** → 멈추고 orchestrator 에 escalate
+8. **3회 실패 시** → 즉시 멈춤. "제가 의도를 잘못 이해했을 수 있습니다. 처음부터 같이 정리해볼까요?" 출력
+
+### 인식 임계값 (절대 규칙)
+
+**4px 변화는 push 하지 않는다.**
+
+| 속성          | 최소 변화                                     |
+| ------------- | --------------------------------------------- |
+| padding / gap | 8px 이상                                      |
+| 배경색        | 명확한 대비 차이 (muted ≈ muted 는 인식 불가) |
+| border 두께   | 1px → 2px 이상                                |
+| font-size     | 2px 이상                                      |
+
+### Visual Hierarchy 선행 점검 (spacing 작업 전 필수)
+
+```
+[ ] panel bg ≠ card bg ?  →  같으면 padding 아무리 커도 boundary 없음
+[ ] card border 가 배경 대비 충분히 두드러지는가?
+[ ] shadow/elevation 이 필요한가?
+[ ] 변화 폭이 인식 임계값(8px+) 이상인가?
+```
+
+### 관련 커맨드
+
+- `/ui-spec <issue>` — 명세표 자동 생성
+- `/visual-check <route> [selector]` — AI 시각 검증
+- `/ci-watch` — push 후 CI polling
