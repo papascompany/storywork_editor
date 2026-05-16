@@ -186,6 +186,9 @@
 | `/sw-compose <projectId>` | `analyze-script` → `auto-compose-page` 풀 파이프 | `.claude/commands/sw-compose.md` |
 | `/sw-pdf <projectId>` | `compile-pdf` + `preflight-check` | `.claude/commands/sw-pdf.md` |
 | `/sw-review` | 변경 PR에 대해 `simplify` + `security-review` | `.claude/commands/sw-review.md` |
+| `/visual-check <route> [selector]` | dev 서버 screenshot 캡처 (FOLLOWUP-51, 2026-05-16) | `.claude/commands/visual-check.md` |
+| `/ci-watch` | push 직후 GitHub Actions CI 자동 polling (FOLLOWUP-52) | `.claude/commands/ci-watch.md` |
+| `/ui-spec <issue>` | 사용자 UI 직관 표현 → 명세표 변환 (FOLLOWUP-53) | `.claude/commands/ui-spec.md` |
 
 ---
 
@@ -197,4 +200,4 @@
 
 ---
 
-_Last updated: 2026-04-25_
+_Last updated: 2026-05-17_
