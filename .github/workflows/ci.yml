@@ -43,6 +43,12 @@ jobs:
       - name: Lint
         run: pnpm lint
 
+      - name: Check Tailwind @source directives (ADR-0013)
+        run: bash scripts/check-tailwind-source.sh
+
+      - name: Check CSS anti-patterns (ADR-0014)
+        run: bash scripts/check-css-anti-patterns.sh
+
       - name: Typecheck
         run: pnpm typecheck
 
@@ -51,3 +57,6 @@ jobs:
 
       - name: Build
         run: pnpm build
+
+      - name: CSS Sanity Check (FOLLOWUP-55)
+        run: bash scripts/css-sanity-check.sh

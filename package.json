@@ -33,7 +33,10 @@
     "ingest:sample": "tsx --tsconfig tsconfig.scripts.json scripts/ingest-poses.ts --limit 5",
     "ingest:full": "tsx --tsconfig tsconfig.scripts.json scripts/ingest-poses.ts",
     "visual-check": "bash scripts/visual-check.sh",
-    "ci-watch": "bash scripts/ci-watch.sh"
+    "ci-watch": "bash scripts/ci-watch.sh",
+    "check:css-source": "bash scripts/check-tailwind-source.sh",
+    "check:css-anti": "bash scripts/check-css-anti-patterns.sh",
+    "check:css-sanity": "bash scripts/css-sanity-check.sh"
   },
   "devDependencies": {
     "@commitlint/cli": "^19.0.0",
