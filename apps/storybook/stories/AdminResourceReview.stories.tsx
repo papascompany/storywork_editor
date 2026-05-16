@@ -8,6 +8,7 @@ import type { Meta, StoryObj } from '@storybook/react'
 import * as React from 'react'
 
 import { ReviewQueue } from '../../admin/src/components/review-queue/ReviewQueue'
+import type { ReviewQueueProps } from '../../admin/src/components/review-queue/ReviewQueue'
 
 // ─── 픽스처 ──────────────────────────────────────────────────────────────────
 
@@ -127,6 +128,8 @@ const meta = {
     },
   },
   tags: ['autodocs'],
+  // render() 전용 스토리 — args 는 story 레벨에서 직접 공급. 기본값으로 타입 충족
+  args: {} as ReviewQueueProps<MockReviewItem>,
 } satisfies Meta<typeof ReviewQueue<MockReviewItem>>
 
 export default meta
@@ -196,7 +199,7 @@ export const Empty: Story = {
   render: () => (
     <div className="p-4">
       <ReviewQueue
-        items={[]}
+        items={[] as MockReviewItem[]}
         rowKey={(item) => item.id}
         renderCard={(item, opts) => <ReviewCard item={item} isFocused={opts.isFocused} />}
         onApprove={async () => {}}

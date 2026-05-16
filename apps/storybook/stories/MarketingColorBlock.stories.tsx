@@ -32,6 +32,11 @@ const meta = {
       options: ['lime', 'lilac', 'cream', 'pink', 'mint', 'coral', 'navy'],
     },
   },
+  // render() 전용 스토리(AllVariants)를 위해 기본 args 제공
+  args: {
+    variant: 'lime',
+    children: null,
+  },
 } satisfies Meta<typeof ColorBlock>
 
 export default meta

@@ -29,6 +29,11 @@ const meta = {
     title: { control: 'text' },
     body: { control: 'text' },
   },
+  // render() 전용 스토리(Grid)를 위해 기본 args 제공 — story 레벨 args 를 optional 로 처리
+  args: {
+    title: 'Feature 제목',
+    body: '기능 설명 본문.',
+  },
 } satisfies Meta<typeof FeatureCard>
 
 export default meta

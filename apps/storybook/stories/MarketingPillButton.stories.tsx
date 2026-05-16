@@ -33,6 +33,10 @@ const meta = {
     href: { control: 'text' },
     external: { control: 'boolean' },
   },
+  // render() 전용 스토리(WithIcon, Disabled, CtaPair)를 위해 기본 args 제공
+  args: {
+    children: '지금 시작하기',
+  },
 } satisfies Meta<typeof PillButton>
 
 export default meta

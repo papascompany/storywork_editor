@@ -43,6 +43,9 @@ export default defineConfig({
       '@storywork/schema': path.resolve(__dirname, '../../packages/shared-schema/src/index.ts'),
       '@storywork/ui': path.resolve(__dirname, '../../packages/shared-ui/src/index.ts'),
       '@storywork/utils': path.resolve(__dirname, '../../packages/shared-utils/src/index.ts'),
+      // Next.js @/* path alias — apps/web 루트 기준
+      // Vite alias: string key 는 prefix 매칭. '@/' → apps/web 루트 디렉토리
+      '@/': `${path.resolve(__dirname)}/`,
     },
   },
   test: {

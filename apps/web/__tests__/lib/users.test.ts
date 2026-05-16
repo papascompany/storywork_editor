@@ -31,9 +31,7 @@ const mockPrismaUser = {
 
 describe('updateUserProfile — 입력 검증', () => {
   beforeEach(() => {
-    vi.mocked(prisma.user.update).mockResolvedValue(
-      mockPrismaUser as Parameters<typeof prisma.user.update>[0]['data'] & typeof mockPrismaUser,
-    )
+    vi.mocked(prisma.user.update).mockResolvedValue(mockPrismaUser as never)
   })
 
   it('정상 name 업데이트 성공', async () => {

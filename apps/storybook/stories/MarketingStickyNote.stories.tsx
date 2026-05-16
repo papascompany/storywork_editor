@@ -32,6 +32,12 @@ const meta = {
     caption: { control: 'text' },
     imageUrl: { control: 'text' },
   },
+  // render() 전용 스토리(ColorCycle, FourUp)를 위해 기본 args 제공
+  args: {
+    number: 1,
+    scene: '기본 장면',
+    caption: '기본 캡션.',
+  },
 } satisfies Meta<typeof StickyNote>
 
 export default meta

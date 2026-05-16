@@ -4,6 +4,19 @@
 
 import '@testing-library/jest-dom'
 
+// ── Supabase browser client mock ──────────────────────────────────────────────
+// marketing/* 테스트가 Header.tsx 를 통해 supabase/client 를 의존한다.
+// jsdom 환경에서 환경변수 없이 createBrowserClient 를 호출하면 throw 하므로
+// setup 단계에서 module-level mock 으로 교체한다.
+// vi.mock 은 hoisted 되지 않으므로 여기서는 globalThis 에 환경변수를 주입한다.
+// (실제 createBrowserClient 호출이 일어나기 전에 값이 있어야 한다)
+if (!process.env['NEXT_PUBLIC_SUPABASE_URL']) {
+  process.env['NEXT_PUBLIC_SUPABASE_URL'] = 'http://localhost:54321'
+}
+if (!process.env['NEXT_PUBLIC_SUPABASE_ANON_KEY']) {
+  process.env['NEXT_PUBLIC_SUPABASE_ANON_KEY'] = 'test-anon-key'
+}
+
 // ── fabric polyfills ─────────────────────────────────────────────────────────
 if (typeof globalThis.requestAnimationFrame === 'undefined') {
   globalThis.requestAnimationFrame = (cb: FrameRequestCallback): number => {

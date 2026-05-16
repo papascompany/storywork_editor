@@ -6,10 +6,10 @@
   "scripts": {
     "dev": "storybook dev --port 6006",
     "storybook": "storybook dev --port 6006",
-    "build": "echo 'storybook build skipped — FOLLOWUP-50 (Storybook 8.x type migration)'",
+    "build": "storybook build",
     "build-storybook": "storybook build",
     "lint": "eslint stories --max-warnings 0",
-    "typecheck": "echo 'storybook typecheck skipped — FOLLOWUP-50: Storybook 8.x type migration (stories Story args 누락)'",
+    "typecheck": "tsc --noEmit",
     "test": "echo 'No unit tests for storybook app'",
     "clean": "rimraf storybook-static"
   },

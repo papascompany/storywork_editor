@@ -24,6 +24,8 @@ interface StickyNoteProps {
   placeholderLabel?: string
   rotation?: number
   className?: string
+  /** 인라인 스타일 — storybook / 그리드 컨테이너에서 너비 제어용 */
+  style?: React.CSSProperties
 }
 
 const bgColors = [
@@ -42,6 +44,7 @@ export function StickyNote({
   placeholderLabel,
   rotation = 0,
   className = '',
+  style,
 }: StickyNoteProps) {
   const bg = bgColors[(number - 1) % bgColors.length]
 
@@ -57,6 +60,7 @@ export function StickyNote({
         display: 'flex',
         flexDirection: 'column',
         gap: 'var(--mkt-space-sm)',
+        ...style,
       }}
     >
       {/* 장면 번호 eyebrow */}

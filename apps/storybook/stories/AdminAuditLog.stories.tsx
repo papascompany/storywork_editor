@@ -79,6 +79,8 @@ const listMeta = {
     },
   },
   tags: ['autodocs'],
+  // render() 전용 스토리 — args 는 story 레벨에서 직접 제공하므로 기본값은 빈 객체
+  args: {} as { initialData: AuditLogRow[]; initialTotalCount: number },
 } satisfies Meta<typeof AuditListClient>
 
 export default listMeta

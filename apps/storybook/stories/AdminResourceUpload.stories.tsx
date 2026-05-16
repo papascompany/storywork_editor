@@ -192,14 +192,14 @@ type Story = StoryObj<typeof meta>
 export const Default: Story = {
   name: 'Default — 업로드 폼',
   render: () => {
-    const [submitted, setSubmitted] = React.useState<unknown>(null)
+    const [submitted, setSubmitted] = React.useState<string | null>(null)
     return (
       <div className="p-4">
         <h2 className="text-lg font-bold text-[var(--color-text)] mb-4">신규 리소스 업로드</h2>
-        <UploadFormDemo onSubmit={(payload) => setSubmitted(payload)} />
-        {submitted && (
+        <UploadFormDemo onSubmit={(payload) => setSubmitted(JSON.stringify(payload))} />
+        {submitted !== null && (
           <div className="mt-4 p-4 bg-green-50 rounded-[var(--radius-md)] text-sm text-green-700">
-            <strong>제출됨:</strong> {JSON.stringify(submitted)}
+            <strong>제출됨:</strong> {submitted}
           </div>
         )}
       </div>

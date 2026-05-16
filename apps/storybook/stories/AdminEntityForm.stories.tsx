@@ -65,6 +65,8 @@ const meta = {
     },
   },
   tags: ['autodocs'],
+  // render() 전용 스토리 — args 는 story 레벨에서 직접 공급. 기본값으로 타입 충족
+  args: {} as Parameters<typeof EntityForm<typeof resourceSchema>>[0],
 } satisfies Meta<typeof EntityForm<typeof resourceSchema>>
 
 export default meta

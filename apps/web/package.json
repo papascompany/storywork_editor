@@ -8,8 +8,8 @@
     "build": "next build",
     "start": "next start --port 3000",
     "lint": "eslint . --max-warnings 0",
-    "typecheck": "echo 'web typecheck skipped — FOLLOWUP-49: editor-template/editor-text dist export 형태 + users.test.ts mock 타입 (5/15 핸드오프 명시 부채)'",
-    "test": "echo 'web test skipped — FOLLOWUP-49: marketing/* vite alias resolve 5건 + page-persistence/command-palette/editor.smoke localStorage 환경 (jsdom). admin/packages test 는 그대로 게이트.'",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
     "test:e2e": "playwright test",
     "clean": "rimraf .next out"
   },

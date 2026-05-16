@@ -8,6 +8,7 @@ import type { Meta, StoryObj } from '@storybook/react'
 import * as React from 'react'
 
 import { ReviewQueue } from '../../admin/src/components/review-queue/ReviewQueue'
+import type { ReviewQueueProps } from '../../admin/src/components/review-queue/ReviewQueue'
 
 // ─── 픽스처 ──────────────────────────────────────────────────────────────────
 
@@ -97,6 +98,8 @@ const meta = {
     },
   },
   tags: ['autodocs'],
+  // render() 전용 스토리 — args 는 story 레벨에서 직접 공급. 기본값으로 타입 충족
+  args: {} as ReviewQueueProps<PoseItem>,
 } satisfies Meta<typeof ReviewQueue<PoseItem>>
 
 export default meta
@@ -169,7 +172,7 @@ export const EmptyQueue: Story = {
   render: () => (
     <div className="p-4">
       <ReviewQueue
-        items={[]}
+        items={[] as PoseItem[]}
         rowKey={(item) => item.id}
         renderCard={(item, opts) => <PoseCard item={item} isFocused={opts.isFocused} />}
         onApprove={async () => {}}
@@ -186,7 +189,7 @@ export const Loading: Story = {
   render: () => (
     <div className="p-4">
       <ReviewQueue
-        items={[]}
+        items={[] as PoseItem[]}
         rowKey={(item) => item.id}
         renderCard={(item, opts) => <PoseCard item={item} isFocused={opts.isFocused} />}
         onApprove={async () => {}}

@@ -17,6 +17,8 @@ const config: StorybookConfig = {
       'next/link': path.resolve(__dirname, '../__mocks__/next-link.tsx'),
       'next/image': path.resolve(__dirname, '../__mocks__/next-image.tsx'),
       'next/navigation': path.resolve(__dirname, '../__mocks__/next-navigation.ts'),
+      // apps/web 의 @/* path alias — Header.tsx 등 marketing 컴포넌트 의존
+      '@/': `${path.resolve(__dirname, '../../web')}/`,
     }
     return cfg
   },

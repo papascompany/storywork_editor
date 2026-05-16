@@ -12,6 +12,7 @@ import * as React from 'react'
 // 컴포넌트는 admin 앱에서 import — storybook vite 는 상대 경로 번들 가능
 import { BulkActionBar } from '../../admin/src/components/bulk-action-bar/BulkActionBar'
 import { DataTable } from '../../admin/src/components/data-table/DataTable'
+import type { DataTableProps } from '../../admin/src/components/data-table/DataTable'
 
 // ─── 픽스처 ──────────────────────────────────────────────────────────────────
 
@@ -94,6 +95,8 @@ const meta = {
     },
   },
   tags: ['autodocs'],
+  // render() 전용 스토리 — args 는 story 레벨에서 직접 공급. 기본값으로 타입 충족
+  args: {} as DataTableProps<ResourceRow>,
 } satisfies Meta<typeof DataTable<ResourceRow>>
 
 export default meta
