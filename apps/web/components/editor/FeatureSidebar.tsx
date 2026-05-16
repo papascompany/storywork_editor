@@ -286,11 +286,11 @@ export function FeatureSidebar({
         aria-live="polite"
         aria-atomic="false"
       >
-        {/* 패널 헤더 — px-4 py-3 → px-4 py-3.5 로 수직 호흡감 */}
+        {/* 패널 헤더 — px-5 py-3.5: 수평=콘텐츠 패널과 동기화 (20px), 수직은 보존 */}
         <div
           className={cn(
             'flex items-center justify-between',
-            'px-4 py-3.5',
+            'px-5 py-3.5',
             'border-b border-[var(--editor-border)]',
             // 패널 헤더 미세 강조
             'bg-[var(--editor-panel)]',

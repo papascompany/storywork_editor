@@ -236,7 +236,7 @@ export function WordFxPanel({ canvas, history }: WordFxPanelProps) {
   return (
     <div className="flex flex-col h-full overflow-hidden">
       {/* 검색창 */}
-      <div className="px-8 py-4 border-b border-[var(--editor-border)] shrink-0">
+      <div className="px-5 py-4 border-b border-[var(--editor-border)] shrink-0">
         <input
           ref={searchRef}
           type="search"
@@ -263,7 +263,7 @@ export function WordFxPanel({ canvas, history }: WordFxPanelProps) {
       {/* 카테고리 탭 — 검색 중엔 숨김 */}
       {!query.trim() && (
         <div
-          className="flex overflow-x-auto gap-1 px-8 py-4 border-b border-[var(--editor-border)] shrink-0 scrollbar-none"
+          className="flex overflow-x-auto gap-1 px-5 py-4 border-b border-[var(--editor-border)] shrink-0 scrollbar-none"
           role="tablist"
           aria-label="효과 카테고리"
         >
@@ -307,7 +307,7 @@ export function WordFxPanel({ canvas, history }: WordFxPanelProps) {
 
       {/* 선택 안내 */}
       {!hasSelection && (
-        <div className="px-8 py-4 shrink-0">
+        <div className="px-5 py-4 shrink-0">
           <p className="text-[11px] text-[var(--color-warning-600)] bg-[var(--color-warning-50)] rounded-[var(--radius-sm)] px-3 py-2">
             텍스트 객체를 먼저 선택하세요.
           </p>
@@ -316,7 +316,7 @@ export function WordFxPanel({ canvas, history }: WordFxPanelProps) {
 
       {/* 적용된 효과 표시 */}
       {hasSelection && appliedEffects.length > 0 && (
-        <div className="px-8 py-4 border-b border-[var(--editor-border)] shrink-0">
+        <div className="px-5 py-4 border-b border-[var(--editor-border)] shrink-0">
           <p className="text-[10px] font-semibold uppercase tracking-wider text-[var(--editor-text-muted)] mb-1.5">
             적용된 효과
           </p>
@@ -345,7 +345,7 @@ export function WordFxPanel({ canvas, history }: WordFxPanelProps) {
       )}
 
       {/* 효과 그리드 */}
-      <div className="flex-1 overflow-y-auto p-8">
+      <div className="flex-1 overflow-y-auto p-5">
         {displayedEffects.length === 0 ? (
           <p className="text-[12px] text-[var(--editor-text-muted)] text-center py-8">
             검색 결과가 없습니다.
@@ -370,7 +370,7 @@ export function WordFxPanel({ canvas, history }: WordFxPanelProps) {
       </div>
 
       {/* 개수 표시 */}
-      <div className="px-8 py-4 border-t border-[var(--editor-border)] shrink-0">
+      <div className="px-5 py-4 border-t border-[var(--editor-border)] shrink-0">
         <p className="text-[10px] text-[var(--editor-text-muted)]">
           {displayedEffects.length}개 효과
           {query.trim() ? ` (검색: "${query}")` : ''}
