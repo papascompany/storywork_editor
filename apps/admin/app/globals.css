@@ -3,6 +3,10 @@
  *
  * Nike 디자인 시스템 (DESIGN-nike.md SSOT) 기반.
  * Admin 표면은 --nike-* 토큰과 .nike-* 유틸리티만 사용합니다.
+ *
+ * 1900713 의 shared-ui fix (universal padding reset 제거 + @source 추가) 가
+ * admin 에도 동일하게 반영되어야 하므로 turbo-ignore trigger 를 위해
+ * admin entry CSS 도 갱신함 (2026-05-17, 회고 §3 종료).
  */
 @import '../../../packages/shared-ui/src/styles/globals.css';
 
