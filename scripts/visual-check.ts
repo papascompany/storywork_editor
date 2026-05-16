@@ -49,7 +49,9 @@ async function loadPlaywright(): Promise<PlaywrightModule> {
   ]
   for (const candidate of candidates) {
     if (fs.existsSync(candidate)) {
-      return import(candidate) as Promise<PlaywrightModule>
+      const mod = (await import(candidate)) as PlaywrightModule & { default?: PlaywrightModule }
+      // CJS interop: dynamic import 가 `{ default: <cjs exports> }` 로 래핑할 때 unwrap
+      return mod.chromium ? mod : (mod.default as PlaywrightModule)
     }
   }
   throw new Error(
