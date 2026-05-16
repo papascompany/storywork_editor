@@ -13,6 +13,19 @@
 
 @import 'tailwindcss';
 
+/* ── Tailwind v4 source detection (monorepo) ─────────────────────────────────
+ * v4 의 자동 source detection 은 @import 한 CSS 파일이 속한 package 만 scan 한다.
+ * 그 결과 apps/web, apps/admin, 다른 packages/* 의 컴포넌트가 사용하는 utility 가
+ * 빌드된 CSS 에 포함되지 않는 사일런트 버그가 발생한다 (2026-05-16 발견).
+ * 회고 §3 의 12 commits spacing 시도가 모두 "효과 없음" 이었던 진짜 root cause.
+ *
+ * 경로는 이 파일(packages/shared-ui/src/styles/globals.css) 기준 상대 경로:
+ *   styles → src → shared-ui → packages → <repo-root>
+ */
+@source "../../../../apps/web";
+@source "../../../../apps/admin";
+@source "../../../../packages";
+
 /* ── 라이트 모드 CSS 변수 ─────────────────────────────────────────────────── */
 :root {
   /* Brand */
