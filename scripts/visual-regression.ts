@@ -100,6 +100,9 @@ const PAGES: PageDef[] = [
     device: 'desktop',
     // FormatPickerModal 이 자동 표시됨 (dismissable=false)
     waitForSelector: '[role="dialog"]',
+    // CI skip: Supabase 연결 없이 렌더가 macOS 와 달라짐 (webfont/canvas 차이).
+    // 로컬(pnpm visual-regression)에서는 실행됨.
+    skip: 'CI: editor needs Supabase + webfont environment matching baseline',
   },
   {
     name: 'web-editor-mobile',
@@ -107,6 +110,7 @@ const PAGES: PageDef[] = [
     route: '/editor',
     device: 'mobile',
     waitForSelector: '[role="dialog"]',
+    skip: 'CI: editor needs Supabase + webfont environment matching baseline',
   },
   // ── admin ─────────────────────────────────────────────────────────
   {
