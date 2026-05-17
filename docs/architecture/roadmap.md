@@ -75,6 +75,10 @@
 - [x] [PERF-ADMIN-01] admin navigation 4초 지연 1차 개선 — auth cache + query payload 축소 + route loading skeleton — @architect
 - [x] [DESIGN-04] 시각 회귀 자동화 — `/login`, `/reset-password`, `/403`, admin nav, `/editor` desktop/mobile snapshots — @qa-tester ✅ 2026-05-17 (커밋 25e619a + a0e00f0) — 12개 baseline CI (editor 2개 로컬 전용), pixelmatch compare, CI green
 - [x] [PERF-ADMIN-02] 실제 navigation timing 측정 — local/prod waterfall 로 P75 목표 수립 — @qa-tester + @architect ✅ 2026-05-17 — `scripts/perf-admin-measure.ts` + `scripts/perf-admin-save-auth.ts` + `docs/perf/admin-navigation-baseline-2026-05-17.md`. prod 5회 측정: TTFB P75 261ms / FCP P75 1028ms(목표 초과) / Total P75 1480ms. 인증 후 보호 페이지 재측정(PERF-ADMIN-03) 필요.
+- [ ] [PERF-ADMIN-03] (P1) 인증 storage state 저장 후 보호 페이지 재측정 — `pnpm perf:admin:save-auth` 로 admin storage state 캡처 후 `pnpm perf:admin` 으로 audit/resources/templates Prisma 쿼리 실제 시간 포함된 P75 도출 — @architect
+- [ ] [PERF-ADMIN-04] (P2) login 페이지 FCP 개선 — 현재 P75 1028ms (목표 800ms, +228ms 초과). Pretendard Variable woff2 subset 분리 또는 `font-display: optional` — @ui-designer
+- [ ] [PERF-ADMIN-05] (P2) LCP 수집 방식 개선 — 현재 LCP=0 미수집. PerformanceObserver 를 page load 초기 등록 + buffered=true 로 변경 — @architect
+- [ ] [PERF-ADMIN-06] (P2) Lighthouse CI 통합 — perf 회귀 자동 차단 (PERF-ADMIN-03 후속) — @qa-tester + @architect
 
 ## M5 — Text/Bubble/Effects/Templates
 
