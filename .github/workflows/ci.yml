@@ -18,7 +18,7 @@ jobs:
   ci:
     name: Lint / Typecheck / Test / Build
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 30
 
     steps:
       - name: Checkout
@@ -60,3 +60,52 @@ jobs:
 
       - name: CSS Sanity Check (FOLLOWUP-55)
         run: bash scripts/css-sanity-check.sh
+
+      # ── 시각 회귀 (DESIGN-04) ──────────────────────────────────────────────
+      # web(3000) + admin(3001) production build 를 백그라운드 기동 후 snapshot 비교.
+      # 폰트 차이 완화: threshold=0.15, maxDiffRatio=0.05
+      # 실행 시간: ~90초 (14개 snapshot × Playwright 기동)
+      - name: Install Playwright browsers
+        run: pnpm --filter @storywork/web exec playwright install chromium --with-deps
+
+      - name: Build web + admin for visual regression
+        run: |
+          pnpm --filter @storywork/web build
+          pnpm --filter @storywork/admin build
+
+      - name: Start web server (port 3000)
+        run: pnpm --filter @storywork/web start &
+        env:
+          PORT: 3000
+
+      - name: Start admin server (port 3001)
+        run: pnpm --filter @storywork/admin start &
+        env:
+          PORT: 3001
+
+      - name: Wait for servers to be ready
+        run: |
+          echo "Waiting for web (port 3000)..."
+          for i in $(seq 1 30); do
+            curl -sf http://localhost:3000 > /dev/null 2>&1 && echo "web ready" && break
+            sleep 2
+          done
+          echo "Waiting for admin (port 3001)..."
+          for i in $(seq 1 30); do
+            curl -sf http://localhost:3001/login > /dev/null 2>&1 && echo "admin ready" && break
+            sleep 2
+          done
+
+      - name: Visual Regression (DESIGN-04)
+        run: SKIP_SERVER_CHECK=1 bash scripts/visual-regression.sh --threshold 0.15 --max-diff-ratio 0.05
+        env:
+          WEB_PORT: 3000
+          ADMIN_PORT: 3001
+
+      - name: Upload visual regression diff (on failure)
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: visual-regression-snapshots
+          path: tests/visual-regression/snapshots/
+          retention-days: 7

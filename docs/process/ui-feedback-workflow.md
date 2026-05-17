@@ -227,12 +227,50 @@ spacing 작업 전 다음을 먼저 확인한다:
 | `/ci-watch` | push 후 CI 자동 polling | [.claude/commands/ci-watch.md](../../.claude/commands/ci-watch.md) |
 | `/ui-spec` | 사용자 피드백 → 명세표 자동 생성 | [.claude/commands/ui-spec.md](../../.claude/commands/ui-spec.md) |
 | `pnpm visual-check` | CLI 직접 실행 | `bash scripts/visual-check.sh` |
+| `pnpm visual-regression` | 14개 페이지 시각 회귀 비교 (DESIGN-04) | `bash scripts/visual-regression.sh` |
+| `pnpm visual-regression:update` | baseline snapshot 갱신 | `bash scripts/visual-regression.sh --update` |
 | `pnpm ci-watch` | CLI 직접 실행 | `bash scripts/ci-watch.sh` |
 | `check-prod-sanity.sh` | Step 0 자동화 — prod deploy + CSS utility 존재 검증 | `bash scripts/check-prod-sanity.sh --web --utility p-5` |
 
 ---
 
-## 10. FOLLOWUP-54 진단 노트 — visual-check 인프라 한계 해소
+## 10. UI 의도적 변경 시 baseline 갱신 (DESIGN-04)
+
+> 시각 회귀 자동화가 활성화된 이후, 의도적인 UI 변경은 반드시 snapshot 을 함께 갱신해야 CI 를 통과한다.
+
+### 갱신 SOP
+
+1. UI 변경 구현 후 dev 서버 기동 (`pnpm dev`)
+2. baseline 갱신: `pnpm visual-regression:update`
+3. 생성된 snapshot 파일들을 PR 에 함께 commit
+4. PR 본문에 "시각 회귀 baseline 갱신: <변경 이유>" 명시
+5. PR 리뷰어가 snapshot diff 를 검토 (GitHub PR Files 탭에서 PNG diff 가능)
+
+```bash
+# 전체 갱신
+pnpm visual-regression:update
+
+# web 만 갱신
+bash scripts/visual-regression.sh --update --only-web
+
+# 특정 페이지만 갱신
+bash scripts/visual-regression.sh --update --filter "admin-403"
+```
+
+### 갱신이 필요한 상황
+
+- 의도적 디자인 변경 (색상, 폰트, 레이아웃)
+- 컴포넌트 구조 변경 (새 요소 추가, 기존 요소 제거)
+- 포트/라우팅 변경
+
+### 갱신이 필요 없는 상황 (CI fail 이면 회귀)
+
+- 순수 로직 변경 (CSS/UI 무관)
+- API 응답 형식 변경 (화면에 영향 없을 때)
+
+---
+
+## 11. FOLLOWUP-54 진단 노트 — visual-check 인프라 한계 해소
 
 > 2026-05-17 진단 결과. 회고 §4 에서 발견된 두 한계를 보강.
 

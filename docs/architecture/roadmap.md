@@ -73,7 +73,7 @@
 - [x] [DESIGN-02] admin `mkt-*` 직접 사용 제거 — `rg -n "mkt-|--mkt-" apps/admin` 0건 — @admin-builder
 - [x] [DESIGN-03] editor chrome Nike-neutral bridge — `/editor` scope `--editor-*` 가 ink/canvas/soft-cloud/hairline 기준으로 동작 — @editor-engineer
 - [x] [PERF-ADMIN-01] admin navigation 4초 지연 1차 개선 — auth cache + query payload 축소 + route loading skeleton — @architect
-- [ ] [DESIGN-04] 시각 회귀 자동화 — `/login`, `/reset-password`, `/403`, admin nav, `/editor` desktop/mobile snapshots — @qa-tester
+- [x] [DESIGN-04] 시각 회귀 자동화 — `/login`, `/reset-password`, `/403`, admin nav, `/editor` desktop/mobile snapshots — @qa-tester ✅ 2026-05-17 (커밋 TBD) — 14개 baseline (7페이지 × desktop+mobile), pixelmatch compare, CI 통합, baseline 갱신 SOP
 - [ ] [PERF-ADMIN-02] 실제 navigation timing 측정 — local/prod waterfall 로 P75 목표 수립 — @qa-tester + @architect
 
 ## M5 — Text/Bubble/Effects/Templates

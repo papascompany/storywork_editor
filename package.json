@@ -33,6 +33,8 @@
     "ingest:sample": "tsx --tsconfig tsconfig.scripts.json scripts/ingest-poses.ts --limit 5",
     "ingest:full": "tsx --tsconfig tsconfig.scripts.json scripts/ingest-poses.ts",
     "visual-check": "bash scripts/visual-check.sh",
+    "visual-regression": "bash scripts/visual-regression.sh",
+    "visual-regression:update": "bash scripts/visual-regression.sh --update",
     "ci-watch": "bash scripts/ci-watch.sh",
     "check:css-source": "bash scripts/check-tailwind-source.sh",
     "check:css-anti": "bash scripts/check-css-anti-patterns.sh",
