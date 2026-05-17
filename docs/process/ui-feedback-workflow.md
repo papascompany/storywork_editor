@@ -171,5 +171,42 @@ spacing 작업 전 다음을 먼저 확인한다:
 
 ---
 
-_Last updated: 2026-05-16_
+## 9. FOLLOWUP-54 진단 노트 — visual-check 인프라 한계 해소
+
+> 2026-05-17 진단 결과. 회고 §4 에서 발견된 두 한계를 보강.
+
+### 한계 1 — Playwright headless 의 `md:` breakpoint 미적용 (해소)
+
+**원래 가설**: SSR/hydration 타이밍 또는 matchMedia mock 누락.
+
+**실제 원인**: FeatureSidebar 는 도구 클릭 시에만 `width: 0px → 328px` 로 전환되는 상태 기반 패널. Playwright 가 클릭 없이 캡처하면 width: 0 상태로 렌더됨. matchMedia 나 hydration 문제가 아님.
+
+**진단 측정값** (viewport 1280px, Playwright headless):
+
+```
+matchMedia(min-width: 768px): true   ← 정상
+window.innerWidth: 1280              ← 정상
+ToolBar (aside): width 80px          ← w-20 정상
+FeatureSidebar (aside): width 308px  ← hidden md:flex 정상 (클릭 전 0px)
+```
+
+**해결**: `--click "[aria-label='도형']"` 옵션으로 도구 버튼 클릭 후 캡처.
+
+```bash
+# 패널 열린 상태 캡처
+pnpm visual-check /editor --click "[aria-label='도형']" --wait 2000
+```
+
+### 한계 2 — `visual-check.sh` localhost 전용 (해소)
+
+**해결**: `--url <full-url>` 옵션 추가. 외부 URL 사용 시 dev 서버 readiness 체크 자동 skip.
+
+```bash
+pnpm visual-check --url https://storywork-editor-web.vercel.app/editor
+```
+
+---
+
+_Last updated: 2026-05-17_
 _근거: [2026-05-15_16 회고](../retrospective/2026-05-15_16_ui_design_retrospective.md) §5, §7_
+_FOLLOWUP-54: [roadmap.md FOLLOWUP-54](../architecture/roadmap.md)_
