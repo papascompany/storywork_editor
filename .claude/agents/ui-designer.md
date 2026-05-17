@@ -74,6 +74,24 @@ pnpm --filter @storywork/admin build
 
 ---
 
+## UI 피드백 트리 진입 전 (Step 0 — FOLLOWUP-58)
+
+> 2026-05-17 회고 §5.5 기반 — "코드 변경했는데 prod 에 안 보임" 함정 차단.
+> 근거: [2026-05-17_spacing_root_cause_resolution.md](../../docs/retrospective/2026-05-17_spacing_root_cause_resolution.md) §5.5
+
+**UI 피드백 작업을 시작하기 전에 항상:**
+
+1. prod 가 최신 commit 빌드를 서빙 중인지 확인
+   - `vercel ls <project> --limit 3` → state=READY + SHA=HEAD 여야 함
+   - BLOCKED/CANCELED 면 → repo visibility / Vercel plan 점검 (회고 Layer 1)
+2. 변경한 utility 가 prod CSS 에 들어있는지 확인
+   - `bash scripts/check-prod-sanity.sh --web --utility <class>`
+   - 없으면 → Layer 2/3 재발 의심. `pnpm check:css-anti && pnpm check:css-source && pnpm build && pnpm check:css-sanity` 실행
+
+**둘 다 확인되지 않으면 명세화/구현 진입 금지.** 회고 §3 의 13일 패턴 재발 차단.
+
+---
+
 ## UI 피드백 트리 (FOLLOWUP-53)
 
 > 2026-05-15 회고 §5, §7 기반 — spacing 12연속 실패 패턴 차단.
