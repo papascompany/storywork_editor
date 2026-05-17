@@ -85,8 +85,10 @@ packages/*/src/**/*.js
 packages/*/src/**/*.js.map
 package-lock.json
 
-# 시각 검증 스크린샷 (tmp/visual/) — git-ignored
+# 시각 검증 스크린샷 (tmp/visual/) + perf 측정 결과 + auth state — git-ignored
 tmp/
+# perf 보고서는 docs/perf/ 에 커밋하지만 auth state 는 절대 커밋 금지
+tmp/perf/admin-auth.json
 
 # 에이전트/도구 메타 (사용자별 환경, 공유 금지)
 .codex/

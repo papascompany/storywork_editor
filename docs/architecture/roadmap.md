@@ -74,7 +74,7 @@
 - [x] [DESIGN-03] editor chrome Nike-neutral bridge — `/editor` scope `--editor-*` 가 ink/canvas/soft-cloud/hairline 기준으로 동작 — @editor-engineer
 - [x] [PERF-ADMIN-01] admin navigation 4초 지연 1차 개선 — auth cache + query payload 축소 + route loading skeleton — @architect
 - [x] [DESIGN-04] 시각 회귀 자동화 — `/login`, `/reset-password`, `/403`, admin nav, `/editor` desktop/mobile snapshots — @qa-tester ✅ 2026-05-17 (커밋 25e619a + a0e00f0) — 12개 baseline CI (editor 2개 로컬 전용), pixelmatch compare, CI green
-- [ ] [PERF-ADMIN-02] 실제 navigation timing 측정 — local/prod waterfall 로 P75 목표 수립 — @qa-tester + @architect
+- [x] [PERF-ADMIN-02] 실제 navigation timing 측정 — local/prod waterfall 로 P75 목표 수립 — @qa-tester + @architect ✅ 2026-05-17 — `scripts/perf-admin-measure.ts` + `scripts/perf-admin-save-auth.ts` + `docs/perf/admin-navigation-baseline-2026-05-17.md`. prod 5회 측정: TTFB P75 261ms / FCP P75 1028ms(목표 초과) / Total P75 1480ms. 인증 후 보호 페이지 재측정(PERF-ADMIN-03) 필요.
 
 ## M5 — Text/Bubble/Effects/Templates
 
