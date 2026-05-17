@@ -163,10 +163,19 @@ if (typeof globalThis.IntersectionObserver === 'undefined') {
 }
 
 // localStorage mock — jsdom 에서 localStorage 지원
-if (typeof globalThis.localStorage === 'undefined') {
-  const store: Record<string, string> = {}
-  Object.defineProperty(globalThis, 'localStorage', {
-    value: {
+// CI 환경의 jsdom 이 localStorage 객체는 제공하지만 setItem 등 메서드가
+// 손상된 경우가 있어 typeof check 만으로는 부족하다 (회고 25977212881).
+// → setItem 이 function 인지 검증 후 항상 안전한 mock 으로 교체.
+{
+  const existing = globalThis.localStorage as unknown
+  const isHealthy =
+    existing &&
+    typeof (existing as Record<string, unknown>)['setItem'] === 'function' &&
+    typeof (existing as Record<string, unknown>)['getItem'] === 'function' &&
+    typeof (existing as Record<string, unknown>)['removeItem'] === 'function'
+  if (!isHealthy) {
+    const store: Record<string, string> = {}
+    const storageMock = {
       getItem: (key: string) => store[key] ?? null,
       setItem: (key: string, value: string) => {
         store[key] = value
@@ -177,6 +186,20 @@ if (typeof globalThis.localStorage === 'undefined') {
       clear: () => {
         Object.keys(store).forEach((k) => delete store[k])
       },
-    },
-  })
+      key: (index: number) => Object.keys(store)[index] ?? null,
+      get length() {
+        return Object.keys(store).length
+      },
+    }
+    Object.defineProperty(globalThis, 'localStorage', {
+      value: storageMock,
+      writable: true,
+      configurable: true,
+    })
+    Object.defineProperty(globalThis, 'sessionStorage', {
+      value: storageMock,
+      writable: true,
+      configurable: true,
+    })
+  }
 }
