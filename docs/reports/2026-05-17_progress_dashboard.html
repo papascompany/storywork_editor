@@ -1,0 +1,1057 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>StoryWork — Progress Dashboard · 2026-05-17</title>
+    <style>
+      :root {
+        --ink: #111111;
+        --on-primary: #ffffff;
+        --canvas: #ffffff;
+        --soft-cloud: #f5f5f5;
+        --charcoal: #39393b;
+        --ash: #4b4b4d;
+        --mute: #707072;
+        --stone: #9e9ea0;
+        --hairline: #cacacb;
+        --hairline-soft: #e5e5e5;
+        --sale: #d30005;
+        --success: #007d48;
+        --info: #1151ff;
+        --warn: #c97a00;
+        --pink: #fde7ec;
+        --cream: #fef3d8;
+        --mint: #e3f2e6;
+        --lilac: #e8e4f8;
+        --lavender: #f0ecff;
+        --font:
+          'Pretendard Variable', Pretendard, 'Apple SD Gothic Neo', -apple-system, BlinkMacSystemFont,
+          system-ui, sans-serif;
+        --mono: 'JetBrains Mono', 'SF Mono', Menlo, ui-monospace, monospace;
+      }
+      * {
+        box-sizing: border-box;
+      }
+      html,
+      body {
+        margin: 0;
+        padding: 0;
+        background: var(--soft-cloud);
+        color: var(--ink);
+        font-family: var(--font);
+        font-size: 14px;
+        line-height: 1.55;
+        letter-spacing: -0.01em;
+      }
+      .page {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 48px 32px 96px;
+      }
+      header.hero {
+        margin-bottom: 32px;
+        padding: 32px 0 24px;
+        border-bottom: 1px solid var(--hairline);
+      }
+      header.hero .tag {
+        font-family: var(--mono);
+        font-size: 11px;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+        color: var(--mute);
+        margin-bottom: 12px;
+      }
+      header.hero h1 {
+        margin: 0 0 8px;
+        font-size: 44px;
+        font-weight: 800;
+        letter-spacing: -0.03em;
+        line-height: 1.05;
+        text-transform: uppercase;
+      }
+      header.hero p.lead {
+        margin: 0;
+        font-size: 16px;
+        color: var(--ash);
+        max-width: 720px;
+      }
+      header.hero .meta {
+        margin-top: 16px;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+      }
+      .chip {
+        font-family: var(--mono);
+        font-size: 11px;
+        padding: 6px 12px;
+        border-radius: 999px;
+        background: var(--canvas);
+        border: 1px solid var(--hairline);
+        color: var(--charcoal);
+      }
+      .chip.ink {
+        background: var(--ink);
+        color: var(--on-primary);
+        border-color: var(--ink);
+      }
+      .chip.success {
+        background: var(--mint);
+        color: var(--success);
+        border-color: var(--mint);
+      }
+      .chip.warn {
+        background: var(--cream);
+        color: var(--warn);
+        border-color: var(--cream);
+      }
+      .chip.sale {
+        background: var(--pink);
+        color: var(--sale);
+        border-color: var(--pink);
+      }
+      h2 {
+        margin: 56px 0 16px;
+        font-size: 13px;
+        text-transform: uppercase;
+        letter-spacing: 0.12em;
+        color: var(--mute);
+        font-weight: 700;
+      }
+      h2::after {
+        content: '';
+        display: block;
+        height: 1px;
+        background: var(--hairline);
+        margin-top: 8px;
+      }
+      .grid {
+        display: grid;
+        gap: 16px;
+      }
+      .grid.cols-4 {
+        grid-template-columns: repeat(4, 1fr);
+      }
+      .grid.cols-3 {
+        grid-template-columns: repeat(3, 1fr);
+      }
+      .grid.cols-2 {
+        grid-template-columns: repeat(2, 1fr);
+      }
+      @media (max-width: 768px) {
+        .grid.cols-4,
+        .grid.cols-3,
+        .grid.cols-2 {
+          grid-template-columns: 1fr;
+        }
+        header.hero h1 {
+          font-size: 32px;
+        }
+        .page {
+          padding: 24px 20px 64px;
+        }
+      }
+      .card {
+        background: var(--canvas);
+        border: 1px solid var(--hairline);
+        border-radius: 4px;
+        padding: 20px;
+      }
+      .stat .label {
+        font-family: var(--mono);
+        font-size: 10px;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        color: var(--mute);
+      }
+      .stat .value {
+        font-size: 40px;
+        font-weight: 800;
+        line-height: 1.1;
+        margin-top: 8px;
+        letter-spacing: -0.02em;
+      }
+      .stat .sub {
+        font-size: 11px;
+        color: var(--mute);
+        margin-top: 6px;
+      }
+      .stat .value .frac {
+        color: var(--stone);
+        font-size: 22px;
+        font-weight: 600;
+      }
+
+      /* milestone bars */
+      .ms-list {
+        background: var(--canvas);
+        border: 1px solid var(--hairline);
+        border-radius: 4px;
+        padding: 20px 24px;
+      }
+      .ms-row {
+        display: grid;
+        grid-template-columns: 220px 1fr 80px;
+        gap: 16px;
+        align-items: center;
+        padding: 10px 0;
+        border-bottom: 1px solid var(--hairline-soft);
+      }
+      .ms-row:last-child {
+        border-bottom: 0;
+      }
+      .ms-name {
+        font-size: 13px;
+        font-weight: 600;
+      }
+      .ms-name .desc {
+        display: block;
+        font-weight: 400;
+        font-size: 11px;
+        color: var(--mute);
+        margin-top: 2px;
+      }
+      .bar {
+        position: relative;
+        height: 10px;
+        background: var(--hairline-soft);
+        border-radius: 0;
+        overflow: hidden;
+      }
+      .bar > i {
+        position: absolute;
+        left: 0;
+        top: 0;
+        bottom: 0;
+        background: var(--ink);
+      }
+      .ms-row.done .bar > i {
+        background: var(--success);
+      }
+      .ms-row.partial .bar > i {
+        background: var(--ink);
+      }
+      .ms-row.empty .bar > i {
+        background: var(--stone);
+      }
+      .ms-pct {
+        font-family: var(--mono);
+        font-size: 12px;
+        text-align: right;
+        color: var(--charcoal);
+      }
+      .ms-pct .num {
+        font-size: 16px;
+        font-weight: 700;
+        color: var(--ink);
+      }
+
+      /* root cause 5 layer */
+      .rc {
+        background: var(--ink);
+        color: var(--on-primary);
+        border-radius: 4px;
+        padding: 28px 32px;
+      }
+      .rc h3 {
+        margin: 0 0 4px;
+        font-size: 11px;
+        text-transform: uppercase;
+        letter-spacing: 0.15em;
+        color: var(--stone);
+        font-weight: 700;
+      }
+      .rc .rc-title {
+        font-size: 22px;
+        font-weight: 800;
+        margin-bottom: 18px;
+        letter-spacing: -0.01em;
+      }
+      .rc-layers {
+        display: grid;
+        gap: 10px;
+      }
+      .rc-layer {
+        display: grid;
+        grid-template-columns: 80px 1fr 1fr 130px;
+        gap: 14px;
+        align-items: center;
+        padding: 14px 16px;
+        background: var(--charcoal);
+        border-radius: 3px;
+      }
+      .rc-layer .id {
+        font-family: var(--mono);
+        font-size: 11px;
+        letter-spacing: 0.1em;
+        color: var(--stone);
+        text-transform: uppercase;
+      }
+      .rc-layer .what {
+        font-size: 12px;
+        color: #d8d8d9;
+      }
+      .rc-layer .how {
+        font-size: 12px;
+        color: #ffffff;
+      }
+      .rc-layer .lock {
+        font-family: var(--mono);
+        font-size: 10px;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        text-align: right;
+      }
+      .rc-layer .lock.auto {
+        color: #6fe39c;
+      }
+      .rc-layer .lock.doc {
+        color: #f3c25a;
+      }
+      .rc-layer .lock.hybrid {
+        color: #b8a4ff;
+      }
+      @media (max-width: 768px) {
+        .rc-layer {
+          grid-template-columns: 1fr;
+          gap: 6px;
+        }
+        .rc-layer .lock {
+          text-align: left;
+        }
+      }
+
+      /* CI pipeline */
+      .pipeline {
+        background: var(--canvas);
+        border: 1px solid var(--hairline);
+        border-radius: 4px;
+        padding: 24px;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        align-items: stretch;
+      }
+      .pipeline .step {
+        flex: 1 1 130px;
+        min-width: 120px;
+        padding: 10px 12px;
+        background: var(--soft-cloud);
+        border: 1px solid var(--hairline-soft);
+        border-radius: 3px;
+        position: relative;
+      }
+      .pipeline .step .n {
+        font-family: var(--mono);
+        font-size: 9px;
+        color: var(--mute);
+        letter-spacing: 0.1em;
+      }
+      .pipeline .step .name {
+        font-size: 12px;
+        font-weight: 700;
+        margin-top: 4px;
+      }
+      .pipeline .step .tag {
+        margin-top: 6px;
+        display: inline-block;
+        font-family: var(--mono);
+        font-size: 9px;
+        padding: 2px 6px;
+        background: var(--canvas);
+        border: 1px solid var(--hairline);
+        color: var(--mute);
+        border-radius: 2px;
+      }
+      .pipeline .step.guard {
+        background: var(--mint);
+        border-color: var(--mint);
+      }
+      .pipeline .step.guard .tag {
+        background: var(--mint);
+        border-color: #c5e6cb;
+        color: var(--success);
+      }
+      .pipeline .arrow {
+        align-self: center;
+        color: var(--stone);
+        font-family: var(--mono);
+      }
+      .pipeline-final {
+        margin-top: 12px;
+        background: var(--ink);
+        color: var(--on-primary);
+        padding: 14px 18px;
+        border-radius: 3px;
+        font-size: 13px;
+        text-align: center;
+        font-weight: 700;
+        letter-spacing: 0.04em;
+      }
+
+      /* bundle cards */
+      .bundle {
+        background: var(--canvas);
+        border: 1px solid var(--hairline);
+        border-radius: 4px;
+        padding: 20px;
+        position: relative;
+      }
+      .bundle .num {
+        position: absolute;
+        right: 16px;
+        top: 12px;
+        font-family: var(--mono);
+        font-size: 28px;
+        font-weight: 800;
+        color: var(--stone);
+        letter-spacing: -0.04em;
+      }
+      .bundle .id {
+        font-family: var(--mono);
+        font-size: 10px;
+        letter-spacing: 0.12em;
+        color: var(--mute);
+        text-transform: uppercase;
+      }
+      .bundle .title {
+        font-size: 15px;
+        font-weight: 700;
+        margin: 6px 0 8px;
+      }
+      .bundle .desc {
+        font-size: 12px;
+        color: var(--charcoal);
+        margin-bottom: 12px;
+      }
+      .bundle .sha {
+        font-family: var(--mono);
+        font-size: 10px;
+        color: var(--info);
+      }
+
+      /* todo table */
+      .todo {
+        background: var(--canvas);
+        border: 1px solid var(--hairline);
+        border-radius: 4px;
+        padding: 0;
+        overflow: hidden;
+      }
+      .todo table {
+        width: 100%;
+        border-collapse: collapse;
+      }
+      .todo th,
+      .todo td {
+        text-align: left;
+        padding: 12px 16px;
+        font-size: 13px;
+        border-bottom: 1px solid var(--hairline-soft);
+        vertical-align: top;
+      }
+      .todo th {
+        background: var(--soft-cloud);
+        font-size: 10px;
+        text-transform: uppercase;
+        letter-spacing: 0.1em;
+        color: var(--mute);
+        font-weight: 700;
+        white-space: nowrap;
+      }
+      .todo td.pri {
+        white-space: nowrap;
+      }
+      .todo td.id {
+        font-family: var(--mono);
+        font-size: 11px;
+        color: var(--mute);
+        white-space: nowrap;
+      }
+      .pri-badge {
+        display: inline-block;
+        font-family: var(--mono);
+        font-size: 10px;
+        padding: 3px 8px;
+        border-radius: 999px;
+        font-weight: 700;
+        letter-spacing: 0.06em;
+      }
+      .pri-badge.p0 {
+        background: var(--ink);
+        color: var(--on-primary);
+      }
+      .pri-badge.p1 {
+        background: var(--pink);
+        color: var(--sale);
+      }
+      .pri-badge.p2 {
+        background: var(--cream);
+        color: var(--warn);
+      }
+      .pri-badge.p3 {
+        background: var(--soft-cloud);
+        color: var(--mute);
+      }
+      .pri-badge.dl {
+        background: var(--lilac);
+        color: #5a3eb8;
+      }
+
+      /* recent commits */
+      .commits {
+        background: var(--canvas);
+        border: 1px solid var(--hairline);
+        border-radius: 4px;
+        padding: 0;
+      }
+      .commits .row {
+        display: grid;
+        grid-template-columns: 90px 1fr;
+        gap: 14px;
+        padding: 8px 16px;
+        border-bottom: 1px solid var(--hairline-soft);
+      }
+      .commits .row:last-child {
+        border: 0;
+      }
+      .commits .sha {
+        font-family: var(--mono);
+        font-size: 11px;
+        color: var(--info);
+      }
+      .commits .msg {
+        font-size: 12px;
+        color: var(--charcoal);
+      }
+
+      .lede {
+        font-size: 14px;
+        color: var(--ash);
+        margin: 4px 0 0;
+      }
+      .footnote {
+        margin-top: 64px;
+        padding-top: 24px;
+        border-top: 1px solid var(--hairline);
+        font-size: 11px;
+        color: var(--mute);
+        font-family: var(--mono);
+      }
+      .footnote a {
+        color: var(--info);
+      }
+      .legend {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 18px;
+        margin: 12px 0 8px;
+        font-size: 11px;
+        color: var(--mute);
+        font-family: var(--mono);
+      }
+      .legend .dot {
+        display: inline-block;
+        width: 10px;
+        height: 10px;
+        margin-right: 6px;
+        vertical-align: middle;
+        border-radius: 2px;
+      }
+      .dot.auto {
+        background: #6fe39c;
+      }
+      .dot.doc {
+        background: #f3c25a;
+      }
+      .dot.hybrid {
+        background: #b8a4ff;
+      }
+      .next-rec {
+        background: var(--lavender);
+        border-radius: 4px;
+        padding: 20px 24px;
+        border: 1px solid #d8d0ff;
+      }
+      .next-rec h3 {
+        margin: 0 0 10px;
+        font-size: 11px;
+        text-transform: uppercase;
+        letter-spacing: 0.12em;
+        color: #5a3eb8;
+      }
+      .next-rec .title {
+        font-size: 22px;
+        font-weight: 800;
+        margin: 4px 0 8px;
+        letter-spacing: -0.01em;
+      }
+      .next-rec .reasons {
+        font-size: 13px;
+        color: var(--charcoal);
+        margin: 0;
+      }
+      .next-rec ul {
+        margin: 8px 0 0;
+        padding-left: 18px;
+      }
+      .next-rec li {
+        font-size: 13px;
+        margin-bottom: 4px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="page">
+      <!-- HERO -->
+      <header class="hero">
+        <div class="tag">StoryWork · Progress Dashboard</div>
+        <h1>회고 §3 사이클 종결<br />다음은 가치 마일스톤</h1>
+        <p class="lede">
+          13일간의 spacing UI 실패가 5층 root cause + CI gate 6개 + 도구 트리오로 코드/CI/문서/SOP
+          모든 차원에서 닫혔다. 다음 작업은 핵심 가치 제안인 M4 AI Pipeline.
+        </p>
+        <div class="meta">
+          <span class="chip ink">2026-05-17</span>
+          <span class="chip">HEAD <span style="font-family: var(--mono)">61cc490</span></span>
+          <span class="chip success">CI green</span>
+          <span class="chip">prod web/admin live</span>
+        </div>
+      </header>
+
+      <!-- KEY STATS -->
+      <h2>핵심 지표</h2>
+      <div class="grid cols-4">
+        <div class="card stat">
+          <div class="label">Total commits</div>
+          <div class="value">206</div>
+          <div class="sub">M0 부트스트랩 시작 이후</div>
+        </div>
+        <div class="card stat">
+          <div class="label">Roadmap 진행</div>
+          <div class="value">70 <span class="frac">/ 121</span></div>
+          <div class="sub">57.9% 완료 · 51건 미완</div>
+        </div>
+        <div class="card stat">
+          <div class="label">ADR / 회고</div>
+          <div class="value">14 <span class="frac">· 2</span></div>
+          <div class="sub">결정 14건 · 회고 2건 (5/15 + 5/17)</div>
+        </div>
+        <div class="card stat">
+          <div class="label">CI gates</div>
+          <div class="value">8</div>
+          <div class="sub">lint → @source → anti-pattern → tc → test → build → css-sanity → visual-reg</div>
+        </div>
+      </div>
+
+      <!-- MILESTONES -->
+      <h2>마일스톤 진행률</h2>
+      <div class="ms-list">
+        <div class="ms-row done">
+          <div class="ms-name">
+            M0 — Bootstrap
+            <span class="desc">monorepo · prisma · supabase · 디자인 토큰</span>
+          </div>
+          <div class="bar"><i style="width: 67%"></i></div>
+          <div class="ms-pct"><span class="num">4/6</span></div>
+        </div>
+        <div class="ms-row done">
+          <div class="ms-name">
+            M1 — Editor Core MVP
+            <span class="desc">fabric v6 · 레이어 · history · export · 모바일 BottomSheet</span>
+          </div>
+          <div class="bar"><i style="width: 100%"></i></div>
+          <div class="ms-pct"><span class="num">13/13</span></div>
+        </div>
+        <div class="ms-row partial">
+          <div class="ms-name">
+            M2 — Pose Library (PNG)
+            <span class="desc">1,260 PNG 적재 · 키포인트 추정 · 시맨틱 검색</span>
+          </div>
+          <div class="bar"><i style="width: 60%"></i></div>
+          <div class="ms-pct"><span class="num">6/10</span></div>
+        </div>
+        <div class="ms-row done">
+          <div class="ms-name">
+            M3 — Admin Console
+            <span class="desc">Format · Resource · Template · Audit Log</span>
+          </div>
+          <div class="bar"><i style="width: 100%"></i></div>
+          <div class="ms-pct"><span class="num">6/6</span></div>
+        </div>
+        <div class="ms-row empty">
+          <div class="ms-name">
+            M4 — AI Pipeline
+            <span class="desc">ai-script · ai-recommend · ai-layout · 대본→페이지</span>
+          </div>
+          <div class="bar"><i style="width: 0%"></i></div>
+          <div class="ms-pct"><span class="num">0/5</span></div>
+        </div>
+        <div class="ms-row done">
+          <div class="ms-name">
+            M5 — Text/Bubble/Effects/Templates
+            <span class="desc">editor-text · bubble · effects · template</span>
+          </div>
+          <div class="bar"><i style="width: 100%"></i></div>
+          <div class="ms-pct"><span class="num">4/4</span></div>
+        </div>
+        <div class="ms-row empty">
+          <div class="ms-name">
+            M6 — POD PDF
+            <span class="desc">pdf-engine · workers · preflight · 인쇄소 프리셋</span>
+          </div>
+          <div class="bar"><i style="width: 0%"></i></div>
+          <div class="ms-pct"><span class="num">0/4</span></div>
+        </div>
+        <div class="ms-row empty">
+          <div class="ms-name">
+            M7 — Creator + Billing
+            <span class="desc">Stripe · 구독 게이트 · 마이데이터</span>
+          </div>
+          <div class="bar"><i style="width: 0%"></i></div>
+          <div class="ms-pct"><span class="num">0/4</span></div>
+        </div>
+        <div class="ms-row empty">
+          <div class="ms-name">
+            M8 — Social
+            <span class="desc">OG 이미지 · 공모전 · 갤러리 · SNS 카드</span>
+          </div>
+          <div class="bar"><i style="width: 0%"></i></div>
+          <div class="ms-pct"><span class="num">0/4</span></div>
+        </div>
+        <div class="ms-row empty">
+          <div class="ms-name">
+            M9 — Stabilization
+            <span class="desc">Lighthouse · 키보드 · 보안 · 부하</span>
+          </div>
+          <div class="bar"><i style="width: 0%"></i></div>
+          <div class="ms-pct"><span class="num">0/4</span></div>
+        </div>
+        <div class="ms-row done">
+          <div class="ms-name">
+            DESIGN-SYS — Nike 안정화
+            <span class="desc">SSOT · mkt 제거 · editor bridge · 시각 회귀 + timing</span>
+          </div>
+          <div class="bar"><i style="width: 67%"></i></div>
+          <div class="ms-pct"><span class="num">6/9</span></div>
+        </div>
+        <div class="ms-row done">
+          <div class="ms-name">
+            FOLLOWUP — 인프라 부채
+            <span class="desc">회고 5층 잠금 + 도구 트리오 + 부채 정리</span>
+          </div>
+          <div class="bar"><i style="width: 52%"></i></div>
+          <div class="ms-pct"><span class="num">15/29</span></div>
+        </div>
+      </div>
+
+      <!-- 5층 root cause -->
+      <h2>회고 §3 13일 사이클 — 5층 root cause 잠금 메커니즘</h2>
+      <div class="rc">
+        <h3>Retrospective 2026-05-17 § 2-5</h3>
+        <div class="rc-title">사일런트 버그 5층이 누적된 결과를 코드/CI/문서로 잠갔다</div>
+        <div class="legend">
+          <span><span class="dot auto"></span>자동 차단 (CI gate)</span>
+          <span><span class="dot doc"></span>문서 잠금</span>
+          <span><span class="dot hybrid"></span>도구 + 문서</span>
+        </div>
+        <div class="rc-layers">
+          <div class="rc-layer">
+            <span class="id">Layer 1</span>
+            <span class="what">Vercel Hobby Plan + private repo + collaborator</span>
+            <span class="how">CLAUDE.md §9 위험 표 · Step 0 SOP · plan 호환성 사전 확인</span>
+            <span class="lock doc">DOC</span>
+          </div>
+          <div class="rc-layer">
+            <span class="id">Layer 2</span>
+            <span class="what">layer 밖 universal <code>* { padding: 0 }</code> reset</span>
+            <span class="how">ADR-0014 · scripts/check-css-anti-patterns.sh · CI gate</span>
+            <span class="lock auto">AUTO</span>
+          </div>
+          <div class="rc-layer">
+            <span class="id">Layer 3</span>
+            <span class="what">Tailwind v4 monorepo <code>@source</code> directive 누락</span>
+            <span class="how">ADR-0013 · scripts/check-tailwind-source.sh · CI gate</span>
+            <span class="lock auto">AUTO</span>
+          </div>
+          <div class="rc-layer">
+            <span class="id">Layer 4</span>
+            <span class="what">turbo-ignore HEAD~1 skip — admin 자동 skip</span>
+            <span class="how">scripts/css-sanity-check.sh — web+admin 빌드 산출물 양쪽 utility 검증</span>
+            <span class="lock auto">AUTO</span>
+          </div>
+          <div class="rc-layer">
+            <span class="id">Layer 5</span>
+            <span class="what">회고가 본질 오인 (16/24/32px 시도만 12 commits)</span>
+            <span class="how">/ui-spec · ui-designer 트리 · Step 0 SOP · visual-regression baseline</span>
+            <span class="lock hybrid">TOOL+DOC</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- CI pipeline -->
+      <h2>CI 파이프라인 — 8 단계 게이트</h2>
+      <div class="pipeline">
+        <div class="step">
+          <div class="n">01</div>
+          <div class="name">lint</div>
+          <span class="tag">ADR-0012</span>
+        </div>
+        <div class="arrow">→</div>
+        <div class="step guard">
+          <div class="n">02</div>
+          <div class="name">@source check</div>
+          <span class="tag">ADR-0013</span>
+        </div>
+        <div class="arrow">→</div>
+        <div class="step guard">
+          <div class="n">03</div>
+          <div class="name">anti-pattern</div>
+          <span class="tag">ADR-0014</span>
+        </div>
+        <div class="arrow">→</div>
+        <div class="step">
+          <div class="n">04</div>
+          <div class="name">typecheck</div>
+          <span class="tag">33 ws</span>
+        </div>
+        <div class="arrow">→</div>
+        <div class="step">
+          <div class="n">05</div>
+          <div class="name">test</div>
+          <span class="tag">737+ tests</span>
+        </div>
+        <div class="arrow">→</div>
+        <div class="step">
+          <div class="n">06</div>
+          <div class="name">build</div>
+          <span class="tag">web+admin+storybook</span>
+        </div>
+        <div class="arrow">→</div>
+        <div class="step guard">
+          <div class="n">07</div>
+          <div class="name">css-sanity</div>
+          <span class="tag">FOLLOWUP-55</span>
+        </div>
+        <div class="arrow">→</div>
+        <div class="step guard">
+          <div class="n">08</div>
+          <div class="name">visual-regression</div>
+          <span class="tag">DESIGN-04</span>
+        </div>
+      </div>
+      <div class="pipeline-final">✓ main merge 가능 — 5층 회귀 자동 차단</div>
+
+      <!-- bundles -->
+      <h2>이번 세션 완료 묶음 (6건)</h2>
+      <div class="grid cols-3">
+        <div class="bundle">
+          <span class="num">01</span>
+          <div class="id">FOLLOWUP-55/56/57 · P0</div>
+          <div class="title">CSS Sanity CI Gate</div>
+          <div class="desc">
+            @source · universal reset · 빌드 산출물 utility 검증 — 회고 Layer 2/3/4 자동 차단
+          </div>
+          <div class="sha">df63151</div>
+        </div>
+        <div class="bundle">
+          <span class="num">02</span>
+          <div class="id">FOLLOWUP-49/50 · P1</div>
+          <div class="title">CI echo skip 해제</div>
+          <div class="desc">
+            web typecheck 21+ + test 5+ · storybook 8.x args · jsdom localStorage 강화
+          </div>
+          <div class="sha">effce8c · 84a8dbd</div>
+        </div>
+        <div class="bundle">
+          <span class="num">03</span>
+          <div class="id">FOLLOWUP-54 · P1</div>
+          <div class="title">visual-check 인프라 보강</div>
+          <div class="desc">
+            --url · --click · --seed-storage · --device · --wait-for-selector · --emulate-media
+          </div>
+          <div class="sha">239251b</div>
+        </div>
+        <div class="bundle">
+          <span class="num">04</span>
+          <div class="id">FOLLOWUP-58 · P2</div>
+          <div class="title">Step 0 deploy/build sanity</div>
+          <div class="desc">
+            회고 §7.4 트리 0단계 · ui-spec · ui-designer 프롬프트 + scripts/check-prod-sanity.sh
+          </div>
+          <div class="sha">73c4d4d</div>
+        </div>
+        <div class="bundle">
+          <span class="num">05</span>
+          <div class="id">DESIGN-04 · P1</div>
+          <div class="title">시각 회귀 자동화</div>
+          <div class="desc">
+            14 baseline snapshots · pixelmatch · CI 통합 · 의도적 변경 시 baseline 갱신 SOP
+          </div>
+          <div class="sha">25e619a · a0e00f0</div>
+        </div>
+        <div class="bundle">
+          <span class="num">06</span>
+          <div class="id">PERF-ADMIN-02 · P1</div>
+          <div class="title">Admin timing baseline</div>
+          <div class="desc">
+            prod 5회 측정 · P75 TTI 975ms · login FCP 미달 (+228ms) · PERF-03~06 후속 등재
+          </div>
+          <div class="sha">bb7bafa · 61cc490</div>
+        </div>
+      </div>
+
+      <!-- todo P1+ -->
+      <h2>잔여 작업 — 우선순위별</h2>
+      <div class="todo">
+        <table>
+          <thead>
+            <tr>
+              <th>우선순위</th>
+              <th>ID</th>
+              <th>제목</th>
+              <th>비고</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="pri"><span class="pri-badge p1">P1</span></td>
+              <td class="id">PERF-ADMIN-03</td>
+              <td>인증 storage state 저장 후 보호 페이지 재측정</td>
+              <td>4초 지연 정량화의 마지막 조각</td>
+            </tr>
+            <tr>
+              <td class="pri"><span class="pri-badge p1">P1</span></td>
+              <td class="id">M2-07</td>
+              <td>lowDpi 슬롯 제약 (ADR-0011a)</td>
+              <td>M4 진입 직전 필수</td>
+            </tr>
+            <tr>
+              <td class="pri"><span class="pri-badge p2">P2</span></td>
+              <td class="id">PERF-ADMIN-04</td>
+              <td>login FCP 개선 — Pretendard subset</td>
+              <td>현재 1028ms / 목표 800ms</td>
+            </tr>
+            <tr>
+              <td class="pri"><span class="pri-badge p2">P2</span></td>
+              <td class="id">PERF-ADMIN-05</td>
+              <td>LCP 수집 방식 개선</td>
+              <td>현재 LCP=0 미수집</td>
+            </tr>
+            <tr>
+              <td class="pri"><span class="pri-badge p2">P2</span></td>
+              <td class="id">PERF-ADMIN-06</td>
+              <td>Lighthouse CI 통합</td>
+              <td>perf 회귀 자동 차단</td>
+            </tr>
+            <tr>
+              <td class="pri"><span class="pri-badge p2">P2</span></td>
+              <td class="id">M0-05</td>
+              <td>CI 5잡 + main 브랜치 보호 룰 정식화</td>
+              <td>CI 사실상 동작 · 보호 룰만 미설정</td>
+            </tr>
+            <tr>
+              <td class="pri"><span class="pri-badge p2">P2</span></td>
+              <td class="id">M0-06</td>
+              <td>Sentry/PostHog 부트스트랩</td>
+              <td>운영 관측</td>
+            </tr>
+            <tr>
+              <td class="pri"><span class="pri-badge dl">DL</span></td>
+              <td class="id">FOLLOWUP-10</td>
+              <td>GitHub Actions Node 20 → Node 24</td>
+              <td>마감 2026-09-16</td>
+            </tr>
+            <tr>
+              <td class="pri"><span class="pri-badge p2">P2</span></td>
+              <td class="id">FOLLOWUP-01/02/06/08</td>
+              <td>ESLint resolver · turbo --parallel · no-raw-color · shared-schema "type":"module"</td>
+              <td>인프라 부채 4건</td>
+            </tr>
+            <tr>
+              <td class="pri"><span class="pri-badge p2">P2</span></td>
+              <td class="id">FOLLOWUP-12/13/14</td>
+              <td>PgBouncer · Vercel preview env · env.ts 빌드 검증</td>
+              <td>DB/배포 부채 3건</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- big milestones -->
+      <h2>큰 마일스톤 (M4 → M9)</h2>
+      <div class="grid cols-2">
+        <div class="card">
+          <div style="display: flex; justify-content: space-between; align-items: baseline">
+            <strong style="font-size: 16px">M4 — AI Pipeline</strong>
+            <span class="chip warn">다음 큰 마일스톤</span>
+          </div>
+          <p class="lede">핵심 가치 제안 — 대본만 넣으면 자동 페이지 N개.</p>
+          <ul style="margin: 8px 0 0; padding-left: 20px; font-size: 13px">
+            <li>M4-01 ai-script 분석기 + 골든셋 20 (F1 ≥ 0.8)</li>
+            <li>M4-02 ai-recommend 포즈/배경/말풍선 (만족도 ≥ 70%)</li>
+            <li>M4-03 ai-layout compose() + 결정론 시드 (충돌 0)</li>
+            <li>M4-04 사용자 흐름 대본 → 페이지 N개 E2E</li>
+            <li>M4-05 alternatives UI (한 클릭 교체)</li>
+          </ul>
+        </div>
+        <div class="card">
+          <div style="display: flex; justify-content: space-between; align-items: baseline">
+            <strong style="font-size: 16px">M6 / M7 / M8 / M9</strong>
+            <span class="chip">사용자 흐름 순서</span>
+          </div>
+          <p class="lede">핵심 가치(M4) 후 출판/결제/소셜/안정화 순.</p>
+          <ul style="margin: 8px 0 0; padding-left: 20px; font-size: 13px">
+            <li><strong>M6 POD PDF</strong> — pdf-engine 벡터 · Inngest · preflight · 인쇄소 프리셋</li>
+            <li><strong>M7 Creator + Billing</strong> — Stripe · 구독 게이트 · 마이데이터 · 결제 페이지</li>
+            <li><strong>M8 Social</strong> — OG(nano-banana 2) · 공모전 · 갤러리 · SNS</li>
+            <li><strong>M9 안정화</strong> — Lighthouse 90+ · 키보드 · 보안 · 부하 100</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- next recommendation -->
+      <h2>추천 다음 작업</h2>
+      <div class="next-rec">
+        <h3>Next Up</h3>
+        <div class="title">M4-01 ai-script 분석기 + 골든셋 20</div>
+        <p class="reasons">
+          M1-M3 + M5 + DESIGN + 인프라 부채 정리가 모두 끝났고, M4 가 사용자 핵심 가치
+          제안의 시작점.
+        </p>
+        <ul>
+          <li><strong>왜 지금?</strong> 회고 사이클 종결 + visual regression 으로 다음 UI 변경이 안전. AI 가치 측정 단계 진입 적기.</li>
+          <li><strong>병행</strong>: M2-07 lowDpi 슬롯 제약 (M4 진입 직전 필수)</li>
+          <li><strong>지연 가능</strong>: PERF-ADMIN-03~06 (사용자 체감 4초가 이미 미들웨어 기준 230ms 로 측정됨 — 우선순위 낮춤)</li>
+          <li><strong>병행 권고</strong>: FOLLOWUP-10 Node 24 (마감 4개월 전 적정 시기)</li>
+        </ul>
+      </div>
+
+      <!-- recent commits -->
+      <h2>최근 commits (last 12, 이번 세션 종결까지)</h2>
+      <div class="commits">
+        <div class="row"><span class="sha">61cc490</span><span class="msg">docs(roadmap): perf-admin-03/04/05/06 후속 항목 등재</span></div>
+        <div class="row"><span class="sha">bb7bafa</span><span class="msg">perf(admin): perf-admin-02 navigation timing baseline + p75 목표</span></div>
+        <div class="row"><span class="sha">bf3e30e</span><span class="msg">docs(roadmap): design-04 sha 25e619a+a0e00f0 반영</span></div>
+        <div class="row"><span class="sha">a0e00f0</span><span class="msg">fix(visual-regression): ci os-font noise 대응 — editor skip + maxDiffRatio 0.08</span></div>
+        <div class="row"><span class="sha">25e619a</span><span class="msg">test(visual-regression): design-04 시각 회귀 자동화 — 14 page snapshots</span></div>
+        <div class="row"><span class="sha">d781431</span><span class="msg">docs(roadmap): followup-58 sha 73c4d4d 반영</span></div>
+        <div class="row"><span class="sha">73c4d4d</span><span class="msg">docs(process): followup-58 회고 §7.4 step 0 deploy/build sanity 도입</span></div>
+        <div class="row"><span class="sha">84a8dbd</span><span class="msg">fix(web): jsdom localstorage mock 무조건 교체 — ci 회귀 fix</span></div>
+        <div class="row"><span class="sha">239251b</span><span class="msg">feat(visual-check): followup-54 prod url + click + storage seed + device emulation</span></div>
+        <div class="row"><span class="sha">effce8c</span><span class="msg">fix(web,storybook): followup-49/50 ci echo skip 해제 + 부채 정리</span></div>
+        <div class="row"><span class="sha">df63151</span><span class="msg">ci(infra): followup-55/56/57 css sanity + @source + anti-pattern gate</span></div>
+        <div class="row"><span class="sha">faa3faa</span><span class="msg">docs: 2026-05-17 회고 + adr-0013/0014 + followup-55/56/57/58 등재</span></div>
+      </div>
+
+      <div class="footnote">
+        Generated 2026-05-17 · HEAD <code>61cc490</code> · 회고 §3 sat 13일 사이클 종결 직후 ·
+        다음 작업 = M4 AI Pipeline.<br />
+        roadmap: <a href="../architecture/roadmap.md">docs/architecture/roadmap.md</a> ·
+        회고: <a href="../retrospective/2026-05-17_spacing_root_cause_resolution.md">2026-05-17_spacing_root_cause_resolution.md</a> ·
+        ADR: <a href="../architecture/decisions.md">docs/architecture/decisions.md</a>
+      </div>
+    </div>
+  </body>
+</html>
