@@ -153,6 +153,8 @@
 - [x] **[FOLLOWUP-54] (P1) visual-check 인프라 한계 보강** ✅ 2026-05-17 — 산출: `scripts/visual-check.ts` 에 `--url`/`--click`/`--seed-storage`/`--device`/`--wait-for-selector`/`--emulate-media` 6개 옵션 추가, `scripts/visual-check.sh` passthrough + 빈 배열 unbound 버그 fix, `.claude/commands/visual-check.md` 사용 예시 갱신, `docs/process/ui-feedback-workflow.md` 신규 옵션 기록. 검증: `pnpm visual-check --url https://storywork-editor-web.vercel.app/editor` prod 캡처 정상. dev 의 panel click 은 FormatPickerModal dismissable=false 라 `--seed-storage` 또는 chain click 필요(`--click` 자체 정상). @architect
 - [x] **[FOLLOWUP-49] (P1) `apps/web` typecheck + test 부채** — vitest.config.ts `@/` alias 추가 + setup.ts Supabase env 주입 + users.test.ts mock `as never` 타입 단언으로 5개 marketing 테스트 파일 (og/landing/features/intro/showcase-derbyman) 통과. typecheck 1건(users.test.ts L35) 수정. typecheck/test script echo 스킵 해제. 27개 테스트 파일 407 tests all pass — SHA: effce8c
 - [x] **[FOLLOWUP-50] (P1) `apps/storybook` Storybook 8.x type migration** — 11개 stories 파일 meta에 `args: {}` 기본값 추가 (render() 전용 스토리 args optional화). `StickyNote` 컴포넌트 `style` prop 추가. storybook tsconfig + vite main.ts 에 `@/` alias 추가. `AdminResourceUpload` unknown→string 타입 수정. typecheck/build script echo 스킵 해제. storybook build 통과 — SHA: effce8c
+- [x] **[FOLLOWUP-59] (P1) 법무 검토 — 약관/PP 정식화** — `/legal/terms`, `/legal/privacy` 현재 베타 placeholder. 정식 출시 전 법무 검토 후 실 약관으로 교체 필요. 개인정보보호법 준수 여부, 국제 데이터 전송(Supabase/Anthropic), 이용자 권리 조항 검토 의무 — @architect 🚦(휴먼 게이트)
+- [ ] **[FOLLOWUP-60] (P1) PostHog/Sentry 부트스트랩** — `apps/web/app/layout.tsx` 에 NEXT_PUBLIC_POSTHOG_KEY/NEXT_PUBLIC_SENTRY_DSN 환경변수 자리 준비됨. M0-06 과 별도 PR 로 진행. 쿠키 동의 배너 연동 필요 (FOLLOWUP-59 법무 검토 후 진행) — @architect
 - [ ] [FOLLOWUP-01] `eslint-import-resolver-typescript` 추가 — `@storywork/*` 패키지명 import 도 역참조 차단 가능. 현재는 상대 경로만 차단됨 — @architect (M1 진입 전)
 - [ ] [FOLLOWUP-02] `pnpm dev` (turbo --parallel) 일부 패키지가 시작되지 않는 이슈 — turbo 2.9.7 의 `--parallel` deprecated 이슈로 추정. `turbo run dev` 만 사용하도록 변경(persistent: true 이미 있음) 또는 `concurrency` 설정 추가 — @architect
 - [ ] [FOLLOWUP-03] Storybook 8.6 호환성 경고(`@storybook/addon-essentials@8.6.14` vs `8.6.18`) — 마이너 패치 — @ui-designer
@@ -193,6 +195,7 @@
 - [x] [MKT-04] 포즈 자산 실 연결 — Supabase Storage thumb → 22 자산 (16 unique) — `f3b2a8d`
 - [x] [MKT-05] OG 이미지 + 메타데이터 — Edge runtime 4 템플릿 + favicon + sitemap + robots — `a74db15`
 - [x] [MKT-06] Storybook 49 스토리 (9 파일) + next/* mock 인프라 — `b637dfc`
+- [x] [MKT-08] 랜딩 컨텐츠 풍성화 + SEO + 컴플라이언스 — 가치제안 3-up / 페르소나 4종 / FAQ 9개 / 사용 사례 3종 / 사회적 증거 / JSON-LD 3종 / robots 강화 / sitemap legal 추가 / /legal/terms + /legal/privacy placeholder (FOLLOWUP-59) — @ui-designer (pending commit)
 - [ ] [MKT-07] Pretendard webfont 정식 등록 (next/font/local) (FOLLOWUP-33, M5-01 마무리에 통합 예정)
 
 ## 🛠 편집기 Phase 1+2 (Bookmoa Storige 흡수, 2026-05-11) ✅

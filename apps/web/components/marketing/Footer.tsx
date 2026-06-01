@@ -31,8 +31,8 @@ const FOOTER_LINKS = {
     { label: 'API 문서', href: '#' },
   ],
   '법적 고지': [
-    { label: '이용약관', href: '#' },
-    { label: '개인정보처리방침', href: '#' },
+    { label: '서비스 이용약관', href: '/legal/terms' },
+    { label: '개인정보처리방침', href: '/legal/privacy' },
     { label: '저작권 정책', href: '#' },
   ],
 } as const

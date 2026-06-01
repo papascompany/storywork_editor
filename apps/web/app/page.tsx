@@ -1,7 +1,9 @@
 /**
  * / — 랜딩 페이지
  *
- * 색상 흐름: white hero → marquee → cream → lime → navy → coral → white CTA
+ * 색상 흐름:
+ *   white hero → marquee → value-props(lilac) → cream → lime → navy
+ *   → persona(mint) → coral → showcase → FAQ(cream) → social-proof → CTA
  * RSC (서버 컴포넌트) — MarqueeStrip 만 client
  */
 
@@ -45,6 +47,635 @@ export const metadata: Metadata = {
     description: '대본 → 자동 페이지 → POD 인쇄. 콘티 작가의 5분.',
     images: [`${BASE_URL}/api/og/landing`],
   },
+}
+
+/* ── B.1 JSON-LD structured data ─────────────────────────────────────────── */
+const jsonLdOrganization = {
+  '@context': 'https://schema.org',
+  '@type': 'Organization',
+  name: '스토리워크',
+  url: BASE_URL,
+  logo: `${BASE_URL}/icon.png`,
+  contactPoint: {
+    '@type': 'ContactPoint',
+    email: 'hello@storywork.kr',
+    contactType: 'customer service',
+    availableLanguage: 'Korean',
+  },
+}
+
+const jsonLdSoftwareApp = {
+  '@context': 'https://schema.org',
+  '@type': 'SoftwareApplication',
+  name: '스토리워크',
+  applicationCategory: 'DesignApplication',
+  operatingSystem: 'Web',
+  description:
+    '1,270+ 포즈 라이브러리와 AI 자동 배치로 콘티 작가급 스토리보드를 5분 만에. POD 출판까지 한 번에.',
+  url: BASE_URL,
+  screenshot: `${BASE_URL}/api/og/landing`,
+  offers: {
+    '@type': 'Offer',
+    price: '0',
+    priceCurrency: 'KRW',
+    availability: 'https://schema.org/InStock',
+  },
+}
+
+const jsonLdWebSite = {
+  '@context': 'https://schema.org',
+  '@type': 'WebSite',
+  name: '스토리워크',
+  url: BASE_URL,
+  potentialAction: {
+    '@type': 'SearchAction',
+    target: {
+      '@type': 'EntryPoint',
+      urlTemplate: `${BASE_URL}/features?q={search_term_string}`,
+    },
+    'query-input': 'required name=search_term_string',
+  },
+}
+
+/* ── A.1 핵심 가치 제안 3-up ─────────────────────────────────────────────── */
+function ValuePropsSection() {
+  const props = [
+    {
+      stat: '5분',
+      label: '첫 페이지 완성',
+      desc: '대본 붙여넣기부터 콘티 초안까지 5분. 신용카드 없이 무료.',
+      bg: 'var(--mkt-block-mint)',
+    },
+    {
+      stat: '1,270+',
+      label: '포즈 자산',
+      desc: '남·여·아이·동물 캐릭터, 다양한 감정과 동작. 직접 그리지 않아도 됩니다.',
+      bg: 'var(--mkt-block-lilac)',
+    },
+    {
+      stat: 'POD',
+      label: '출판까지 한 번에',
+      desc: 'B5/A5/정사각형 인쇄 사양 PDF를 그대로 인쇄소로. 파일 변환 없음.',
+      bg: 'var(--mkt-block-coral)',
+    },
+  ]
+
+  return (
+    <div style={{ padding: 'var(--mkt-space-section) var(--mkt-space-xl)' }}>
+      <div style={{ maxWidth: 'var(--mkt-max-width)', margin: '0 auto' }}>
+        <div
+          style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(3, 1fr)',
+            gap: 'var(--mkt-space-md)',
+          }}
+          className="value-props-grid"
+        >
+          {props.map(({ stat, label, desc, bg }) => (
+            <div
+              key={stat}
+              style={{
+                backgroundColor: bg,
+                borderRadius: 'var(--mkt-rounded-lg)',
+                padding: 'var(--mkt-space-xxl) var(--mkt-space-xl)',
+                display: 'flex',
+                flexDirection: 'column',
+                gap: 'var(--mkt-space-sm)',
+              }}
+            >
+              <p
+                style={{
+                  fontFamily: 'var(--mkt-font-sans)',
+                  fontSize: 'clamp(36px, 4vw, 52px)',
+                  fontWeight: 340,
+                  lineHeight: 1,
+                  letterSpacing: '-1px',
+                  color: 'var(--mkt-ink)',
+                }}
+              >
+                {stat}
+              </p>
+              <p className="mkt-headline" style={{ color: 'var(--mkt-ink)', marginBottom: '4px' }}>
+                {label}
+              </p>
+              <p className="mkt-body-sm" style={{ color: 'var(--mkt-ink)', opacity: 0.7 }}>
+                {desc}
+              </p>
+            </div>
+          ))}
+        </div>
+
+        <style>{`
+          @media (max-width: 768px) {
+            .value-props-grid {
+              grid-template-columns: 1fr !important;
+            }
+          }
+          @media (min-width: 769px) and (max-width: 1024px) {
+            .value-props-grid {
+              grid-template-columns: 1fr 1fr !important;
+            }
+          }
+        `}</style>
+      </div>
+    </div>
+  )
+}
+
+/* ── A.2 사용자 페르소나 4-up ────────────────────────────────────────────── */
+function PersonaSection() {
+  const personas = [
+    {
+      icon: '✏',
+      title: '아마추어 작가',
+      role: '글을 쓰지만 그림은 부담',
+      scenario: '대본을 쓰면 AI가 장면을 나누고 포즈·배경을 자동 배치. 처음 콘티도 완성 가능.',
+      highlight: 'var(--mkt-block-cream)',
+    },
+    {
+      icon: '🎨',
+      title: '크리에이터',
+      role: '인스타·유튜브 카드뉴스 제작',
+      scenario: '내 리소스(캐릭터·배경)를 마이데이터로 등록하고 반복 작업을 자동화.',
+      highlight: 'var(--mkt-block-lime)',
+    },
+    {
+      icon: '📚',
+      title: '만화 작가',
+      role: '시리즈 콘티 대량 작업',
+      scenario: 'B5 인쇄 사양 PDF 한 번에. POD 인쇄소로 그대로 전송.',
+      highlight: 'var(--mkt-block-pink)',
+    },
+    {
+      icon: '🏫',
+      title: '교육 현장',
+      role: '스토리보드 수업 도구',
+      scenario: '학생들이 대본을 쓰면 시각화된 콘티로 즉시 확인. 결과물 PDF 저장.',
+      highlight: 'var(--mkt-block-mint)',
+    },
+  ]
+
+  return (
+    <div
+      style={{
+        padding: '0 var(--mkt-space-xl) var(--mkt-space-section)',
+      }}
+    >
+      <div style={{ maxWidth: 'var(--mkt-max-width)', margin: '0 auto' }}>
+        <div style={{ marginBottom: 'var(--mkt-space-xxl)' }}>
+          <p
+            className="mkt-caption"
+            style={{ color: 'var(--mkt-ink)', opacity: 0.45, marginBottom: 'var(--mkt-space-md)' }}
+          >
+            WHO
+          </p>
+          <h2 className="mkt-display-lg" style={{ color: 'var(--mkt-ink)' }}>
+            이런 분들을 위해 만들었습니다
+          </h2>
+        </div>
+
+        <div
+          style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(2, 1fr)',
+            gap: 'var(--mkt-space-md)',
+          }}
+          className="persona-grid"
+        >
+          {personas.map(({ icon, title, role, scenario, highlight }) => (
+            <div
+              key={title}
+              style={{
+                border: '1px solid var(--mkt-hairline)',
+                borderRadius: 'var(--mkt-rounded-lg)',
+                padding: 'var(--mkt-space-xl)',
+                display: 'flex',
+                flexDirection: 'column',
+                gap: 'var(--mkt-space-sm)',
+                backgroundColor: 'var(--mkt-canvas)',
+                transition: 'border-color 150ms ease',
+              }}
+              className="persona-card"
+            >
+              <div
+                style={{
+                  width: '48px',
+                  height: '48px',
+                  backgroundColor: highlight,
+                  borderRadius: 'var(--mkt-rounded-md)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  fontSize: '22px',
+                  marginBottom: 'var(--mkt-space-xs)',
+                }}
+                aria-hidden="true"
+              >
+                {icon}
+              </div>
+              <p className="mkt-headline" style={{ color: 'var(--mkt-ink)' }}>
+                {title}
+              </p>
+              <p
+                className="mkt-body-sm"
+                style={{ color: 'var(--mkt-ink)', opacity: 0.5, fontWeight: 480 }}
+              >
+                {role}
+              </p>
+              <p className="mkt-body-sm" style={{ color: 'var(--mkt-ink)', opacity: 0.75 }}>
+                {scenario}
+              </p>
+            </div>
+          ))}
+        </div>
+
+        <style>{`
+          .persona-card:hover {
+            border-color: var(--mkt-ink);
+          }
+          @media (max-width: 768px) {
+            .persona-grid {
+              grid-template-columns: 1fr !important;
+            }
+          }
+        `}</style>
+      </div>
+    </div>
+  )
+}
+
+/* ── A.3 FAQ ─────────────────────────────────────────────────────────────── */
+function FaqSection() {
+  const faqs = [
+    {
+      q: 'AI가 자동 배치한 결과를 직접 수정할 수 있나요?',
+      a: '네. AI가 생성한 초안은 출발점일 뿐입니다. fabric.js 기반 편집기에서 포즈·배경·말풍선·텍스트를 모두 자유롭게 바꿀 수 있습니다. 마음에 안 드는 포즈는 한 클릭으로 교체, 위치와 크기도 드래그로 조정 가능합니다.',
+    },
+    {
+      q: '포즈 라이브러리의 저작권은 어떻게 되나요?',
+      a: '스토리워크 포즈 자산은 서비스 내 사용 및 POD 상업 출판까지 허용됩니다. 단, 자산 자체를 추출해 외부에서 재배포하는 것은 금지됩니다. 정확한 라이선스 조건은 이용약관을 참조해 주세요.',
+    },
+    {
+      q: 'POD 출판이란 무엇인가요?',
+      a: 'Print-On-Demand의 약자로, 주문이 들어올 때마다 소량 인쇄하는 방식입니다. 스토리워크는 인쇄소에 전달 가능한 재단선·여백이 포함된 PDF를 자동 생성합니다. 재고 없이 1권도 출판 가능합니다.',
+    },
+    {
+      q: '모바일에서도 편집이 가능한가요?',
+      a: '가능합니다. 터치 기반 모바일 편집을 지원하며 핀치 줌, 레이어 패널(BottomSheet), 인스펙터 풀스크린 모드가 제공됩니다. 다만 정밀 작업(레이어 세부 조정 등)은 데스크톱을 권장합니다.',
+    },
+    {
+      q: '내가 쓴 대본은 AI 학습에 사용되나요?',
+      a: '아니오. 이용자가 입력한 대본은 장면 분석 목적으로만 Claude API에 전달되며, Anthropic의 데이터 처리 정책에 따라 모델 학습에 사용되지 않습니다. 자세한 내용은 개인정보처리방침을 참조해 주세요.',
+    },
+    {
+      q: '지원하는 출판 판형(판형 프리셋)이 무엇인가요?',
+      a: '현재 B5(130×188mm), A5(148×210mm), 정사각형(170×170mm), 세로형(128×182mm)을 지원합니다. 재단 여백(bleed) 3mm가 자동 적용됩니다. 관리자 등록으로 사용자 정의 판형 추가도 가능합니다.',
+    },
+    {
+      q: '무료로 사용할 수 있는 범위는 어느 정도인가요?',
+      a: '베타 기간 중에는 모든 핵심 기능(편집기, AI 자동 배치, PDF 출판)을 무료로 이용할 수 있습니다. 정식 출시 후 플랜별 차등 제공으로 전환될 예정이며, 사전 공지 후 적용됩니다.',
+    },
+    {
+      q: '협업 기능은 지원하나요?',
+      a: '현재는 단독 편집 모드만 지원합니다. 2인 이상 실시간 협업(Yjs 기반)은 로드맵에 있으며, 이 버전에서는 파일 공유(JSON 내보내기/가져오기)로 협업을 대체할 수 있습니다.',
+    },
+    {
+      q: '제 캐릭터(리소스)를 직접 등록할 수 있나요?',
+      a: '크리에이터 플랜(예정)에서 가능합니다. PNG 투명 배경 이미지를 업로드하면 마이데이터 패널에 등록되어 편집기에서 바로 사용할 수 있습니다. 베타 기간에는 관리자 검수를 통해 시스템 라이브러리 등록도 신청할 수 있습니다.',
+    },
+  ]
+
+  return (
+    <div
+      style={{
+        padding: '0 var(--mkt-space-xl) var(--mkt-space-section)',
+      }}
+    >
+      <div style={{ maxWidth: 'var(--mkt-max-width)', margin: '0 auto' }}>
+        <ColorBlock variant="cream">
+          <div style={{ maxWidth: '680px' }}>
+            <p
+              className="mkt-caption"
+              style={{
+                color: 'var(--mkt-ink)',
+                opacity: 0.45,
+                marginBottom: 'var(--mkt-space-md)',
+              }}
+            >
+              FAQ
+            </p>
+            <h2
+              className="mkt-display-lg"
+              style={{ color: 'var(--mkt-ink)', marginBottom: 'var(--mkt-space-xxl)' }}
+            >
+              자주 묻는 질문
+            </h2>
+
+            <div
+              style={{
+                display: 'flex',
+                flexDirection: 'column',
+                gap: '0',
+              }}
+            >
+              {faqs.map(({ q, a }, i) => (
+                <details
+                  key={i}
+                  style={{
+                    borderTop: '1px solid var(--mkt-hairline)',
+                    paddingTop: 'var(--mkt-space-md)',
+                    paddingBottom: 'var(--mkt-space-md)',
+                  }}
+                  className="faq-item"
+                >
+                  <summary
+                    className="mkt-body"
+                    style={{
+                      color: 'var(--mkt-ink)',
+                      fontWeight: 480,
+                      cursor: 'pointer',
+                      listStyle: 'none',
+                      display: 'flex',
+                      justifyContent: 'space-between',
+                      alignItems: 'flex-start',
+                      gap: 'var(--mkt-space-md)',
+                    }}
+                  >
+                    <span>{q}</span>
+                    <span
+                      className="faq-icon"
+                      style={{
+                        fontFamily: 'var(--mkt-font-mono)',
+                        fontSize: '18px',
+                        flexShrink: 0,
+                        lineHeight: 1.5,
+                        color: 'var(--mkt-ink)',
+                        opacity: 0.45,
+                        userSelect: 'none',
+                      }}
+                      aria-hidden="true"
+                    >
+                      +
+                    </span>
+                  </summary>
+                  <p
+                    className="mkt-body-sm"
+                    style={{
+                      color: 'var(--mkt-ink)',
+                      opacity: 0.7,
+                      marginTop: 'var(--mkt-space-sm)',
+                      lineHeight: 1.6,
+                    }}
+                  >
+                    {a}
+                  </p>
+                </details>
+              ))}
+              <div style={{ borderTop: '1px solid var(--mkt-hairline)' }} aria-hidden="true" />
+            </div>
+          </div>
+
+          <style>{`
+            .faq-item summary::-webkit-details-marker { display: none; }
+            .faq-item[open] .faq-icon { opacity: 0.65; }
+            .faq-item summary:focus-visible {
+              outline: 2px solid var(--mkt-ink);
+              border-radius: 2px;
+              outline-offset: 2px;
+            }
+          `}</style>
+        </ColorBlock>
+      </div>
+    </div>
+  )
+}
+
+/* ── A.4 사회적 증거 placeholder ─────────────────────────────────────────── */
+function SocialProofSection() {
+  const stats = [
+    { value: '베타', label: '출시 단계', sub: '정식 런칭 준비 중' },
+    { value: '1,270+', label: '포즈 자산', sub: '지속 업데이트' },
+    { value: '5분', label: '첫 콘티 완성', sub: '평균 소요 시간' },
+    { value: '무료', label: '베타 기간', sub: '가격 정책 추후 공지' },
+  ]
+
+  return (
+    <div
+      style={{
+        padding: '0 var(--mkt-space-xl) var(--mkt-space-section)',
+      }}
+    >
+      <div style={{ maxWidth: 'var(--mkt-max-width)', margin: '0 auto' }}>
+        <div
+          style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(4, 1fr)',
+            gap: 'var(--mkt-space-md)',
+            textAlign: 'center',
+          }}
+          className="social-proof-grid"
+        >
+          {stats.map(({ value, label, sub }) => (
+            <div
+              key={value}
+              style={{
+                padding: 'var(--mkt-space-xl) var(--mkt-space-md)',
+                borderRadius: 'var(--mkt-rounded-md)',
+                border: '1px solid var(--mkt-hairline)',
+              }}
+            >
+              <p
+                style={{
+                  fontFamily: 'var(--mkt-font-sans)',
+                  fontSize: 'clamp(28px, 3vw, 42px)',
+                  fontWeight: 340,
+                  lineHeight: 1,
+                  letterSpacing: '-0.5px',
+                  color: 'var(--mkt-ink)',
+                  marginBottom: '8px',
+                }}
+              >
+                {value}
+              </p>
+              <p className="mkt-body-sm" style={{ color: 'var(--mkt-ink)', fontWeight: 540 }}>
+                {label}
+              </p>
+              <p
+                className="mkt-caption"
+                style={{ color: 'var(--mkt-ink)', opacity: 0.4, marginTop: '4px' }}
+              >
+                {sub}
+              </p>
+            </div>
+          ))}
+        </div>
+
+        <style>{`
+          @media (max-width: 768px) {
+            .social-proof-grid {
+              grid-template-columns: 1fr 1fr !important;
+            }
+          }
+          @media (max-width: 480px) {
+            .social-proof-grid {
+              grid-template-columns: 1fr !important;
+            }
+          }
+        `}</style>
+      </div>
+    </div>
+  )
+}
+
+/* ── A.5 사용 사례 3종 ───────────────────────────────────────────────────── */
+function UseCasesSection() {
+  const cases = [
+    {
+      tag: '베타 사용자 사례',
+      title: '더미맨의 월요일',
+      desc: '평범한 회사원이 주말마다 그리던 4컷 만화. 대본 한 페이지가 완성된 콘티가 되기까지.',
+      href: '/showcase/derbyman',
+      cta: '사례 보기',
+      bg: 'var(--mkt-block-navy)',
+      textColor: 'var(--mkt-inverse-ink)',
+      available: true,
+    },
+    {
+      tag: '곧 출시',
+      title: '인스타그램 카드뉴스',
+      desc: '정사각형 판형으로 SNS 카드뉴스를 만드는 법. AI 대본 분석으로 6장 구성 자동 제안.',
+      href: '#',
+      cta: '알림 받기',
+      bg: 'var(--mkt-block-coral)',
+      textColor: 'var(--mkt-ink)',
+      available: false,
+    },
+    {
+      tag: '곧 출시',
+      title: '교육용 스토리보드',
+      desc: '수업 자료로 쓸 스토리보드를 학생들과 함께 만드는 법. A5 인쇄본 배포까지.',
+      href: '#',
+      cta: '알림 받기',
+      bg: 'var(--mkt-block-lilac)',
+      textColor: 'var(--mkt-ink)',
+      available: false,
+    },
+  ]
+
+  return (
+    <div
+      style={{
+        padding: '0 var(--mkt-space-xl) var(--mkt-space-section)',
+      }}
+    >
+      <div style={{ maxWidth: 'var(--mkt-max-width)', margin: '0 auto' }}>
+        <div style={{ marginBottom: 'var(--mkt-space-xxl)' }}>
+          <p
+            className="mkt-caption"
+            style={{ color: 'var(--mkt-ink)', opacity: 0.45, marginBottom: 'var(--mkt-space-md)' }}
+          >
+            USE CASES
+          </p>
+          <h2 className="mkt-display-lg" style={{ color: 'var(--mkt-ink)' }}>
+            이렇게 활용합니다
+          </h2>
+        </div>
+
+        <div
+          style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(3, 1fr)',
+            gap: 'var(--mkt-space-md)',
+          }}
+          className="use-cases-grid"
+        >
+          {cases.map(({ tag, title, desc, href, cta, bg, textColor, available }) => (
+            <div
+              key={title}
+              style={{
+                backgroundColor: bg,
+                borderRadius: 'var(--mkt-rounded-lg)',
+                padding: 'var(--mkt-space-xxl) var(--mkt-space-xl)',
+                display: 'flex',
+                flexDirection: 'column',
+                gap: 'var(--mkt-space-md)',
+                minHeight: '280px',
+              }}
+            >
+              <span
+                className="mkt-caption"
+                style={{
+                  color: textColor,
+                  opacity: available ? 0.6 : 0.5,
+                  display: 'inline-block',
+                  backgroundColor: available ? 'transparent' : 'rgba(0,0,0,0.08)',
+                  borderRadius: '4px',
+                  padding: available ? '0' : '3px 8px',
+                  alignSelf: 'flex-start',
+                }}
+              >
+                {tag}
+              </span>
+              <div style={{ flex: 1 }}>
+                <p
+                  className="mkt-headline"
+                  style={{ color: textColor, marginBottom: 'var(--mkt-space-sm)' }}
+                >
+                  {title}
+                </p>
+                <p className="mkt-body-sm" style={{ color: textColor, opacity: 0.75 }}>
+                  {desc}
+                </p>
+              </div>
+              {available ? (
+                <Link
+                  href={href}
+                  style={{
+                    fontFamily: 'var(--mkt-font-sans)',
+                    fontSize: 'var(--mkt-body-sm-size)',
+                    fontWeight: 560,
+                    color: textColor,
+                    textDecoration: 'none',
+                    alignSelf: 'flex-start',
+                  }}
+                  className="use-case-link"
+                >
+                  {cta} →
+                </Link>
+              ) : (
+                <span
+                  style={{
+                    fontFamily: 'var(--mkt-font-sans)',
+                    fontSize: 'var(--mkt-body-sm-size)',
+                    fontWeight: 480,
+                    color: textColor,
+                    opacity: 0.45,
+                    alignSelf: 'flex-start',
+                  }}
+                >
+                  준비 중
+                </span>
+              )}
+            </div>
+          ))}
+        </div>
+
+        <style>{`
+          .use-case-link:hover { text-decoration: underline; }
+          .use-case-link:focus-visible {
+            outline: 2px solid currentColor;
+            border-radius: 2px;
+            outline-offset: 2px;
+          }
+          @media (max-width: 768px) {
+            .use-cases-grid {
+              grid-template-columns: 1fr !important;
+            }
+          }
+        `}</style>
+      </div>
+    </div>
+  )
 }
 
 /* ── 4컷 미니 콘티 — 더미맨 실 포즈 자산 ──────────────────────────────────── */
@@ -420,6 +1051,20 @@ export default function LandingPage() {
 
   return (
     <div style={{ backgroundColor: 'var(--mkt-canvas)' }}>
+      {/* B.1 JSON-LD */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLdOrganization) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLdSoftwareApp) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLdWebSite) }}
+      />
+
       <Header />
 
       {/* ── HERO ──────────────────────────────────────────────────────────── */}
@@ -504,6 +1149,9 @@ export default function LandingPage() {
 
       {/* ── MARQUEE STRIP ────────────────────────────────────────────────── */}
       <MarqueeStrip items={marqueeItems} />
+
+      {/* ── A.1 핵심 가치 제안 3-up ──────────────────────────────────────── */}
+      <ValuePropsSection />
 
       {/* ── FEATURE 1: 캔바도 어렵다면 (cream) ──────────────────────────── */}
       <div style={{ padding: 'var(--mkt-space-section) var(--mkt-space-xl)' }}>
@@ -788,6 +1436,9 @@ export default function LandingPage() {
         </div>
       </div>
 
+      {/* ── A.2 사용자 페르소나 ─────────────────────────────────────────── */}
+      <PersonaSection />
+
       {/* ── SHOWCASE TEASER ───────────────────────────────────────────────── */}
       <Section>
         <div
@@ -891,6 +1542,15 @@ export default function LandingPage() {
           }
         `}</style>
       </Section>
+
+      {/* ── A.5 사용 사례 3종 ────────────────────────────────────────────── */}
+      <UseCasesSection />
+
+      {/* ── A.3 FAQ ──────────────────────────────────────────────────────── */}
+      <FaqSection />
+
+      {/* ── A.4 사회적 증거 placeholder ─────────────────────────────────── */}
+      <SocialProofSection />
 
       {/* ── FINAL CTA ────────────────────────────────────────────────────── */}
       <section

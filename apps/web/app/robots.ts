@@ -5,7 +5,7 @@ export default function robots(): MetadataRoute.Robots {
     rules: {
       userAgent: '*',
       allow: '/',
-      disallow: ['/api/', '/editor/internal/'],
+      disallow: ['/api/', '/editor/', '/mypage/', '/auth/'],
     },
     sitemap: 'https://storywork-editor-web.vercel.app/sitemap.xml',
   }
