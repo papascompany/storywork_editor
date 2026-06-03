@@ -1,0 +1,7 @@
+{
+  "format": "light-novel",
+  "expectedSceneCount": 2,
+  "expectedCharacters": [],
+  "expectedBoundaries": [0, 7],
+  "expectedEmotions": ["neutral", "neutral"]
+}

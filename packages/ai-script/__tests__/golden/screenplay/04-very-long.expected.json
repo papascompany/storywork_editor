@@ -1,0 +1,7 @@
+{
+  "format": "screenplay",
+  "expectedSceneCount": 4,
+  "expectedCharacters": ["철수", "영희", "민수"],
+  "expectedBoundaries": [0, 4, 8, 14],
+  "expectedEmotions": ["neutral", "neutral", "neutral", "happy"]
+}

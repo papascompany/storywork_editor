@@ -1,0 +1,7 @@
+{
+  "format": "novel",
+  "expectedSceneCount": 3,
+  "expectedCharacters": ["철수", "영희"],
+  "expectedBoundaries": [0, 1, 2],
+  "expectedEmotions": ["neutral", "neutral", "neutral"]
+}

@@ -1,0 +1,7 @@
+{
+  "format": "diary",
+  "expectedSceneCount": 1,
+  "expectedCharacters": [],
+  "expectedBoundaries": [0],
+  "expectedEmotions": ["happy"]
+}
