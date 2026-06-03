@@ -308,8 +308,8 @@ export async function POST(req: Request): Promise<NextResponse> {
             projectId: prjId,
             index: page.pageIndex,
             templateId: page.templateId ?? null,
-            // PageFabricJson → Prisma JSON 캐스팅
-            fabricJson: page.fabricJson as Parameters<
+            // PageFabricJson → Prisma JSON 캐스팅 (구조적 호환, unknown 경유)
+            fabricJson: page.fabricJson as unknown as Parameters<
               typeof tx.page.create
             >[0]['data']['fabricJson'],
             thumbnail: null,
