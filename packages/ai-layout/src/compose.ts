@@ -187,6 +187,7 @@ async function buildPageFabricJson(
   recommended: RecommendResult,
   format: LayoutFormat,
   opts: ComposeOptions,
+  pageHint?: TemplateHint,
 ): Promise<{ fabricJson: PageFabricJson; templateId?: string; warnings: string[] }> {
   const seed = opts.seed ?? 0
   const templates = opts._templates ?? []
@@ -198,12 +199,16 @@ async function buildPageFabricJson(
   const firstScene = analyzed.scenes.find((s) => s.index === firstSceneIdx)
   const charCount = firstScene ? firstScene.characters.length : 1
 
-  // 장면 수와 cameraAngle 로 hint 추론
-  let hint: TemplateHint = 'default'
-  if (sceneIndices.length === 4) hint = 'four-cut'
+  // page-split 의 templateHint 우선 사용 (R3 풀샷 단독 등 명시적 분류 보존).
+  // 없으면 장면 수/cameraAngle 로 fallback 추론.
+  let hint: TemplateHint
+  if (pageHint && pageHint !== 'default') {
+    hint = pageHint
+  } else if (sceneIndices.length === 4) hint = 'four-cut'
   else if (sceneIndices.length === 2) hint = '1on1-talk'
   else if (firstScene?.meta.cameraAngle === 'closeup') hint = 'closeup'
   else if (firstScene?.meta.cameraAngle === 'wide') hint = 'wide'
+  else hint = 'default'
 
   // Template 매칭
   const { template } = matchTemplate(hint, preferredIds, charCount, templates)
@@ -467,6 +472,7 @@ export async function compose(
       recommended,
       format,
       opts,
+      group.templateHint,
     )
 
     pages.push({
