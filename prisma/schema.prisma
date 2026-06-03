@@ -99,6 +99,16 @@ model User {
   totpSecret    String?
   /// TOTP 설정 완료 여부
   totpVerified  Boolean        @default(false)
+  /// 회원 탈퇴 soft delete 시각 — null 이면 활성 계정 (LEGAL-OPS-03)
+  deletedAt     DateTime?
+  /// hard delete 예정 시각 (deletedAt + 30일). cron 이 이 값 기준으로 영구 삭제 (LEGAL-OPS-03)
+  deletionScheduledFor DateTime?
+  /// 탈퇴 사유 (분석용, 선택) — "비용" | "사용성" | "기능 부족" | "기타"
+  deletionReason String?       @db.VarChar(200)
+  /// 마케팅 수신 동의 (서비스 이용약관과 별도) — LEGAL-OPS-07
+  marketingConsent Boolean     @default(false)
+  /// 마케팅 동의 변경 시각 (기록용)
+  marketingConsentAt DateTime?
   createdAt     DateTime       @default(now())
   updatedAt     DateTime       @updatedAt
   projects      Project[]
@@ -111,6 +121,8 @@ model User {
   comments      Comment[]
 
   @@index([role])
+  @@index([deletedAt])
+  @@index([deletionScheduledFor])
 }
 
 model Subscription {
