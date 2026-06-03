@@ -262,11 +262,9 @@ describe('POST /api/script/full-pipeline', () => {
   beforeEach(() => {
     vi.clearAllMocks()
 
-    // 기본 mock 설정
-    mockCreateWebServerClient.mockResolvedValue(
-      makeMockSupabase() as ReturnType<typeof makeMockSupabase>,
-    )
-    mockGetPrismaClient.mockReturnValue(makeMockPrisma() as ReturnType<typeof makeMockPrisma>)
+    // 기본 mock 설정 (partial mock → any 캐스팅으로 타입 검사 완화)
+    mockCreateWebServerClient.mockResolvedValue(makeMockSupabase() as any)
+    mockGetPrismaClient.mockReturnValue(makeMockPrisma() as any)
     mockAnalyze.mockResolvedValue(makeMockAnalyzeResult(2))
     mockRecommend.mockResolvedValue(makeMockRecommendResult(2))
     mockCompose.mockResolvedValue(makeMockComposeResult(2))
@@ -335,9 +333,7 @@ describe('POST /api/script/full-pipeline', () => {
   // ── 2. 인증 실패 ──────────────────────────────────────────────────
 
   it('미인증 → 401', async () => {
-    mockCreateWebServerClient.mockResolvedValue(
-      makeMockSupabase(false) as ReturnType<typeof makeMockSupabase>,
-    )
+    mockCreateWebServerClient.mockResolvedValue(makeMockSupabase(false) as any)
 
     const { status } = await callRoute({
       scriptRaw: '철수: 안녕!',
@@ -383,9 +379,7 @@ describe('POST /api/script/full-pipeline', () => {
   // ── 4. Format 없음 ────────────────────────────────────────────────
 
   it('존재하지 않는 formatId → 404', async () => {
-    mockGetPrismaClient.mockReturnValue(
-      makeMockPrisma({ format: null }) as ReturnType<typeof makeMockPrisma>,
-    )
+    mockGetPrismaClient.mockReturnValue(makeMockPrisma({ format: null }) as any)
 
     const { status, data } = await callRoute({
       scriptRaw: '철수: 안녕!',
@@ -404,7 +398,7 @@ describe('POST /api/script/full-pipeline', () => {
     mockGetPrismaClient.mockReturnValue(
       makeMockPrisma({
         project: { id: 'existing-project', ownerId: MOCK_DB_USER.id },
-      }) as ReturnType<typeof makeMockPrisma>,
+      }) as any,
     )
 
     const { status, data } = await callRoute({
@@ -423,7 +417,7 @@ describe('POST /api/script/full-pipeline', () => {
     mockGetPrismaClient.mockReturnValue(
       makeMockPrisma({
         project: { id: 'others-project', ownerId: 'other-user-id' },
-      }) as ReturnType<typeof makeMockPrisma>,
+      }) as any,
     )
 
     const { status } = await callRoute({
@@ -441,7 +435,7 @@ describe('POST /api/script/full-pipeline', () => {
     mockGetPrismaClient.mockReturnValue(
       makeMockPrisma({
         transaction: vi.fn().mockRejectedValue(new Error('DB connection lost')),
-      }) as ReturnType<typeof makeMockPrisma>,
+      }) as any,
     )
 
     const { status } = await callRoute({
