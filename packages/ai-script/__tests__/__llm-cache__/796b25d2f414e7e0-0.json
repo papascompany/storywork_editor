@@ -1,0 +1,15 @@
+{
+  "scenes": [
+    {
+      "index": 0,
+      "location": "방 내부 창가",
+      "timeOfDay": "morning",
+      "cameraAngle": "closeup",
+      "pacing": "slow",
+      "mood": "tense",
+      "emotion": "tense"
+    }
+  ],
+  "characters": [],
+  "confidence": 0.88
+}

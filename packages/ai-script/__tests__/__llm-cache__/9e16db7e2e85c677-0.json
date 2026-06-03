@@ -1,0 +1,24 @@
+{
+  "scenes": [
+    {
+      "index": 0,
+      "location": "사무실",
+      "timeOfDay": "morning",
+      "cameraAngle": "medium",
+      "pacing": "slow",
+      "mood": "calm",
+      "emotion": "neutral"
+    },
+    {
+      "index": 1,
+      "location": "사무실 창가",
+      "timeOfDay": "noon",
+      "cameraAngle": "wide",
+      "pacing": "normal",
+      "mood": "hopeful",
+      "emotion": "calm"
+    }
+  ],
+  "characters": [],
+  "confidence": 0.88
+}

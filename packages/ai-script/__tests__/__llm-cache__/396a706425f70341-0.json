@@ -1,0 +1,24 @@
+{
+  "scenes": [
+    {
+      "index": 0,
+      "location": "카페",
+      "timeOfDay": "noon",
+      "cameraAngle": "medium",
+      "pacing": "slow",
+      "mood": "calm",
+      "emotion": "happy"
+    },
+    {
+      "index": 1,
+      "location": "거리",
+      "timeOfDay": "evening",
+      "cameraAngle": "wide",
+      "pacing": "slow",
+      "mood": "hopeful",
+      "emotion": "happy"
+    }
+  ],
+  "characters": [],
+  "confidence": 0.88
+}

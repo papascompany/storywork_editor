@@ -1,0 +1,14 @@
+{
+  "scenes": [
+    {
+      "index": 0,
+      "location": "불명",
+      "cameraAngle": "medium",
+      "pacing": "normal",
+      "mood": "tense",
+      "emotion": "surprised"
+    }
+  ],
+  "characters": [],
+  "confidence": 0.88
+}

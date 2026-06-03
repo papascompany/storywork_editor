@@ -1,0 +1,43 @@
+{
+  "scenes": [
+    {
+      "index": 0,
+      "location": "불명의 건물 외부",
+      "cameraAngle": "wide",
+      "pacing": "normal",
+      "mood": "tense",
+      "emotion": "tense"
+    },
+    {
+      "index": 1,
+      "location": "건물 내부",
+      "cameraAngle": "medium",
+      "pacing": "normal",
+      "mood": "neutral",
+      "emotion": "neutral"
+    },
+    {
+      "index": 2,
+      "location": "건물 내부",
+      "cameraAngle": "closeup",
+      "pacing": "fast",
+      "mood": "tense",
+      "emotion": "tense"
+    }
+  ],
+  "characters": [
+    {
+      "name": "철수",
+      "suggestedBodyType": "M"
+    },
+    {
+      "name": "영희",
+      "suggestedBodyType": "F"
+    },
+    {
+      "name": "민수",
+      "suggestedBodyType": "M"
+    }
+  ],
+  "confidence": 0.88
+}

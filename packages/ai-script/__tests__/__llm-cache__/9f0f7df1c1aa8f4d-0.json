@@ -1,0 +1,56 @@
+{
+  "scenes": [
+    {
+      "index": 0,
+      "location": "도시 거리",
+      "timeOfDay": "evening",
+      "cameraAngle": "wide",
+      "pacing": "slow",
+      "mood": "neutral",
+      "emotion": "neutral"
+    },
+    {
+      "index": 1,
+      "location": "극장 내부",
+      "timeOfDay": "evening",
+      "cameraAngle": "wide",
+      "pacing": "slow",
+      "mood": "sad",
+      "emotion": "sad"
+    },
+    {
+      "index": 2,
+      "location": "무대",
+      "timeOfDay": "evening",
+      "cameraAngle": "medium",
+      "pacing": "normal",
+      "mood": "hopeful",
+      "emotion": "hopeful"
+    },
+    {
+      "index": 3,
+      "location": "극장 로비",
+      "timeOfDay": "night",
+      "cameraAngle": "closeup",
+      "pacing": "normal",
+      "mood": "neutral",
+      "emotion": "surprised"
+    },
+    {
+      "index": 4,
+      "location": "극장 외부",
+      "timeOfDay": "night",
+      "cameraAngle": "wide",
+      "pacing": "slow",
+      "mood": "romantic",
+      "emotion": "happy"
+    }
+  ],
+  "characters": [
+    {
+      "name": "철수",
+      "suggestedBodyType": "M"
+    }
+  ],
+  "confidence": 0.88
+}

@@ -1,0 +1,24 @@
+{
+  "scenes": [
+    {
+      "index": 0,
+      "location": "실내",
+      "timeOfDay": "noon",
+      "cameraAngle": "medium",
+      "pacing": "normal",
+      "mood": "neutral",
+      "emotion": "neutral"
+    }
+  ],
+  "characters": [
+    {
+      "name": "철수",
+      "suggestedBodyType": "M"
+    },
+    {
+      "name": "영희",
+      "suggestedBodyType": "F"
+    }
+  ],
+  "confidence": 0.88
+}

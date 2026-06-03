@@ -1,0 +1,24 @@
+{
+  "scenes": [
+    {
+      "index": 0,
+      "location": "거리",
+      "timeOfDay": "noon",
+      "cameraAngle": "medium",
+      "pacing": "fast",
+      "mood": "action",
+      "emotion": "surprised"
+    },
+    {
+      "index": 1,
+      "location": "거리",
+      "timeOfDay": "noon",
+      "cameraAngle": "closeup",
+      "pacing": "normal",
+      "mood": "tense",
+      "emotion": "tense"
+    }
+  ],
+  "characters": [],
+  "confidence": 0.88
+}

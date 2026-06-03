@@ -1,0 +1,30 @@
+{
+  "scenes": [
+    {
+      "index": 0,
+      "location": "전장",
+      "cameraAngle": "wide",
+      "pacing": "fast",
+      "mood": "action",
+      "emotion": "fearful"
+    },
+    {
+      "index": 1,
+      "location": "전장",
+      "cameraAngle": "medium",
+      "pacing": "fast",
+      "mood": "tense",
+      "emotion": "tense"
+    },
+    {
+      "index": 2,
+      "location": "전장",
+      "cameraAngle": "closeup",
+      "pacing": "fast",
+      "mood": "action",
+      "emotion": "tense"
+    }
+  ],
+  "characters": [],
+  "confidence": 0.88
+}

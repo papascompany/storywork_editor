@@ -1,0 +1,33 @@
+{
+  "scenes": [
+    {
+      "index": 0,
+      "location": "방 내부",
+      "timeOfDay": "morning",
+      "cameraAngle": "medium",
+      "pacing": "slow",
+      "mood": "calm",
+      "emotion": "neutral"
+    },
+    {
+      "index": 1,
+      "location": "방 내부",
+      "timeOfDay": "morning",
+      "cameraAngle": "closeup",
+      "pacing": "slow",
+      "mood": "sad",
+      "emotion": "sad"
+    },
+    {
+      "index": 2,
+      "location": "방 내부",
+      "timeOfDay": "noon",
+      "cameraAngle": "wide",
+      "pacing": "normal",
+      "mood": "hopeful",
+      "emotion": "hopeful"
+    }
+  ],
+  "characters": [],
+  "confidence": 0.88
+}

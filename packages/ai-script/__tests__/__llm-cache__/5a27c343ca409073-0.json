@@ -1,0 +1,38 @@
+{
+  "scenes": [
+    {
+      "index": 0,
+      "location": "던전 입구",
+      "cameraAngle": "wide",
+      "pacing": "normal",
+      "mood": "tense",
+      "emotion": "fearful"
+    },
+    {
+      "index": 1,
+      "location": "던전 내부",
+      "cameraAngle": "medium",
+      "pacing": "normal",
+      "mood": "tense",
+      "emotion": "tense"
+    },
+    {
+      "index": 2,
+      "location": "던전 내부",
+      "cameraAngle": "medium",
+      "pacing": "fast",
+      "mood": "action",
+      "emotion": "tense"
+    },
+    {
+      "index": 3,
+      "location": "최종 관문",
+      "cameraAngle": "closeup",
+      "pacing": "fast",
+      "mood": "tense",
+      "emotion": "fearful"
+    }
+  ],
+  "characters": [],
+  "confidence": 0.88
+}

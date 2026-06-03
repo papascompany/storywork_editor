@@ -1,0 +1,15 @@
+{
+  "scenes": [
+    {
+      "index": 0,
+      "location": "기차 내부",
+      "timeOfDay": "noon",
+      "cameraAngle": "wide",
+      "pacing": "slow",
+      "mood": "hopeful",
+      "emotion": "happy"
+    }
+  ],
+  "characters": [],
+  "confidence": 0.88
+}

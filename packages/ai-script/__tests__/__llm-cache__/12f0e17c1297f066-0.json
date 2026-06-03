@@ -1,0 +1,46 @@
+{
+  "scenes": [
+    {
+      "index": 0,
+      "location": "카페 외부",
+      "timeOfDay": "morning",
+      "cameraAngle": "wide",
+      "pacing": "slow",
+      "mood": "calm",
+      "emotion": "neutral"
+    },
+    {
+      "index": 1,
+      "location": "카페 내부",
+      "timeOfDay": "morning",
+      "cameraAngle": "medium",
+      "pacing": "normal",
+      "mood": "tense",
+      "emotion": "sad"
+    },
+    {
+      "index": 2,
+      "location": "카페 내부",
+      "timeOfDay": "morning",
+      "cameraAngle": "closeup",
+      "pacing": "normal",
+      "mood": "neutral",
+      "emotion": "neutral"
+    }
+  ],
+  "characters": [
+    {
+      "name": "철수",
+      "suggestedBodyType": "M"
+    },
+    {
+      "name": "영희",
+      "suggestedBodyType": "F"
+    },
+    {
+      "name": "민수",
+      "suggestedBodyType": "M"
+    }
+  ],
+  "confidence": 0.88
+}

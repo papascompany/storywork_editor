@@ -1,0 +1,15 @@
+{
+  "scenes": [
+    {
+      "index": 0,
+      "location": "방 내부",
+      "timeOfDay": "morning",
+      "cameraAngle": "medium",
+      "pacing": "slow",
+      "mood": "neutral",
+      "emotion": "neutral"
+    }
+  ],
+  "characters": [],
+  "confidence": 0.88
+}

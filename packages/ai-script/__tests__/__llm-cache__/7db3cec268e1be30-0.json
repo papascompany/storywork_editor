@@ -1,0 +1,37 @@
+{
+  "scenes": [
+    {
+      "index": 0,
+      "location": "학교 복도",
+      "timeOfDay": "noon",
+      "cameraAngle": "medium",
+      "pacing": "normal",
+      "mood": "neutral",
+      "emotion": "neutral"
+    },
+    {
+      "index": 1,
+      "location": "교실",
+      "timeOfDay": "noon",
+      "cameraAngle": "medium",
+      "pacing": "normal",
+      "mood": "tense",
+      "emotion": "sad"
+    }
+  ],
+  "characters": [
+    {
+      "name": "철수",
+      "suggestedBodyType": "M"
+    },
+    {
+      "name": "영희",
+      "suggestedBodyType": "F"
+    },
+    {
+      "name": "민수",
+      "suggestedBodyType": "M"
+    }
+  ],
+  "confidence": 0.88
+}
