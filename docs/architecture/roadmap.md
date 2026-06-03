@@ -115,9 +115,43 @@
 ## M8 — Social
 
 - [ ] [M8-01] OG 이미지 자동 생성(nano-banana 2) — Lighthouse SEO 100 — @ui-designer
-- [ ] [M8-02] 공모전 시즌 모듈 + 자동 동결 — pg_cron — @admin-builder
-- [ ] [M8-03] 뽐내기 갤러리 + 좋아요/댓글 — 무한 스크롤 모바일 — @ui-designer + @admin-builder
+- [x] [M8-02] 공모전 시즌 모듈 + admin CRUD — 사용자 목록/상세 페이지 완료, pg_cron 자동 동결은 BOARD-05로 별도 분리 — @admin-builder ✅ 2026-06-03 (commit 1ea593f)
+- [x] [M8-03] 뽐내기 갤러리 + 좋아요/댓글 — 무한 스크롤(cursor-based) + Reaction(like/heart/wow) + 댓글 CRUD 완료 — @ui-designer ✅ 2026-06-03 (commit 690a145)
 - [ ] [M8-04] SNS 공유 카드(카카오/X/페북) — 검증 — @ui-designer
+
+## BOARD — 공모전/공지/Q&A/갤러리 (2026-06-03)
+
+- [x] [BOARD-01] Notice 모델 + 사용자 페이지(/notices, /notices/[id]) + admin CRUD — @architect ✅ 2026-06-03 (commit 81ee2a8 + 690a145 + 1ea593f)
+- [x] [BOARD-02] Inquiry(Q&A) 모델 + 사용자 폼(/contact) + 마이페이지(/mypage/inquiries) + admin 응답 큐 — @architect ✅ 2026-06-03
+- [x] [BOARD-03] 공모전 시즌 사용자 페이지(/contest, /contest/[seasonId]) + admin — @architect ✅ 2026-06-03
+- [x] [BOARD-04] 갤러리(/showcase) + 댓글 + Reaction + admin 모더레이션 — @architect ✅ 2026-06-03
+- [ ] [BOARD-05] pg_cron 자동 동결 (시즌 closesAt 지나면 출품 자동 잠금) — @architect (P1, M8-02 후속)
+- [ ] [BOARD-06] FAQ 별도 페이지 + 카테고리 — @ui-designer (P1)
+- [ ] [BOARD-07] 신고 큐 (Comment/Showcase 신고 접수 + admin 처리) — @admin-builder (P1)
+
+## LEGAL-OPS — 한국 법규 출시 필수 (P0, 출시 전 완료 필수)
+
+- [ ] [LEGAL-01] 개인정보처리방침 정식화 (법무 검토 + 실 약관) — FOLLOWUP-59 인계 — 🚦 휴먼 게이트
+- [ ] [LEGAL-02] 이용약관 정식화 + 전자상거래법 청약철회 조항 — 🚦 휴먼 게이트
+- [ ] [LEGAL-03] 쿠키 동의 배너 (GDPR 최소화 + 한국 정통망법) — @ui-designer
+- [ ] [LEGAL-04] 개인정보 수집·이용 동의 체크박스 (회원가입 + 문의 폼) — @ui-designer + @architect
+- [ ] [LEGAL-05] 미성년자 이용 제한 고지 + 법정대리인 동의 처리 — 🚦 휴먼 게이트
+
+## COMMS — 알림/이메일 (M7 진입 직전)
+
+- [ ] [COMMS-01] Inquiry 답변 시 이메일 자동 발송 — Resend 또는 SendGrid — @architect (BOARD-02 placeholder 완성)
+- [ ] [COMMS-02] 회원가입/비밀번호 재설정 트랜잭션 이메일 커스텀 템플릿 — @ui-designer
+- [ ] [COMMS-03] 공모전 시작/종료 알림 푸시 (Web Push API) — @architect
+- [ ] [COMMS-04] 마케팅 뉴스레터 구독 옵션 + 수신거부 처리 — LEGAL-03 연동 — 🚦 휴먼 게이트
+
+## COMMERCE-EXT — 거래 확장 (M7 후속)
+
+- [ ] [COMMERCE-01] 크리에이터 리소스 마켓플레이스 (판매 등록 + 수수료 정책) — 🚦 휴먼 게이트
+- [ ] [COMMERCE-02] POD 인쇄소 연동 API (업체별 사양 자동 전송) — @pdf-publisher + @architect
+- [ ] [COMMERCE-03] 크리에이터 정산 시스템 (월별 수익 정산 + 세금계산서) — 🚦 휴먼 게이트
+- [ ] [COMMERCE-04] 기업 라이선스 (팀 구독 + 워크스페이스) — 🚦 휴먼 게이트
+- [ ] [COMMERCE-05] 공모전 수상작 유통 수익 분배 — 🚦 휴먼 게이트
+- [ ] [COMMERCE-06] NFT/디지털 굿즈 연동 (추후 시장 상황 판단) — P3, parking
 
 ## M9 — Stabilization
 
