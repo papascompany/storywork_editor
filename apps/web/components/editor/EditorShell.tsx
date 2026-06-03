@@ -1202,6 +1202,7 @@ export function EditorShell() {
             selectedIds={selectedIds}
             closeRequest={mobileCloseRequest}
             onPageChange={(idx) => setCurrentPage(idx)}
+            onApplyAlternative={handleApplyAlternative}
           />
         </div>
 

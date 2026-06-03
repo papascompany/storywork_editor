@@ -47,9 +47,12 @@ import { applyZoom, fitToViewport, getZoomPercent, MIN_ZOOM, MAX_ZOOM } from './
 import type { ObjectProps } from './hooks/useSelection'
 import { LayerPanel } from './LayerPanel'
 import { PagePanel } from './page-system/PagePanel'
+import { AlternativesSection } from './panels/alternatives-section'
 import { BackgroundPanel } from './panels/BackgroundPanel'
 import { PlaceholderPanel } from './panels/PlaceholderPanel'
 import { ShapePanel } from './panels/ShapePanel'
+import type { AlternativeCandidate } from './store/useAlternativesStore'
+import { selectHasAlternatives, useAlternativesStore } from './store/useAlternativesStore'
 import { ACTIVE_TOOLS, TOOL_MILESTONE, type ToolId, useToolStore } from './store/useToolStore'
 import type { HistoryRef as History } from './types'
 
@@ -73,6 +76,8 @@ export type MobileBottomSheetProps = {
   closeRequest?: number
   /** 페이지 전환 콜백 (FOLLOWUP-46) */
   onPageChange?: (index: number) => void
+  /** M4-05: 한 클릭 교체 콜백 */
+  onApplyAlternative?: (candidate: AlternativeCandidate) => void
 }
 
 // ── 높이 상수 ─────────────────────────────────
@@ -496,7 +501,9 @@ export function MobileBottomSheet({
   selectedIds,
   closeRequest,
   onPageChange,
+  onApplyAlternative,
 }: MobileBottomSheetProps) {
+  const hasAlternatives = useAlternativesStore(selectHasAlternatives)
   const [snap, setSnap] = useState<SheetSnap>('peek')
   const [activeTab, setActiveTab] = useState<Tab>('tools')
   const sheetRef = useRef<HTMLDivElement>(null)
@@ -679,6 +686,12 @@ export function MobileBottomSheet({
                   layerTree={layerTree}
                   history={history as any}
                 />
+                {/* M4-05: AI 추천 대안 후보 섹션 */}
+                {hasAlternatives && onApplyAlternative && (
+                  <div className="border-t border-[var(--color-border)]">
+                    <AlternativesSection onApply={onApplyAlternative} isMobile />
+                  </div>
+                )}
               </div>
             )}
             {activeTab === 'layers' && (
