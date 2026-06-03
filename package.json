@@ -29,6 +29,8 @@
     "supabase:start": "supabase start",
     "supabase:stop": "supabase stop",
     "supabase:status": "supabase status",
+    "migrate:character:dummyman": "tsx --tsconfig tsconfig.scripts.json scripts/migrate-dummyman-character.ts",
+    "migrate:character:dummyman:dry": "tsx --tsconfig tsconfig.scripts.json scripts/migrate-dummyman-character.ts --dry-run",
     "ingest:dry": "tsx --tsconfig tsconfig.scripts.json scripts/ingest-poses.ts --dry-run",
     "ingest:sample": "tsx --tsconfig tsconfig.scripts.json scripts/ingest-poses.ts --limit 5",
     "ingest:full": "tsx --tsconfig tsconfig.scripts.json scripts/ingest-poses.ts",
