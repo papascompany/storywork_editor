@@ -26,6 +26,10 @@ const NAV_ITEMS: NavItemDef[] = [
   { href: '/resources', label: '리소스', exact: false },
   { href: '/templates', label: '템플릿', exact: false },
   { href: '/template-sets', label: '템플릿 세트', exact: false },
+  { href: '/notices', label: '공지사항', exact: false },
+  { href: '/inquiries', label: '문의 처리', exact: false },
+  { href: '/contests', label: '공모전', exact: false },
+  { href: '/showcase', label: '쇼케이스 관리', exact: false },
   { href: '/audit', label: '감사 로그', exact: false },
 ]
 

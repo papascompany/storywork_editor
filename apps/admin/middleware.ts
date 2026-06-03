@@ -58,6 +58,25 @@ export async function middleware(request: NextRequest): Promise<NextResponse> {
   return response
 }
 
+/**
+ * TOTP 쿠키 옵션 빌더 — apps/admin/app/api/auth/totp-* 에서 사용.
+ * Secure + HttpOnly + SameSite=Lax.
+ * Returns { name, value, options } for response.cookies.set().
+ */
+export function buildTotpCookieOptions(maxAgeSeconds = 3600) {
+  return {
+    name: 'totp_verified',
+    value: '1',
+    options: {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'lax' as const,
+      path: '/',
+      maxAge: maxAgeSeconds,
+    },
+  }
+}
+
 export const config = {
   matcher: [
     /*

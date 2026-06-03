@@ -13,7 +13,17 @@ import { prisma } from './prisma'
 
 export type AuditAction = 'create' | 'update' | 'delete' | 'publish' | 'reject'
 
-export type AuditEntityType = 'Format' | 'Resource' | 'Template' | 'TemplateSet' | 'User'
+export type AuditEntityType =
+  | 'Format'
+  | 'Resource'
+  | 'Template'
+  | 'TemplateSet'
+  | 'User'
+  | 'Notice'
+  | 'Inquiry'
+  | 'ContestSeason'
+  | 'Showcase'
+  | 'Comment'
 
 export interface RecordAuditOptions {
   actorId: string
