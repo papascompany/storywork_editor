@@ -12,6 +12,8 @@ import { Footer } from '@/components/marketing/Footer'
 import { Header } from '@/components/marketing/Header'
 import { prisma } from '@/lib/prisma'
 
+export const dynamic = 'force-dynamic'
+
 export const metadata: Metadata = {
   title: '공모전',
   description: '스토리워크 공모전 시즌. 나만의 스토리보드를 출품하고 크리에이터를 꿈꾸세요.',

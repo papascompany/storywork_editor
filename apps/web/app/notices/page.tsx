@@ -12,6 +12,8 @@ import { Footer } from '@/components/marketing/Footer'
 import { Header } from '@/components/marketing/Header'
 import { prisma } from '@/lib/prisma'
 
+export const dynamic = 'force-dynamic'
+
 export const metadata: Metadata = {
   title: '공지사항',
   description: '스토리워크 서비스 공지사항 및 업데이트 안내',

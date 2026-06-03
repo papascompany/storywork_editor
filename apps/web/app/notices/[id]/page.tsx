@@ -12,6 +12,8 @@ import { Footer } from '@/components/marketing/Footer'
 import { Header } from '@/components/marketing/Header'
 import { prisma } from '@/lib/prisma'
 
+export const dynamic = 'force-dynamic'
+
 interface Props {
   params: Promise<{ id: string }>
 }

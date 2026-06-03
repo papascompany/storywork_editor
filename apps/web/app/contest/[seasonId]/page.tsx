@@ -16,6 +16,8 @@ import { Header } from '@/components/marketing/Header'
 import { prisma } from '@/lib/prisma'
 import { createWebServerClient } from '@/lib/supabase/server'
 
+export const dynamic = 'force-dynamic'
+
 interface Props {
   params: Promise<{ seasonId: string }>
 }

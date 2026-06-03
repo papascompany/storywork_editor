@@ -13,6 +13,8 @@ import { Footer } from '@/components/marketing/Footer'
 import { Header } from '@/components/marketing/Header'
 import { prisma } from '@/lib/prisma'
 
+export const dynamic = 'force-dynamic'
+
 export const metadata: Metadata = {
   title: '갤러리',
   description: '스토리워크 크리에이터들의 스토리보드 갤러리. 좋아하는 작품에 반응을 남겨보세요.',
