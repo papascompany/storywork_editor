@@ -14,6 +14,7 @@
  *  - opts.llmEnabled 로 명시 오버라이드 가능
  */
 
+import { enhanceWithLLM } from './llm/enhance.js'
 import { detectFormat } from './parsers/detect-format.js'
 import { parseNovel } from './parsers/parse-novel.js'
 import { parseScreenplay } from './parsers/parse-screenplay.js'
@@ -89,22 +90,10 @@ function parseByFormat(text: string, fmt: Exclude<ScriptInputFormat, 'auto'>): A
 }
 
 // ─────────────────────────────────────────────
-// LLM 보강 (stub — 환경변수 활성 시 실제 구현)
+// LLM 보강 래퍼 (enhanceWithLLM 위임)
 // ─────────────────────────────────────────────
 
-async function enrichWithLlm(
-  _text: string,
-  scenes: AnalyzedScene[],
-  _seed: number,
-): Promise<AnalyzedScene[]> {
-  // TODO(M4-01): Vercel AI Gateway + claude-sonnet-4-6 로 메타 보강
-  // 현재는 룰-only 결과 그대로 반환
-  // 구현 시:
-  //   - prompt caching 활성 (CLAUDE.md §4.3)
-  //   - temperature 0 + seed 고정
-  //   - 각 scene 에 meta.location, meta.cameraAngle, meta.mood 채우기
-  return scenes
-}
+// (실제 구현은 llm/enhance.ts 에 위임 — analyze.ts 는 오케스트레이터만)
 
 // ─────────────────────────────────────────────
 // 단일 시드 분석
@@ -116,21 +105,43 @@ async function analyzeOnce(
   seed: number,
   llmEnabled: boolean,
 ): Promise<Omit<AnalyzeResult, 'alternatives'>> {
-  let scenes = parseByFormat(text, format)
+  const scenes = parseByFormat(text, format)
+  const characters = extractCharacters(scenes)
 
-  if (llmEnabled && scenes.length > 0) {
-    scenes = await enrichWithLlm(text, scenes, seed)
+  // LLM 비활성 시 룰-only 결과 즉시 반환
+  if (!llmEnabled || scenes.length === 0) {
+    return {
+      format,
+      scenes,
+      characters,
+      seed,
+      modelVersion: 'rule-only',
+    }
   }
 
-  const characters = extractCharacters(scenes)
-  const modelVersion = llmEnabled ? 'claude-sonnet-4-6' : 'rule-only'
-
-  return {
-    format,
-    scenes,
-    characters,
-    seed,
-    modelVersion,
+  // LLM 활성 시 enhanceWithLLM 에 위임 (graceful fallback 내장)
+  try {
+    const enriched = await enhanceWithLLM(
+      text,
+      { format, scenes, characters, seed, modelVersion: 'rule-only' },
+      { seed },
+    )
+    return {
+      format: enriched.format,
+      scenes: enriched.scenes,
+      characters: enriched.characters,
+      seed,
+      modelVersion: enriched.modelVersion,
+    }
+  } catch (err) {
+    console.warn('[ai-script] LLM enhance 실패, 룰-only 결과 유지', err)
+    return {
+      format,
+      scenes,
+      characters,
+      seed,
+      modelVersion: 'rule-only',
+    }
   }
 }
 

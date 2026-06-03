@@ -24,8 +24,10 @@
     "clean": "rimraf dist *.tsbuildinfo"
   },
   "dependencies": {
+    "@ai-sdk/anthropic": "^3.0.81",
     "@storywork/schema": "workspace:*",
-    "@storywork/utils": "workspace:*"
+    "@storywork/utils": "workspace:*",
+    "ai": "^6.0.195"
   },
   "devDependencies": {
     "typescript": "^5.6.0",
