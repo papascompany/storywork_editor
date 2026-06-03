@@ -76,7 +76,14 @@
 - [x] [M4-02] `ai-recommend` 포즈/배경/말풍선 추천 — 만족도 100.0% (16/16, 목표 ≥ 70%) — @scene-analyzer ✅ 2026-06-03 (→ Step 1~5 커밋 참조)
 - [x] [M4-03] `ai-layout` compose() + 결정론 시드 ✅ 2026-06-03 — 충돌 0, safe 침범 0. 페이지 분할 5 규칙 (R1~R5) + Template 매칭 + Slot 배치 + lowDpi 제약 (M2-07 통합). 골든 5 시나리오 + lowDpi E2E 102/102 tests pass. `POST /api/script/compose` + 문서 2종 (`ai-layout-compose.md` + `full-pipeline.md`). 커밋: `5517071`+`1c5619b`+`5000889`+`9c6a2ea` — @layout-composer
 - [x] [M4-04] 사용자 흐름: 대본 → 자동 페이지 N개 — E2E 통과 ✅ 2026-06-03 — commit `14004b3`+`7e6c9f3`+`b9088ee`+`778fa0b`. `/api/script/full-pipeline` + `/editor/import` Wizard + `useProjectImport` + E2E 4 시나리오 (A~D), 63 tests green — @layout-composer + @editor-engineer
-- [ ] [M4-05] alternatives UI(한 클릭 교체) — 모바일에서도 동작 — @ui-designer
+- [x] [M4-05] alternatives UI(한 클릭 교체) — 모바일에서도 동작 — @ui-designer ✅ 2026-06-03
+  - useAlternativesStore (Zustand+Immer, 14 단위 테스트)
+  - AlternativesSection: 2열 카드 그리드 (pose/bg/bubble/wordFx), confidence 배지, "현재" 표시
+  - RightPanel Properties 탭 하단 통합 (desktop)
+  - MobileBottomSheet Inspector 탭 통합 (mobile, snap half 에서 visible)
+  - EditorShell: 선택 변경 시 alternatives 자동 로드 + handleApplyAlternative (history command 통합)
+  - GET /api/projects/[id]/alternatives (재진입 시 복원 API)
+  - 커밋: `292b857`+`ebc1f28`+`6c7af1a`+`b2920cd`
 
 ## DESIGN-SYS — Admin/Editor Nike 안정화 (2026-05-15)
 

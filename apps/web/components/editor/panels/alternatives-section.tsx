@@ -20,12 +20,7 @@ import { Cloud, MessageCircle, MessageSquare, Mic, Sparkles, Wand2 } from 'lucid
 import React from 'react'
 
 import type { AlternativeCandidate, AlternativeLayerKind } from '../store/useAlternativesStore'
-import {
-  selectCurrentCandidates,
-  selectHasAlternatives,
-  selectSelectedIndex,
-  useAlternativesStore,
-} from '../store/useAlternativesStore'
+import { useAlternativesStore } from '../store/useAlternativesStore'
 
 // ─── 배경 톤 → CSS 색상 매핑 ─────────────────────────────────────────────────
 
@@ -195,14 +190,19 @@ export type AlternativesSectionProps = {
 }
 
 export function AlternativesSection({ onApply, isMobile = false }: AlternativesSectionProps) {
-  const candidates = useAlternativesStore(selectCurrentCandidates)
-  const selectedIndex = useAlternativesStore(selectSelectedIndex)
-  const hasAlternatives = useAlternativesStore(selectHasAlternatives)
-  const current = useAlternativesStore((s) => s.current)
+  // 원시값/길이 셀렉터만 사용 — 객체/배열 참조 반환 회피 (Zustand immer 무한 루프 방지)
+  const candidateCount = useAlternativesStore((s) => s.current?.candidates.length ?? 0)
+  const selectedIndex = useAlternativesStore((s) => s.current?.selectedIndex ?? 0)
+  const layerKind = useAlternativesStore((s) => s.current?.layerKind)
+  const layerId = useAlternativesStore((s) => s.current?.layerId)
+  const hasAlternatives = candidateCount > 1
 
-  if (!hasAlternatives || !current) return null
+  // candidates 는 렌더 시점에 getState() 로 직접 접근 (참조 안정성 불필요)
+  const candidates = layerId ? (useAlternativesStore.getState().current?.candidates ?? []) : []
 
-  const kind = current.layerKind
+  if (!hasAlternatives || !layerKind) return null
+
+  const kind = layerKind
 
   const handleApply = (candidate: AlternativeCandidate) => {
     if (candidate.index === selectedIndex) return
