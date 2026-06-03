@@ -4,6 +4,7 @@
 
 export * from './enums.js'
 export * from './format.js'
+export * from './character.js'
 export * from './resource.js'
 export * from './project.js'
 export * from './page.js'

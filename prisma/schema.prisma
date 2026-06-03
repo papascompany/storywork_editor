@@ -103,6 +103,7 @@ model User {
   updatedAt     DateTime       @updatedAt
   projects      Project[]
   resources     Resource[]     @relation("CreatorResources")
+  characters    Character[]    @relation("CreatorCharacters")
   showcases     Showcase[]
   subscriptions Subscription[]
   notices       Notice[]
@@ -170,6 +171,28 @@ model TemplateSet {
   templates Template[]
 }
 
+/// 캐릭터 — 여러 포즈를 묶는 단위 (시스템 캐릭터 or 크리에이터 정의)
+model Character {
+  id          String         @id @default(cuid())
+  ownerType   OwnerType
+  /// system 캐릭터는 null, creator 캐릭터는 User.id
+  ownerId     String?
+  owner       User?          @relation("CreatorCharacters", fields: [ownerId], references: [id], onDelete: SetNull)
+  name        String
+  description String?
+  bodyType    String
+  /// "흑백 스케치", "수채화" 등 스타일 태그
+  styleTag    String?
+  thumbnail   String?
+  status      ResourceStatus @default(draft)
+  poses       Resource[]     @relation("CharacterPoses")
+  createdAt   DateTime       @default(now())
+  updatedAt   DateTime       @updatedAt
+
+  @@index([ownerType, ownerId])
+  @@index([status])
+}
+
 /// 관리자 등록 리소스 (포즈/배경/소품 등 모두)
 model Resource {
   id               String                       @id @default(cuid())
@@ -207,6 +230,9 @@ model Resource {
   license          Json
   /// 'folder-default' | 'sidecar' | 'override'
   licenseSource    String
+  /// kind='pose' 일 때 소속 캐릭터 FK (선택)
+  characterId      String?
+  character        Character?                   @relation("CharacterPoses", fields: [characterId], references: [id], onDelete: SetNull)
   status           ResourceStatus               @default(draft)
   reviewer         String?
   reviewNote       String?
@@ -223,6 +249,7 @@ model Resource {
   @@index([kind, format, status])
   @@index([kind, lowDpi, status])
   @@index([ownerType, ownerId])
+  @@index([characterId])
 }
 
 /// 사용자 스토리보드 작품

@@ -183,6 +183,8 @@ const ResourceBaseSchema = z.object({
   tagsBootstrap: z.array(z.string()),
   license: ResourceLicenseSchema,
   licenseSource: z.enum(['folder-default', 'sidecar', 'override']),
+  /// kind='pose' 일 때 소속 캐릭터 ID (선택)
+  characterId: z.string().cuid().nullable().optional(),
   status: ResourceStatusSchema.default('draft'),
   reviewer: z.string().nullable().optional(),
   reviewNote: z.string().nullable().optional(),
