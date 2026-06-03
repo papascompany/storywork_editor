@@ -46,7 +46,7 @@
 - [x] [M2-04] pgvector 인덱스(시각+텍스트 임베딩) + 시맨틱 검색 API — `embed.ts`(voyage/openai/mock) + `POST /api/search/poses` ✅ 2026-05-05 (커밋 a886620) — 45 tests, 50쿼리 골든셋. **mock 임베딩**으로 동작, 실제 의미적 검색은 Voyage/OpenAI API 키 도입 후 측정
 - [x] [M2-05] 검색 UI(필터: bodyType/view/action/mood, format, lowDpi 토글) — `PosePanel` 활성, 무한 스크롤 + 드래그/클릭 캔버스 추가 ✅ 2026-05-05 (커밋 184eec4) — 19 tests, lowDpi 자동 1/2 크기 (ADR-0011a)
 - [x] [M2-06] **slug 정규화** — 한글/공백/괄호 → URL-safe ✅ M2-01 에 포함 (`packages/shared-utils/src/slug.ts`, NFC/NFD 처리)
-- [ ] [M2-07] **lowDpi 슬롯 제약** — `ai-layout` 가 lowDpi 자산을 페이지 1/2 이하 슬롯에만 배치 (ADR-0011a) — @layout-composer (M4 진입 직전 처리)
+- [x] [M2-07] **lowDpi 슬롯 제약** ✅ 2026-06-03 — `ai-layout` 가 lowDpi 자산을 페이지 1/2 이하 슬롯에만 배치 (ADR-0011a). M4-03 step 2+3 에 통합. effectiveDpi 계산 + size-violation/dpi-warning/dpi-error 3단계. `packages/ai-layout/src/constraints/low-dpi.ts` (커밋 `1c5619b`) — @layout-composer
 - [ ] [M2-08] 키포인트 검수 편집기(관리자) — 클릭으로 누락 점 보강 — @admin-builder + @editor-engineer (**M3-04 Resource CRUD 안에 통합** 권장)
 - [ ] [M2-09] PNG 색상 변경 보조: `tintMaskUrl` 기반 BlendColor 데모 — @editor-engineer (현재 자산 모두 마스크 미보유 → 우선순위 ↓)
 
@@ -74,7 +74,7 @@
 - [ ] [M4-01-03] LLM 보강 — Vercel AI Gateway + claude-sonnet-4-6 + prompt caching — F1 ≥ 0.85 — @scene-analyzer
 
 - [x] [M4-02] `ai-recommend` 포즈/배경/말풍선 추천 — 만족도 100.0% (16/16, 목표 ≥ 70%) — @scene-analyzer ✅ 2026-06-03 (→ Step 1~5 커밋 참조)
-- [ ] [M4-03] `ai-layout` compose() + 결정론 시드 — 충돌 0, safe 침범 0 — @layout-composer
+- [x] [M4-03] `ai-layout` compose() + 결정론 시드 ✅ 2026-06-03 — 충돌 0, safe 침범 0. 페이지 분할 5 규칙 (R1~R5) + Template 매칭 + Slot 배치 + lowDpi 제약 (M2-07 통합). 골든 5 시나리오 + lowDpi E2E 102/102 tests pass. `POST /api/script/compose` + 문서 2종 (`ai-layout-compose.md` + `full-pipeline.md`). 커밋: `5517071`+`1c5619b`+`5000889`+`9c6a2ea` — @layout-composer
 - [ ] [M4-04] 사용자 흐름: 대본 → 자동 페이지 N개 — E2E 통과 — @layout-composer + @editor-engineer
 - [ ] [M4-05] alternatives UI(한 클릭 교체) — 모바일에서도 동작 — @ui-designer
 
