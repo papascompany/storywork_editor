@@ -61,7 +61,18 @@
 
 ## M4 — AI Pipeline
 
-- [ ] [M4-01] `ai-script` 분석기 + 골든셋 20 — F1 ≥ 0.8 — @scene-analyzer
+### M4-00 — Character 시스템 ✅ 2026-06-03
+
+- [x] [M4-00-01] Character 모델 + Resource FK + RLS — prisma migrate deploy 완료 — @architect ✅ `628de83`
+- [x] [M4-00-02] 더미맨 자동 매핑 스크립트 — 1270건 100% 매핑 (idempotent) — @architect ✅ `9764c65`
+- [x] [M4-00-03] Admin Character CRUD — /characters + /characters/new + /characters/[id] — @architect ✅ `b039ab8`
+
+### M4-01 — ai-script 분석기 ✅ 2026-06-03
+
+- [x] [M4-01-01] analyze() 코어 + 형식 자동감지 (5형식) + SceneMeta — rule-only + LLM stub — @architect ✅ `49a224b`
+- [x] [M4-01-02] 골든셋 20 + F1 측정 — 룰-only: format 0.900, scene F1 0.899, char F1 1.000 — @architect ✅ `4556bfb`
+- [ ] [M4-01-03] LLM 보강 — Vercel AI Gateway + claude-sonnet-4-6 + prompt caching — F1 ≥ 0.85 — @scene-analyzer
+
 - [ ] [M4-02] `ai-recommend` 포즈/배경/말풍선 추천 — 만족도 ≥ 70% — @scene-analyzer
 - [ ] [M4-03] `ai-layout` compose() + 결정론 시드 — 충돌 0, safe 침범 0 — @layout-composer
 - [ ] [M4-04] 사용자 흐름: 대본 → 자동 페이지 N개 — E2E 통과 — @layout-composer + @editor-engineer

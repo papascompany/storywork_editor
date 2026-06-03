@@ -270,6 +270,9 @@ export default [
       // " 2.tsx / 2.ts" 패턴 — 에디터/에이전트 백업 파일 (실수 생성), 린트 대상 제외
       '**/* 2.ts',
       '**/* 2.tsx',
+      // shared-schema src/editor/ 빌드 산출물 (.d.ts/.js) — src/ 내에 남아있는 stray artifact
+      'packages/shared-schema/src/editor/*.d.ts',
+      'packages/shared-schema/src/editor/*.js',
     ],
   },
 
