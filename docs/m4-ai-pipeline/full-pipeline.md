@@ -51,7 +51,7 @@
 | `POST /api/script/analyze` | `{ scriptRaw, format?, seed? }` | `AnalyzeResult` |
 | `POST /api/script/recommend` | `{ analyzed, characterMapping?, seed? }` | `RecommendResult` |
 | `POST /api/script/compose` | `{ analyzed, recommended, formatId, seed? }` | `ComposeResult` |
-| `POST /api/script/full-pipeline` (M4-04 예정) | `{ scriptRaw, projectId, formatId, seed? }` | `{ projectId, pages, warnings }` + DB 저장 |
+| `POST /api/script/full-pipeline` | `{ scriptRaw, projectId?, formatId, title?, characterMapping?, seed?, llmEnabled? }` | `{ projectId, pages, scenes, warnings, seed, redirectTo }` + DB 저장 |
 
 모든 엔드포인트 Supabase 세션 필수.
 
@@ -85,11 +85,38 @@ LLM 호출 비용 보호:
 | M4-02 ai-recommend | ✅ commit `af14315`..`c6414b0` |
 | M4-03 ai-layout compose() | ✅ commit `5517071`+`1c5619b`+`5000889`+`9c6a2ea` |
 | M2-07 lowDpi 슬롯 제약 | ✅ M4-03 에 통합 |
-| M4-04 E2E 사용자 흐름 | 진입 가능 |
+| M4-04 E2E 사용자 흐름 | ✅ 2026-06-03 — commit `14004b3`+`7e6c9f3`+`b9088ee`+`778fa0b` |
 | M4-05 alternatives UI | 진입 가능 |
 
-## 다음 단계
+## M4-04 구현 완료 내역
 
-**M4-04 E2E**: `/api/script/full-pipeline` POST 한 번에 4 단계 통합 + DB 저장 + 편집기 진입.
+### Step 1 — `/api/script/full-pipeline`
+- analyze → recommend → compose 4단계 통합 POST 엔드포인트
+- `prisma.$transaction` 으로 Project/SceneDoc/Scene/Line/Page 원자적 저장
+- 기존 `projectId` 소유권 검증 + 덮어쓰기 지원
+- `llmEnabled` 기본 `false` (비용 보호, ADR-0007)
+- lowDpi warnings 응답에 전달 (ADR-0011a)
+- 단위 테스트 15개
+
+### Step 2 — `/editor/import` Wizard
+- 5단계 Wizard: 대본 입력 → 판형 확인 → 캐릭터 매핑 → 자동 생성 → 미리보기
+- `ScriptImporterShell` / `ScriptInputArea` / `CharacterMappingTable` / `PipelineWarnings` / `PreviewPages`
+- 판형 4종 프리셋 (B5 소설 / A5 아트북 / 정사각형 / 모바일 웹툰)
+- 단위 테스트 19개
+
+### Step 3 — 편집기 진입 시 자동생성 페이지 로드
+- `useProjectImport` 훅: URL `?projectId=` → `/api/projects/[id]` 로드
+- `EditorShell` 통합 (localStorage 복구보다 우선)
+- 단위 테스트 5개
+
+### Step 4 — E2E 시나리오 4종
+- 시나리오 A: screenplay 형식 (결정론 포함)
+- 시나리오 B: 웹소설 형식 (형식 자동감지)
+- 시나리오 C: 1 장면 최소 입력
+- 시나리오 D: 8+ 장면 대형 대본
+- fabricJson Schema v1 횡단 검증 (layers, bg/pose/bubble 구조)
+- 24개 테스트
+
+## 다음 단계
 
 **M4-05 alternatives UI**: 편집기에서 추천 결과 K개 카드 + 한 클릭 교체 (모바일 BottomSheet).
