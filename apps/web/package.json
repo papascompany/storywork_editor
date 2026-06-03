@@ -14,6 +14,7 @@
     "clean": "rimraf .next out"
   },
   "dependencies": {
+    "@storywork/ai-script": "workspace:*",
     "@storywork/editor-bubble": "workspace:*",
     "@storywork/editor-core": "workspace:*",
     "@storywork/editor-effects": "workspace:*",

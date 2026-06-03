@@ -11,7 +11,15 @@
     "skipLibCheck": true,
     "baseUrl": ".",
     "paths": {
-      "@/*": ["./*"]
+      "@/*": ["./*"],
+      "@storywork/ai-script": ["../../packages/ai-script/src/index.ts"],
+      "@storywork/ai-recommend": ["../../packages/ai-recommend/src/index.ts"],
+      "@storywork/ai-layout": ["../../packages/ai-layout/src/index.ts"],
+      "@storywork/schema": ["../../packages/shared-schema/src/index.ts"],
+      "@storywork/schema/prisma": ["../../packages/shared-schema/src/prisma.ts"],
+      "@storywork/schema/editor": ["../../packages/shared-schema/src/editor/v1.ts"],
+      "@storywork/schema/license": ["../../packages/shared-schema/src/license/index.ts"],
+      "@storywork/utils": ["../../packages/shared-utils/src/index.ts"]
     }
   },
   "include": ["**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],
