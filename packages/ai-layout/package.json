@@ -24,6 +24,8 @@
     "clean": "rimraf dist *.tsbuildinfo"
   },
   "dependencies": {
+    "@storywork/ai-recommend": "workspace:*",
+    "@storywork/ai-script": "workspace:*",
     "@storywork/editor-core": "workspace:*",
     "@storywork/schema": "workspace:*",
     "@storywork/utils": "workspace:*"

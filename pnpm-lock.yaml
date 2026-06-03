@@ -481,6 +481,12 @@ importers:
 
   packages/ai-layout:
     dependencies:
+      '@storywork/ai-recommend':
+        specifier: workspace:*
+        version: link:../ai-recommend
+      '@storywork/ai-script':
+        specifier: workspace:*
+        version: link:../ai-script
       '@storywork/editor-core':
         specifier: workspace:*
         version: link:../editor-core
