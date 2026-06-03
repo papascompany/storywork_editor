@@ -43,6 +43,13 @@ export default defineConfig({
       '@storywork/schema': path.resolve(__dirname, '../../packages/shared-schema/src/index.ts'),
       '@storywork/ui': path.resolve(__dirname, '../../packages/shared-ui/src/index.ts'),
       '@storywork/utils': path.resolve(__dirname, '../../packages/shared-utils/src/index.ts'),
+      // AI 패키지 — src 직접 참조 (dist 빌드 불필요)
+      '@storywork/ai-script': path.resolve(__dirname, '../../packages/ai-script/src/index.ts'),
+      '@storywork/ai-recommend': path.resolve(
+        __dirname,
+        '../../packages/ai-recommend/src/index.ts',
+      ),
+      '@storywork/ai-layout': path.resolve(__dirname, '../../packages/ai-layout/src/index.ts'),
       // Next.js @/* path alias — apps/web 루트 기준
       // Vite alias: string key 는 prefix 매칭. '@/' → apps/web 루트 디렉토리
       '@/': `${path.resolve(__dirname)}/`,
