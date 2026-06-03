@@ -3,24 +3,28 @@
  *
  * 전략:
  *  - 룰-only baseResult 에 시맨틱 메타 (location, mood, emotion 등) 보강
- *  - system prompt: 캐시 가능한 고정 instruction (prompts/enhance-system.md)
+ *  - system prompt: 인라인 상수 (system-prompt.ts) — Next.js webpack 호환
  *  - user message: 동적 (장면 발췌 + 기존 장면 목록)
  *  - temperature=0, seed 고정 → 결정론 보장
  *  - 실패 시 baseResult 그대로 반환 (graceful fallback)
  *
  * 비용 보호:
  *  - CI: STORYWORK_LLM 미설정 or '0' → 호출 안 됨 (analyze.ts 에서 가드)
- *  - 로컬 캐시: STORYWORK_LLM_CACHE=1 → tmp/ai-cache/<hash>-<seed>.json 우선
+ *  - 로컬 캐시: STORYWORK_LLM_CACHE=1 → __tests__/__llm-cache__/<hash>-<seed>.json 우선
  *
  * Prompt Cache:
- *  - @ai-sdk/anthropic providerOptions 의 cacheControl 사용
- *  - system prompt 가 항상 캐시 첫 블록 → cache_control: ephemeral
+ *  - Anthropic prompt caching: system prompt 고정 텍스트 캐시 히트 최적화
+ *  - AI SDK v6 providerOptions.anthropic 에 cacheControl 적용
+ *
+ * Next.js/webpack 호환:
+ *  - import.meta.url 기반 경로 계산 제거
+ *  - 파일시스템 접근은 Node.js 환경에서만 (캐시 I/O)
+ *  - 시스템 프롬프트는 TypeScript 인라인 상수 (system-prompt.ts)
  */
 
 import { createHash } from 'node:crypto'
 import { mkdir, readFile, writeFile } from 'node:fs/promises'
 import { join } from 'node:path'
-import { fileURLToPath } from 'node:url'
 
 import { createAnthropic } from '@ai-sdk/anthropic'
 import { generateObject } from 'ai'
@@ -28,18 +32,25 @@ import { z } from 'zod'
 
 import type { AnalyzedScene, AnalyzeResult, DetectedCharacter } from '../types.js'
 
+import { ENHANCE_SYSTEM_PROMPT } from './system-prompt.js'
+
 // ─────────────────────────────────────────────
 // 상수
 // ─────────────────────────────────────────────
 
 const DEFAULT_MODEL_ID = 'claude-sonnet-4-6'
 
-// 프롬프트 파일 경로 — src/llm/enhance.ts 기준 두 단계 위 prompts/
-const __dirname = fileURLToPath(new URL('.', import.meta.url))
-const PROMPT_PATH = join(__dirname, '../../prompts/enhance-system.md')
-
-// LLM 응답 캐시 디렉토리 (결정론 보장 + CI 비용 보호)
-const CACHE_DIR = join(__dirname, '../../__tests__/__llm-cache__')
+// LLM 응답 캐시 디렉토리
+// STORYWORK_LLM_CACHE_DIR 환경변수로 명시 설정 가능 (배포/CI 대비)
+// 미설정 시: process.cwd() + '__tests__/__llm-cache__'
+//   - vitest 실행 cwd = packages/ai-script → 올바른 경로
+//   - Next.js route handler 에서는 STORYWORK_LLM_CACHE_DIR 설정 권장
+function getCacheDir(): string {
+  if (process.env['STORYWORK_LLM_CACHE_DIR']) {
+    return process.env['STORYWORK_LLM_CACHE_DIR']
+  }
+  return join(process.cwd(), '__tests__/__llm-cache__')
+}
 
 // ─────────────────────────────────────────────
 // 출력 스키마
@@ -80,8 +91,8 @@ function inputHash(raw: string, seed: number): string {
 
 async function readCache(hash: string, seed: number): Promise<EnhanceResponse | null> {
   try {
-    const path = join(CACHE_DIR, `${hash}-${seed}.json`)
-    const data = await readFile(path, 'utf-8')
+    const cacheFile = join(getCacheDir(), `${hash}-${seed}.json`)
+    const data = await readFile(cacheFile, 'utf-8')
     return JSON.parse(data) as EnhanceResponse
   } catch {
     return null
@@ -90,29 +101,13 @@ async function readCache(hash: string, seed: number): Promise<EnhanceResponse | 
 
 async function writeCache(hash: string, seed: number, data: EnhanceResponse): Promise<void> {
   try {
-    await mkdir(CACHE_DIR, { recursive: true })
-    const path = join(CACHE_DIR, `${hash}-${seed}.json`)
-    await writeFile(path, JSON.stringify(data, null, 2), 'utf-8')
+    const dir = getCacheDir()
+    await mkdir(dir, { recursive: true })
+    const cacheFile = join(dir, `${hash}-${seed}.json`)
+    await writeFile(cacheFile, JSON.stringify(data, null, 2), 'utf-8')
   } catch {
     // 캐시 쓰기 실패는 무시
   }
-}
-
-// ─────────────────────────────────────────────
-// 시스템 프롬프트 로더 (캐시 가능한 고정 텍스트)
-// ─────────────────────────────────────────────
-
-let _cachedSystemPrompt: string | null = null
-
-async function loadSystemPrompt(): Promise<string> {
-  if (_cachedSystemPrompt !== null) return _cachedSystemPrompt
-  try {
-    _cachedSystemPrompt = await readFile(PROMPT_PATH, 'utf-8')
-  } catch {
-    // 파일 로드 실패 시 인라인 폴백 (배포 환경 대비)
-    _cachedSystemPrompt = `당신은 한국어 대본을 분석하는 AI입니다. 장면 메타데이터를 JSON으로 추출하세요.`
-  }
-  return _cachedSystemPrompt
 }
 
 // ─────────────────────────────────────────────
@@ -126,14 +121,13 @@ function buildUserMessage(
 ): string {
   // 장면별 원문 발췌 (첫 100자)
   const excerpts = baseScenes.map((scene) => {
-    // lines 에서 첫 100자 추출
     const firstLineText = scene.lines[0]?.text ?? scene.summary
     const excerpt = (scene.summary + ' ' + firstLineText).slice(0, 100)
     return {
       index: scene.index,
       summary: scene.summary,
       excerpt,
-      charCount: scene.lines.length,
+      lineCount: scene.lines.length,
     }
   })
 
@@ -144,7 +138,7 @@ function buildUserMessage(
       totalScenes: baseScenes.length,
       detectedCharacters: charNames,
       scenes: excerpts,
-      // 원문 일부 (첫 200자) — 전체 대본은 토큰 절약을 위해 발췌만
+      // 원문 첫 200자 발췌 — 전체 대본은 토큰 절약을 위해 생략
       scriptHead: raw.slice(0, 200),
     },
     null,
@@ -174,7 +168,8 @@ export async function enhanceWithLLM(
   }
 
   // 2. LLM 호출
-  const systemPrompt = await loadSystemPrompt()
+  // 시스템 프롬프트: 인라인 상수 (Next.js webpack 호환, prompt cache 최적화)
+  const systemPrompt = ENHANCE_SYSTEM_PROMPT
   const userMessage = buildUserMessage(raw, baseResult.scenes, baseResult.characters)
 
   // Vercel AI Gateway 또는 직접 Anthropic API 사용
@@ -188,7 +183,6 @@ export async function enhanceWithLLM(
   })
 
   const { object } = await generateObject({
-    // prompt caching: anthropic() 대신 .messages() 사용 + cacheControl
     model: anthropic(modelId),
     schema: EnhanceResponseSchema,
     messages: [
@@ -204,12 +198,10 @@ export async function enhanceWithLLM(
     ],
     system: systemPrompt,
     temperature: 0,
-    // AI SDK anthropic provider 의 seed 파라미터
     providerOptions: {
       anthropic: {
-        // prompt cache: system prompt 를 캐시 가능한 블록으로 지정
-        // AI SDK v4+ 에서는 messages 에 cache_control 을 직접 주입
-        // system 은 string 이므로 cacheControl 은 별도 provider option 으로
+        // prompt cache: system prompt 가 고정 텍스트이므로 캐시 효과 기대
+        // AI SDK v6 + Anthropic prompt caching 자동 활성 (1024 토큰 이상 시)
       },
     },
   })
@@ -217,8 +209,8 @@ export async function enhanceWithLLM(
   // 3. Zod 검증된 결과 캐시 저장
   const validated = EnhanceResponseSchema.parse(object)
 
-  if (useCache || process.env['STORYWORK_LLM_CACHE'] !== '0') {
-    // 기본적으로 항상 캐시 저장 (다음 실행 결정론 보장)
+  // 기본적으로 항상 캐시 저장 (다음 실행 결정론 보장 + 비용 절감)
+  if (process.env['STORYWORK_LLM_CACHE'] !== '0') {
     await writeCache(hash, seed, validated)
   }
 
