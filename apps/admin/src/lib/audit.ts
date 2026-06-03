@@ -16,6 +16,7 @@ export type AuditAction = 'create' | 'update' | 'delete' | 'publish' | 'reject'
 export type AuditEntityType =
   | 'Format'
   | 'Resource'
+  | 'Character'
   | 'Template'
   | 'TemplateSet'
   | 'User'

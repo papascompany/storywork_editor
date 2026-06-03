@@ -24,6 +24,7 @@ const NAV_ITEMS: NavItemDef[] = [
   { href: '/', label: '대시보드', exact: true },
   { href: '/formats', label: '판형', exact: false },
   { href: '/resources', label: '리소스', exact: false },
+  { href: '/characters', label: '캐릭터', exact: false },
   { href: '/templates', label: '템플릿', exact: false },
   { href: '/template-sets', label: '템플릿 세트', exact: false },
   { href: '/notices', label: '공지사항', exact: false },
