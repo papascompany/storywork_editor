@@ -76,6 +76,12 @@ enum ShowcaseMode {
   gallery
 }
 
+enum InquiryStatus {
+  OPEN
+  REPLIED
+  CLOSED
+}
+
 // ─────────────────────────────────────────────
 // Models
 // ─────────────────────────────────────────────
@@ -99,6 +105,9 @@ model User {
   resources     Resource[]     @relation("CreatorResources")
   showcases     Showcase[]
   subscriptions Subscription[]
+  notices       Notice[]
+  inquiries     Inquiry[]
+  comments      Comment[]
 
   @@index([role])
 }
@@ -333,6 +342,7 @@ model Showcase {
   createdAt DateTime       @default(now())
   updatedAt DateTime       @updatedAt
   reactions Reaction[]
+  comments  Comment[]
 
   @@index([ownerId])
   @@index([mode, contestId])
@@ -378,4 +388,55 @@ model AuditLog {
   @@index([actorId])
   @@index([target])
   @@index([at])
+}
+
+/// 공지사항
+model Notice {
+  id          String    @id @default(cuid())
+  title       String
+  body        String    @db.Text
+  isPinned    Boolean   @default(false)
+  /// null 이면 draft (미게시)
+  publishedAt DateTime?
+  authorId    String
+  author      User      @relation(fields: [authorId], references: [id])
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  @@index([publishedAt, isPinned])
+}
+
+/// 1:1 문의 (Q&A) — 비회원도 가능 (email)
+model Inquiry {
+  id         String        @id @default(cuid())
+  /// null = 비회원
+  userId     String?
+  user       User?         @relation(fields: [userId], references: [id], onDelete: SetNull)
+  email      String
+  subject    String
+  body       String        @db.Text
+  status     InquiryStatus @default(OPEN)
+  adminReply String?       @db.Text
+  repliedAt  DateTime?
+  createdAt  DateTime      @default(now())
+  updatedAt  DateTime      @updatedAt
+
+  @@index([status, createdAt])
+  @@index([userId])
+}
+
+/// Showcase 댓글
+model Comment {
+  id         String   @id @default(cuid())
+  showcaseId String
+  showcase   Showcase @relation(fields: [showcaseId], references: [id], onDelete: Cascade)
+  userId     String
+  user       User     @relation(fields: [userId], references: [id])
+  body       String   @db.Text
+  /// soft delete
+  isDeleted  Boolean  @default(false)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@index([showcaseId, createdAt])
 }
