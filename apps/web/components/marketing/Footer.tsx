@@ -34,6 +34,7 @@ const FOOTER_LINKS = {
   '법적 고지': [
     { label: '서비스 이용약관', href: '/legal/terms' },
     { label: '개인정보처리방침', href: '/legal/privacy' },
+    { label: '환불 정책', href: '/legal/refund' },
     { label: '저작권 정책', href: '#' },
   ],
 } as const

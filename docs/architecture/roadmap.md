@@ -148,6 +148,21 @@
 - [ ] [LEGAL-04] 개인정보 수집·이용 동의 체크박스 (회원가입 + 문의 폼) — @ui-designer + @architect
 - [ ] [LEGAL-05] 미성년자 이용 제한 고지 + 법정대리인 동의 처리 — 🚦 휴먼 게이트
 
+### 완료
+
+- [x] [LEGAL-OPS-03] 회원 탈퇴 흐름 — soft delete + 30일 hard delete + 데이터 export
+  - User 모델 deletedAt/deletionScheduledFor/marketingConsent 추가
+  - GET /api/account/export (PIPA 35조 이동권)
+  - POST /api/account/delete (본인 재인증 + soft delete + audit)
+  - PATCH /api/account/marketing-consent (별도 동의 관리)
+  - /mypage/account 계정 설정 + 2단계 탈퇴 모달
+  - /goodbye 탈퇴 완료 안내 + 미들웨어 차단
+  - /admin/users 회원 관리 + /admin/users/[id] 복원
+  - /api/cron/hard-delete-users placeholder
+  - /legal/refund placeholder + Privacy 이용자 권리 강화
+- [x] [LEGAL-OPS-05] 데이터 다운로드 권리 — LEGAL-OPS-03 Step 2 로 통합 완료
+- [x] [LEGAL-OPS-07] 마케팅 동의 별도 관리 (부분) — marketingConsent 필드 + 토글 API
+
 ## COMMS — 알림/이메일 (M7 진입 직전)
 
 - [ ] [COMMS-01] Inquiry 답변 시 이메일 자동 발송 — Resend 또는 SendGrid — @architect (BOARD-02 placeholder 완성)

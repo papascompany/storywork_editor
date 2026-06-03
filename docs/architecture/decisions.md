@@ -155,4 +155,21 @@
 
 ---
 
+## ADR-0015 — 회원 탈퇴 Soft Delete + 30일 Hard Delete (LEGAL-OPS-03)
+
+- **결정**: 회원 탈퇴를 expand-contract 방식의 soft delete 로 구현한다.
+  - `User.deletedAt = now()` 설정 시 서비스 접근 차단.
+  - `User.deletionScheduledFor = deletedAt + 30일` 로 hard delete 예정일 설정.
+  - 30일 이내 관리자 복원 가능 (`/admin/users/[id]` 복원 버튼).
+  - `/api/cron/hard-delete-users` 가 `CRON_SECRET` 헤더 인증 후 영구 삭제.
+- **맥락**: 한국 개인정보보호법(PIPA) + GDPR 권고 패턴. 분쟁 대비 30일 보관, 이후 파기 의무.
+- **이동권**: `GET /api/account/export` 로 전체 데이터 JSON 다운로드 (PIPA 35조).
+- **마케팅 동의**: 서비스 필수 동의와 분리. `User.marketingConsent` 별도 필드 + `/api/account/marketing-consent` PATCH.
+- **미들웨어**: `deletedAt != null` 인 사용자가 보호 경로(`/mypage`, `/editor`) 접근 시 `/goodbye` 리다이렉트.
+- **RLS**: `anon_cannot_see_deleted_users` 정책으로 삭제 사용자 public select 차단.
+- **Stripe placeholder**: M7 결제 미구현이라 구독 취소는 `console.warn` placeholder. M7 완료 시 `POST /api/account/delete` 의 TODO(M7) 블록 연결.
+- **결정일**: 2026-06-03
+
+---
+
 신규 ADR 은 다음 번호로 추가하고 `roadmap.md` 의 관련 작업에서 링크.

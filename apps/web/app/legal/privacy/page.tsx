@@ -285,7 +285,7 @@ export default function PrivacyPage() {
             </ul>
           </LegalSection>
 
-          <LegalSection title="4. 이용자의 권리">
+          <LegalSection title="4. 이용자의 권리 (PIPA 제35조 등)">
             <p
               className="mkt-body"
               style={{
@@ -302,6 +302,7 @@ export default function PrivacyPage() {
                 flexDirection: 'column',
                 gap: 'var(--mkt-space-xs)',
                 paddingLeft: 'var(--mkt-space-lg)',
+                marginBottom: 'var(--mkt-space-md)',
               }}
             >
               {[
@@ -310,6 +311,7 @@ export default function PrivacyPage() {
                 '개인정보 삭제 요청 (단, 법령 의무 보존 기간 내 항목 제외)',
                 '개인정보 처리 정지 요청',
                 '개인정보 이동 요청 (기계 판독 가능한 형식으로 제공)',
+                '마케팅 수신 동의 변경 (언제든지, 별도 동의)',
               ].map((item) => (
                 <li key={item}>
                   <p className="mkt-body-sm" style={{ color: 'var(--mkt-ink)', opacity: 0.75 }}>
@@ -318,11 +320,63 @@ export default function PrivacyPage() {
                 </li>
               ))}
             </ul>
+
+            {/* 데이터 이동권 강화 안내 */}
+            <div
+              style={{
+                backgroundColor: 'var(--mkt-surface-soft)',
+                borderRadius: 'var(--mkt-rounded-md)',
+                padding: 'var(--mkt-space-md) var(--mkt-space-lg)',
+                marginBottom: 'var(--mkt-space-md)',
+              }}
+            >
+              <p
+                className="mkt-body-sm"
+                style={{ color: 'var(--mkt-ink)', fontWeight: 540, marginBottom: '4px' }}
+              >
+                데이터 다운로드 권리 (이동권)
+              </p>
+              <p className="mkt-body-sm" style={{ color: 'var(--mkt-ink)', opacity: 0.7 }}>
+                로그인 후{' '}
+                <a href="/mypage?tab=account" style={{ color: 'var(--mkt-ink)', fontWeight: 540 }}>
+                  마이페이지 &gt; 계정 설정
+                </a>
+                에서 본인의 모든 데이터(프로필·작품·구독·문의 이력 등)를 JSON 형식으로 즉시
+                다운로드할 수 있습니다.
+              </p>
+            </div>
+
+            {/* 회원 탈퇴 권리 안내 */}
+            <div
+              style={{
+                backgroundColor: 'var(--mkt-surface-soft)',
+                borderRadius: 'var(--mkt-rounded-md)',
+                padding: 'var(--mkt-space-md) var(--mkt-space-lg)',
+                marginBottom: 'var(--mkt-space-md)',
+              }}
+            >
+              <p
+                className="mkt-body-sm"
+                style={{ color: 'var(--mkt-ink)', fontWeight: 540, marginBottom: '4px' }}
+              >
+                회원 탈퇴 및 개인정보 삭제 권리
+              </p>
+              <p className="mkt-body-sm" style={{ color: 'var(--mkt-ink)', opacity: 0.7 }}>
+                로그인 후{' '}
+                <a href="/mypage?tab=account" style={{ color: 'var(--mkt-ink)', fontWeight: 540 }}>
+                  마이페이지 &gt; 계정 설정
+                </a>
+                에서 직접 탈퇴할 수 있습니다. 탈퇴 즉시 계정 접근이 제한되며, 탈퇴 후{' '}
+                <strong>30일간 보관 후 영구 삭제</strong>됩니다. 30일 이내에는 관리자에게 문의해
+                복원할 수 있습니다.
+              </p>
+            </div>
+
             <p
               className="mkt-body-sm"
               style={{ color: 'var(--mkt-ink)', opacity: 0.6, marginTop: 'var(--mkt-space-md)' }}
             >
-              권리 행사는{' '}
+              직접 권리 행사가 어려운 경우{' '}
               <a
                 href={`mailto:${CONTACT_EMAIL}`}
                 style={{ color: 'var(--mkt-ink)', fontWeight: 560 }}
