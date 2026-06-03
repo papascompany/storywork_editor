@@ -29,6 +29,9 @@ import { ControlBar } from './ControlBar'
 import type { ObjectProps } from './hooks/useSelection'
 import { LayerPanel } from './LayerPanel'
 import { PagePanel } from './page-system/PagePanel'
+import { AlternativesSection } from './panels/alternatives-section'
+import type { AlternativeCandidate } from './store/useAlternativesStore'
+import { selectHasAlternatives, useAlternativesStore } from './store/useAlternativesStore'
 import type { HistoryRef as History } from './types'
 
 // ─── 타입 ─────────────────────────────────────────────────────────────────────
@@ -40,6 +43,8 @@ type RightPanelProps = {
   history: History | null
   selectedIds: string[]
   onPageChange?: (index: number) => void
+  /** 한 클릭 교체 콜백 — AlternativesSection 에서 후보 선택 시 호출 */
+  onApplyAlternative?: (candidate: AlternativeCandidate) => void
 }
 
 type TabValue = 'properties' | 'layers' | 'pages'
@@ -60,7 +65,9 @@ export function RightPanel({
   history,
   selectedIds,
   onPageChange,
+  onApplyAlternative,
 }: RightPanelProps) {
+  const hasAlternatives = useAlternativesStore(selectHasAlternatives)
   const [tab, setTab] = useState<TabValue>('properties')
   // 사용자가 수동으로 Layers 탭을 클릭했는지 추적
   const userManualTab = useRef(false)
@@ -151,6 +158,13 @@ export function RightPanel({
             layerTree={layerTree}
             history={history as any}
           />
+
+          {/* AI 추천 대안 후보 섹션 — pose/bubble/bg layer 선택 시만 표시 */}
+          {hasAlternatives && onApplyAlternative && (
+            <div className="border-t border-[var(--editor-border,var(--color-border))]">
+              <AlternativesSection onApply={onApplyAlternative} />
+            </div>
+          )}
         </TabsContent>
 
         {/* Layers 탭 */}

@@ -60,6 +60,8 @@ import {
   loadLatestProject,
   saveProjectToLocalStorage,
 } from './store/page-persistence'
+import type { AlternativeCandidate, LayerAlternativesMeta } from './store/useAlternativesStore'
+import { useAlternativesStore } from './store/useAlternativesStore'
 import { usePageStore } from './store/usePageStore'
 import { type ToolId, useToolStore } from './store/useToolStore'
 import { ToolBar } from './ToolBar'
@@ -153,6 +155,118 @@ export function EditorShell() {
     clearSelection,
   } = useSelection(canvasRef.current)
   const { canUndo, canRedo, undo, redo } = useHistory(historyRef.current)
+
+  // ── M4-05: alternatives store 연동 ─────────────────────────────
+  // 선택된 layer 의 meta.alternatives 를 읽어 store 에 로드
+  const { loadAlternatives, clear: clearAlternatives } = useAlternativesStore()
+
+  useEffect(() => {
+    const canvas = canvasRef.current
+    if (!canvas || selectedIds.length !== 1) {
+      clearAlternatives()
+      return
+    }
+    const layerId = selectedIds[0]
+    if (!layerId) {
+      clearAlternatives()
+      return
+    }
+    // canvas.getObjectData 로 layer meta 접근
+    const objectData = canvas.getObjectData(layerId)
+    const meta = (objectData?.meta as LayerAlternativesMeta | undefined) ?? null
+    loadAlternatives(layerId, meta)
+  }, [selectedIds, readyTick, loadAlternatives, clearAlternatives])
+
+  // 한 클릭 교체 콜백 — fabricObj 의 속성을 candidate 로 갱신
+  const handleApplyAlternative = useCallback(
+    (candidate: AlternativeCandidate) => {
+      const canvas = canvasRef.current
+      const history = historyRef.current
+      if (!canvas || !history) return
+
+      const layerId = useAlternativesStore.getState().current?.layerId
+      if (!layerId) return
+
+      const fabricObj = canvas.getObject(layerId) as any
+      if (!fabricObj) return
+
+      void import('@storywork/editor-history').then(
+        ({ TransformObjectCommand, snapshotFromFabricObject }) => {
+          const before = snapshotFromFabricObject(fabricObj)
+
+          // kind 별 속성 적용
+          const kind = useAlternativesStore.getState().current?.layerKind
+          if (kind === 'bg' && candidate.tone) {
+            const toneColorMap: Record<string, string> = {
+              cream: '#FFF8F0',
+              mint: '#E8F5F0',
+              lilac: '#EEE8F8',
+              pink: '#FDE8F0',
+              navy: '#1A2540',
+              white: '#FFFFFF',
+            }
+            fabricObj.set({ fill: toneColorMap[candidate.tone] ?? '#FFFFFF' })
+          } else if (kind === 'bubble' && candidate.shape) {
+            // bubble Group 내부 path 에 shape 변경은 복잡하므로 meta 갱신만
+            // (실제 shape 교체는 M5 편집기에서 구현 예정)
+            const objectData = canvas.getObjectData(layerId)
+            if (objectData?.meta) {
+              ;(objectData.meta as Record<string, unknown>).shape = candidate.shape
+            }
+          } else if (kind === 'pose' && candidate.thumbnail) {
+            // pose: 새 이미지 URL 로 교체
+            void FabricImage.fromURL(candidate.thumbnail, { crossOrigin: 'anonymous' })
+              .then((img) => {
+                const currentLeft = fabricObj.left ?? 0
+                const currentTop = fabricObj.top ?? 0
+                const currentScaleX = fabricObj.scaleX ?? 1
+                const currentScaleY = fabricObj.scaleY ?? 1
+
+                img.set({
+                  left: currentLeft,
+                  top: currentTop,
+                  scaleX: (currentScaleX * (fabricObj.width ?? 1)) / (img.width ?? 1),
+                  scaleY: (currentScaleY * (fabricObj.height ?? 1)) / (img.height ?? 1),
+                })
+
+                const removeCmd = new (require('@storywork/editor-history').RemoveObjectCommand)({
+                  canvas,
+                  id: layerId,
+                  fabricObj,
+                  objectData: canvas.getObjectData(layerId) ?? {},
+                })
+                const addCmd = new (require('@storywork/editor-history').AddObjectCommand)({
+                  canvas,
+                  fabricObj: img,
+                  dataOverrides: {
+                    kind: 'pose',
+                    resourceId: candidate.resourceId,
+                    meta: {
+                      ...canvas.getObjectData(layerId)?.meta,
+                      resourceId: candidate.resourceId,
+                    },
+                  },
+                })
+                history.push(removeCmd)
+                history.push(addCmd)
+                showToast(`${candidate.label} 적용됨`, 'success')
+              })
+              .catch(() => {
+                showToast('이미지 교체에 실패했습니다.', 'error')
+              })
+            return
+          }
+
+          canvas._fabricCanvas.requestRenderAll()
+          const after = snapshotFromFabricObject(fabricObj)
+          const cmd = new TransformObjectCommand({ canvas, id: layerId, before, after })
+          history.push(cmd)
+          showToast(`${candidate.label} 적용됨`, 'success')
+        },
+      )
+    },
+    [showToast],
+  )
   const { saveStatus, lastSavedAt, failReason } = useAutosave(
     canvasRef.current,
     layerTreeRef.current,
@@ -1067,6 +1181,7 @@ export function EditorShell() {
             history={historyRef.current as any}
             selectedIds={selectedIds}
             onPageChange={(idx) => setCurrentPage(idx)}
+            onApplyAlternative={handleApplyAlternative}
           />
         </div>
 
