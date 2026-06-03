@@ -21,8 +21,9 @@ const FOOTER_LINKS = {
   회사: [
     { label: '서비스 소개', href: '/intro' },
     { label: '사례', href: '/showcase/derbyman' },
-    { label: '블로그', href: '#' },
-    { label: '문의', href: '#' },
+    { label: '공지사항', href: '/notices' },
+    { label: '공모전', href: '/contest' },
+    { label: 'Q&A 문의', href: '/contact' },
   ],
   리소스: [
     { label: '시작 가이드', href: '#' },
