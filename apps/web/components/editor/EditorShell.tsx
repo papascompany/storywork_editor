@@ -32,7 +32,7 @@ import type { LayerNodeJson, LayerTree } from '@storywork/editor-layers'
 import type { PageJsonV1 } from '@storywork/schema/editor'
 import { useTheme, useToast } from '@storywork/ui'
 import { FabricImage, Rect } from 'fabric'
-import { useCallback, useEffect, useRef, useState } from 'react'
+import React, { useCallback, useEffect, useRef, useState } from 'react'
 
 import type { ResourceSummary } from '../../app/api/_lib/search-types'
 import { DEFAULT_FORMAT, SEED_BACKGROUND_FILL, SEED_POSE_PNG_DATA_URL } from '../../lib/editor/seed'
@@ -44,6 +44,7 @@ import { FeatureSidebar } from './FeatureSidebar'
 import { fitToViewport, Footer } from './Footer'
 import { useAutosave } from './hooks/useAutosave'
 import { useHistory } from './hooks/useHistory'
+import { useProjectImport } from './hooks/useProjectImport'
 import { consumePendingSave, useSaveProject } from './hooks/useSaveProject'
 import { useSelection } from './hooks/useSelection'
 import type { EditorRefs } from './hooks/useStoryCanvas'
@@ -129,6 +130,14 @@ export function EditorShell() {
     [showToastFn],
   )
 
+  // ── M4-04: URL projectId query param 로드 (자동생성 페이지 → 편집기 진입) ──
+  const { loadedProjectId } = useProjectImport(
+    canvasRef as React.RefObject<{ loadJson: (json: PageJsonV1) => Promise<void> } | null>,
+    loadProject,
+    showToast,
+    readyTick,
+  )
+
   const { active: activeTool, setActive: setActiveTool, tapTool } = useToolStore()
 
   const [mobileCloseRequest, setMobileCloseRequest] = useState(0)
@@ -173,6 +182,8 @@ export function EditorShell() {
   useEffect(() => {
     if (!readyTick) return // canvas 아직 미준비
     if (project) return // 이미 프로젝트 있음
+    // M4-04: URL projectId 가 있으면 useProjectImport 가 처리 — 여기서는 패스
+    if (loadedProjectId) return
 
     // PR7: sessionStorage 에 pending save 가 있으면 먼저 복원
     // (로그인 후 /editor 로 돌아온 경우 — 로그인 전 작품 데이터 복원)
