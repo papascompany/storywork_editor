@@ -73,7 +73,7 @@
 - [x] [M4-01-02] 골든셋 20 + F1 측정 — 룰-only: format 0.900, scene F1 0.899, char F1 1.000 — @architect ✅ `4556bfb`
 - [ ] [M4-01-03] LLM 보강 — Vercel AI Gateway + claude-sonnet-4-6 + prompt caching — F1 ≥ 0.85 — @scene-analyzer
 
-- [ ] [M4-02] `ai-recommend` 포즈/배경/말풍선 추천 — 만족도 ≥ 70% — @scene-analyzer
+- [x] [M4-02] `ai-recommend` 포즈/배경/말풍선 추천 — 만족도 100.0% (16/16, 목표 ≥ 70%) — @scene-analyzer ✅ 2026-06-03 (→ Step 1~5 커밋 참조)
 - [ ] [M4-03] `ai-layout` compose() + 결정론 시드 — 충돌 0, safe 침범 0 — @layout-composer
 - [ ] [M4-04] 사용자 흐름: 대본 → 자동 페이지 N개 — E2E 통과 — @layout-composer + @editor-engineer
 - [ ] [M4-05] alternatives UI(한 클릭 교체) — 모바일에서도 동작 — @ui-designer
