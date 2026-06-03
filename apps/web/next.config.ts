@@ -18,6 +18,9 @@ const nextConfig: NextConfig = {
   },
 
   // Transpile monorepo packages
+  // NOTE: @storywork/ai-script 은 Node.js 전용(fs/import.meta.url 사용)이라
+  //   transpile 에서 제외하고 dist/ 빌드를 사용한다.
+  //   Vercel 배포 전 pnpm --filter @storywork/ai-script build 선행 필수.
   transpilePackages: [
     '@storywork/editor-core',
     '@storywork/editor-layers',
@@ -29,7 +32,6 @@ const nextConfig: NextConfig = {
     '@storywork/editor-effects',
     '@storywork/editor-export',
     '@storywork/editor-ui',
-    '@storywork/ai-script',
     '@storywork/ai-recommend',
     '@storywork/ai-layout',
     '@storywork/pdf-engine',
@@ -50,6 +52,15 @@ const nextConfig: NextConfig = {
       '.js': ['.ts', '.tsx', '.js'],
       '.jsx': ['.tsx', '.jsx'],
     }
+
+    // @storywork/ai-script 은 Node.js 서버 전용 패키지 (fs/import.meta.url 사용)
+    // webpack 번들에 포함하지 않고 런타임 require 로 처리
+    const originalExternals = config.externals ?? []
+    config.externals = [
+      ...(Array.isArray(originalExternals) ? originalExternals : [originalExternals]),
+      '@storywork/ai-script',
+    ]
+
     return config
   },
 }

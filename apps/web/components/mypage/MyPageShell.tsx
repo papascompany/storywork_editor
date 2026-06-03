@@ -12,10 +12,11 @@
  * URL: ?tab=projects|profile|billing|my-data
  */
 
-import { CreditCard, FolderOpen, Library, User } from 'lucide-react'
+import { CreditCard, FolderOpen, Library, Settings, User } from 'lucide-react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import * as React from 'react'
 
+import { AccountSettingsClient } from './AccountSettingsClient'
 import { BillingTab } from './BillingTab'
 import { MyDataTab } from './MyDataTab'
 import { ProfileTab } from './ProfileTab'
@@ -24,13 +25,14 @@ import type { ProjectData } from './ProjectsTab'
 
 // ─── 탭 정의 ──────────────────────────────────────────────────────────────────
 
-type TabId = 'projects' | 'profile' | 'billing' | 'my-data'
+type TabId = 'projects' | 'profile' | 'billing' | 'my-data' | 'account'
 
 const TABS: { id: TabId; label: string; icon: React.ElementType }[] = [
   { id: 'projects', label: '내 작품', icon: FolderOpen },
   { id: 'profile', label: '프로필', icon: User },
   { id: 'billing', label: '결제·구독', icon: CreditCard },
   { id: 'my-data', label: '마이데이터', icon: Library },
+  { id: 'account', label: '계정 설정', icon: Settings },
 ]
 
 // ─── Props ────────────────────────────────────────────────────────────────────
@@ -42,11 +44,19 @@ interface MyPageShellProps {
   name: string | null
   createdAt: Date
   projects: ProjectData[]
+  marketingConsent?: boolean
 }
 
 // ─── 컴포넌트 ─────────────────────────────────────────────────────────────────
 
-export function MyPageShell({ userId, email, name, createdAt, projects }: MyPageShellProps) {
+export function MyPageShell({
+  userId,
+  email,
+  name,
+  createdAt,
+  projects,
+  marketingConsent = false,
+}: MyPageShellProps) {
   const router = useRouter()
   const searchParams = useSearchParams()
   const rawTab = searchParams.get('tab') ?? 'projects'
@@ -69,6 +79,8 @@ export function MyPageShell({ userId, email, name, createdAt, projects }: MyPage
         return <BillingTab />
       case 'my-data':
         return <MyDataTab />
+      case 'account':
+        return <AccountSettingsClient email={email} marketingConsent={marketingConsent} />
     }
   }
 
