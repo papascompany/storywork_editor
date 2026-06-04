@@ -169,7 +169,10 @@ function renderText(page: PDFPage, cmd: TextCommand, ctx: PageRenderContext): vo
   if (!cmd.text) return
 
   const font = ctx.embedFont ?? ctx.defaultFont
-  const { x, y } = toPoint(cmd.x, cmd.y, cmd.height, ctx)
+  // TextCommand 의 y는 상단 기준. PDF 렌더는 기준선(baseline) 기준.
+  // height 대신 fontSize/MM_TO_PT 로 텍스트 높이 근사
+  const textHeightMm = cmd.fontSize / MM_TO_PT
+  const { x, y } = toPoint(cmd.x, cmd.y, textHeightMm, ctx)
   const sizePt = cmd.fontSize // fabricJson 에서 fontSize는 이미 pt 단위
 
   // 색상 파싱 (#rrggbb)
