@@ -9,7 +9,13 @@
     "tsBuildInfoFile": "./dist/.tsbuildinfo",
     "composite": false,
     "rootDir": "./src",
-    "paths": {},
+    "paths": {
+      "@storywork/schema": ["../shared-schema/dist/index.d.ts"],
+      "@storywork/schema/editor": ["../shared-schema/dist/editor/v1.d.ts"],
+      "@storywork/schema/prisma": ["../shared-schema/dist/prisma.d.ts"],
+      "@storywork/schema/license": ["../shared-schema/dist/license/index.d.ts"],
+      "@storywork/utils": ["../shared-utils/dist/index.d.ts"]
+    },
     "skipLibCheck": true
   },
   "include": ["src/**/*.ts"],

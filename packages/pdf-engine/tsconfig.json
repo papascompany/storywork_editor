@@ -1,7 +1,14 @@
 {
   "extends": "../../tsconfig.base.json",
   "compilerOptions": {
-    "tsBuildInfoFile": ".tsbuildinfo"
+    "tsBuildInfoFile": ".tsbuildinfo",
+    "paths": {
+      "@storywork/schema": ["../shared-schema/src/index.ts"],
+      "@storywork/schema/editor": ["../shared-schema/src/editor/v1.ts"],
+      "@storywork/schema/prisma": ["../shared-schema/src/prisma.ts"],
+      "@storywork/schema/license": ["../shared-schema/src/license/index.ts"],
+      "@storywork/utils": ["../shared-utils/src/index.ts"]
+    }
   },
   "include": ["src/**/*.ts"],
   "exclude": ["node_modules", "dist", "__tests__"]
