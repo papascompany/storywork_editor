@@ -19,4 +19,4 @@ export { MM_TO_PT, PDF_PRODUCER } from './types.js'
 export { fabricLayersToCommands } from './adapter/fabric-to-pdf.js'
 export type { RenderCommand, AdapterResult } from './adapter/fabric-to-pdf.js'
 
-// buildPdf 는 Step 5 에서 export 추가
+export { buildPdf } from './build.js'
