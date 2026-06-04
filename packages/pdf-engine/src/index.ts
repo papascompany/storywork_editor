@@ -20,3 +20,10 @@ export { fabricLayersToCommands } from './adapter/fabric-to-pdf.js'
 export type { RenderCommand, AdapterResult } from './adapter/fabric-to-pdf.js'
 
 export { buildPdf } from './build.js'
+
+// ─── Preflight ───────────────────────────────────────────────────────────────
+
+export { preflight, preflightBuffer } from './preflight/check.js'
+export type { PreflightReport, PreflightViolation, PreflightSeverity } from './preflight/types.js'
+export type { PreflightProfile } from './preflight/profiles.js'
+export { PROFILES, getProfileById } from './preflight/profiles.js'
