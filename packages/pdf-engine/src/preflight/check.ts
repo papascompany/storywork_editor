@@ -14,7 +14,7 @@
 
 import type { PdfBuildInput, PdfBuildOptions } from '../types.js'
 
-import { PROFILES, getProfileById } from './profiles.js'
+import { PROFILES, getProfileById, getProfileLoader } from './profiles.js'
 import { bleedCheck, colorCheck, dpiCheck, fontCheck, pageCountCheck, safeCheck } from './rules.js'
 import type { PreflightReport, PreflightViolation } from './types.js'
 
@@ -87,20 +87,41 @@ function buildReport(
  * Variant A: PdfBuildInput → PreflightReport[]
  *
  * @param input      buildPdf() 와 동일한 입력 객체
- * @param profileId  지정 시 해당 프로필만, 생략 시 3개 모두 검증
+ * @param profileId  지정 시 해당 프로필만, 생략 시 전체 active 프로필 검증
  * @param opts       buildPdf() 옵션 (embedFonts 등 font-check 에 전달)
+ *
+ * DB 어댑터 (setProfileLoader) 가 등록된 경우 DB 조회 우선.
+ * 실패하거나 미등록 시 in-memory PROFILES fallback.
  */
 export async function preflight(
   input: PdfBuildInput,
   profileId?: string,
   opts: PdfBuildOptions = {},
 ): Promise<PreflightReport[]> {
+  const loader = getProfileLoader()
+
   if (profileId !== undefined) {
-    const profile = getProfileById(profileId)
-    return [buildReport(input, profile, opts)]
+    // 지정 프로필 단건
+    let profile = loader ? await loader.getById(profileId).catch(() => null) : null
+    if (!profile) {
+      // DB 미등록 또는 실패 → in-memory fallback
+      profile = getProfileById(profileId) ?? null
+    }
+    return [buildReport(input, profile ?? undefined, opts)]
   }
 
-  // 모든 프로필 검증
+  // 전체 프로필 — DB loader 우선
+  if (loader) {
+    try {
+      const dbProfiles = await loader.listActive()
+      if (dbProfiles.length > 0) {
+        return dbProfiles.map((p) => buildReport(input, p, opts))
+      }
+    } catch {
+      // DB 실패 → in-memory fallback
+    }
+  }
+
   return PROFILES.map((profile) => buildReport(input, profile, opts))
 }
 

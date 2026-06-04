@@ -102,7 +102,39 @@ export const PROFILES: PreflightProfile[] = [
   PROFILE_COMICMAKER,
 ]
 
-/** ID로 프로필 조회 */
+/** ID로 프로필 조회 (in-memory fallback) */
 export function getProfileById(id: string): PreflightProfile | undefined {
   return PROFILES.find((p) => p.id === id)
+}
+
+// ─── DB 어댑터 인터페이스 ─────────────────────────────────────────────────────
+
+/**
+ * ProfileLoader — DB 또는 외부 저장소에서 프로필을 로드하는 어댑터 인터페이스.
+ *
+ * apps/web 에서 Prisma 기반 구현체를 setProfileLoader() 로 주입한다.
+ * 미주입 시 in-memory PROFILES fallback 사용.
+ */
+export interface ProfileLoader {
+  getById(id: string): Promise<PreflightProfile | null>
+  listActive(): Promise<PreflightProfile[]>
+}
+
+let _loader: ProfileLoader | null = null
+
+/**
+ * DB 어댑터를 등록한다.
+ * apps/web 부팅 시 또는 최초 preflight 호출 전에 한 번 실행한다.
+ * null 전달 시 어댑터 해제 (테스트용).
+ */
+export function setProfileLoader(loader: ProfileLoader | null): void {
+  _loader = loader
+}
+
+/**
+ * 현재 등록된 ProfileLoader 를 반환한다.
+ * 미등록 시 null.
+ */
+export function getProfileLoader(): ProfileLoader | null {
+  return _loader
 }

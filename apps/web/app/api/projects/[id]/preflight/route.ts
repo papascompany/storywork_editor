@@ -37,7 +37,11 @@ import { preflight } from '@storywork/pdf-engine'
 import type { PdfBuildInput, PageInput } from '@storywork/pdf-engine'
 import { createWebServerClient } from '@/lib/supabase/server'
 import { getPrismaClient } from '../../../_lib/prisma'
+import { initDbProfileLoader } from '@/lib/preflight/db-loader'
 /* eslint-enable import/order */
+
+// DB 어댑터 초기화 (lazy, idempotent)
+initDbProfileLoader()
 
 // ─── 에러 응답 헬퍼 ───────────────────────────────────────────────────────────
 

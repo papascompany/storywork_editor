@@ -25,6 +25,11 @@ export { buildPdf } from './build.js'
 
 export { preflight, preflightBuffer } from './preflight/check.js'
 export type { PreflightReport, PreflightViolation, PreflightSeverity } from './preflight/types.js'
-export type { PreflightProfile } from './preflight/profiles.js'
-export { PROFILES, getProfileById } from './preflight/profiles.js'
+export type { PreflightProfile, ProfileLoader } from './preflight/profiles.js'
+export {
+  PROFILES,
+  getProfileById,
+  setProfileLoader,
+  getProfileLoader,
+} from './preflight/profiles.js'
 export { buildPreflightPdf } from './preflight/visualize.js'
