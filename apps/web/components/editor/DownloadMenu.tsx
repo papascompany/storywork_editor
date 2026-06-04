@@ -21,10 +21,11 @@ import {
   cn,
   showToast,
 } from '@storywork/ui'
-import { ChevronDown, Download, FileImage, FileJson, FileText } from 'lucide-react'
+import { ChevronDown, Download, FileImage, FileJson, FileText, ShieldCheck } from 'lucide-react'
 import React, { useCallback, useState } from 'react'
 
 import { PdfProgressToastContainer } from './PdfProgressToast'
+import { PreflightModal } from './PreflightModal'
 
 import { usePdfJobProgress } from '@/lib/realtime/usePdfJobProgress'
 
@@ -55,6 +56,7 @@ export function DownloadMenu({
 }: DownloadMenuProps) {
   const [exporting, setExporting] = useState<'png' | 'json' | null>(null)
   const [pdfJobId, setPdfJobId] = useState<string | null>(null)
+  const [preflightOpen, setPreflightOpen] = useState(false)
   const isDisabled = !canvas
 
   const safeName = sanitizeFilename(fileName)
@@ -218,6 +220,24 @@ export function DownloadMenu({
               </span>
             )}
           </DropdownMenuItem>
+
+          <DropdownMenuSeparator />
+
+          {/* 프리플라이트 검사 */}
+          <DropdownMenuItem
+            onSelect={() => setPreflightOpen(true)}
+            disabled={!projectId}
+            aria-label="인쇄소 프리플라이트 검사"
+            data-testid="preflight-check"
+          >
+            <ShieldCheck aria-hidden="true" />
+            프리플라이트 검사
+            {!projectId && (
+              <span className="ml-auto text-[10px] text-[var(--color-text-muted)] opacity-60">
+                저장 필요
+              </span>
+            )}
+          </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
 
@@ -230,6 +250,13 @@ export function DownloadMenu({
         message={message}
         error={error}
         onDismiss={() => setPdfJobId(null)}
+      />
+
+      {/* 프리플라이트 모달 */}
+      <PreflightModal
+        projectId={projectId}
+        open={preflightOpen}
+        onClose={() => setPreflightOpen(false)}
       />
     </>
   )
