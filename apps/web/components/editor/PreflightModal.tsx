@@ -127,6 +127,42 @@ function ProfileTab({
   )
 }
 
+// ─── 인쇄소 선택 드롭다운 ────────────────────────────────────────────────────
+
+interface PrinterOption {
+  id: string
+  name: string
+}
+
+function PrinterSelect({
+  options,
+  value,
+  onChange,
+  disabled,
+}: {
+  options: PrinterOption[]
+  value: string
+  onChange: (v: string) => void
+  disabled?: boolean
+}) {
+  return (
+    <select
+      value={value}
+      onChange={(e) => onChange(e.target.value)}
+      disabled={disabled}
+      className="rounded border border-[var(--color-border)] bg-[var(--color-surface)] px-2 py-1.5 text-sm text-[var(--color-text-primary)] focus:outline-none focus:ring-2 focus:ring-[var(--color-primary-500)]"
+      aria-label="인쇄소 선택"
+    >
+      <option value="">전체 인쇄소 검증</option>
+      {options.map((o) => (
+        <option key={o.id} value={o.id}>
+          {o.name}
+        </option>
+      ))}
+    </select>
+  )
+}
+
 // ─── 메인 컴포넌트 ────────────────────────────────────────────────────────────
 
 interface PreflightModalProps {
@@ -140,6 +176,29 @@ export function PreflightModal({ projectId, open, onClose }: PreflightModalProps
   const [reports, setReports] = useState<PreflightReport[] | null>(null)
   const [summary, setSummary] = useState<PreflightSummary | null>(null)
   const [activeProfileIdx, setActiveProfileIdx] = useState(0)
+  const [printerOptions, setPrinterOptions] = useState<PrinterOption[]>([])
+  const [selectedPrinterId, setSelectedPrinterId] = useState<string>('')
+
+  // 인쇄소 목록 로드 (모달 오픈 시)
+  React.useEffect(() => {
+    if (!open) return
+    fetch('/api/printers')
+      .then((r) => r.json())
+      .then((data: unknown) => {
+        if (
+          data !== null &&
+          typeof data === 'object' &&
+          'data' in data &&
+          Array.isArray((data as { data: unknown }).data)
+        ) {
+          const rows = (data as { data: Array<{ id: string; name: string }> }).data
+          setPrinterOptions(rows.map((r) => ({ id: r.id, name: r.name })))
+        }
+      })
+      .catch(() => {
+        // 목록 로드 실패 시 전체 검증만 제공
+      })
+  }, [open])
 
   const runPreflight = useCallback(async () => {
     if (!projectId) {
@@ -150,10 +209,13 @@ export function PreflightModal({ projectId, open, onClose }: PreflightModalProps
     setReports(null)
     setSummary(null)
     try {
+      const body: { embedFonts: boolean; profileId?: string } = { embedFonts: true }
+      if (selectedPrinterId) body.profileId = selectedPrinterId
+
       const res = await fetch(`/api/projects/${projectId}/preflight`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ embedFonts: true }),
+        body: JSON.stringify(body),
       })
       if (!res.ok) {
         const data = (await res.json()) as { error?: string }
@@ -173,7 +235,7 @@ export function PreflightModal({ projectId, open, onClose }: PreflightModalProps
     } finally {
       setLoading(false)
     }
-  }, [projectId])
+  }, [projectId, selectedPrinterId])
 
   const activeReport = reports?.[activeProfileIdx]
 
@@ -197,8 +259,16 @@ export function PreflightModal({ projectId, open, onClose }: PreflightModalProps
           {!reports && (
             <div className="flex flex-col items-center gap-3 py-6">
               <p className="text-sm text-[var(--color-text-secondary)]">
-                BookPrint Korea / InstaPrint / ComicMaker 3사 인쇄 사양을 자동으로 검증합니다.
+                등록된 인쇄소 사양을 자동으로 검증합니다.
               </p>
+              {printerOptions.length > 0 && (
+                <PrinterSelect
+                  options={printerOptions}
+                  value={selectedPrinterId}
+                  onChange={setSelectedPrinterId}
+                  disabled={loading}
+                />
+              )}
               <Button
                 onClick={() => {
                   void runPreflight()
