@@ -44,6 +44,8 @@ export interface TextCommand {
   kind: 'text'
   x: number
   y: number
+  width: number
+  height: number
   text: string
   fontSize: number
   /** 헥스 컬러 */
