@@ -12,6 +12,7 @@
     "baseUrl": ".",
     "paths": {
       "@/*": ["./*"],
+      "@storywork/workers": ["../../apps/workers/src/index.ts"],
       "@storywork/ai-script": ["../../packages/ai-script/src/index.ts"],
       "@storywork/ai-recommend": ["../../packages/ai-recommend/src/index.ts"],
       "@storywork/ai-layout": ["../../packages/ai-layout/src/index.ts"],

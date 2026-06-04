@@ -374,6 +374,9 @@ importers:
       '@storywork/ui':
         specifier: workspace:^
         version: link:../../packages/shared-ui
+      '@storywork/workers':
+        specifier: workspace:*
+        version: link:../workers
       '@supabase/ssr':
         specifier: ^0.10.2
         version: 0.10.2(@supabase/supabase-js@2.105.3)
@@ -428,7 +431,7 @@ importers:
         version: 19.2.3(@types/react@19.2.14)
       '@vitejs/plugin-react':
         specifier: ^4.0.0
-        version: 4.7.0(vite@5.4.21(@types/node@22.19.17)(lightningcss@1.32.0))
+        version: 4.7.0(vite@8.0.10(@types/node@22.19.17)(esbuild@0.27.7)(jiti@2.6.1)(tsx@4.21.0)(yaml@2.8.4))
       canvas:
         specifier: ^3.0.0
         version: 3.2.3
@@ -462,6 +465,18 @@ importers:
 
   apps/workers:
     dependencies:
+      '@prisma/client':
+        specifier: ^6.0.0
+        version: 6.19.3(prisma@6.19.3(typescript@5.9.3))(typescript@5.9.3)
+      '@storywork/pdf-engine':
+        specifier: workspace:*
+        version: link:../../packages/pdf-engine
+      '@storywork/schema':
+        specifier: workspace:*
+        version: link:../../packages/shared-schema
+      '@supabase/supabase-js':
+        specifier: ^2.105.3
+        version: 2.105.3
       inngest:
         specifier: ^3.0.0
         version: 3.54.2(@opentelemetry/core@2.7.1(@opentelemetry/api@1.9.1))(next@15.5.15(@opentelemetry/api@1.9.1)(@playwright/test@1.60.0)(react-dom@19.2.5(react@19.2.5))(react@19.2.5))(typescript@5.9.3)(zod@4.4.2)
@@ -10688,7 +10703,7 @@ snapshots:
 
   '@vercel/oidc@3.2.0': {}
 
-  '@vitejs/plugin-react@4.7.0(vite@5.4.21(@types/node@22.19.17)(lightningcss@1.32.0))':
+  '@vitejs/plugin-react@4.7.0(vite@8.0.10(@types/node@22.19.17)(esbuild@0.27.7)(jiti@2.6.1)(tsx@4.21.0)(yaml@2.8.4))':
     dependencies:
       '@babel/core': 7.29.0
       '@babel/plugin-transform-react-jsx-self': 7.27.1(@babel/core@7.29.0)
@@ -10696,7 +10711,7 @@ snapshots:
       '@rolldown/pluginutils': 1.0.0-beta.27
       '@types/babel__core': 7.20.5
       react-refresh: 0.17.0
-      vite: 5.4.21(@types/node@22.19.17)(lightningcss@1.32.0)
+      vite: 8.0.10(@types/node@22.19.17)(esbuild@0.27.7)(jiti@2.6.1)(tsx@4.21.0)(yaml@2.8.4)
     transitivePeerDependencies:
       - supports-color
 

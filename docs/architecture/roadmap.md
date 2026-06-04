@@ -119,7 +119,7 @@
 ## M6 — POD PDF
 
 - [x] [M6-01] `pdf-engine` 벡터 빌더 + 표지 — 결정론 출력 — @pdf-publisher ✅ 2026-06-04 (커밋 6c88485..969e0eb) — buildPdf() ADR-0007 결정론(seed→ISO, useObjectStreams=false), 16p 로컬 8~17ms, TrimBox/BleedBox, 표지 6종 톤, 단위 테스트 28개, POST /api/projects/[id]/publish, docs/m6-pod-pdf/
-- [ ] [M6-02] `apps/workers` Inngest 잡 + 진행 % 푸시 — 16p ≤ 6초 — @pdf-publisher + @architect
+- [x] [M6-02] `apps/workers` Inngest 잡 + 진행 % 푸시 — 16p ≤ 6초 — @pdf-publisher + @architect ✅ 2026-06-04 — pdfBuildJob(inngest/pdf-build), /api/inngest serve(), /publish?async=true→202, Supabase Realtime pdf-jobs:{jobId}, usePdfJobProgress 훅, PdfProgressToastContainer, 단위테스트 6개, docs/m6-pod-pdf/async-jobs.md
 - [ ] [M6-03] preflight 검증기 — 인쇄소 3사 통과 — @pdf-publisher + @qa-tester
 - [ ] [M6-04] 인쇄소 사양 프리셋 + 등록 UI — 관리자 추가 가능 — @admin-builder + @pdf-publisher
 

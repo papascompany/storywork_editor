@@ -89,6 +89,9 @@ export type TopBarProps = {
   isAuthenticated?: boolean
   serverSaveStatus?: 'idle' | 'saving' | 'saved' | 'error'
   onSave?: () => void
+
+  // M6-02: PDF 비동기 출판용 projectId
+  projectId?: string | null
 }
 
 // ─── TopBar ──────────────────────────────────────────────────────────────────
@@ -112,6 +115,7 @@ export function TopBar({
   isAuthenticated = false,
   serverSaveStatus = 'idle',
   onSave,
+  projectId = null,
 }: TopBarProps) {
   const { resolvedTheme, toggleTheme } = useTheme()
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
@@ -261,7 +265,12 @@ export function TopBar({
       </Tooltip>
 
       {/* 다운로드 드롭다운 */}
-      <DownloadMenu canvas={canvas} layerTree={layerTree} fileName={fileName} />
+      <DownloadMenu
+        canvas={canvas}
+        layerTree={layerTree}
+        fileName={fileName}
+        projectId={projectId}
+      />
 
       {/* 저장 */}
       {renderSaveButton()}
