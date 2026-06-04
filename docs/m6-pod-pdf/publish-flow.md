@@ -1,4 +1,20 @@
-# PDF 출판 흐름 (M6-01 + M6-02)
+# PDF 출판 흐름 (M6-01 + M6-02 + M6-03)
+
+## 프리플라이트 검사 (M6-03, 출판 전 선택적 실행)
+
+```
+편집기 완성 → DownloadMenu "프리플라이트 검사" 클릭
+  → POST /api/projects/{id}/preflight
+  → 서버: Project + Format + Pages 로드
+  → 서버: preflight() 3사 프로필 검증
+  → 응답 200: { reports: PreflightReport[], summary: { totalErrors, totalWarnings, allPassed } }
+  → 클라이언트: PreflightModal 에 결과 표시
+  → 사용자: 오류 확인 후 수정 또는 그대로 출판 진행
+```
+
+자세한 프리플라이트 사양: [preflight.md](./preflight.md)
+
+---
 
 ## 동기 모드 (기본, async=false)
 
