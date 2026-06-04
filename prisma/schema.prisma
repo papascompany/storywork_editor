@@ -111,14 +111,15 @@ model User {
   marketingConsentAt DateTime?
   createdAt     DateTime       @default(now())
   updatedAt     DateTime       @updatedAt
-  projects      Project[]
-  resources     Resource[]     @relation("CreatorResources")
-  characters    Character[]    @relation("CreatorCharacters")
-  showcases     Showcase[]
-  subscriptions Subscription[]
-  notices       Notice[]
-  inquiries     Inquiry[]
-  comments      Comment[]
+  projects         Project[]
+  resources        Resource[]       @relation("CreatorResources")
+  characters       Character[]      @relation("CreatorCharacters")
+  showcases        Showcase[]
+  subscriptions    Subscription[]
+  notices          Notice[]
+  inquiries        Inquiry[]
+  comments         Comment[]
+  printerProfiles  PrinterProfile[]
 
   @@index([role])
   @@index([deletedAt])
@@ -412,6 +413,39 @@ model ContestSeason {
   createdAt DateTime   @default(now())
   updatedAt DateTime   @updatedAt
   entries   Showcase[]
+}
+
+/// 인쇄소 사양 프리셋 (POD preflight 프로필)
+model PrinterProfile {
+  id                String   @id @default(cuid())
+  /// URL/import 키 — 'bookprint-korea' 등 영문 슬러그
+  slug              String   @unique
+  name              String
+  description       String?  @db.Text
+  /// 지원 판형 ID 배열 (빈 배열 = 모두 허용)
+  formats           String[]
+  bleedMinMm        Float
+  bleedMaxMm        Float
+  safeMinMm         Float
+  imageDpiMinPose   Float
+  imageDpiMinBg     Float
+  fontEmbedRequired Boolean  @default(true)
+  /// 허용 색공간 순서 — ['rgb'] | ['cmyk'] | ['rgb','cmyk']
+  colorSpaces       String[]
+  /// 최대 페이지 수 (null = 제한 없음)
+  maxPages          Int?
+  /// 프로필 전용 커스텀 경고 메시지 목록
+  customWarnings    String[]
+  /// 시스템 프리셋 — true 이면 삭제 불가
+  isSystem          Boolean  @default(false)
+  isActive          Boolean  @default(true)
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+  createdById       String?
+  createdBy         User?    @relation(fields: [createdById], references: [id], onDelete: SetNull)
+
+  @@index([isActive])
+  @@index([slug])
 }
 
 /// 관리자 액션 감사 로그

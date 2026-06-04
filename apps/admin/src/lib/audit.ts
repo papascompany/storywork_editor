@@ -25,6 +25,7 @@ export type AuditEntityType =
   | 'ContestSeason'
   | 'Showcase'
   | 'Comment'
+  | 'PrinterProfile'
 
 export interface RecordAuditOptions {
   actorId: string
