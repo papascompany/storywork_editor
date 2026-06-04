@@ -16,6 +16,7 @@
   "dependencies": {
     "@storywork/ai-recommend": "workspace:*",
     "@storywork/ai-script": "workspace:*",
+    "@storywork/pdf-engine": "workspace:*",
     "@storywork/editor-bubble": "workspace:*",
     "@storywork/editor-core": "workspace:*",
     "@storywork/editor-effects": "workspace:*",
