@@ -121,7 +121,9 @@
 - [x] [M6-01] `pdf-engine` 벡터 빌더 + 표지 — 결정론 출력 — @pdf-publisher ✅ 2026-06-04 (커밋 6c88485..969e0eb) — buildPdf() ADR-0007 결정론(seed→ISO, useObjectStreams=false), 16p 로컬 8~17ms, TrimBox/BleedBox, 표지 6종 톤, 단위 테스트 28개, POST /api/projects/[id]/publish, docs/m6-pod-pdf/
 - [x] [M6-02] `apps/workers` Inngest 잡 + 진행 % 푸시 — 16p ≤ 6초 — @pdf-publisher + @architect ✅ 2026-06-04 — pdfBuildJob(inngest/pdf-build), /api/inngest serve(), /publish?async=true→202, Supabase Realtime pdf-jobs:{jobId}, usePdfJobProgress 훅, PdfProgressToastContainer, 단위테스트 6개, docs/m6-pod-pdf/async-jobs.md
 - [x] [M6-03] preflight 검증기 — 인쇄소 3사 통과 — @pdf-publisher + @qa-tester ✅ 2026-06-04 — 3사 프로필(bookprint-korea/instaprint/comicmaker) + 6룰(bleed/safe/dpi/font/color/page-count) + preflight() API + buildPreflightPdf() + POST /api/projects/[id]/preflight + PreflightModal. ADR-0011a lowDpi 통합. 96 tests pass. 커밋: `460a666`+`ca3faa8`+`7aed356`+`5377a31`
-- [ ] [M6-04] 인쇄소 사양 프리셋 + 등록 UI — 관리자 추가 가능 — @admin-builder + @pdf-publisher
+- [x] [M6-04] 인쇄소 사양 프리셋 + 등록 UI — 관리자 추가 가능 — @admin-builder + @pdf-publisher ✅ 2026-06-04 — PrinterProfile DB 모델 + Zod 스키마 + seed 3건(isSystem=true) + admin /printers CRUD(DataTable/EntityForm/delete guard) + API `GET/POST /api/admin/printers` + `GET/PATCH/DELETE /api/admin/printers/[id]` + ProfileLoader 인터페이스 + Prisma DB 어댑터 + preflight() DB 우선 로드 + in-memory fallback + PreflightModal 인쇄소 선택 드롭다운 + /api/printers 공개 목록 API + 단위 테스트 16개. 커밋: `884028f`+`f4237da`+`fdb3746`+`8026ba0`
+
+**M6 마일스톤 4건 모두 완료** (M6-01 ~ M6-04)
 
 ## M7 — Creator Mode + Billing
 
