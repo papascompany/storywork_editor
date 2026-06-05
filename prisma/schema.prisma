@@ -119,7 +119,8 @@ model User {
   notices          Notice[]
   inquiries        Inquiry[]
   comments         Comment[]
-  printerProfiles  PrinterProfile[]
+  printerProfiles    PrinterProfile[]
+  companyInfoUpdates CompanyInfo[]
 
   @@index([role])
   @@index([deletedAt])
@@ -512,4 +513,39 @@ model Comment {
   updatedAt  DateTime @updatedAt
 
   @@index([showcaseId, createdAt])
+}
+
+/// 회사 정보 (사업자 정보 + 운영자 연락처) — 싱글톤 (1 row only)
+/// 한국 전자상거래법 표준 + 개인정보보호법 처리 위탁 명시용
+/// 싱글톤 id 고정값: 'company-info-singleton'
+model CompanyInfo {
+  /// 고정 id — 항상 'company-info-singleton' 사용 (upsert 키)
+  id                     String  @id @default(cuid())
+  // ── 기본 정보 ──
+  companyName            String  @default("")
+  ceoName                String  @default("")
+  // ── 법적 등록 정보 ──
+  /// 사업자등록번호 형식: 000-00-00000
+  businessRegistrationNo String?
+  /// 통신판매업신고번호 형식: 2026-서울-00000
+  mailOrderBusinessNo    String?
+  // ── 주소/연락처 ──
+  address                String  @default("") @db.Text
+  phone                  String  @default("")
+  email                  String  @default("")
+  faxNo                  String?
+  // ── 부가정보 (Footer 표시용) ──
+  privacyOfficerName     String?
+  privacyOfficerEmail    String?
+  /// 예: "평일 10:00 ~ 18:00 (점심 12-13시 제외)"
+  customerServiceHours   String?
+  hostingProvider        String  @default("Vercel · Supabase")
+  // ── footer 노출 토글 ──
+  /// false 이면 footer/약관에 placeholder 유지. 필수 필드 입력 완료 후 true 로 전환.
+  isPublished            Boolean @default(false)
+  // ── 메타 ──
+  updatedById            String?
+  updatedBy              User?   @relation(fields: [updatedById], references: [id], onDelete: SetNull)
+  createdAt              DateTime @default(now())
+  updatedAt              DateTime @updatedAt
 }
