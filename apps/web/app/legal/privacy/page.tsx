@@ -16,6 +16,7 @@ import * as React from 'react'
 
 import { Footer } from '../../../components/marketing/Footer'
 import { Header } from '../../../components/marketing/Header'
+import { getPublishedCompanyInfo } from '../../../lib/company-info'
 
 export const metadata: Metadata = {
   title: '개인정보처리방침',
@@ -24,9 +25,15 @@ export const metadata: Metadata = {
 }
 
 const EFFECTIVE_DATE = '2026년 6월 1일'
-const CONTACT_EMAIL = 'privacy@storywork.kr'
+const FALLBACK_CONTACT_EMAIL = 'privacy@storywork.kr'
 
-export default function PrivacyPage() {
+export default async function PrivacyPage() {
+  const companyInfo = await getPublishedCompanyInfo()
+  const CONTACT_EMAIL =
+    companyInfo?.privacyOfficerEmail ?? companyInfo?.email ?? FALLBACK_CONTACT_EMAIL
+  const hostingProvider = companyInfo?.hostingProvider ?? 'Vercel · Supabase'
+  const privacyOfficerName = companyInfo?.privacyOfficerName ?? null
+  const privacyOfficerEmail = companyInfo?.privacyOfficerEmail ?? null
   return (
     <div style={{ backgroundColor: 'var(--mkt-canvas)' }}>
       <Header />
@@ -207,16 +214,10 @@ export default function PrivacyPage() {
             <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--mkt-space-sm)' }}>
               {[
                 {
-                  vendor: 'Supabase, Inc.',
-                  task: '데이터베이스 및 파일 스토리지 운영',
-                  country: '미국 (AWS)',
-                  scope: '이메일, 작품 데이터, 업로드 파일',
-                },
-                {
-                  vendor: 'Vercel, Inc.',
-                  task: '웹 서비스 호스팅 및 CDN',
+                  vendor: hostingProvider,
+                  task: '웹 서비스 호스팅, 데이터베이스 및 파일 스토리지 운영',
                   country: '미국',
-                  scope: 'IP, 접속 로그',
+                  scope: '이메일, 작품 데이터, 업로드 파일, IP, 접속 로그',
                 },
                 {
                   vendor: 'Anthropic, PBC',
@@ -432,15 +433,29 @@ export default function PrivacyPage() {
                 className="mkt-body-sm"
                 style={{ color: 'var(--mkt-ink)', fontWeight: 560, marginBottom: '4px' }}
               >
-                개인정보 보호책임자 (placeholder — FOLLOWUP-59)
+                개인정보 보호책임자
+                {!privacyOfficerName && (
+                  <span style={{ fontWeight: 400, opacity: 0.5 }}>
+                    {' '}
+                    (placeholder — FOLLOWUP-59)
+                  </span>
+                )}
               </p>
+              {privacyOfficerName && (
+                <p
+                  className="mkt-body-sm"
+                  style={{ color: 'var(--mkt-ink)', opacity: 0.7, marginBottom: '2px' }}
+                >
+                  이름: {privacyOfficerName}
+                </p>
+              )}
               <p className="mkt-body-sm" style={{ color: 'var(--mkt-ink)', opacity: 0.7 }}>
                 이메일:{' '}
                 <a
-                  href={`mailto:${CONTACT_EMAIL}`}
+                  href={`mailto:${privacyOfficerEmail ?? CONTACT_EMAIL}`}
                   style={{ color: 'var(--mkt-ink)', fontWeight: 560 }}
                 >
-                  {CONTACT_EMAIL}
+                  {privacyOfficerEmail ?? CONTACT_EMAIL}
                 </a>
               </p>
             </div>

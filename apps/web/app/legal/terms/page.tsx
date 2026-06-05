@@ -11,6 +11,7 @@ import * as React from 'react'
 
 import { Footer } from '../../../components/marketing/Footer'
 import { Header } from '../../../components/marketing/Header'
+import { getPublishedCompanyInfo } from '../../../lib/company-info'
 
 export const metadata: Metadata = {
   title: '서비스 이용약관',
@@ -19,10 +20,13 @@ export const metadata: Metadata = {
 }
 
 const EFFECTIVE_DATE = '2026년 6월 1일'
-const COMPANY_NAME = '스토리워크'
-const CONTACT_EMAIL = 'legal@storywork.kr'
+const FALLBACK_COMPANY_NAME = '스토리워크'
+const FALLBACK_CONTACT_EMAIL = 'legal@storywork.kr'
 
-export default function TermsPage() {
+export default async function TermsPage() {
+  const companyInfo = await getPublishedCompanyInfo()
+  const COMPANY_NAME = companyInfo?.companyName ?? FALLBACK_COMPANY_NAME
+  const CONTACT_EMAIL = companyInfo?.email ?? FALLBACK_CONTACT_EMAIL
   return (
     <div style={{ backgroundColor: 'var(--mkt-canvas)' }}>
       <Header />

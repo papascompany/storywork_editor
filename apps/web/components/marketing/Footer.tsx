@@ -1,6 +1,9 @@
 import Link from 'next/link'
 import * as React from 'react'
 
+import { getPublishedCompanyInfo } from '../../lib/company-info'
+import type { PublicCompanyInfo } from '../../lib/company-info'
+
 /**
  * Footer — 마케팅 푸터
  *
@@ -9,6 +12,9 @@ import * as React from 'react'
  * - padding: 64px 32px
  * - figmaMono caption 으로 컬럼 헤더
  * - 4컬럼 그리드 (모바일 2열 → 1열)
+ *
+ * CompanyInfo.isPublished=true 이면 사업자정보 블록 표시.
+ * false 이면 placeholder 유지 (LEGAL-OPS-01).
  */
 
 const FOOTER_LINKS = {
@@ -39,7 +45,76 @@ const FOOTER_LINKS = {
   ],
 } as const
 
-export function Footer() {
+/**
+ * 사업자정보 블록 — isPublished=true 일 때만 렌더
+ */
+function BusinessInfoBlock({ info }: { info: PublicCompanyInfo }) {
+  return (
+    <div
+      style={{
+        paddingTop: 'var(--mkt-space-xl)',
+        borderTop: '1px solid var(--mkt-hairline-soft)',
+        display: 'flex',
+        flexDirection: 'column',
+        gap: '4px',
+      }}
+    >
+      <p
+        className="mkt-caption"
+        style={{ color: 'var(--mkt-ink)', opacity: 0.35, marginBottom: '8px' }}
+      >
+        사업자 정보
+      </p>
+      {(info.companyName || info.ceoName) && (
+        <p className="mkt-caption" style={{ color: 'var(--mkt-ink)', opacity: 0.55 }}>
+          {info.companyName}
+          {info.ceoName ? ` · 대표: ${info.ceoName}` : ''}
+        </p>
+      )}
+      {info.businessRegistrationNo && (
+        <p className="mkt-caption" style={{ color: 'var(--mkt-ink)', opacity: 0.45 }}>
+          사업자등록번호: {info.businessRegistrationNo}
+        </p>
+      )}
+      {info.mailOrderBusinessNo && (
+        <p className="mkt-caption" style={{ color: 'var(--mkt-ink)', opacity: 0.45 }}>
+          통신판매업신고: {info.mailOrderBusinessNo}
+        </p>
+      )}
+      {info.address && (
+        <p className="mkt-caption" style={{ color: 'var(--mkt-ink)', opacity: 0.45 }}>
+          주소: {info.address}
+        </p>
+      )}
+      {(info.phone || info.email) && (
+        <p className="mkt-caption" style={{ color: 'var(--mkt-ink)', opacity: 0.45 }}>
+          {info.phone ? `전화: ${info.phone}` : ''}
+          {info.phone && info.email ? ' / ' : ''}
+          {info.email ? `이메일: ${info.email}` : ''}
+        </p>
+      )}
+      {info.faxNo && (
+        <p className="mkt-caption" style={{ color: 'var(--mkt-ink)', opacity: 0.45 }}>
+          팩스: {info.faxNo}
+        </p>
+      )}
+      {info.hostingProvider && (
+        <p className="mkt-caption" style={{ color: 'var(--mkt-ink)', opacity: 0.35 }}>
+          호스팅: {info.hostingProvider}
+        </p>
+      )}
+      {info.customerServiceHours && (
+        <p className="mkt-caption" style={{ color: 'var(--mkt-ink)', opacity: 0.35 }}>
+          고객센터: {info.customerServiceHours}
+        </p>
+      )}
+    </div>
+  )
+}
+
+export async function Footer() {
+  const companyInfo = await getPublishedCompanyInfo()
+
   return (
     <footer
       style={{
@@ -163,6 +238,9 @@ export function Footer() {
             ))}
           </div>
         </div>
+
+        {/* 사업자정보 블록 — isPublished=true 일 때만 표시 */}
+        {companyInfo && <BusinessInfoBlock info={companyInfo} />}
       </div>
     </footer>
   )
