@@ -91,6 +91,51 @@
 
 ---
 
-## After 측정값 (수정 후)
+---
 
-TBD — Step 6에서 갱신 예정
+## After 측정값 (Step 6 — 수정 완료)
+
+| 지표 | Before | After |
+|---|---|---|
+| typecheck | 0 errors | 0 errors |
+| lint | **10 errors** (ai-script) | **0 errors** (37/37 tasks) |
+| test | **53 failed** / 498 total | **0 failed** / 498 total |
+| check:css-source | OK | OK |
+| check:css-anti | OK | OK |
+
+---
+
+## 수정 완료 항목
+
+### B-1 (HIGH) ai-script 스트레이 .js 파일 제거 → lint 10 errors 해소
+- `packages/ai-script/src/` 에 혼재하던 컴파일 산출물 36개 파일 삭제 (`.js`, `.d.ts`, `.js.map`, `.d.ts.map`)
+- 원인: `tsc` 가 과거 시점에 `noEmit: false` 모드로 잘못 실행되어 `src/` 안에 emit 한 것
+- `.gitignore` 에 `packages/*/src/**/*.js` 패턴이 이미 있어 재발 방지됨
+- commit: `ef97a11`
+
+### C-1 (HIGH) 마케팅 테스트 53건 실패 → 0 failures
+- 근본 원인: `Footer.tsx` 가 `async function` (RSC) 이라 `await getPublishedCompanyInfo()` → Prisma + `next/cache` 호출
+- jsdom 환경에서 async RSC 를 동기 `render()` 로 실행하면 React Suspense 가 트리를 비워 `<body><div /></body>` 반환
+- 수정: 4개 마케팅 테스트 파일에 `vi.mock('../../components/marketing/Footer', () => ...)` 동기 stub 추가
+- commit: `ef97a11`
+
+---
+
+## 부채 등재 (미해소, FOLLOWUP)
+
+| ID | 항목 | 심각도 | 영향 |
+|---|---|---|---|
+| FOLLOWUP-60 | eslint-plugin-react-hooks 미설치 — hooks deps 자동 감지 부재 | MED | hooks 오용 미감지 |
+| FOLLOWUP-61 | ai-script src 스트레이 재발 방지 (.gitignore 이미 커버, CI 명시적 check 추가 여부) | LOW | 재발 시 lint 오류 |
+| FOLLOWUP-62 | async RSC + jsdom 테스트 패턴 가이드라인 문서화 | LOW | 신규 async RSC 테스트 오류 재발 |
+| FOLLOWUP-63 | prisma format cosmetic drift CI check 여부 결정 | LOW | schema 정렬 불일치 |
+
+---
+
+## 커밋 목록
+
+| SHA | 내용 |
+|---|---|
+| `86fbf21` | docs(audit): 전체 소스 오류 진단 보고서 (Step 1) |
+| `ef97a11` | fix(audit): high severity 항목 수정 (Step 2) |
+| `c07e958` | chore(audit): medium/low 부채 FOLLOWUP 등재 (Step 3-4) |
