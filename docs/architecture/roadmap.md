@@ -159,6 +159,13 @@
 
 ### 완료
 
+- [x] [LEGAL-OPS-01] 사업자 정보 admin 관리 + footer/약관/PP 동적 노출 (183077f)
+  - Prisma CompanyInfo 싱글톤 모델 + migration 20260605000000_company_info
+  - shared-schema CompanyInfoSchema / UpdateCompanyInfoSchema / PublicCompanyInfoSchema
+  - admin /company 페이지: RHF+Zod 6섹션 폼, Footer 미리보기, isPublished 토글
+  - /api/admin/company GET/PATCH + audit log + revalidateTag('company-info')
+  - Footer.tsx async SC 전환, 사업자정보 블록 동적 렌더
+  - legal/terms, legal/privacy 동적 변수 대체 (company name, officer, hosting)
 - [x] [LEGAL-OPS-03] 회원 탈퇴 흐름 — soft delete + 30일 hard delete + 데이터 export
   - User 모델 deletedAt/deletionScheduledFor/marketingConsent 추가
   - GET /api/account/export (PIPA 35조 이동권)
