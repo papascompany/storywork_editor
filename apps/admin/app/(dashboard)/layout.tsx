@@ -34,6 +34,7 @@ const NAV_ITEMS: NavItemDef[] = [
   { href: '/printers', label: '인쇄소 프로필', exact: false },
   { href: '/users', label: '회원 관리', exact: false },
   { href: '/audit', label: '감사 로그', exact: false },
+  { href: '/company', label: '회사정보', exact: false },
 ]
 
 // ─── 로고 슬롯 (서버 렌더, Link 포함) ───────────────────────────────────────
