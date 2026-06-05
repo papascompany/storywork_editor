@@ -97,6 +97,10 @@
 - [ ] [PERF-ADMIN-04] (P2) login 페이지 FCP 개선 — 현재 P75 1028ms (목표 800ms, +228ms 초과). Pretendard Variable woff2 subset 분리 또는 `font-display: optional` — @ui-designer
 - [ ] [PERF-ADMIN-05] (P2) LCP 수집 방식 개선 — 현재 LCP=0 미수집. PerformanceObserver 를 page load 초기 등록 + buffered=true 로 변경 — @architect
 - [ ] [PERF-ADMIN-06] (P2) Lighthouse CI 통합 — perf 회귀 자동 차단 (PERF-ADMIN-03 후속) — @qa-tester + @architect
+- [x] [PERF-WEB-01] (P0) web speed audit Step 1 진단 — 5 시나리오 × 2 viewport × 3 반복 측정 — @architect ✅ 2026-06-05 (`dab88d4`, `docs/perf/2026-06-05_web-speed-audit.md`) — /notices desktop LCP P75 4016ms (Poor), /editor First Load 590KB. 권고 #1~#9.
+- [x] [PERF-WEB-02] (P0) Step 2 묶음 fix #1+#2+#3 — Speed Insights RUM + /notices Prisma 통합 + unstable_cache — @architect ✅ 2026-06-05 (`314e4f5`, `0d5eca7`, `010ef57`) — 데스크탑 LCP 4016ms → < 800ms 목표
+- [ ] [PERF-WEB-03] (P1) Step 3 — `/editor` dynamic import (First Load 590KB → ~250KB). 회귀 위험 큼, 별도 PR.
+- [ ] [PERF-WEB-04] (P2) Speed Insights 7일 누적 후 실유저 RUM 분석 → E.2 #5/#6 우선순위 재평가
 
 ## M5 — Text/Bubble/Effects/Templates
 

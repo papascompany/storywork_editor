@@ -1,10 +1,9 @@
-# Web Speed Audit — 2026-06-05 (Step 1 진단)
+# Web Speed Audit — 2026-06-05 (Step 1 진단 + Step 2 fix)
 
-> **본 보고서는 진단만 포함합니다. 개선 작업(fix) 은 별도 PR.**
-> 회고 §7.2-① "명세 외 변경 금지" + §7.2-② "실측 없이 추측 fix 금지" 룰 준수.
+> **Step 1** = 진단 (HEAD `dab88d4` 기준)
+> **Step 2** = 권고 #1+#2+#3 적용 (옵션 C, 묶음 fix) — §J 참조
 >
-> Step 2~6 (실제 개선 작업) 은 사용자가 본 보고서의 권고 우선순위를 결정한 후
-> 별도 위임으로 진행한다.
+> Step 3 (`/editor` dynamic import) 는 별도 PR. 회고 §7.2 룰 준수.
 
 ---
 
@@ -320,3 +319,42 @@ _측정일: 2026-06-05_
 _HEAD: 1476d7b_
 _작성: Claude Code (Opus 4.7) — `vercel-debug-perf` agent 위임 결과_
 _본 PR 은 진단 보고서만 포함. 코드 fix 없음._
+
+---
+
+## J. Step 2 — 권고 #1+#2+#3 묶음 fix (2026-06-05)
+
+§H 옵션 C 선택. /editor dynamic import (#4) 는 별도 PR 로 분리.
+
+### J.1 적용 변경
+
+| Commit | 권고 | 변경 |
+|---|---|---|
+| `314e4f5` | #1 | `@vercel/speed-insights ^2.0.0` 추가 + RootLayout `<SpeedInsights />` |
+| `0d5eca7` | #3 (Prisma 통합) | `/notices` 3 쿼리 (pinned/regular/count) → 단일 `findMany` + JS split |
+| `010ef57` | #2 (캐싱) | `apps/web/lib/notices.ts` 신규 `unstable_cache` (TTL 3600s, tag `'notices'`) + admin CRUD `revalidateTag('notices')` |
+
+설계 결정:
+- **`'use cache'` 대신 `unstable_cache`** — 기존 `company-info.ts` 와 동일 패턴 유지. Cache Components experimental 활성화 회피, 안정성 우선.
+- **단일 `findMany` (옵션 A)** — notices 는 데이터량 적어 페이지네이션도 JS 에서 처리. N>500 이상으로 늘면 `$transaction` batching 으로 재검토.
+- **`force-dynamic` 제거** — 데이터 레벨 캐시로 RSC 무효화 단축. `searchParams` 사용으로 여전히 dynamic 라우트지만 DB 라운드트립 0.
+
+### J.2 After 측정 (Step 4 시점에 갱신)
+
+> _Vercel deploy 완료 후 `pnpm perf:web:prod --filter notices` 재측정 결과로 채움._
+
+| 시나리오 | Before (P75) | After (P75) | Δ |
+|---|---|---|---|
+| `/notices` desktop LCP | 4016ms | _측정 대기_ | _-_ |
+| `/notices` mobile LCP | 1568ms | _측정 대기_ | _-_ |
+| `/notices` First Load JS gzip | 223KB | _측정 대기_ | _-_ |
+| `/` First Load JS gzip | 228KB | _측정 대기_ | _-_ |
+
+목표:
+- desktop LCP < 800ms (E.2 #2 목표)
+- bundle size 변화 없음 (SpeedInsights 는 client-side defer 스크립트, 측정 영향 미미)
+
+### J.3 후속
+
+- **Step 3 (별도 PR)**: `/editor` dynamic import (E.2 #4). 회귀 위험 큼 → 단독 PR.
+- **RUM 누적**: Speed Insights 7일 후 실유저 LCP P75 확인 → E.2 #5/#6 우선순위 재평가.
