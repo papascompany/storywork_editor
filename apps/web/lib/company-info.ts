@@ -40,40 +40,47 @@ const SINGLETON_ID = 'company-info-singleton'
  */
 export const getPublishedCompanyInfo = unstable_cache(
   async (): Promise<PublicCompanyInfo | null> => {
-    const info = await prisma.companyInfo.findUnique({
-      where: { id: SINGLETON_ID },
-      select: {
-        isPublished: true,
-        companyName: true,
-        ceoName: true,
-        businessRegistrationNo: true,
-        mailOrderBusinessNo: true,
-        address: true,
-        phone: true,
-        email: true,
-        faxNo: true,
-        privacyOfficerName: true,
-        privacyOfficerEmail: true,
-        customerServiceHours: true,
-        hostingProvider: true,
-      },
-    })
+    // CI/SSG 빌드 환경에서 DATABASE_URL 이 없으면 Prisma 초기화 오류 발생.
+    // unstable_cache 콜백 내부에서 try/catch 로 감싸 graceful fallback 처리.
+    try {
+      const info = await prisma.companyInfo.findUnique({
+        where: { id: SINGLETON_ID },
+        select: {
+          isPublished: true,
+          companyName: true,
+          ceoName: true,
+          businessRegistrationNo: true,
+          mailOrderBusinessNo: true,
+          address: true,
+          phone: true,
+          email: true,
+          faxNo: true,
+          privacyOfficerName: true,
+          privacyOfficerEmail: true,
+          customerServiceHours: true,
+          hostingProvider: true,
+        },
+      })
 
-    if (!info || !info.isPublished) return null
+      if (!info || !info.isPublished) return null
 
-    return {
-      companyName: info.companyName,
-      ceoName: info.ceoName,
-      businessRegistrationNo: info.businessRegistrationNo,
-      mailOrderBusinessNo: info.mailOrderBusinessNo,
-      address: info.address,
-      phone: info.phone,
-      email: info.email,
-      faxNo: info.faxNo,
-      privacyOfficerName: info.privacyOfficerName,
-      privacyOfficerEmail: info.privacyOfficerEmail,
-      customerServiceHours: info.customerServiceHours,
-      hostingProvider: info.hostingProvider,
+      return {
+        companyName: info.companyName,
+        ceoName: info.ceoName,
+        businessRegistrationNo: info.businessRegistrationNo,
+        mailOrderBusinessNo: info.mailOrderBusinessNo,
+        address: info.address,
+        phone: info.phone,
+        email: info.email,
+        faxNo: info.faxNo,
+        privacyOfficerName: info.privacyOfficerName,
+        privacyOfficerEmail: info.privacyOfficerEmail,
+        customerServiceHours: info.customerServiceHours,
+        hostingProvider: info.hostingProvider,
+      }
+    } catch {
+      // DB 미연결 환경 (CI 빌드, SSG prerender) — 사업자정보 없이 렌더
+      return null
     }
   },
   ['company-info'],

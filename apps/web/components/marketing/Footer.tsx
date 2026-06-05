@@ -113,13 +113,8 @@ function BusinessInfoBlock({ info }: { info: PublicCompanyInfo }) {
 }
 
 export async function Footer() {
-  // CI/SSG 환경에서 DATABASE_URL 이 없으면 Prisma 초기화 오류 발생 → null graceful fallback
-  let companyInfo: Awaited<ReturnType<typeof getPublishedCompanyInfo>> = null
-  try {
-    companyInfo = await getPublishedCompanyInfo()
-  } catch {
-    // DB 미연결 환경 (CI, 정적 빌드) — 사업자정보 없이 렌더
-  }
+  // getPublishedCompanyInfo 는 내부적으로 DB 오류 시 null 을 반환한다 (graceful fallback).
+  const companyInfo = await getPublishedCompanyInfo()
 
   return (
     <footer
