@@ -258,6 +258,10 @@
   - `window.addEventListener('unhandledrejection')` 글로벌 핸들러 (BUG-015 React freeze 방지)
 - [x] [FOLLOWUP-17] ResizeObserver 3중 가드 + getEventPoint + ControlBar fixed (BUG-013/014/SELECT-1) ✅ 2026-05-05 (M1-07 에 통합 — 커밋 615b695, df9f164, 0a3f47e)
 - [ ] [FOLLOWUP-18] extendFabricOption 화이트리스트 정의 — Schema v1 의 fabric 내부 커스텀 속성(styles/charSpacing/cmykFill 등) 보존 강제 — @editor-engineer (M5 텍스트 작업 직전)
+- [ ] [FOLLOWUP-60] `eslint-plugin-react-hooks` 추가 — React hooks deps (useEffect/useMemo/useCallback) 누락 자동 감지 룰 미설치. `react-hooks/exhaustive-deps: warn` 추가 후 기존 위반 점진 수정 — @architect
+- [ ] [FOLLOWUP-61] `ai-script/src/` 빌드 산출물 재발 방지 — `.gitignore` 에 `packages/ai-script/src/**/*.js` 추가 또는 tsconfig.json `noEmit: true` 강제(현재 base에만 있음). CI lint step 에서 `src/**/*.js` 존재 체크 — @architect
+- [ ] [FOLLOWUP-62] async RSC + jsdom 테스트 패턴 가이드라인 — `Footer`처럼 `async Server Component` 가 `vi.mock` 없이 jsdom 에서 쓰이면 Suspense 블록으로 빈 DOM 반환. 신규 async RSC 를 import 하는 테스트는 반드시 컴포넌트 레벨 mock 필수. `docs/process/testing-async-rsc.md` 작성 권고 — @architect
+- [ ] [FOLLOWUP-63] prisma format cosmetic drift — `pnpm prisma format` 이 현재 schema 의 컬럼 정렬을 변경하지만 의미 차이 없음. CI 에 `prisma format --check` 추가 여부 결정 필요 (현재 미추가) — @architect
 
 ## ☁️ Vercel 배포 상태 (M0 종료 시점)
 - **admin**: https://storywork-editor-admin.vercel.app ✅ 200 — env 16, root `apps/admin`, vercel.json (turbo build)
