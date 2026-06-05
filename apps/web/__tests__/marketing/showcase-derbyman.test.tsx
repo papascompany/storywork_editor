@@ -42,6 +42,17 @@ vi.mock('@storywork/ui', () => ({
   SheetClose: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
 }))
 
+// Footer 는 async RSC — jsdom 환경에서 async Server Component 는 Suspense 를 유발한다.
+// React 18 jsdom 에서 async RSC 를 동기 render 로 실행하면 빈 트리를 반환하므로
+// Footer 를 동기 stub 으로 교체해 렌더 블로킹을 방지한다.
+vi.mock('../../components/marketing/Footer', () => ({
+  Footer: () => (
+    <footer data-testid="footer-stub">
+      <span>All rights reserved</span>
+    </footer>
+  ),
+}))
+
 import DerbymanPage from '../../app/showcase/derbyman/page'
 
 describe('더미맨 사례 페이지 (/showcase/derbyman)', () => {
