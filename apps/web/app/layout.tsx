@@ -1,4 +1,5 @@
 import { ThemeProvider, ToastProvider } from '@storywork/ui'
+import { SpeedInsights } from '@vercel/speed-insights/next'
 import type { Metadata, Viewport } from 'next'
 
 import './globals.css'
@@ -69,6 +70,7 @@ export default function RootLayout({
         <ThemeProvider defaultTheme="system" storageKey="sw-ui-theme">
           <ToastProvider>{children}</ToastProvider>
         </ThemeProvider>
+        <SpeedInsights />
       </body>
     </html>
   )
