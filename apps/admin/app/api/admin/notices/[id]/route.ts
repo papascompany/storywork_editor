@@ -2,6 +2,7 @@
  * PATCH /api/admin/notices/[id] — 공지사항 수정
  * DELETE /api/admin/notices/[id] — 공지사항 삭제
  */
+import { revalidateTag } from 'next/cache'
 import { NextResponse } from 'next/server'
 import { z } from 'zod'
 
@@ -70,6 +71,9 @@ export async function PATCH(request: Request, { params }: RouteContext): Promise
       diff: { title: { before: existing.title, after: updated.title } },
     })
 
+    // /notices 캐시 즉시 무효화
+    revalidateTag('notices')
+
     return NextResponse.json({ id: updated.id })
   } catch (err) {
     console.error('[api/admin/notices/[id]] update failed:', err)
@@ -101,6 +105,9 @@ export async function DELETE(_request: Request, { params }: RouteContext): Promi
       entityId: id,
       meta: { title: existing.title },
     })
+
+    // /notices 캐시 즉시 무효화
+    revalidateTag('notices')
 
     return NextResponse.json({ ok: true })
   } catch (err) {

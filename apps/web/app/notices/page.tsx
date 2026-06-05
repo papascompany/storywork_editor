@@ -10,9 +10,7 @@ import * as React from 'react'
 
 import { Footer } from '@/components/marketing/Footer'
 import { Header } from '@/components/marketing/Header'
-import { prisma } from '@/lib/prisma'
-
-export const dynamic = 'force-dynamic'
+import { getPublishedNotices } from '@/lib/notices'
 
 export const metadata: Metadata = {
   title: '공지사항',
@@ -37,16 +35,9 @@ export default async function NoticesPage({ searchParams }: NoticesPageProps) {
   const params = await searchParams
   const page = Math.max(1, parseInt(params.page ?? '1', 10))
 
-  const now = new Date()
-
-  // 단일 쿼리로 모든 published notice 를 가져온 뒤 JS 에서 split/paginate.
-  // 진단 보고서 #2: 3 라운드트립 → 1 라운드트립. notices 는 일반적으로 적은 양.
-  // 향후 N>500 이상으로 늘면 $transaction 으로 pinned/regular 를 분리 페이지네이션 검토.
-  const allNotices = await prisma.notice.findMany({
-    where: { publishedAt: { lte: now, not: null } },
-    orderBy: [{ isPinned: 'desc' }, { publishedAt: 'desc' }],
-    select: { id: true, title: true, publishedAt: true, isPinned: true },
-  })
+  // 진단 보고서 #3: unstable_cache + 'notices' 태그 (1h TTL).
+  // admin POST/PATCH/DELETE 시 revalidateTag('notices') 로 즉시 무효화.
+  const allNotices = await getPublishedNotices()
 
   const pinnedNotices = allNotices.filter((n) => n.isPinned)
   const regularNotices = allNotices.filter((n) => !n.isPinned)

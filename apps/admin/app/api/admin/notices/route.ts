@@ -1,6 +1,7 @@
 /**
  * POST /api/admin/notices — 공지사항 생성
  */
+import { revalidateTag } from 'next/cache'
 import { NextResponse } from 'next/server'
 import { z } from 'zod'
 
@@ -56,6 +57,9 @@ export async function POST(request: Request): Promise<NextResponse> {
       entityId: notice.id,
       meta: { title, isPinned, publish },
     })
+
+    // /notices 캐시 즉시 무효화 (apps/web/lib/notices.ts 의 'notices' 태그)
+    revalidateTag('notices')
 
     return NextResponse.json({ id: notice.id }, { status: 201 })
   } catch (err) {
