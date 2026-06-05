@@ -36,30 +36,24 @@ interface NoticesPageProps {
 export default async function NoticesPage({ searchParams }: NoticesPageProps) {
   const params = await searchParams
   const page = Math.max(1, parseInt(params.page ?? '1', 10))
-  const skip = (page - 1) * PAGE_SIZE
 
   const now = new Date()
 
-  const [pinnedNotices, totalCount, pagedNotices] = await Promise.all([
-    // 핀 고정 항목 (게시 중인 것만)
-    prisma.notice.findMany({
-      where: { isPinned: true, publishedAt: { lte: now, not: null } },
-      orderBy: { publishedAt: 'desc' },
-      select: { id: true, title: true, publishedAt: true, isPinned: true },
-    }),
-    // 비핀 항목 총 개수
-    prisma.notice.count({
-      where: { isPinned: false, publishedAt: { lte: now, not: null } },
-    }),
-    // 비핀 항목 페이지
-    prisma.notice.findMany({
-      where: { isPinned: false, publishedAt: { lte: now, not: null } },
-      orderBy: { publishedAt: 'desc' },
-      skip,
-      take: PAGE_SIZE,
-      select: { id: true, title: true, publishedAt: true, isPinned: true },
-    }),
-  ])
+  // 단일 쿼리로 모든 published notice 를 가져온 뒤 JS 에서 split/paginate.
+  // 진단 보고서 #2: 3 라운드트립 → 1 라운드트립. notices 는 일반적으로 적은 양.
+  // 향후 N>500 이상으로 늘면 $transaction 으로 pinned/regular 를 분리 페이지네이션 검토.
+  const allNotices = await prisma.notice.findMany({
+    where: { publishedAt: { lte: now, not: null } },
+    orderBy: [{ isPinned: 'desc' }, { publishedAt: 'desc' }],
+    select: { id: true, title: true, publishedAt: true, isPinned: true },
+  })
+
+  const pinnedNotices = allNotices.filter((n) => n.isPinned)
+  const regularNotices = allNotices.filter((n) => !n.isPinned)
+  const totalCount = regularNotices.length
+
+  const skip = (page - 1) * PAGE_SIZE
+  const pagedNotices = regularNotices.slice(skip, skip + PAGE_SIZE)
 
   const totalPages = Math.max(1, Math.ceil(totalCount / PAGE_SIZE))
 
