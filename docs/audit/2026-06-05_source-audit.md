@@ -132,6 +132,19 @@
 
 ---
 
+---
+
+## CI gate 추가 fix (Step 6 이후)
+
+**빌드 실패 추가 발견 (CI에서만 재현):**
+- CI 빌드에서 `/legal/privacy`, `/legal/terms`, `/contact` prerender 중 `PrismaClientInitializationError` 발생
+- 원인: `getPublishedCompanyInfo`의 `unstable_cache` 콜백 내부에서 DATABASE_URL 없이 Prisma 호출
+- Footer의 외부 try/catch로는 `unstable_cache` 내부 오류를 잡지 못함
+- 수정: `lib/company-info.ts` `unstable_cache` 콜백 내부를 try/catch로 감쌈 → null 반환
+- CI 결과: `26992840078` SUCCESS
+
+---
+
 ## 커밋 목록
 
 | SHA | 내용 |
@@ -139,3 +152,6 @@
 | `86fbf21` | docs(audit): 전체 소스 오류 진단 보고서 (Step 1) |
 | `ef97a11` | fix(audit): high severity 항목 수정 (Step 2) |
 | `c07e958` | chore(audit): medium/low 부채 FOLLOWUP 등재 (Step 3-4) |
+| `a09f427` | docs(audit): 종합 결과 + roadmap 갱신 (Step 6) |
+| `f7a17a1` | fix(web): footer Prisma 초기화 오류 graceful fallback (1차) |
+| `65ab299` | fix(web): company-info Prisma 오류 graceful fallback (CI SUCCESS) |
