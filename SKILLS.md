@@ -200,4 +200,4 @@
 
 ---
 
-_Last updated: 2026-05-17_
+_Last updated: 2026-06-05 · M4 AI Pipeline + M6 POD PDF 완료 후_
