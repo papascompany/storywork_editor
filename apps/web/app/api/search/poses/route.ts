@@ -1,20 +1,24 @@
 /**
  * POST /api/search/poses — 포즈 시맨틱 + 필터 검색 API (M2-04)
  *
- * - service_role 전용 (RLS 우회). 사용자별 quota 는 M7에서.
+ * - 인증 필수: Supabase 세션 확인 → 미인증 401.
+ *   (편집기 pose 패널 전용 호출. 유료 임베딩 API + raw SQL 스캔을 익명 호출자가
+ *    무제한 트리거하는 비용 남용/DoS 를 차단한다.)
  * - query 있으면 embeddingText cosine 유사도 검색
  * - filters 있으면 WHERE 절 추가 (복합 가능)
  * - 둘 다 없으면 최신순
  * - ADR-0011a: lowDpi filter 지원
  */
 
+/* eslint-disable import/order */
 import { type NextRequest, NextResponse } from 'next/server'
 import { z } from 'zod'
-
+import { createWebServerClient } from '@/lib/supabase/server'
 import { embedSearchQuery } from '../../_lib/embed-server'
 import { getPrismaClient } from '../../_lib/prisma'
 import { buildSearchQuery } from '../../_lib/search-query'
 import type { ResourceSummary, SearchPosesResponse } from '../../_lib/search-types'
+/* eslint-enable import/order */
 
 // re-export for consumer convenience
 export type { ResourceSummary, SearchPosesResponse }
@@ -47,6 +51,16 @@ export type SearchPosesBody = z.infer<typeof SearchBodySchema>
 
 export async function POST(req: NextRequest): Promise<NextResponse> {
   const startMs = Date.now()
+
+  // 0. 인증 확인 — 미인증 호출자의 유료 임베딩/DB 스캔 남용 차단
+  const supabase = await createWebServerClient()
+  const {
+    data: { user: authUser },
+    error: authError,
+  } = await supabase.auth.getUser()
+  if (authError || !authUser) {
+    return NextResponse.json({ error: '로그인이 필요합니다.' }, { status: 401 })
+  }
 
   // 1. 요청 파싱
   let body: SearchPosesBody

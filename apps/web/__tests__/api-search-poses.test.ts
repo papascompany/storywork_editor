@@ -23,6 +23,14 @@ vi.mock('../app/api/_lib/search-query', () => ({
   buildSearchQuery: vi.fn(),
 }))
 
+// 인증 mock — createWebServerClient().auth.getUser()
+const { mockGetUser } = vi.hoisted(() => ({ mockGetUser: vi.fn() }))
+vi.mock('@/lib/supabase/server', () => ({
+  createWebServerClient: vi.fn().mockResolvedValue({
+    auth: { getUser: mockGetUser },
+  }),
+}))
+
 // ─────────────────────────────────────────────
 // 타입 + import (mock 이후)
 // ─────────────────────────────────────────────
@@ -79,6 +87,8 @@ async function callRoute(body: unknown): Promise<{ status: number; data: unknown
 describe('POST /api/search/poses', () => {
   beforeEach(() => {
     vi.clearAllMocks()
+    // 기본: 인증된 사용자
+    mockGetUser.mockResolvedValue({ data: { user: { id: 'u1' } }, error: null })
     mockBuildSearchQuery.mockResolvedValue({
       results: [sampleResource],
       total: 1,
@@ -87,6 +97,24 @@ describe('POST /api/search/poses', () => {
 
   afterEach(() => {
     vi.resetModules()
+  })
+
+  // ── 0. 인증 ──────────────────────────────
+  it('미인증(user=null) → 401, 임베딩/검색 호출 안 함', async () => {
+    mockGetUser.mockResolvedValueOnce({ data: { user: null }, error: null })
+    const { status } = await callRoute({ query: '서있는 여자' })
+    expect(status).toBe(401)
+    expect(mockEmbedSearchQuery).not.toHaveBeenCalled()
+    expect(mockBuildSearchQuery).not.toHaveBeenCalled()
+  })
+
+  it('auth 에러 → 401', async () => {
+    mockGetUser.mockResolvedValueOnce({
+      data: { user: null },
+      error: { message: 'invalid token' },
+    })
+    const { status } = await callRoute({ query: '서있는' })
+    expect(status).toBe(401)
   })
 
   // ── 1. 기본 query 검색 ────────────────────
@@ -233,6 +261,7 @@ describe('POST /api/search/poses', () => {
 describe('lowDpi 필터 통합 (buildSearchQuery mock)', () => {
   beforeEach(() => {
     vi.clearAllMocks()
+    mockGetUser.mockResolvedValue({ data: { user: { id: 'u1' } }, error: null })
     mockBuildSearchQuery.mockResolvedValue({ results: [], total: 0 })
   })
 

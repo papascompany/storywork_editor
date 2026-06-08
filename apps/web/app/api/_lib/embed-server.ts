@@ -81,14 +81,23 @@ function httpPost(
         },
       },
       (res) => {
+        const status = res.statusCode ?? 0
         const chunks: Buffer[] = []
         res.on('data', (c: Buffer) => chunks.push(c))
         res.on('end', () => {
           const text = Buffer.concat(chunks).toString('utf8')
+          // HTTP 에러(4xx/5xx)를 명확히 구분 — 키 만료/rate limit/업스트림 장애가
+          // "빈 응답"으로 둔갑해 불투명한 500 이 되는 것을 방지한다.
+          if (status >= 400) {
+            reject(new Error(`임베딩 제공자(${hostname}) ${status} 응답: ${text.slice(0, 200)}`))
+            return
+          }
           try {
             resolve(JSON.parse(text))
           } catch {
-            reject(new Error(`JSON 파싱 실패: ${text.slice(0, 200)}`))
+            reject(
+              new Error(`임베딩 응답 JSON 파싱 실패(${hostname} ${status}): ${text.slice(0, 200)}`),
+            )
           }
         })
       },
