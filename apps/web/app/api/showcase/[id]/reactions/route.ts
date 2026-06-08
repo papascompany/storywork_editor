@@ -50,14 +50,14 @@ export async function POST(request: Request, { params }: RouteContext): Promise<
 
   try {
     await prisma.$transaction(async (tx) => {
-      // upsert
-      await tx.reaction.upsert({
-        where: { showcaseId_userId_kind: { showcaseId, userId: dbUser.id, kind } },
-        create: { showcaseId, userId: dbUser.id, kind },
-        update: {},
+      // createMany + skipDuplicates → ON CONFLICT DO NOTHING (race-safe).
+      // 신규 생성된 경우(count>0)에만 likes 증가 → 중복 POST 시 카운터 inflation 방지.
+      // (DELETE 의 deleted.count>0 가드와 대칭)
+      const created = await tx.reaction.createMany({
+        data: { showcaseId, userId: dbUser.id, kind },
+        skipDuplicates: true,
       })
-      // likes 카운트 업데이트 (like 반응만)
-      if (kind === 'like') {
+      if (kind === 'like' && created.count > 0) {
         await tx.showcase.update({
           where: { id: showcaseId },
           data: { likes: { increment: 1 } },
