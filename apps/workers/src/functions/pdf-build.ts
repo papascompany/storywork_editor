@@ -55,6 +55,13 @@ function getPrisma() {
 function getSupabaseAdmin() {
   const url = process.env['NEXT_PUBLIC_SUPABASE_URL'] ?? process.env['SUPABASE_URL'] ?? ''
   const key = process.env['SUPABASE_SERVICE_ROLE_KEY'] ?? ''
+  // 자격증명 누락 시 createClient('','') 로 진행하면 업로드/Realtime 단계에서
+  // 불명확한 에러가 3회 재시도되므로, 진입점에서 명확히 실패시킨다.
+  if (!url || !key) {
+    throw new Error(
+      '[pdf-build] Supabase 자격증명 누락: NEXT_PUBLIC_SUPABASE_URL(또는 SUPABASE_URL) + SUPABASE_SERVICE_ROLE_KEY 환경변수가 필요합니다.',
+    )
+  }
   return createClient(url, key, {
     auth: { persistSession: false, autoRefreshToken: false },
   })
