@@ -394,6 +394,48 @@ describe('PATCH /api/template-sets/[id]', () => {
     expect(res.status).toBe(200)
   })
 
+  it('표지 오버라이드(coverEnabled/coverWidthMm/isActive)가 prisma.update 로 전달된다', async () => {
+    mockSession = { user: { id: 'u1' } }
+    mockAdminUser = {
+      id: 'u1',
+      email: 'a@b.com',
+      role: 'curator',
+      totpVerified: true,
+      totpSetup: true,
+    }
+    const { PATCH } = await import('../../app/api/template-sets/[id]/route')
+    const { req, params } = makeRequestWithId('PATCH', 'set-1', {
+      coverEnabled: false, // 미사용 오버라이드
+      coverWidthMm: 408,
+      coverHeightMm: '', // 빈 값 → null(상속)
+      isActive: false,
+    })
+    const res = await PATCH(req, { params })
+    expect(res.status).toBe(200)
+    const arg = mockTemplateSetUpdate.mock.calls[0]?.[0] as { data: Record<string, unknown> }
+    expect(arg.data.coverEnabled).toBe(false)
+    expect(arg.data.coverWidthMm).toBe(408)
+    expect(arg.data.coverHeightMm).toBeNull()
+    expect(arg.data.isActive).toBe(false)
+  })
+
+  it('coverEnabled=null(상속) 오버라이드도 update 로 전달된다', async () => {
+    mockSession = { user: { id: 'u1' } }
+    mockAdminUser = {
+      id: 'u1',
+      email: 'a@b.com',
+      role: 'curator',
+      totpVerified: true,
+      totpSetup: true,
+    }
+    const { PATCH } = await import('../../app/api/template-sets/[id]/route')
+    const { req, params } = makeRequestWithId('PATCH', 'set-1', { coverEnabled: null })
+    const res = await PATCH(req, { params })
+    expect(res.status).toBe(200)
+    const arg = mockTemplateSetUpdate.mock.calls[0]?.[0] as { data: Record<string, unknown> }
+    expect(arg.data.coverEnabled).toBeNull()
+  })
+
   it('존재하지 않는 ID → 404', async () => {
     mockSession = { user: { id: 'u1' } }
     mockAdminUser = {

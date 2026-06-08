@@ -52,6 +52,34 @@ describe('NewFormatPage (프리셋 + 폼)', () => {
     expect(screen.getByLabelText(/판형 이름/)).toBeDefined()
   })
 
+  it('표지 설정 필드(표지 사용/표지 폭/표지 높이/판형 활성화)가 렌더된다', () => {
+    render(<NewFormatPage />)
+    // 표지 사용 + 판형 활성화 — role="switch"
+    expect(screen.getByRole('switch', { name: '표지 사용' })).toBeDefined()
+    expect(screen.getByRole('switch', { name: '판형 활성화' })).toBeDefined()
+    // 표지 폭/높이 — number 입력
+    expect(screen.getByLabelText(/표지 폭/)).toBeDefined()
+    expect(screen.getByLabelText(/표지 높이/)).toBeDefined()
+  })
+
+  it('판형 활성화 스위치 기본값은 켜짐(true), 표지 사용은 꺼짐(false)', () => {
+    render(<NewFormatPage />)
+    expect(screen.getByRole('switch', { name: '판형 활성화' }).getAttribute('aria-checked')).toBe(
+      'true',
+    )
+    expect(screen.getByRole('switch', { name: '표지 사용' }).getAttribute('aria-checked')).toBe(
+      'false',
+    )
+  })
+
+  it('표지 사용 스위치 토글이 동작한다', () => {
+    render(<NewFormatPage />)
+    const sw = screen.getByRole('switch', { name: '표지 사용' })
+    expect(sw.getAttribute('aria-checked')).toBe('false')
+    fireEvent.click(sw)
+    expect(sw.getAttribute('aria-checked')).toBe('true')
+  })
+
   it('프리셋 카드 클릭 후 폼 필드가 채워진다', async () => {
     render(<NewFormatPage />)
     const b5Card = screen.getByRole('button', { name: /B5 \(단행본\)/ })

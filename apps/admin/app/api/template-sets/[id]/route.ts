@@ -131,12 +131,21 @@ export async function PATCH(req: NextRequest, { params }: RouteContext) {
   type UpdateData = {
     name?: string
     coverIdx?: number
+    coverEnabled?: boolean | null
+    coverWidthMm?: number | null
+    coverHeightMm?: number | null
+    isActive?: boolean
     templates?: { set: { id: string }[] }
   }
 
   const updateData: UpdateData = {}
   if (parsed.data.name !== undefined) updateData.name = parsed.data.name
   if (parsed.data.coverIdx !== undefined) updateData.coverIdx = parsed.data.coverIdx
+  // 표지 오버라이드 — null 도 유효(상속으로 명시 리셋)이므로 undefined 만 skip
+  if (parsed.data.coverEnabled !== undefined) updateData.coverEnabled = parsed.data.coverEnabled
+  if (parsed.data.coverWidthMm !== undefined) updateData.coverWidthMm = parsed.data.coverWidthMm
+  if (parsed.data.coverHeightMm !== undefined) updateData.coverHeightMm = parsed.data.coverHeightMm
+  if (parsed.data.isActive !== undefined) updateData.isActive = parsed.data.isActive
   if (templateIds !== undefined) {
     updateData.templates = { set: templateIds.map((tid) => ({ id: tid })) }
   }

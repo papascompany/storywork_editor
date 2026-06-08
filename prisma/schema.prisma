@@ -151,6 +151,15 @@ model Format {
   bleedMm   Float      @default(3)
   safeMm    Float      @default(5)
   gridDef   Json?
+  /// 표지(Cover) 설정 — admin 기본 정책. 편집기 실제 소비는 phase 2(FOLLOWUP-COVER-01)
+  /// 표지 사용 유무 (이 판형의 기본값)
+  coverEnabled  Boolean @default(false)
+  /// 표지 독립 폭(mm) — null 이면 widthMm 사용
+  coverWidthMm  Float?
+  /// 표지 독립 높이(mm) — null 이면 heightMm 사용
+  coverHeightMm Float?
+  /// 판형 활성화/비활성화 — false 면 편집기 판형 선택에서 숨김(phase 2 소비)
+  isActive  Boolean    @default(true)
   createdAt DateTime   @default(now())
   updatedAt DateTime   @updatedAt
   templates Template[]
@@ -180,6 +189,16 @@ model TemplateSet {
   id        String     @id @default(cuid())
   name      String
   coverIdx  Int        @default(0)
+  /// 표지(Cover) 오버라이드 — null 이면 Format 기본값 상속.
+  /// effective = set.coverEnabled ?? format.coverEnabled (size 동일 규칙)
+  /// null=상속, true=사용, false=미사용
+  coverEnabled  Boolean?
+  /// 표지 독립 폭(mm) 오버라이드 — null 이면 Format 값 상속
+  coverWidthMm  Float?
+  /// 표지 독립 높이(mm) 오버라이드 — null 이면 Format 값 상속
+  coverHeightMm Float?
+  /// 세트 활성화/비활성화
+  isActive  Boolean    @default(true)
   createdAt DateTime   @default(now())
   updatedAt DateTime   @updatedAt
   templates Template[]

@@ -82,10 +82,25 @@ export type TemplatePatch = z.infer<typeof templatePatchSchema>
 
 // ─── TemplateSet 스키마 ───────────────────────────────────────────────────────
 
+/** 표지 독립 치수(mm) 오버라이드 — 비우면 Format 값 상속. '' → null 정규화 */
+const coverDimensionOverrideMm = z.preprocess(
+  (v) => (v === '' || v === undefined ? null : v),
+  z.number().min(10).max(1500).nullable(),
+)
+
 export const templateSetUpsertSchema = z.object({
   name: z.string().min(2).max(50),
   templateIds: z.array(z.string()).min(1).max(50),
   coverIdx: z.number().int().min(0).default(0),
+  // ── 표지(Cover) 오버라이드 — null/미지정 = Format 기본값 상속 ──
+  /** null=상속, true=사용, false=미사용 */
+  coverEnabled: z.boolean().nullable().optional(),
+  /** 표지 독립 폭(mm) 오버라이드 — null/비우면 Format 값 상속 */
+  coverWidthMm: coverDimensionOverrideMm.optional(),
+  /** 표지 독립 높이(mm) 오버라이드 — null/비우면 Format 값 상속 */
+  coverHeightMm: coverDimensionOverrideMm.optional(),
+  /** 세트 활성화/비활성화 */
+  isActive: z.boolean().default(true),
 })
 
 export type TemplateSetUpsert = z.infer<typeof templateSetUpsertSchema>

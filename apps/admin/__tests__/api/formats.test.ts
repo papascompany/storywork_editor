@@ -229,6 +229,33 @@ describe('POST /api/formats', () => {
     const res = await POST(makeRequest('POST', VALID_BODY))
     expect(res.status).toBe(409)
   })
+
+  it('표지 설정(coverEnabled/coverWidthMm/isActive)이 prisma.create 로 전달된다', async () => {
+    mockSession = { user: { id: 'u1' } }
+    mockAdminUser = {
+      id: 'u1',
+      email: 'a@b.com',
+      role: 'curator',
+      totpVerified: true,
+      totpSetup: true,
+    }
+    const { POST } = await import('../../app/api/formats/route')
+    await POST(
+      makeRequest('POST', {
+        ...VALID_BODY,
+        coverEnabled: true,
+        coverWidthMm: 420,
+        coverHeightMm: '', // 빈 값 → null
+        isActive: false,
+      }),
+    )
+    expect(mockFormatCreate).toHaveBeenCalledTimes(1)
+    const arg = mockFormatCreate.mock.calls[0]?.[0] as { data: Record<string, unknown> }
+    expect(arg.data.coverEnabled).toBe(true)
+    expect(arg.data.coverWidthMm).toBe(420)
+    expect(arg.data.coverHeightMm).toBeNull()
+    expect(arg.data.isActive).toBe(false)
+  })
 })
 
 // ─── GET /api/formats/[id] ────────────────────────────────────────────────────

@@ -39,6 +39,10 @@ export default async function FormatEditPage({ params }: PageProps) {
         bleedMm: format.bleedMm,
         safeMm: format.safeMm,
         gridDef: (format.gridDef as Record<string, unknown>) ?? {},
+        coverEnabled: format.coverEnabled,
+        coverWidthMm: format.coverWidthMm,
+        coverHeightMm: format.coverHeightMm,
+        isActive: format.isActive,
         templateCount: format._count.templates,
         projectCount: format._count.projects,
       }}

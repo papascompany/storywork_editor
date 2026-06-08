@@ -266,6 +266,8 @@
 - [ ] [FOLLOWUP-61] `ai-script/src/` 빌드 산출물 재발 방지 — `.gitignore` 에 `packages/ai-script/src/**/*.js` 추가 또는 tsconfig.json `noEmit: true` 강제(현재 base에만 있음). CI lint step 에서 `src/**/*.js` 존재 체크 — @architect
 - [ ] [FOLLOWUP-62] async RSC + jsdom 테스트 패턴 가이드라인 — `Footer`처럼 `async Server Component` 가 `vi.mock` 없이 jsdom 에서 쓰이면 Suspense 블록으로 빈 DOM 반환. 신규 async RSC 를 import 하는 테스트는 반드시 컴포넌트 레벨 mock 필수. `docs/process/testing-async-rsc.md` 작성 권고 — @architect
 - [ ] [FOLLOWUP-63] prisma format cosmetic drift — `pnpm prisma format` 이 현재 schema 의 컬럼 정렬을 변경하지만 의미 차이 없음. CI 에 `prisma format --check` 추가 여부 결정 필요 (현재 미추가) — @architect
+- [x] [COVER-ADMIN-01] 표지(Cover) 설정 admin 1차 — @admin-builder ✅ 2026-06-08 — Format 기본값(`coverEnabled`/`coverWidthMm`/`coverHeightMm`/`isActive`) + TemplateSet 오버라이드(상속=null tri-state) 스키마/마이그레이션(`20260608000000_format_templateset_cover_settings`, prod 적용·8컬럼 검증)·admin 폼(Format Edit/New, TemplateSet Edit)·API(POST/PATCH)·테스트(365 green, 신규 cover 검증 19). Storige 편집기 학습(`docs/reference/STORIGE_EDITOR_STUDY.md`) 반영.
+- [ ] [FOLLOWUP-COVER-02] (P1) 표지 설정 **편집기 소비** (phase 2) — admin 에 저장된 `Format.coverEnabled`/`coverWidthMm/HeightMm`/`isActive` + `TemplateSet` 오버라이드를 사용자 편집기가 실제 사용: ① `FormatPicker` 가 `isActive=false` 판형 숨김, ② 표지 사용 시 표지 페이지 자동 생성(독립 치수 적용), ③ 해석 규칙 `set.override ?? format.default ?? 판형치수`. 회귀 위험(편집기) → 별도 PR + visual-regression 필수 — @editor-engineer + @layout-composer
 
 ## ☁️ Vercel 배포 상태 (M0 종료 시점)
 - **admin**: https://storywork-editor-admin.vercel.app ✅ 200 — env 16, root `apps/admin`, vercel.json (turbo build)

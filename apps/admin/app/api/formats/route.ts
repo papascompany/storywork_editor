@@ -81,7 +81,19 @@ export async function POST(req: NextRequest) {
     return apiError('VALIDATION_ERROR', 'Zod 검증 실패', 400, parsed.error.flatten())
   }
 
-  const { name, widthMm, heightMm, dpi, bleedMm, safeMm, gridDef } = parsed.data
+  const {
+    name,
+    widthMm,
+    heightMm,
+    dpi,
+    bleedMm,
+    safeMm,
+    gridDef,
+    coverEnabled,
+    coverWidthMm,
+    coverHeightMm,
+    isActive,
+  } = parsed.data
 
   // 중복 이름 확인
   const existing = await prisma.format.findUnique({ where: { name } })
@@ -90,7 +102,19 @@ export async function POST(req: NextRequest) {
   }
 
   const format = await prisma.format.create({
-    data: { name, widthMm, heightMm, dpi, bleedMm, safeMm, gridDef: gridDef ?? {} },
+    data: {
+      name,
+      widthMm,
+      heightMm,
+      dpi,
+      bleedMm,
+      safeMm,
+      gridDef: gridDef ?? {},
+      coverEnabled,
+      coverWidthMm: coverWidthMm ?? null,
+      coverHeightMm: coverHeightMm ?? null,
+      isActive,
+    },
   })
 
   await recordAudit({

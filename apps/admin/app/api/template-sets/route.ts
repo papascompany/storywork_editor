@@ -80,7 +80,8 @@ export async function POST(req: NextRequest) {
     return apiError('VALIDATION_ERROR', 'Zod 검증 실패', 400, parsed.error.flatten())
   }
 
-  const { name, templateIds, coverIdx } = parsed.data
+  const { name, templateIds, coverIdx, coverEnabled, coverWidthMm, coverHeightMm, isActive } =
+    parsed.data
 
   // coverIdx 범위 검증
   if (coverIdx >= templateIds.length) {
@@ -111,6 +112,10 @@ export async function POST(req: NextRequest) {
     data: {
       name,
       coverIdx,
+      coverEnabled: coverEnabled ?? null,
+      coverWidthMm: coverWidthMm ?? null,
+      coverHeightMm: coverHeightMm ?? null,
+      isActive: isActive ?? true,
       templates: {
         connect: templateIds.map((id) => ({ id })),
       },

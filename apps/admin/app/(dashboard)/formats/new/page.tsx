@@ -36,6 +36,27 @@ const FIELD_META: Record<string, FieldMeta> = {
   },
   bleedMm: { label: '재단 여백 (Bleed, mm)', helpText: '인쇄소 권장 3mm' },
   safeMm: { label: '안전 영역 (Safe, mm)', helpText: '내용 잘림 방지 5mm' },
+  // ── 표지(Cover) 설정 ──
+  coverEnabled: {
+    label: '표지 사용',
+    widget: 'switch',
+    helpText: '이 판형에서 표지 페이지를 사용합니다 (편집기 반영은 추후)',
+  },
+  coverWidthMm: {
+    label: '표지 폭 (mm)',
+    widget: 'number',
+    helpText: '비우면 판형 가로(widthMm) 사용 · 10~1500',
+  },
+  coverHeightMm: {
+    label: '표지 높이 (mm)',
+    widget: 'number',
+    helpText: '비우면 판형 세로(heightMm) 사용 · 10~1500',
+  },
+  isActive: {
+    label: '판형 활성화',
+    widget: 'switch',
+    helpText: '끄면 편집기 판형 선택에서 숨깁니다 (편집기 반영은 추후)',
+  },
 }
 
 // ─── 프리셋 카드 ──────────────────────────────────────────────────────────────
@@ -115,6 +136,10 @@ export default function NewFormatPage() {
     bleedMm: 3,
     safeMm: 5,
     gridDef: {},
+    coverEnabled: false,
+    coverWidthMm: null,
+    coverHeightMm: null,
+    isActive: true,
   })
   const [serverErrors, setServerErrors] = React.useState<Record<string, string>>({})
   const [formKey, setFormKey] = React.useState(0)

@@ -41,6 +41,10 @@ export default async function TemplateSetEditPage({ params }: PageProps) {
     id: set.id,
     name: set.name,
     coverIdx: set.coverIdx,
+    coverEnabled: set.coverEnabled,
+    coverWidthMm: set.coverWidthMm,
+    coverHeightMm: set.coverHeightMm,
+    isActive: set.isActive,
     templates: set.templates.map((t) => ({
       id: t.id,
       name: t.name,

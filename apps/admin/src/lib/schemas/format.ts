@@ -7,6 +7,17 @@
  */
 import { z } from 'zod'
 
+/**
+ * 표지 독립 치수(mm) — 비우면 판형 치수 상속.
+ * number 위젯이 빈 입력 시 '' 를 보내므로 preprocess 로 '' → null 정규화.
+ */
+const coverDimensionMm = z
+  .preprocess(
+    (v) => (v === '' || v === undefined ? null : v),
+    z.number().min(10).max(1500).nullable(),
+  )
+  .optional()
+
 export const formatInputSchema = z.object({
   name: z.string().min(2).max(50),
   widthMm: z.number().int().min(50).max(500),
@@ -22,6 +33,15 @@ export const formatInputSchema = z.object({
       gutterMm: z.number().min(0).max(20).optional(),
     })
     .default({}),
+  // ── 표지(Cover) 설정 — 기본 정책 + 활성화 (편집기 소비는 phase 2) ──
+  /** 표지 사용 유무(기본값) */
+  coverEnabled: z.boolean().default(false),
+  /** 표지 독립 폭(mm) — null/비우면 widthMm 사용 */
+  coverWidthMm: coverDimensionMm,
+  /** 표지 독립 높이(mm) — null/비우면 heightMm 사용 */
+  coverHeightMm: coverDimensionMm,
+  /** 판형 활성화/비활성화 — false 면 편집기 판형 선택에서 숨김(phase 2) */
+  isActive: z.boolean().default(true),
 })
 
 export type FormatInput = z.input<typeof formatInputSchema>
@@ -53,6 +73,8 @@ export const FORMAT_PRESETS: FormatPreset[] = [
       bleedMm: 3,
       safeMm: 5,
       gridDef: {},
+      coverEnabled: false,
+      isActive: true,
     },
   },
   {
@@ -67,6 +89,8 @@ export const FORMAT_PRESETS: FormatPreset[] = [
       bleedMm: 3,
       safeMm: 5,
       gridDef: {},
+      coverEnabled: false,
+      isActive: true,
     },
   },
   {
@@ -81,6 +105,8 @@ export const FORMAT_PRESETS: FormatPreset[] = [
       bleedMm: 3,
       safeMm: 5,
       gridDef: {},
+      coverEnabled: false,
+      isActive: true,
     },
   },
   {
@@ -95,6 +121,8 @@ export const FORMAT_PRESETS: FormatPreset[] = [
       bleedMm: 3,
       safeMm: 5,
       gridDef: {},
+      coverEnabled: false,
+      isActive: true,
     },
   },
 ]

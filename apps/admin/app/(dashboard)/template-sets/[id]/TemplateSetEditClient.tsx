@@ -39,6 +39,11 @@ export interface TemplateSetData {
   id: string
   name: string
   coverIdx: number
+  /** 표지 오버라이드 — null = Format 기본값 상속 */
+  coverEnabled: boolean | null
+  coverWidthMm: number | null
+  coverHeightMm: number | null
+  isActive: boolean
   templates: TemplateSummary[]
 }
 
@@ -54,6 +59,17 @@ export function TemplateSetEditClient({ set, userRole }: TemplateSetEditClientPr
   const [name, setName] = React.useState(set.name)
   const [templates, setTemplates] = React.useState<TemplateSummary[]>(set.templates)
   const [coverIdx, setCoverIdx] = React.useState(set.coverIdx)
+  // 표지 오버라이드 — coverEnabled: 'inherit' | 'on' | 'off' (UI 3-state)
+  const [coverEnabledMode, setCoverEnabledMode] = React.useState<'inherit' | 'on' | 'off'>(
+    set.coverEnabled === null ? 'inherit' : set.coverEnabled ? 'on' : 'off',
+  )
+  const [coverWidthMm, setCoverWidthMm] = React.useState<string>(
+    set.coverWidthMm == null ? '' : String(set.coverWidthMm),
+  )
+  const [coverHeightMm, setCoverHeightMm] = React.useState<string>(
+    set.coverHeightMm == null ? '' : String(set.coverHeightMm),
+  )
+  const [isActive, setIsActive] = React.useState(set.isActive)
   const [isSaving, setIsSaving] = React.useState(false)
   const [saveError, setSaveError] = React.useState('')
   const [deleteDialogOpen, setDeleteDialogOpen] = React.useState(false)
@@ -143,6 +159,23 @@ export function TemplateSetEditClient({ set, userRole }: TemplateSetEditClientPr
       setSaveError('템플릿이 1개 이상 필요합니다.')
       return
     }
+    // 표지 치수 검증 (입력된 경우 10~1500)
+    const parseDim = (s: string): number | null => {
+      const trimmed = s.trim()
+      if (trimmed === '') return null
+      return Number(trimmed)
+    }
+    const w = parseDim(coverWidthMm)
+    const h = parseDim(coverHeightMm)
+    for (const [val, label] of [
+      [w, '표지 폭'],
+      [h, '표지 높이'],
+    ] as const) {
+      if (val !== null && (Number.isNaN(val) || val < 10 || val > 1500)) {
+        setSaveError(`${label}은 10~1500mm 사이의 숫자여야 합니다.`)
+        return
+      }
+    }
     setIsSaving(true)
     setSaveError('')
     try {
@@ -153,6 +186,11 @@ export function TemplateSetEditClient({ set, userRole }: TemplateSetEditClientPr
           name,
           templateIds: templates.map((t) => t.id),
           coverIdx,
+          coverEnabled:
+            coverEnabledMode === 'inherit' ? null : coverEnabledMode === 'on' ? true : false,
+          coverWidthMm: w,
+          coverHeightMm: h,
+          isActive,
         }),
       })
       if (res.ok) {
@@ -571,6 +609,197 @@ export function TemplateSetEditClient({ set, userRole }: TemplateSetEditClientPr
                   width: '100%',
                 }}
               />
+            </div>
+
+            {/* ── 표지(Cover) 오버라이드 ── */}
+            <div
+              className="flex flex-col gap-4 pt-4"
+              style={{ borderTop: '1px solid var(--nike-hairline)' }}
+            >
+              <p
+                style={{
+                  fontFamily: 'var(--nike-font-mono)',
+                  fontSize: '11px',
+                  fontWeight: 400,
+                  letterSpacing: '0.6px',
+                  textTransform: 'uppercase',
+                  color: 'var(--nike-ink)',
+                  opacity: 0.55,
+                }}
+              >
+                표지 오버라이드
+              </p>
+
+              {/* 표지 사용 — 3-state */}
+              <div className="flex flex-col gap-1.5">
+                <label
+                  htmlFor="cover-enabled"
+                  style={{
+                    fontFamily: 'var(--nike-font-mono)',
+                    fontSize: '11px',
+                    fontWeight: 400,
+                    letterSpacing: '0.6px',
+                    textTransform: 'uppercase',
+                    color: 'var(--nike-ink)',
+                    opacity: 0.55,
+                  }}
+                >
+                  표지 사용
+                </label>
+                <select
+                  id="cover-enabled"
+                  value={coverEnabledMode}
+                  disabled={!canEdit}
+                  onChange={(e) => setCoverEnabledMode(e.target.value as 'inherit' | 'on' | 'off')}
+                  style={{
+                    height: '44px',
+                    borderRadius: 'var(--nike-admin-rounded-md)',
+                    border: '1px solid var(--nike-hairline)',
+                    backgroundColor: 'var(--nike-canvas)',
+                    padding: '0 12px',
+                    fontFamily: 'var(--nike-font-text)',
+                    fontSize: '14px',
+                    fontWeight: 330,
+                    color: 'var(--nike-ink)',
+                    outline: 'none',
+                    opacity: canEdit ? 1 : 0.6,
+                    width: '100%',
+                  }}
+                >
+                  <option value="inherit">판형 기본값 상속</option>
+                  <option value="on">사용</option>
+                  <option value="off">미사용</option>
+                </select>
+              </div>
+
+              {/* 표지 폭/높이 오버라이드 */}
+              <div className="flex gap-3">
+                <div className="flex flex-col gap-1.5 flex-1">
+                  <label
+                    htmlFor="cover-width"
+                    style={{
+                      fontFamily: 'var(--nike-font-mono)',
+                      fontSize: '11px',
+                      fontWeight: 400,
+                      letterSpacing: '0.6px',
+                      textTransform: 'uppercase',
+                      color: 'var(--nike-ink)',
+                      opacity: 0.55,
+                    }}
+                  >
+                    표지 폭 (mm)
+                  </label>
+                  <input
+                    id="cover-width"
+                    type="number"
+                    inputMode="decimal"
+                    value={coverWidthMm}
+                    disabled={!canEdit}
+                    placeholder="상속"
+                    onChange={(e) => setCoverWidthMm(e.target.value)}
+                    style={{
+                      height: '44px',
+                      borderRadius: 'var(--nike-admin-rounded-md)',
+                      border: '1px solid var(--nike-hairline)',
+                      backgroundColor: 'var(--nike-canvas)',
+                      padding: '0 12px',
+                      fontFamily: 'var(--nike-font-text)',
+                      fontSize: '14px',
+                      fontWeight: 330,
+                      color: 'var(--nike-ink)',
+                      outline: 'none',
+                      opacity: canEdit ? 1 : 0.6,
+                      width: '100%',
+                    }}
+                  />
+                </div>
+                <div className="flex flex-col gap-1.5 flex-1">
+                  <label
+                    htmlFor="cover-height"
+                    style={{
+                      fontFamily: 'var(--nike-font-mono)',
+                      fontSize: '11px',
+                      fontWeight: 400,
+                      letterSpacing: '0.6px',
+                      textTransform: 'uppercase',
+                      color: 'var(--nike-ink)',
+                      opacity: 0.55,
+                    }}
+                  >
+                    표지 높이 (mm)
+                  </label>
+                  <input
+                    id="cover-height"
+                    type="number"
+                    inputMode="decimal"
+                    value={coverHeightMm}
+                    disabled={!canEdit}
+                    placeholder="상속"
+                    onChange={(e) => setCoverHeightMm(e.target.value)}
+                    style={{
+                      height: '44px',
+                      borderRadius: 'var(--nike-admin-rounded-md)',
+                      border: '1px solid var(--nike-hairline)',
+                      backgroundColor: 'var(--nike-canvas)',
+                      padding: '0 12px',
+                      fontFamily: 'var(--nike-font-text)',
+                      fontSize: '14px',
+                      fontWeight: 330,
+                      color: 'var(--nike-ink)',
+                      outline: 'none',
+                      opacity: canEdit ? 1 : 0.6,
+                      width: '100%',
+                    }}
+                  />
+                </div>
+              </div>
+              <p
+                style={{
+                  fontFamily: 'var(--nike-font-text)',
+                  fontSize: '12px',
+                  color: 'var(--nike-ink)',
+                  opacity: 0.55,
+                  marginTop: '-6px',
+                }}
+              >
+                비우면 판형 치수를 상속합니다 · 10~1500mm
+              </p>
+
+              {/* 세트 활성화 */}
+              <div className="flex items-center gap-3">
+                <button
+                  type="button"
+                  role="switch"
+                  id="set-active"
+                  aria-checked={isActive}
+                  aria-label="세트 활성화"
+                  disabled={!canEdit}
+                  onClick={() => setIsActive((v) => !v)}
+                  className="relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2"
+                  style={{
+                    backgroundColor: isActive ? 'var(--nike-ink)' : 'var(--nike-soft-cloud)',
+                    opacity: canEdit ? 1 : 0.6,
+                  }}
+                >
+                  <span
+                    aria-hidden="true"
+                    className={`pointer-events-none inline-block size-5 rounded-full bg-white shadow-sm ring-0 transition-transform ${
+                      isActive ? 'translate-x-5' : 'translate-x-0'
+                    }`}
+                  />
+                </button>
+                <label
+                  htmlFor="set-active"
+                  style={{
+                    fontFamily: 'var(--nike-font-text)',
+                    fontSize: '14px',
+                    fontWeight: 330,
+                    color: 'var(--nike-ink)',
+                  }}
+                >
+                  세트 활성화
+                </label>
+              </div>
             </div>
 
             {canEdit && (
