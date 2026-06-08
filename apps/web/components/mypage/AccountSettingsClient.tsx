@@ -319,6 +319,80 @@ export function AccountSettingsClient({
           >
             탈퇴 즉시 모든 작품과 데이터에 접근할 수 없습니다. 30일 후 영구 삭제됩니다.
           </p>
+
+          {/* 개인정보 파기 안내 (개인정보 보호법 / 전자상거래법) — 개인정보처리방침 §3 요약 */}
+          <div
+            role="note"
+            aria-label="탈퇴 시 개인정보 파기 안내"
+            style={{
+              border: '1px solid var(--mkt-hairline)',
+              borderRadius: 'var(--mkt-rounded-md)',
+              backgroundColor: 'var(--mkt-canvas)',
+              padding: 'var(--mkt-space-md) var(--mkt-space-lg)',
+              marginBottom: 'var(--mkt-space-lg)',
+            }}
+          >
+            <p
+              className="mkt-body-sm"
+              style={{
+                color: 'var(--mkt-ink)',
+                fontWeight: 540,
+                marginBottom: 'var(--mkt-space-sm)',
+              }}
+            >
+              탈퇴 시 개인정보 파기 안내
+            </p>
+            <p
+              className="mkt-body-sm"
+              style={{
+                color: 'var(--mkt-ink)',
+                opacity: 0.7,
+                marginBottom: 'var(--mkt-space-sm)',
+              }}
+            >
+              탈퇴 시 회원님의 개인정보는 「개인정보 보호법」에 따라 파기됩니다. 다만 관계 법령에
+              따라 아래 정보는 일정 기간 보관 후 파기됩니다.
+            </p>
+            <ul
+              style={{
+                display: 'flex',
+                flexDirection: 'column',
+                gap: 'var(--mkt-space-xs)',
+                paddingLeft: 'var(--mkt-space-lg)',
+                marginBottom: 'var(--mkt-space-sm)',
+                listStyleType: 'disc',
+              }}
+            >
+              {[
+                '회원 계정 정보: 탈퇴 후 30일간 보관(분쟁 대비) 후 파기',
+                '접속 로그: 3개월',
+                '전자상거래 관련 기록(계약·결제 등): 5년 (전자상거래법)',
+                '작품 데이터: 탈퇴 즉시 삭제',
+              ].map((item) => (
+                <li
+                  key={item}
+                  className="mkt-body-sm"
+                  style={{ color: 'var(--mkt-ink)', opacity: 0.7 }}
+                >
+                  {item}
+                </li>
+              ))}
+            </ul>
+            <a
+              href="/legal/privacy"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="mkt-body-sm"
+              style={{
+                color: 'var(--mkt-ink)',
+                fontWeight: 540,
+                textDecoration: 'underline',
+              }}
+            >
+              개인정보처리방침에서 자세히 보기
+            </a>
+          </div>
+
           <button
             type="button"
             onClick={openDeleteModal}
