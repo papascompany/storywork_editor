@@ -5,9 +5,9 @@
  * deletionScheduledFor < now() 인 User 를 영구 삭제(cascade).
  *
  * 인증: Authorization: Bearer <CRON_SECRET> 헤더 필수.
- * Vercel Cron 설정 (vercel.json 또는 Supabase pg_cron) 등록은 FOLLOWUP-58.
- *
- * 현재는 수동 호출 전용 (production cron 미등록).
+ * Vercel Cron 등록됨 — apps/web/vercel.json crons (매일 18:00 UTC = 03:00 KST).
+ *   Vercel Cron 이 CRON_SECRET 환경변수 설정 시 Authorization 헤더를 자동 첨부한다.
+ *   ⚠️ 프로덕션에 CRON_SECRET 미설정 시 항상 401 → 파기 미실행. 등록 필수.
  * docs/runbooks/account-deletion.md 에 설정 가이드 기록.
  *
  * cascade 대상:
