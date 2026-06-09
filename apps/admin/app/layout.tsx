@@ -1,3 +1,5 @@
+// deploy-retrigger 2026-06-08: 레포 PUBLIC 복귀 후 BLOCKED 커밋 반영을 위한
+// turbo-ignore 강제 빌드 트리거 (핸드오프 §9). 기능 변경 없음.
 import { ThemeProvider, ToastProvider } from '@storywork/ui'
 import type { Metadata, Viewport } from 'next'
 import localFont from 'next/font/local'
