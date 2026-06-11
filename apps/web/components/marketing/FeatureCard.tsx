@@ -17,10 +17,10 @@ interface FeatureCardProps {
 export function FeatureCard({ icon, title, body, className = '' }: FeatureCardProps) {
   return (
     <div
-      className={className}
+      className={`mkt-sticker-sm ${className}`.trim()}
       style={{
-        backgroundColor: 'var(--mkt-surface-soft)',
-        borderRadius: 'var(--mkt-rounded-md)',
+        backgroundColor: 'var(--mkt-canvas)',
+        borderRadius: '12px',
         padding: 'var(--mkt-space-lg)',
       }}
     >

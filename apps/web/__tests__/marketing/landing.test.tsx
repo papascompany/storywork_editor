@@ -144,7 +144,12 @@ describe('랜딩 페이지 (/)', () => {
 
   it('Final CTA "먼저 만들어 보세요" 가 렌더링된다', () => {
     render(<LandingPage />)
-    expect(screen.getByText(/먼저 만들어 보세요/)).toBeInTheDocument()
+    // "만들어" 는 mkt-marker span 으로 분할되므로 요소 단위 텍스트 결합 매처 사용
+    expect(
+      screen.getByText(
+        (_, el) => el?.tagName === 'H2' && /먼저\s*만들어\s*보세요/.test(el.textContent ?? ''),
+      ),
+    ).toBeInTheDocument()
   })
 
   it('Header 가 렌더링된다 (StoryWork 로고)', () => {

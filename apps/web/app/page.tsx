@@ -17,6 +17,7 @@ import { Footer } from '../components/marketing/Footer'
 import { Header } from '../components/marketing/Header'
 import { MarqueeStrip } from '../components/marketing/MarqueeStrip'
 import { PillButton } from '../components/marketing/PillButton'
+import { ScrollReveal } from '../components/marketing/ScrollReveal'
 import { getDerbymanScenes, getPoseShowcase } from '../lib/marketing-assets'
 
 const BASE_URL = 'https://storywork-editor-web.vercel.app'
@@ -131,37 +132,46 @@ function ValuePropsSection() {
           }}
           className="value-props-grid"
         >
-          {props.map(({ stat, label, desc, bg }) => (
-            <div
-              key={stat}
-              style={{
-                backgroundColor: bg,
-                borderRadius: 'var(--mkt-rounded-lg)',
-                padding: 'var(--mkt-space-xxl) var(--mkt-space-xl)',
-                display: 'flex',
-                flexDirection: 'column',
-                gap: 'var(--mkt-space-sm)',
-              }}
-            >
-              <p
-                style={{
-                  fontFamily: 'var(--mkt-font-sans)',
-                  fontSize: 'clamp(36px, 4vw, 52px)',
-                  fontWeight: 340,
-                  lineHeight: 1,
-                  letterSpacing: '-1px',
-                  color: 'var(--mkt-ink)',
-                }}
+          {props.map(({ stat, label, desc, bg }, i) => (
+            <ScrollReveal key={stat} delay={i * 120}>
+              <div
+                className="mkt-sticker"
+                style={
+                  {
+                    backgroundColor: bg,
+                    borderRadius: '18px',
+                    '--mkt-sticker-rotate': `${[-1.2, 0.8, -0.6][i]}deg`,
+                    padding: 'var(--mkt-space-xxl) var(--mkt-space-xl)',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    gap: 'var(--mkt-space-sm)',
+                    height: '100%',
+                  } as React.CSSProperties
+                }
               >
-                {stat}
-              </p>
-              <p className="mkt-headline" style={{ color: 'var(--mkt-ink)', marginBottom: '4px' }}>
-                {label}
-              </p>
-              <p className="mkt-body-sm" style={{ color: 'var(--mkt-ink)', opacity: 0.7 }}>
-                {desc}
-              </p>
-            </div>
+                <p
+                  style={{
+                    fontFamily: 'var(--mkt-font-sans)',
+                    fontSize: 'clamp(36px, 4vw, 52px)',
+                    fontWeight: 340,
+                    lineHeight: 1,
+                    letterSpacing: '-1px',
+                    color: 'var(--mkt-ink)',
+                  }}
+                >
+                  {stat}
+                </p>
+                <p
+                  className="mkt-headline"
+                  style={{ color: 'var(--mkt-ink)', marginBottom: '4px' }}
+                >
+                  {label}
+                </p>
+                <p className="mkt-body-sm" style={{ color: 'var(--mkt-ink)', opacity: 0.7 }}>
+                  {desc}
+                </p>
+              </div>
+            </ScrollReveal>
           ))}
         </div>
 
@@ -222,17 +232,23 @@ function PersonaSection() {
       }}
     >
       <div style={{ maxWidth: 'var(--mkt-max-width)', margin: '0 auto' }}>
-        <div style={{ marginBottom: 'var(--mkt-space-xxl)' }}>
-          <p
-            className="mkt-caption"
-            style={{ color: 'var(--mkt-ink)', opacity: 0.45, marginBottom: 'var(--mkt-space-md)' }}
-          >
-            WHO
-          </p>
-          <h2 className="mkt-display-lg" style={{ color: 'var(--mkt-ink)' }}>
-            이런 분들을 위해 만들었습니다
-          </h2>
-        </div>
+        <ScrollReveal>
+          <div style={{ marginBottom: 'var(--mkt-space-xxl)' }}>
+            <p
+              className="mkt-caption"
+              style={{
+                color: 'var(--mkt-accent)',
+                opacity: 0.85,
+                marginBottom: 'var(--mkt-space-md)',
+              }}
+            >
+              WHO
+            </p>
+            <h2 className="mkt-display-lg" style={{ color: 'var(--mkt-ink)' }}>
+              이런 분들을 위해 만들었습니다
+            </h2>
+          </div>
+        </ScrollReveal>
 
         <div
           style={{
@@ -242,57 +258,54 @@ function PersonaSection() {
           }}
           className="persona-grid"
         >
-          {personas.map(({ icon, title, role, scenario, highlight }) => (
-            <div
-              key={title}
-              style={{
-                border: '1px solid var(--mkt-hairline)',
-                borderRadius: 'var(--mkt-rounded-lg)',
-                padding: 'var(--mkt-space-xl)',
-                display: 'flex',
-                flexDirection: 'column',
-                gap: 'var(--mkt-space-sm)',
-                backgroundColor: 'var(--mkt-canvas)',
-                transition: 'border-color 150ms ease',
-              }}
-              className="persona-card"
-            >
+          {personas.map(({ icon, title, role, scenario, highlight }, i) => (
+            <ScrollReveal key={title} delay={(i % 2) * 120}>
               <div
                 style={{
-                  width: '48px',
-                  height: '48px',
-                  backgroundColor: highlight,
-                  borderRadius: 'var(--mkt-rounded-md)',
+                  borderRadius: '16px',
+                  padding: 'var(--mkt-space-xl)',
                   display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  fontSize: '22px',
-                  marginBottom: 'var(--mkt-space-xs)',
+                  flexDirection: 'column',
+                  gap: 'var(--mkt-space-sm)',
+                  backgroundColor: 'var(--mkt-canvas)',
+                  height: '100%',
                 }}
-                aria-hidden="true"
+                className="persona-card mkt-sticker-sm"
               >
-                {icon}
+                <div
+                  style={{
+                    width: '48px',
+                    height: '48px',
+                    backgroundColor: highlight,
+                    borderRadius: 'var(--mkt-rounded-md)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    fontSize: '22px',
+                    marginBottom: 'var(--mkt-space-xs)',
+                  }}
+                  aria-hidden="true"
+                >
+                  {icon}
+                </div>
+                <p className="mkt-headline" style={{ color: 'var(--mkt-ink)' }}>
+                  {title}
+                </p>
+                <p
+                  className="mkt-body-sm"
+                  style={{ color: 'var(--mkt-ink)', opacity: 0.5, fontWeight: 480 }}
+                >
+                  {role}
+                </p>
+                <p className="mkt-body-sm" style={{ color: 'var(--mkt-ink)', opacity: 0.75 }}>
+                  {scenario}
+                </p>
               </div>
-              <p className="mkt-headline" style={{ color: 'var(--mkt-ink)' }}>
-                {title}
-              </p>
-              <p
-                className="mkt-body-sm"
-                style={{ color: 'var(--mkt-ink)', opacity: 0.5, fontWeight: 480 }}
-              >
-                {role}
-              </p>
-              <p className="mkt-body-sm" style={{ color: 'var(--mkt-ink)', opacity: 0.75 }}>
-                {scenario}
-              </p>
-            </div>
+            </ScrollReveal>
           ))}
         </div>
 
         <style>{`
-          .persona-card:hover {
-            border-color: var(--mkt-ink);
-          }
           @media (max-width: 768px) {
             .persona-grid {
               grid-template-columns: 1fr !important;
@@ -475,38 +488,41 @@ function SocialProofSection() {
           }}
           className="social-proof-grid"
         >
-          {stats.map(({ value, label, sub }) => (
-            <div
-              key={value}
-              style={{
-                padding: 'var(--mkt-space-xl) var(--mkt-space-md)',
-                borderRadius: 'var(--mkt-rounded-md)',
-                border: '1px solid var(--mkt-hairline)',
-              }}
-            >
-              <p
+          {stats.map(({ value, label, sub }, i) => (
+            <ScrollReveal key={value} delay={i * 90}>
+              <div
+                className="mkt-sticker-sm"
                 style={{
-                  fontFamily: 'var(--mkt-font-sans)',
-                  fontSize: 'clamp(28px, 3vw, 42px)',
-                  fontWeight: 340,
-                  lineHeight: 1,
-                  letterSpacing: '-0.5px',
-                  color: 'var(--mkt-ink)',
-                  marginBottom: '8px',
+                  padding: 'var(--mkt-space-xl) var(--mkt-space-md)',
+                  borderRadius: '14px',
+                  backgroundColor: 'var(--mkt-canvas)',
+                  height: '100%',
                 }}
               >
-                {value}
-              </p>
-              <p className="mkt-body-sm" style={{ color: 'var(--mkt-ink)', fontWeight: 540 }}>
-                {label}
-              </p>
-              <p
-                className="mkt-caption"
-                style={{ color: 'var(--mkt-ink)', opacity: 0.4, marginTop: '4px' }}
-              >
-                {sub}
-              </p>
-            </div>
+                <p
+                  style={{
+                    fontFamily: 'var(--mkt-font-sans)',
+                    fontSize: 'clamp(28px, 3vw, 42px)',
+                    fontWeight: 340,
+                    lineHeight: 1,
+                    letterSpacing: '-0.5px',
+                    color: 'var(--mkt-ink)',
+                    marginBottom: '8px',
+                  }}
+                >
+                  {value}
+                </p>
+                <p className="mkt-body-sm" style={{ color: 'var(--mkt-ink)', fontWeight: 540 }}>
+                  {label}
+                </p>
+                <p
+                  className="mkt-caption"
+                  style={{ color: 'var(--mkt-ink)', opacity: 0.4, marginTop: '4px' }}
+                >
+                  {sub}
+                </p>
+              </div>
+            </ScrollReveal>
           ))}
         </div>
 
@@ -569,17 +585,23 @@ function UseCasesSection() {
       }}
     >
       <div style={{ maxWidth: 'var(--mkt-max-width)', margin: '0 auto' }}>
-        <div style={{ marginBottom: 'var(--mkt-space-xxl)' }}>
-          <p
-            className="mkt-caption"
-            style={{ color: 'var(--mkt-ink)', opacity: 0.45, marginBottom: 'var(--mkt-space-md)' }}
-          >
-            USE CASES
-          </p>
-          <h2 className="mkt-display-lg" style={{ color: 'var(--mkt-ink)' }}>
-            이렇게 활용합니다
-          </h2>
-        </div>
+        <ScrollReveal>
+          <div style={{ marginBottom: 'var(--mkt-space-xxl)' }}>
+            <p
+              className="mkt-caption"
+              style={{
+                color: 'var(--mkt-accent)',
+                opacity: 0.85,
+                marginBottom: 'var(--mkt-space-md)',
+              }}
+            >
+              USE CASES
+            </p>
+            <h2 className="mkt-display-lg" style={{ color: 'var(--mkt-ink)' }}>
+              이렇게 활용합니다
+            </h2>
+          </div>
+        </ScrollReveal>
 
         <div
           style={{
@@ -589,74 +611,80 @@ function UseCasesSection() {
           }}
           className="use-cases-grid"
         >
-          {cases.map(({ tag, title, desc, href, cta, bg, textColor, available }) => (
-            <div
-              key={title}
-              style={{
-                backgroundColor: bg,
-                borderRadius: 'var(--mkt-rounded-lg)',
-                padding: 'var(--mkt-space-xxl) var(--mkt-space-xl)',
-                display: 'flex',
-                flexDirection: 'column',
-                gap: 'var(--mkt-space-md)',
-                minHeight: '280px',
-              }}
-            >
-              <span
-                className="mkt-caption"
-                style={{
-                  color: textColor,
-                  opacity: available ? 0.6 : 0.5,
-                  display: 'inline-block',
-                  backgroundColor: available ? 'transparent' : 'rgba(0,0,0,0.08)',
-                  borderRadius: '4px',
-                  padding: available ? '0' : '3px 8px',
-                  alignSelf: 'flex-start',
-                }}
+          {cases.map(({ tag, title, desc, href, cta, bg, textColor, available }, i) => (
+            <ScrollReveal key={title} delay={i * 120}>
+              <div
+                className="mkt-sticker"
+                style={
+                  {
+                    backgroundColor: bg,
+                    borderRadius: '18px',
+                    '--mkt-sticker-rotate': `${[0.8, -1, 0.6][i]}deg`,
+                    padding: 'var(--mkt-space-xxl) var(--mkt-space-xl)',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    gap: 'var(--mkt-space-md)',
+                    minHeight: '280px',
+                    height: '100%',
+                  } as React.CSSProperties
+                }
               >
-                {tag}
-              </span>
-              <div style={{ flex: 1 }}>
-                <p
-                  className="mkt-headline"
-                  style={{ color: textColor, marginBottom: 'var(--mkt-space-sm)' }}
-                >
-                  {title}
-                </p>
-                <p className="mkt-body-sm" style={{ color: textColor, opacity: 0.75 }}>
-                  {desc}
-                </p>
-              </div>
-              {available ? (
-                <Link
-                  href={href}
-                  style={{
-                    fontFamily: 'var(--mkt-font-sans)',
-                    fontSize: 'var(--mkt-body-sm-size)',
-                    fontWeight: 560,
-                    color: textColor,
-                    textDecoration: 'none',
-                    alignSelf: 'flex-start',
-                  }}
-                  className="use-case-link"
-                >
-                  {cta} →
-                </Link>
-              ) : (
                 <span
+                  className="mkt-caption"
                   style={{
-                    fontFamily: 'var(--mkt-font-sans)',
-                    fontSize: 'var(--mkt-body-sm-size)',
-                    fontWeight: 480,
                     color: textColor,
-                    opacity: 0.45,
+                    opacity: available ? 0.6 : 0.5,
+                    display: 'inline-block',
+                    backgroundColor: available ? 'transparent' : 'rgba(0,0,0,0.08)',
+                    borderRadius: '4px',
+                    padding: available ? '0' : '3px 8px',
                     alignSelf: 'flex-start',
                   }}
                 >
-                  준비 중
+                  {tag}
                 </span>
-              )}
-            </div>
+                <div style={{ flex: 1 }}>
+                  <p
+                    className="mkt-headline"
+                    style={{ color: textColor, marginBottom: 'var(--mkt-space-sm)' }}
+                  >
+                    {title}
+                  </p>
+                  <p className="mkt-body-sm" style={{ color: textColor, opacity: 0.75 }}>
+                    {desc}
+                  </p>
+                </div>
+                {available ? (
+                  <Link
+                    href={href}
+                    style={{
+                      fontFamily: 'var(--mkt-font-sans)',
+                      fontSize: 'var(--mkt-body-sm-size)',
+                      fontWeight: 560,
+                      color: textColor,
+                      textDecoration: 'none',
+                      alignSelf: 'flex-start',
+                    }}
+                    className="use-case-link"
+                  >
+                    {cta} →
+                  </Link>
+                ) : (
+                  <span
+                    style={{
+                      fontFamily: 'var(--mkt-font-sans)',
+                      fontSize: 'var(--mkt-body-sm-size)',
+                      fontWeight: 480,
+                      color: textColor,
+                      opacity: 0.45,
+                      alignSelf: 'flex-start',
+                    }}
+                  >
+                    준비 중
+                  </span>
+                )}
+              </div>
+            </ScrollReveal>
           ))}
         </div>
 
@@ -733,18 +761,24 @@ function MiniStoryboard() {
             <div
               key={i}
               className="hero-cut-card"
-              style={{
-                backgroundColor: cut.bg,
-                borderRadius: 'var(--mkt-rounded-sm)',
-                aspectRatio: '3/4',
-                padding: '10px',
-                display: 'flex',
-                flexDirection: 'column',
-                justifyContent: 'space-between',
-                position: 'relative',
-                overflow: 'hidden',
-                transition: 'transform 180ms ease, box-shadow 180ms ease',
-              }}
+              style={
+                {
+                  backgroundColor: cut.bg,
+                  borderRadius: '12px',
+                  border: '2px solid var(--mkt-ink)',
+                  boxShadow: '4px 4px 0 var(--mkt-shadow-ink)',
+                  '--cut-rotate': `${[-1.6, 1.2, 1, -0.8][i]}deg`,
+                  aspectRatio: '3/4',
+                  padding: '10px',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  justifyContent: 'space-between',
+                  position: 'relative',
+                  overflow: 'hidden',
+                  transition:
+                    'transform 180ms var(--mkt-ease-spring), box-shadow 180ms var(--mkt-ease-out)',
+                } as React.CSSProperties
+              }
             >
               {/* 컷 번호 */}
               <span
@@ -782,16 +816,17 @@ function MiniStoryboard() {
                 </div>
               )}
 
-              {/* 말풍선 */}
+              {/* 말풍선 — 잉크 아웃라인 코믹 스타일 */}
               <div
                 style={{
                   position: 'relative',
                   zIndex: 2,
                   alignSelf: 'flex-end',
                   backgroundColor: 'var(--mkt-canvas)',
-                  borderRadius: '8px 8px 2px 8px',
+                  border: '1.5px solid var(--mkt-ink)',
+                  borderRadius: '10px 10px 2px 10px',
                   padding: '4px 8px',
-                  boxShadow: '0 1px 4px rgba(0,0,0,0.10)',
+                  boxShadow: '2px 2px 0 var(--mkt-shadow-ink)',
                   maxWidth: '90%',
                 }}
                 aria-hidden="true"
@@ -854,11 +889,14 @@ function MiniStoryboard() {
         </Link>
       </div>
 
-      {/* hover + stagger 인터랙션 */}
+      {/* hover + 스프링 팝인 스태거 (디즈니 다이나믹) */}
       <style>{`
+        .hero-cut-card {
+          transform: rotate(var(--cut-rotate, 0deg));
+        }
         .hero-cut-card:hover {
-          transform: translateY(-4px);
-          box-shadow: 0 8px 24px rgba(0,0,0,0.10);
+          transform: rotate(var(--cut-rotate, 0deg)) translate(-2px, -2px);
+          box-shadow: 6px 6px 0 var(--mkt-shadow-ink);
         }
         .hero-case-link:hover {
           text-decoration: underline;
@@ -868,16 +906,18 @@ function MiniStoryboard() {
           border-radius: 2px;
           outline-offset: 2px;
         }
-        @keyframes heroCardIn {
-          from { opacity: 0; transform: translateY(12px); }
-          to   { opacity: 1; transform: translateY(0); }
+        @keyframes heroCardPop {
+          0%   { opacity: 0; transform: rotate(var(--cut-rotate, 0deg)) scale(0.7) translateY(12px); }
+          70%  { transform: rotate(var(--cut-rotate, 0deg)) scale(1.05) translateY(0); }
+          100% { opacity: 1; transform: rotate(var(--cut-rotate, 0deg)) scale(1) translateY(0); }
         }
-        .hero-cut-card:nth-child(1) { animation: heroCardIn 360ms ease both 80ms; }
-        .hero-cut-card:nth-child(2) { animation: heroCardIn 360ms ease both 180ms; }
-        .hero-cut-card:nth-child(3) { animation: heroCardIn 360ms ease both 280ms; }
-        .hero-cut-card:nth-child(4) { animation: heroCardIn 360ms ease both 380ms; }
+        .hero-cut-card:nth-child(1) { animation: heroCardPop 500ms var(--mkt-ease-spring) both 80ms; }
+        .hero-cut-card:nth-child(2) { animation: heroCardPop 500ms var(--mkt-ease-spring) both 200ms; }
+        .hero-cut-card:nth-child(3) { animation: heroCardPop 500ms var(--mkt-ease-spring) both 320ms; }
+        .hero-cut-card:nth-child(4) { animation: heroCardPop 500ms var(--mkt-ease-spring) both 440ms; }
         @media (prefers-reduced-motion: reduce) {
           .hero-cut-card { animation: none !important; }
+          .hero-cut-card:hover { transform: rotate(var(--cut-rotate, 0deg)); box-shadow: 4px 4px 0 var(--mkt-shadow-ink); }
         }
       `}</style>
     </div>
@@ -1093,7 +1133,7 @@ export default function LandingPage() {
             <h1 className="mkt-display-xl" style={{ color: 'var(--mkt-ink)' }}>
               대본만 쓰세요.
               <br />
-              페이지는 AI가
+              페이지는 <span className="mkt-marker">AI가</span>
               <br />
               그립니다.
             </h1>
@@ -1561,29 +1601,31 @@ export default function LandingPage() {
           borderTop: '1px solid var(--mkt-hairline)',
         }}
       >
-        <div
-          style={{
-            maxWidth: '600px',
-            margin: '0 auto',
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
-            gap: 'var(--mkt-space-xl)',
-          }}
-        >
-          <h2 className="mkt-display-lg" style={{ color: 'var(--mkt-ink)', textAlign: 'center' }}>
-            먼저 만들어 보세요.
-          </h2>
-          <p
-            className="mkt-body-lg"
-            style={{ color: 'var(--mkt-ink)', opacity: 0.6, textAlign: 'center' }}
+        <ScrollReveal>
+          <div
+            style={{
+              maxWidth: '600px',
+              margin: '0 auto',
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              gap: 'var(--mkt-space-xl)',
+            }}
           >
-            신용카드 없이 무료. 10분 안에 첫 페이지 완성.
-          </p>
-          <PillButton href="/editor" variant="primary">
-            지금 시작하기
-          </PillButton>
-        </div>
+            <h2 className="mkt-display-lg" style={{ color: 'var(--mkt-ink)', textAlign: 'center' }}>
+              먼저 <span className="mkt-marker">만들어</span> 보세요.
+            </h2>
+            <p
+              className="mkt-body-lg"
+              style={{ color: 'var(--mkt-ink)', opacity: 0.6, textAlign: 'center' }}
+            >
+              신용카드 없이 무료. 10분 안에 첫 페이지 완성.
+            </p>
+            <PillButton href="/editor" variant="primary">
+              지금 시작하기
+            </PillButton>
+          </div>
+        </ScrollReveal>
       </section>
 
       <Footer />

@@ -14,31 +14,39 @@
  * editor-* 패키지나 admin 에는 영향을 주지 않습니다.
  */
 :root {
-  /* ── 마케팅 컬러 (DESIGN.md colors) ──────────────────────────────────── */
-  --mkt-primary: #000000;
-  --mkt-on-primary: #ffffff;
-  --mkt-ink: #000000;
-  --mkt-canvas: #ffffff;
-  --mkt-inverse-canvas: #000000;
-  --mkt-inverse-ink: #ffffff;
-  --mkt-on-inverse-soft: #ffffff;
-  --mkt-hairline: #e6e6e6;
-  --mkt-hairline-soft: #f1f1f1;
-  --mkt-surface-soft: #f7f7f5;
+  /* ── 마케팅 컬러 — "디즈니 다이나믹" (웜 페이퍼 + 잉크 아웃라인) ─────────── */
+  /* 리디자인 2026-06: 모노크롬 → 웜 잉크/페이퍼. 변수명은 유지(전 표면 호환). */
+  --mkt-primary: #2b2620;
+  --mkt-on-primary: #fffaf2;
+  --mkt-ink: #2b2620;
+  --mkt-canvas: #fffaf2;
+  --mkt-inverse-canvas: #2b2620;
+  --mkt-inverse-ink: #fffaf2;
+  --mkt-on-inverse-soft: #fffaf2;
+  --mkt-hairline: #e9e2d6;
+  --mkt-hairline-soft: #f3ede2;
+  --mkt-surface-soft: #faf5ea;
 
-  /* 파스텔 컬러블록 */
-  --mkt-block-lime: #dceeb1;
-  --mkt-block-lilac: #c5b0f4;
-  --mkt-block-cream: #f4ecd6;
-  --mkt-block-pink: #efd4d4;
-  --mkt-block-mint: #c8e6cd;
-  --mkt-block-coral: #f3c9b6;
-  --mkt-block-navy: #1f1d3d;
+  /* 파스텔 컬러블록 — 웜톤·채도 업 (변수명 유지, 값 교체) */
+  --mkt-block-lime: #dcec9e;
+  --mkt-block-lilac: #dcc7f5;
+  --mkt-block-cream: #fff3dc;
+  --mkt-block-pink: #f9c2ce;
+  --mkt-block-mint: #bfe3d4;
+  --mkt-block-coral: #ffcdaa;
+  --mkt-block-navy: #2e2949;
 
-  /* 시맨틱 */
-  --mkt-accent-magenta: #ff3d8b;
+  /* 시맨틱 / 액센트 */
+  --mkt-accent: #e0633c; /* 디즈니 코랄오렌지 — primary CTA·eyebrow */
+  --mkt-accent-sunny: #ffd791; /* 헤드라인 마커·하이라이트 */
+  --mkt-accent-magenta: #e84d7a; /* 보조 팝 (기존 magenta 웜 보정) */
   --mkt-semantic-success: #1ea64a;
-  --mkt-overlay-scrim: #000000;
+  --mkt-overlay-scrim: #2b2620;
+  --mkt-shadow-ink: rgba(43, 38, 32, 0.9); /* 하드 오프셋 섀도 */
+
+  /* 모션 — 스쿼시&스트레치 스프링 */
+  --mkt-ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --mkt-ease-out: cubic-bezier(0, 0, 0.2, 1);
 
   /* ── 마케팅 타이포그래피 스케일 ───────────────────────────────────────── */
   /* Pretendard: 한/영 균형, 가변 폰트. weight 축: 100~900 */
@@ -215,34 +223,43 @@
   text-transform: uppercase;
 }
 
-/* ── 마케팅 버튼 pill ────────────────────────────────────────────────────── */
+/* ── 마케팅 버튼 pill — 스쿼시&스트레치 + 하드 오프셋 섀도 ─────────────────── */
 .mkt-btn-primary {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  background-color: var(--mkt-primary);
+  background-color: var(--mkt-accent);
   color: var(--mkt-on-primary);
   font-family: var(--mkt-font-sans);
   font-size: var(--mkt-button-size);
-  font-weight: var(--mkt-button-weight);
+  font-weight: 560;
   line-height: var(--mkt-button-lh);
   letter-spacing: var(--mkt-button-ls);
   padding: 10px 28px;
   border-radius: var(--mkt-rounded-pill);
-  border: 2px solid transparent;
+  border: 2px solid var(--mkt-ink);
+  box-shadow: 3px 3px 0 var(--mkt-shadow-ink);
   cursor: pointer;
-  transition: opacity 150ms ease;
+  transition:
+    transform 180ms var(--mkt-ease-spring),
+    box-shadow 180ms var(--mkt-ease-out);
   min-height: 44px;
   white-space: nowrap;
   text-decoration: none;
 }
 
 .mkt-btn-primary:hover {
-  opacity: 0.85;
+  transform: translate(-1px, -1px) scale(1.03);
+  box-shadow: 5px 5px 0 var(--mkt-shadow-ink);
+}
+
+.mkt-btn-primary:active {
+  transform: translate(2px, 2px) scale(0.96);
+  box-shadow: 1px 1px 0 var(--mkt-shadow-ink);
 }
 
 .mkt-btn-primary:focus-visible {
-  outline: 2px solid var(--mkt-primary);
+  outline: 2px solid var(--mkt-ink);
   outline-offset: 3px;
 }
 
@@ -254,25 +271,32 @@
   color: var(--mkt-ink);
   font-family: var(--mkt-font-sans);
   font-size: var(--mkt-button-size);
-  font-weight: var(--mkt-button-weight);
+  font-weight: 560;
   line-height: var(--mkt-button-lh);
   letter-spacing: var(--mkt-button-ls);
   padding: 8px 26px 10px;
   border-radius: var(--mkt-rounded-pill);
   border: 2px solid var(--mkt-ink);
   cursor: pointer;
-  transition: opacity 150ms ease;
+  transition:
+    transform 180ms var(--mkt-ease-spring),
+    background-color 150ms ease;
   min-height: 44px;
   white-space: nowrap;
   text-decoration: none;
 }
 
 .mkt-btn-secondary:hover {
-  opacity: 0.75;
+  background-color: var(--mkt-block-cream);
+  transform: translate(-1px, -1px) scale(1.03);
+}
+
+.mkt-btn-secondary:active {
+  transform: scale(0.96);
 }
 
 .mkt-btn-secondary:focus-visible {
-  outline: 2px solid var(--mkt-primary);
+  outline: 2px solid var(--mkt-ink);
   outline-offset: 3px;
 }
 
@@ -281,6 +305,23 @@
   background-color: transparent;
   color: var(--mkt-inverse-ink);
   border-color: var(--mkt-inverse-ink);
+}
+
+.mkt-btn-secondary-inverse:hover {
+  background-color: rgba(255, 250, 242, 0.12);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .mkt-btn-primary,
+  .mkt-btn-secondary {
+    transition: opacity 150ms ease;
+  }
+  .mkt-btn-primary:hover,
+  .mkt-btn-primary:active,
+  .mkt-btn-secondary:hover,
+  .mkt-btn-secondary:active {
+    transform: none;
+  }
 }
 
 /* ── 마케팅 컬러블록 섹션 ────────────────────────────────────────────────── */
@@ -348,5 +389,138 @@
 @media (prefers-reduced-motion: reduce) {
   .mkt-marquee-track {
     animation: none;
+  }
+}
+
+/* ── 디즈니 다이나믹 — 모션 키프레임 ─────────────────────────────────────── */
+@keyframes mkt-pop-in {
+  0% {
+    opacity: 0;
+    transform: scale(0.7) translateY(12px);
+  }
+  70% {
+    transform: scale(1.04) translateY(0);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+@keyframes mkt-float {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-7px);
+  }
+}
+
+@keyframes mkt-wiggle {
+  0%,
+  100% {
+    transform: rotate(-1.5deg);
+  }
+  50% {
+    transform: rotate(1.5deg);
+  }
+}
+
+/* ── 스티커 카드 — 잉크 아웃라인 + 하드 오프셋 섀도 + 리프트 호버 ──────────── */
+/* 회전은 사용처에서 transform/rotate 로 지정. --mkt-sticker-rotate 변수 사용 시
+   호버 리프트가 회전을 보존한다. */
+.mkt-sticker {
+  --mkt-sticker-rotate: 0deg;
+  border: 2px solid var(--mkt-ink);
+  box-shadow: 4px 4px 0 var(--mkt-shadow-ink);
+  transform: rotate(var(--mkt-sticker-rotate));
+  transition:
+    transform 180ms var(--mkt-ease-spring),
+    box-shadow 180ms var(--mkt-ease-out);
+}
+
+.mkt-sticker:hover {
+  transform: rotate(var(--mkt-sticker-rotate)) translate(-2px, -2px);
+  box-shadow: 6px 6px 0 var(--mkt-shadow-ink);
+}
+
+/* 작은 카드용 — 얇은 아웃라인 + 작은 섀도 (목록/그리드 항목) */
+.mkt-sticker-sm {
+  border: 1.5px solid var(--mkt-ink);
+  box-shadow: 3px 3px 0 var(--mkt-shadow-ink);
+  transition:
+    transform 180ms var(--mkt-ease-spring),
+    box-shadow 180ms var(--mkt-ease-out);
+}
+
+.mkt-sticker-sm:hover {
+  transform: translate(-2px, -2px);
+  box-shadow: 5px 5px 0 var(--mkt-shadow-ink);
+}
+
+/* ── 헤드라인 마커 — "짠!" 하이라이트 ──────────────────────────────────────── */
+.mkt-marker {
+  display: inline-block;
+  background-color: var(--mkt-accent-sunny);
+  border: 2px solid var(--mkt-ink);
+  border-radius: 10px;
+  padding: 0 0.18em;
+  transform: rotate(-1.2deg);
+  box-shadow: 3px 3px 0 var(--mkt-shadow-ink);
+}
+
+/* ── 부유 장식 (구름/배지) ─────────────────────────────────────────────────── */
+.mkt-float {
+  animation: mkt-float 5s ease-in-out infinite;
+}
+
+/* ── 팝인 스태거 (히어로 컷 카드 등 — 즉시 재생) ──────────────────────────── */
+.mkt-pop-in {
+  animation: mkt-pop-in 500ms var(--mkt-ease-spring) both;
+  animation-delay: var(--mkt-pop-delay, 0ms);
+}
+
+/* ── 스크롤 리빌 — IntersectionObserver(ScrollReveal 컴포넌트)와 페어 ─────── */
+.mkt-reveal {
+  opacity: 0;
+  transform: translateY(16px);
+  transition:
+    opacity 600ms var(--mkt-ease-out),
+    transform 600ms var(--mkt-ease-out);
+  transition-delay: var(--mkt-reveal-delay, 0ms);
+}
+
+.mkt-reveal.is-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* JS 미지원 환경에서는 항상 노출 (콘텐츠 가림 방지) */
+@media (scripting: none) {
+  .mkt-reveal {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .mkt-sticker,
+  .mkt-sticker-sm {
+    transition: none;
+  }
+  .mkt-sticker:hover,
+  .mkt-sticker-sm:hover {
+    transform: rotate(var(--mkt-sticker-rotate, 0deg));
+    box-shadow: 4px 4px 0 var(--mkt-shadow-ink);
+  }
+  .mkt-float,
+  .mkt-pop-in {
+    animation: none;
+  }
+  .mkt-reveal {
+    opacity: 1;
+    transform: none;
+    transition: none;
   }
 }

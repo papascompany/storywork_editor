@@ -50,18 +50,21 @@ export function StickyNote({
 
   return (
     <article
-      className={className}
+      className={`mkt-sticker ${className}`.trim()}
       aria-label={`컷 ${number}: ${scene}`}
-      style={{
-        backgroundColor: bg,
-        borderRadius: 'var(--mkt-rounded-sm)',
-        padding: 'var(--mkt-space-lg)',
-        transform: `rotate(${rotation}deg)`,
-        display: 'flex',
-        flexDirection: 'column',
-        gap: 'var(--mkt-space-sm)',
-        ...style,
-      }}
+      style={
+        {
+          backgroundColor: bg,
+          borderRadius: '14px',
+          padding: 'var(--mkt-space-lg)',
+          // 회전은 .mkt-sticker 의 --mkt-sticker-rotate 로 — 호버 리프트가 회전을 보존
+          '--mkt-sticker-rotate': `${rotation}deg`,
+          display: 'flex',
+          flexDirection: 'column',
+          gap: 'var(--mkt-space-sm)',
+          ...style,
+        } as React.CSSProperties
+      }
     >
       {/* 장면 번호 eyebrow */}
       <span className="mkt-caption" style={{ color: 'var(--mkt-ink)', opacity: 0.6 }}>
