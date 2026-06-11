@@ -14,29 +14,32 @@
    Nike 토큰 (DESIGN-nike.md)
    ══════════════════════════════════════════════════════════════════════════ */
 :root {
-  /* ── 컬러 ─────────────────────────────────────────────────────────────── */
-  --nike-ink: #111111;
-  --nike-on-primary: #ffffff;
-  --nike-canvas: #ffffff;
-  --nike-soft-cloud: #f5f5f5;
-  --nike-charcoal: #39393b;
-  --nike-ash: #4b4b4d;
-  --nike-mute: #707072;
-  --nike-stone: #9e9ea0;
-  --nike-hairline: #cacacb;
-  --nike-hairline-soft: #e5e5e5;
+  /* ── 컬러 — 디즈니 다이나믹 웜톤 (web --mkt-* 와 동일 언어, DESIGN-C-01) ── */
+  --nike-ink: #2b2620;
+  --nike-on-primary: #fffaf2;
+  --nike-canvas: #fffaf2;
+  --nike-soft-cloud: #faf5ea;
+  --nike-charcoal: #45403a;
+  --nike-ash: #5a544c;
+  --nike-mute: #6f6962;
+  --nike-stone: #a39c92;
+  --nike-hairline: #d8d0c2;
+  --nike-hairline-soft: #ece5d8;
   --nike-sale: #d30005;
   --nike-sale-deep: #780700;
   --nike-success: #007d48;
   --nike-success-bright: #1eaa52;
   --nike-info: #1151ff;
   --nike-info-deep: #0034e3;
+  --nike-accent: #e0633c; /* 코랄오렌지 — 포커스 액션/하이라이트 */
+  --nike-shadow-ink: rgba(43, 38, 32, 0.9);
+  --nike-ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
 
-  /* ── 파스텔 카드 (100p Admin 레퍼런스) ──────────────────────────────── */
-  --nike-card-pink: #fde7ec;
-  --nike-card-cream: #fef3d8;
-  --nike-card-mint: #e3f2e6;
-  --nike-card-lilac: #e8e4f8;
+  /* ── 파스텔 카드 — 웜톤 보정 (100p Admin 레퍼런스) ───────────────────── */
+  --nike-card-pink: #fce0e7;
+  --nike-card-cream: #fff3dc;
+  --nike-card-mint: #e2f1e8;
+  --nike-card-lilac: #ece2fa;
   --nike-card-lavender: #f0ecff;
 
   /* ── 간격 (8px 그리드) ───────────────────────────────────────────────── */
@@ -196,16 +199,19 @@ body {
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  transition: opacity 100ms;
+  transition:
+    opacity 100ms,
+    transform 180ms var(--nike-ease-spring);
   text-decoration: none;
   white-space: nowrap;
   flex-shrink: 0;
 }
 .nike-btn-primary:hover {
-  opacity: 0.82;
+  opacity: 0.88;
+  transform: translateY(-1px) scale(1.02);
 }
 .nike-btn-primary:active {
-  transform: scale(0.97);
+  transform: scale(0.96);
 }
 .nike-btn-primary:disabled {
   opacity: 0.38;
@@ -231,13 +237,19 @@ body {
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  transition: background-color 100ms;
+  transition:
+    background-color 100ms,
+    transform 180ms var(--nike-ease-spring);
   text-decoration: none;
   white-space: nowrap;
   flex-shrink: 0;
 }
 .nike-btn-secondary:hover {
   background-color: var(--nike-soft-cloud);
+  transform: translateY(-1px) scale(1.02);
+}
+.nike-btn-secondary:active {
+  transform: scale(0.96);
 }
 .nike-btn-secondary:disabled {
   opacity: 0.38;
@@ -263,13 +275,19 @@ body {
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  transition: background-color 100ms;
+  transition:
+    background-color 100ms,
+    transform 180ms var(--nike-ease-spring);
   text-decoration: none;
   white-space: nowrap;
   flex-shrink: 0;
 }
 .nike-btn-soft:hover {
   background-color: var(--nike-hairline-soft);
+  transform: translateY(-1px) scale(1.02);
+}
+.nike-btn-soft:active {
+  transform: scale(0.96);
 }
 .nike-btn-soft:focus-visible {
   outline: 2px solid var(--nike-ink);
@@ -280,12 +298,19 @@ body {
    Nike 카드
    ══════════════════════════════════════════════════════════════════════════ */
 
-/* 일반 카드 — 흰 배경 + hairline 테두리 */
+/* 일반 카드 — 웜 페이퍼 배경 + hairline 테두리 + 호버 리프트 */
 .nike-card {
   background-color: var(--nike-canvas);
   border: 1px solid var(--nike-hairline-soft);
   border-radius: var(--nike-rounded-md);
   padding: var(--nike-space-xl);
+  transition:
+    transform 180ms var(--nike-ease-spring),
+    box-shadow 180ms ease;
+}
+.nike-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 18px rgba(43, 38, 32, 0.08);
 }
 
 /* 파스텔 통계 카드 (100p Admin 레퍼런스) */
@@ -295,6 +320,13 @@ body {
   display: flex;
   flex-direction: column;
   gap: 8px;
+  transition:
+    transform 180ms var(--nike-ease-spring),
+    box-shadow 180ms ease;
+}
+.nike-card-pastel:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 18px rgba(43, 38, 32, 0.08);
 }
 .nike-card-pastel.pink {
   background-color: var(--nike-card-pink);
@@ -609,4 +641,30 @@ body {
 .nike-block-navy {
   background-color: var(--nike-card-navy);
   color: var(--nike-on-primary);
+}
+
+/* ══════════════════════════════════════════════════════════════════════════
+   접근성 — 모션 최소화 (DESIGN-C-01 스프링 인터랙션 가드)
+   ══════════════════════════════════════════════════════════════════════════ */
+@media (prefers-reduced-motion: reduce) {
+  .nike-btn-primary,
+  .nike-btn-secondary,
+  .nike-btn-soft,
+  .nike-card,
+  .nike-card-pastel {
+    transition:
+      opacity 100ms,
+      background-color 100ms;
+  }
+  .nike-btn-primary:hover,
+  .nike-btn-primary:active,
+  .nike-btn-secondary:hover,
+  .nike-btn-secondary:active,
+  .nike-btn-soft:hover,
+  .nike-btn-soft:active,
+  .nike-card:hover,
+  .nike-card-pastel:hover {
+    transform: none;
+    box-shadow: none;
+  }
 }
