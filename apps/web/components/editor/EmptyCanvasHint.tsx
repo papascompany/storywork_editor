@@ -99,8 +99,11 @@ export function EmptyCanvasHint({ canvas, onActivatePoseTool }: EmptyCanvasHintP
           'shadow-[var(--elevation-e2,0_2px_8px_rgba(0,0,0,0.08))]',
         )}
       >
-        {/* 아이콘 */}
-        <Sparkles className="size-6 text-[var(--editor-accent)]" aria-hidden="true" />
+        {/* 아이콘 — 코랄 액센트 + 부유 모션 (reduced-motion 시 정지) */}
+        <Sparkles
+          className="editor-float size-6 text-[var(--editor-accent-pop,var(--editor-accent))]"
+          aria-hidden="true"
+        />
 
         {/* 텍스트 */}
         <div className="text-center">

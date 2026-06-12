@@ -187,8 +187,8 @@ export function FormatPickerModal({
                   'focus-visible:outline-none focus-visible:ring-2',
                   'focus-visible:ring-[var(--editor-focus)] focus-visible:ring-offset-2',
                   isSelected
-                    ? 'border-[var(--editor-focus)] bg-[var(--editor-selected-bg)] shadow-md'
-                    : 'border-[var(--color-border)] bg-[var(--color-surface)] hover:border-[var(--editor-border-strong)]',
+                    ? 'border-[color:var(--editor-accent-pop,var(--editor-focus))] bg-[var(--editor-selected-bg)] shadow-md'
+                    : 'border-[color:var(--color-border)] bg-[var(--color-surface)] hover:border-[color:var(--editor-border-strong)]',
                 )}
                 data-testid={`format-preset-${preset.id}`}
               >
@@ -201,7 +201,7 @@ export function FormatPickerModal({
                 </div>
                 {isSelected && (
                   <div
-                    className="absolute top-2 right-2 size-4 rounded-full bg-[var(--editor-accent)] flex items-center justify-center"
+                    className="editor-pop-in absolute top-2 right-2 size-4 rounded-full bg-[var(--editor-accent-pop,var(--editor-accent))] flex items-center justify-center"
                     aria-hidden="true"
                   >
                     <svg
