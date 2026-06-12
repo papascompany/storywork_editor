@@ -67,6 +67,11 @@ model Format {
   bleedMm   Float    @default(3)
   safeMm    Float    @default(5)
   gridDef   Json?
+  // 표지(Cover) 기본 정책 — COVER-ADMIN-01 (마이그레이션 format_templateset_cover_settings)
+  coverEnabled  Boolean @default(false) // 표지 사용 유무 기본값
+  coverWidthMm  Float?                  // 표지 독립 폭 (null=widthMm 상속)
+  coverHeightMm Float?                  // 표지 독립 높이 (null=heightMm 상속)
+  isActive      Boolean @default(true)  // false 면 편집기 FormatPicker 에서 숨김
   templates Template[]
 }
 
@@ -88,6 +93,11 @@ model TemplateSet {
   name      String
   coverIdx  Int      @default(0)
   templates Template[]
+  // 표지 오버라이드 (null=Format 상속, tri-state) + 활성화 — COVER-ADMIN-01
+  coverEnabled  Boolean?
+  coverWidthMm  Float?
+  coverHeightMm Float?
+  isActive      Boolean @default(true)
 }
 
 model Resource {
@@ -134,6 +144,8 @@ model Project {
   format     Format   @relation(fields: [formatId], references: [id])
   title      String
   status     ProjectStatus @default(drafting)
+  // settings.cover: { widthMm, heightMm } | null — 표지 독립 치수 (FOLLOWUP-COVER-02).
+  // 표지 컨벤션: settings.cover 가 설정된 프로젝트는 pages[index=0] = 표지 페이지.
   settings   Json     @default("{}")
   pages      Page[]
   sceneDoc   SceneDoc?

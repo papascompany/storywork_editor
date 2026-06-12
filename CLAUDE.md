@@ -368,4 +368,4 @@ UI 작업 시 다음 SOP 를 반드시 준수한다 (2026-05-15 회고 기반):
 
 ---
 
-_Last updated: 2026-06-05 · M4 (8/8) + M6 (4/4) + LEGAL-OPS-01 + Audit + Perf 완료. Handoff: [docs/handoff/SESSION_HANDOFF_2026-06-05.md](docs/handoff/SESSION_HANDOFF_2026-06-05.md)_
+_Last updated: 2026-06-12 · Audit fix 7건 + 배포 복구 + 디즈니 다이나믹 리디자인(DESIGN-C-01~03) + 표지 풀스택(COVER-ADMIN-01/COVER-02) 완료. Handoff: [docs/handoff/SESSION_HANDOFF_2026-06-12.md](docs/handoff/SESSION_HANDOFF_2026-06-12.md)_
