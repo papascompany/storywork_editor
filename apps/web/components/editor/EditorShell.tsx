@@ -35,6 +35,8 @@ import { FabricImage, Rect } from 'fabric'
 import React, { useCallback, useEffect, useRef, useState } from 'react'
 
 import type { ResourceSummary } from '../../app/api/_lib/search-types'
+import type { CoverConfig } from '../../lib/cover-config'
+import { effectivePageFormat } from '../../lib/cover-config'
 import { DEFAULT_FORMAT, SEED_BACKGROUND_FILL, SEED_POSE_PNG_DATA_URL } from '../../lib/editor/seed'
 
 import { CommandPalette } from './CommandPalette'
@@ -393,6 +395,21 @@ export function EditorShell() {
       }
     }
 
+    // 1.5 FOLLOWUP-COVER-02: 표지(index 0)↔본문 전환 시 캔버스 치수 동기화
+    //     (표지 독립 치수 — canvas.format 단일 소스이므로 여기서만 갱신하면
+    //      포즈 배치/배경/익스포트 등 모든 소비자가 자동 추종)
+    const prevEff = effectivePageFormat(project.format, project.cover, prev)
+    const nextEff = effectivePageFormat(project.format, project.cover, currentPageIndex)
+    if (prevEff.widthMm !== nextEff.widthMm || prevEff.heightMm !== nextEff.heightMm) {
+      canvas.setFormat({
+        id: project.formatId,
+        widthMm: nextEff.widthMm,
+        heightMm: nextEff.heightMm,
+        dpi: project.format.dpi,
+      })
+      fitToViewport(canvas)
+    }
+
     // 2. 새 페이지 JSON 로드
     const newPage = pages[currentPageIndex]
     if (newPage) {
@@ -469,18 +486,25 @@ export function EditorShell() {
 
   // ── FormatPickerModal: 프로젝트 생성 ────────────────────────────
   const handleFormatSelect = useCallback(
-    (format: Parameters<typeof createProject>[0], formatId: string, title: string) => {
-      createProject(format, formatId, title)
+    (
+      format: Parameters<typeof createProject>[0],
+      formatId: string,
+      title: string,
+      cover: CoverConfig | null,
+    ) => {
+      createProject(format, formatId, title, { cover })
       setFormatPickerOpen(false)
       setFileName(title)
 
       const canvas = canvasRef.current
       if (canvas) {
         // FOLLOWUP-42: 판형 변경 → canvas.setFormat() → fabric dimensions 갱신
+        // FOLLOWUP-COVER-02: 표지 사용 시 첫 페이지(index 0)=표지 → 표지 치수로 시작
+        const eff = effectivePageFormat(format, cover, 0)
         canvas.setFormat({
           id: formatId,
-          widthMm: format.widthMm,
-          heightMm: format.heightMm,
+          widthMm: eff.widthMm,
+          heightMm: eff.heightMm,
           dpi: format.dpi,
         })
         canvas._fabricCanvas.clear()
@@ -506,10 +530,12 @@ export function EditorShell() {
     if (prevFormatIdRef.current === formatId) return
     prevFormatIdRef.current = formatId
 
+    // FOLLOWUP-COVER-02: 현재 페이지가 표지(index 0)면 표지 치수 적용
+    const eff = effectivePageFormat(format, project?.cover, project?.currentPageIndex ?? 0)
     canvas.setFormat({
       id: formatId,
-      widthMm: format.widthMm,
-      heightMm: format.heightMm,
+      widthMm: eff.widthMm,
+      heightMm: eff.heightMm,
       dpi: format.dpi,
     })
     fitToViewport(canvas)

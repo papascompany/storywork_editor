@@ -38,6 +38,8 @@ interface ApiProjectResponse {
     title: string
     formatId: string
     status: string
+    /** FOLLOWUP-COVER-02: Project.settings.cover (표지 독립 치수) */
+    cover?: { widthMm: number; heightMm: number } | null
   }
   pages: ApiProjectPage[]
 }
@@ -102,6 +104,7 @@ export function useProjectImport(
           title: data.project.title,
           formatId: data.project.formatId,
           format: FALLBACK_FORMAT,
+          cover: data.project.cover ?? null,
           pages: data.pages.map((p) => ({
             id: p.id,
             index: p.index,

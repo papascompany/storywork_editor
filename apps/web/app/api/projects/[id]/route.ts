@@ -87,12 +87,19 @@ export async function GET(
       return jsonError('이 프로젝트에 접근할 권한이 없습니다.', 403)
     }
 
+    // FOLLOWUP-COVER-02: settings.cover → 클라이언트 복원용
+    const settings = project.settings as {
+      cover?: { widthMm: number; heightMm: number } | null
+    } | null
+    const cover = settings?.cover ?? null
+
     return NextResponse.json({
       project: {
         id: project.id,
         title: project.title,
         formatId: project.formatId,
         status: project.status,
+        cover,
         createdAt: project.createdAt.toISOString(),
         updatedAt: project.updatedAt.toISOString(),
       },

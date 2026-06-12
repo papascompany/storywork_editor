@@ -39,6 +39,14 @@ const SaveProjectBodySchema = z.object({
   projectId: z.string().optional(),
   title: z.string().min(1).max(200),
   formatId: z.string().min(1),
+  /** FOLLOWUP-COVER-02: 표지 설정 — Project.settings.cover 로 영속화 (마이그레이션 불요) */
+  cover: z
+    .object({
+      widthMm: z.number().min(10).max(1500),
+      heightMm: z.number().min(10).max(1500),
+    })
+    .nullable()
+    .optional(),
   pages: z.array(PageInputSchema).min(1).max(100),
 })
 
@@ -103,6 +111,8 @@ export async function POST(req: Request): Promise<NextResponse> {
   const formatId = resolveFormatId(body.formatId)
   const prisma = getPrismaClient()
   const now = new Date()
+  // 표지 설정 → Project.settings Json (cover 미사용 시 null 로 명시 저장)
+  const settings = { cover: body.cover ?? null }
 
   // 4. Format 존재 확인
   const format = await prisma.format.findUnique({ where: { id: formatId } })
@@ -131,7 +141,7 @@ export async function POST(req: Request): Promise<NextResponse> {
       // 프로젝트 메타 업데이트
       await prisma.project.update({
         where: { id: projectId },
-        data: { title, formatId, updatedAt: now },
+        data: { title, formatId, settings, updatedAt: now },
       })
 
       // 페이지 upsert — 기존 index 기준으로 업서트
@@ -163,6 +173,7 @@ export async function POST(req: Request): Promise<NextResponse> {
           formatId,
           title: defaultTitle,
           status: 'drafting',
+          settings,
           pages: {
             create: pages.map((p) => ({
               index: p.index,

@@ -8,6 +8,8 @@
 import { create } from 'zustand'
 import { immer } from 'zustand/middleware/immer'
 
+import type { CoverConfig } from '../../../lib/cover-config'
+
 // ─── 타입 ─────────────────────────────────────────────────────────────────────
 
 export interface PageFormat {
@@ -39,6 +41,11 @@ export interface ProjectData {
   /** 'preset:b5-novel' / 'preset:a5-artbook' / 'preset:square' / 'preset:mobile-story' / DB Format ID */
   formatId: string
   format: PageFormat
+  /**
+   * 표지 설정 (FOLLOWUP-COVER-02) — 설정 시 pages[0] = 표지 페이지(독립 치수).
+   * null/undefined = 표지 없음. 서버 영속화는 Project.settings.cover.
+   */
+  cover?: CoverConfig | null
   pages: PageData[]
   currentPageIndex: number
   createdAt: number
@@ -51,7 +58,12 @@ interface PageStore {
   project: ProjectData | null
 
   // Project 액션
-  createProject: (format: PageFormat, formatId: string, title?: string) => void
+  createProject: (
+    format: PageFormat,
+    formatId: string,
+    title?: string,
+    opts?: { cover?: CoverConfig | null },
+  ) => void
   loadProject: (project: ProjectData) => void
   closeProject: () => void
   renameProject: (title: string) => void
@@ -97,7 +109,7 @@ export const usePageStore = create<PageStore>()(
 
     // ── Project 액션 ─────────────────────────────────────────────────────────
 
-    createProject(format, formatId, title) {
+    createProject(format, formatId, title, opts) {
       const now = Date.now()
       const dateStr = new Date(now).toLocaleDateString('ko-KR', {
         year: 'numeric',
@@ -105,7 +117,10 @@ export const usePageStore = create<PageStore>()(
         day: '2-digit',
       })
       const projectTitle = title ?? `새 콘티 ${dateStr}`
-      const page = makePage(0)
+      const cover = opts?.cover ?? null
+
+      // 표지 사용 시: pages[0] = 표지(독립 치수), pages[1] = 본문 1페이지
+      const pages = cover ? [makePage(0), makePage(1)] : [makePage(0)]
 
       set((s) => {
         s.project = {
@@ -113,7 +128,8 @@ export const usePageStore = create<PageStore>()(
           title: projectTitle,
           formatId,
           format,
-          pages: [page],
+          cover,
+          pages,
           currentPageIndex: 0,
           createdAt: now,
           updatedAt: now,

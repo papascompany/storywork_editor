@@ -94,6 +94,8 @@ type SavePayload = {
   projectId?: string
   title: string
   formatId: string
+  /** FOLLOWUP-COVER-02: 표지 설정 (Project.settings.cover 영속화) */
+  cover?: { widthMm: number; heightMm: number } | null
   pages: Array<{
     index: number
     fabricJson: Record<string, unknown>
@@ -180,6 +182,7 @@ export function useSaveProject(project: ProjectData | null): UseSaveProjectRetur
         projectId: serverProjectId ?? undefined,
         title: project.title,
         formatId: project.formatId,
+        cover: project.cover ?? null,
         pages: project.pages.map((p) => ({
           index: p.index,
           fabricJson: p.fabricJson,
@@ -218,6 +221,7 @@ export function useSaveProject(project: ProjectData | null): UseSaveProjectRetur
         projectId: serverProjectId ?? undefined,
         title: project.title,
         formatId: project.formatId,
+        cover: project.cover ?? null,
         pages: project.pages.map((p) => ({
           index: p.index,
           fabricJson: p.fabricJson,

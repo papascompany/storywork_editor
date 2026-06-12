@@ -32,6 +32,8 @@ import { usePageStore } from '../store/usePageStore'
 interface PageCardProps {
   page: PageData
   pageNumber: number
+  /** FOLLOWUP-COVER-02: 표지 페이지(index 0 + project.cover) 라벨 표시 */
+  coverLabel?: boolean
   isActive: boolean
   isDragging: boolean
   isDragOver: boolean
@@ -52,6 +54,7 @@ interface PageCardProps {
 function PageCard({
   page,
   pageNumber,
+  coverLabel = false,
   isActive,
   isDragging,
   isDragOver,
@@ -89,7 +92,7 @@ function PageCard({
       <button
         type="button"
         onClick={onSelect}
-        aria-label={`${pageNumber}페이지로 이동`}
+        aria-label={coverLabel ? '표지 페이지로 이동' : `${pageNumber}페이지로 이동`}
         aria-current={isActive ? 'true' : undefined}
         className={cn(
           'w-full overflow-hidden rounded-[var(--radius-md)]',
@@ -119,7 +122,7 @@ function PageCard({
           ) : (
             <div className="absolute inset-0 flex items-center justify-center">
               <span className="text-2xl font-bold text-[var(--color-text-muted)] opacity-30">
-                {pageNumber}
+                {coverLabel ? '표지' : pageNumber}
               </span>
             </div>
           )}
@@ -141,7 +144,7 @@ function PageCard({
       {/* 페이지 번호 + ⋯ 메뉴 */}
       <div className="flex items-center justify-between px-1 pt-1 pb-0.5">
         <span className="text-xs text-[var(--color-text-muted)] tabular-nums font-medium">
-          {pageNumber}
+          {coverLabel ? '표지' : pageNumber}
         </span>
 
         {/* ⋯ 드롭다운 (hover 시 또는 menu open 시 노출) */}
@@ -320,6 +323,7 @@ export function PagePanel({ onPageChange, onPageDelete, className }: PagePanelPr
         {pages.map((page, idx) => (
           <div role="listitem" key={page.id}>
             <PageCard
+              coverLabel={Boolean(project.cover) && idx === 0}
               page={page}
               pageNumber={idx + 1}
               isActive={idx === currentPageIndex}

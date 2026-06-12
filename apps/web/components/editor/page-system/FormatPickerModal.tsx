@@ -10,8 +10,10 @@
  */
 
 import { Button, Dialog, DialogContent, DialogHeader, DialogTitle, cn } from '@storywork/ui'
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 
+import type { CoverConfig } from '../../../lib/cover-config'
+import { resolveCoverConfig } from '../../../lib/cover-config'
 import type { PageFormat } from '../store/usePageStore'
 
 // ─── 프리셋 정의 ──────────────────────────────────────────────────────────────
@@ -26,6 +28,41 @@ interface FormatPresetCard {
   bleedMm: number
   safeMm: number
   emoji: string
+  /** admin 표지 설정 (DB 판형 한정 — 하드코드 프리셋은 undefined) */
+  coverEnabled?: boolean | null
+  coverWidthMm?: number | null
+  coverHeightMm?: number | null
+}
+
+/** GET /api/formats 응답 항목 */
+interface DbFormat {
+  id: string
+  name: string
+  widthMm: number
+  heightMm: number
+  dpi: number
+  bleedMm: number
+  safeMm: number
+  coverEnabled: boolean | null
+  coverWidthMm: number | null
+  coverHeightMm: number | null
+}
+
+function dbFormatToCard(f: DbFormat): FormatPresetCard {
+  return {
+    id: f.id,
+    name: f.name,
+    description: `${f.widthMm}×${f.heightMm}mm · ${f.dpi}dpi`,
+    widthMm: f.widthMm,
+    heightMm: f.heightMm,
+    dpi: f.dpi,
+    bleedMm: f.bleedMm,
+    safeMm: f.safeMm,
+    emoji: '',
+    coverEnabled: f.coverEnabled,
+    coverWidthMm: f.coverWidthMm,
+    coverHeightMm: f.coverHeightMm,
+  }
 }
 
 const FORMAT_PRESETS: FormatPresetCard[] = [
@@ -117,7 +154,8 @@ export interface FormatPickerModalProps {
   open: boolean
   /** dismissable=false 이면 overlay 클릭/ESC 로 닫히지 않음 */
   dismissable?: boolean
-  onSelect: (format: PageFormat, formatId: string, title: string) => void
+  /** cover: 표지 사용 판형이면 유효 표지 치수, 아니면 null (FOLLOWUP-COVER-02) */
+  onSelect: (format: PageFormat, formatId: string, title: string, cover: CoverConfig | null) => void
   onClose?: () => void
 }
 
@@ -129,6 +167,30 @@ export function FormatPickerModal({
 }: FormatPickerModalProps) {
   const [selectedPreset, setSelectedPreset] = useState<FormatPresetCard | null>(null)
   const [title, setTitle] = useState('')
+  // DB 판형 목록 (isActive=true 만) — 실패 시 하드코드 프리셋 폴백
+  const [dbCards, setDbCards] = useState<FormatPresetCard[] | null>(null)
+
+  useEffect(() => {
+    if (!open) return
+    let cancelled = false
+    void (async () => {
+      try {
+        const res = await fetch('/api/formats')
+        if (!res.ok) return
+        const data = (await res.json()) as { formats?: DbFormat[] }
+        if (!cancelled && data.formats && data.formats.length > 0) {
+          setDbCards(data.formats.map(dbFormatToCard))
+        }
+      } catch {
+        // 오프라인/오류 → 하드코드 프리셋 유지
+      }
+    })()
+    return () => {
+      cancelled = true
+    }
+  }, [open])
+
+  const cards = dbCards ?? FORMAT_PRESETS
 
   const defaultTitle = `새 콘티 ${new Date().toLocaleDateString('ko-KR', { year: 'numeric', month: '2-digit', day: '2-digit' })}`
 
@@ -142,7 +204,14 @@ export function FormatPickerModal({
       bleedMm: selectedPreset.bleedMm,
       safeMm: selectedPreset.safeMm,
     }
-    onSelect(format, selectedPreset.id, title.trim() || defaultTitle)
+    const cover = resolveCoverConfig({
+      widthMm: selectedPreset.widthMm,
+      heightMm: selectedPreset.heightMm,
+      coverEnabled: selectedPreset.coverEnabled,
+      coverWidthMm: selectedPreset.coverWidthMm,
+      coverHeightMm: selectedPreset.coverHeightMm,
+    })
+    onSelect(format, selectedPreset.id, title.trim() || defaultTitle, cover)
   }
 
   const handleOpenChange = (isOpen: boolean) => {
@@ -169,8 +238,9 @@ export function FormatPickerModal({
 
         {/* 프리셋 카드 그리드 — gap-4 mt-4 호흡감 */}
         <div className="grid grid-cols-2 gap-4 mt-4" role="radiogroup" aria-label="판형 선택">
-          {FORMAT_PRESETS.map((preset) => {
+          {cards.map((preset) => {
             const isSelected = selectedPreset?.id === preset.id
+            const hasCover = preset.coverEnabled === true
             return (
               <button
                 key={preset.id}
@@ -199,6 +269,17 @@ export function FormatPickerModal({
                     {preset.description}
                   </div>
                 </div>
+                {hasCover && (
+                  <span
+                    className={cn(
+                      'absolute top-2 left-2 rounded-full px-2 py-0.5 text-[10px] font-medium',
+                      'bg-[var(--editor-accent-pop,var(--editor-accent))] text-white',
+                    )}
+                    data-testid={`format-cover-badge-${preset.id}`}
+                  >
+                    표지 포함
+                  </span>
+                )}
                 {isSelected && (
                   <div
                     className="editor-pop-in absolute top-2 right-2 size-4 rounded-full bg-[var(--editor-accent-pop,var(--editor-accent))] flex items-center justify-center"
