@@ -194,6 +194,11 @@ export async function POST(
 
   const pages = (project as unknown as { pages: Array<Record<string, unknown>> }).pages
 
+  // FOLLOWUP-COVER-03: Project.settings.cover → 표지 페이지(index 0) 독립 치수
+  const coverDims =
+    (project.settings as { cover?: { widthMm: number; heightMm: number } | null } | null)?.cover ??
+    null
+
   const buildInput: PdfBuildInput = {
     formatId: project.formatId,
     format: {
@@ -210,6 +215,8 @@ export async function POST(
         pageIndex: p['index'] as number,
         fabricJson: (p['fabricJson'] as object) ?? { v: 1, format: {}, layers: [] },
         thumbnail: (p['thumbnail'] as string | null) ?? undefined,
+        // 표지 페이지(index 0)는 독립 치수로 렌더/검증
+        ...(coverDims && (p['index'] as number) === 0 ? { dims: coverDims } : {}),
       }),
     ),
     seed: 0,

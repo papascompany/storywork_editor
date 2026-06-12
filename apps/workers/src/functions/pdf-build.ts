@@ -154,6 +154,11 @@ export const pdfBuildJob = inngest.createFunction(
         thumbnail: string | null
       }>
 
+      // FOLLOWUP-COVER-03: Project.settings.cover → 표지 페이지(index 0) 독립 치수
+      const coverDims =
+        (project.settings as { cover?: { widthMm: number; heightMm: number } | null } | null)
+          ?.cover ?? null
+
       const buildInput: PdfBuildInput = {
         formatId: project.formatId,
         format: {
@@ -169,6 +174,8 @@ export const pdfBuildJob = inngest.createFunction(
             pageIndex: p.index,
             fabricJson: (p.fabricJson as object) ?? { v: 1, format: {}, layers: [] },
             thumbnail: p.thumbnail ?? undefined,
+            // 표지 페이지(index 0)는 독립 치수로 렌더
+            ...(coverDims && p.index === 0 ? { dims: coverDims } : {}),
           }),
         ),
         seed,

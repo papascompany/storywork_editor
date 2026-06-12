@@ -17,6 +17,8 @@ import type { PdfBuildInput } from '../../types.js'
 import type { PreflightProfile } from '../profiles.js'
 import type { PreflightViolation } from '../types.js'
 
+import { effectivePageDims } from './effective-dims.js'
+
 /** effectiveDpi 계산: 픽셀 너비 / (렌더 너비 inch) */
 function calcEffectiveDpi(pixelWidth: number, renderWidthMm: number): number {
   if (renderWidthMm <= 0) return 0
@@ -26,10 +28,11 @@ function calcEffectiveDpi(pixelWidth: number, renderWidthMm: number): number {
 
 export function dpiCheck(input: PdfBuildInput, profile: PreflightProfile): PreflightViolation[] {
   const violations: PreflightViolation[] = []
-  const { widthMm, heightMm } = input.format
-  const pageAreaMm2 = widthMm * heightMm
 
   for (const page of input.pages) {
+    // FOLLOWUP-COVER-03: 표지 등 독립 치수 페이지는 해당 면적 기준
+    const { widthMm, heightMm } = effectivePageDims(input, page)
+    const pageAreaMm2 = widthMm * heightMm
     const fabricJson = page.fabricJson as Record<string, unknown>
     const layers = fabricJson['layers']
     if (!Array.isArray(layers)) continue

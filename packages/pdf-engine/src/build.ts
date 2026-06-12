@@ -146,9 +146,10 @@ export async function buildPdf(
     ctx.warnings.push(...adapterWarnings)
 
     await renderPage({
+      // FOLLOWUP-COVER-03: 페이지별 치수 오버라이드(표지) — bleed/safe/dpi 는 format 상속
       dims: {
-        widthMm: input.format.widthMm,
-        heightMm: input.format.heightMm,
+        widthMm: pageInput.dims?.widthMm ?? input.format.widthMm,
+        heightMm: pageInput.dims?.heightMm ?? input.format.heightMm,
         bleedMm: input.format.bleedMm,
         safeMm: input.format.safeMm,
         dpi: input.format.dpi,

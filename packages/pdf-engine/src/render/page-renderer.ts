@@ -290,6 +290,10 @@ export async function renderPage(opts: RenderPageOptions): Promise<PDFPage> {
 
   const page = ctx.doc.addPage([totalWidthPt, totalHeightPt])
 
+  // FOLLOWUP-COVER-03: 페이지별 치수(표지) 지원 — y-flip 기준을 현재 페이지
+  // 높이로 동기화한다. 페이지는 순차 렌더되므로 공유 ctx 변이가 안전하다.
+  ctx.pageHeightPt = totalHeightPt
+
   // TrimBox / BleedBox 메타
   const bleedPt = bleedMm * MM_TO_PT
   // TrimBox: 인쇄 재단선 (bleed 제거 후 실제 책 크기)

@@ -12,6 +12,8 @@ import type { PdfBuildInput } from '../../types.js'
 import type { PreflightProfile } from '../profiles.js'
 import type { PreflightViolation } from '../types.js'
 
+import { effectivePageDims } from './effective-dims.js'
+
 /** mm 비교 허용 오차 */
 const MM_TOLERANCE = 0.5
 
@@ -44,9 +46,9 @@ export function pageCountCheck(
   }
 
   // 3. 각 페이지 크기 불일치 검사
-  const { widthMm, heightMm } = input.format
-
   for (const page of input.pages) {
+    // FOLLOWUP-COVER-03: 표지 페이지는 PageInput.dims(표지 치수)와 비교
+    const { widthMm, heightMm } = effectivePageDims(input, page)
     const fabricJson = page.fabricJson as Record<string, unknown>
     const pageFormat = fabricJson['format'] as Record<string, unknown> | undefined
 

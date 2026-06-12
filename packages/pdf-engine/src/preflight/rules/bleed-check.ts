@@ -12,6 +12,8 @@ import type { PdfBuildInput } from '../../types.js'
 import type { PreflightProfile } from '../profiles.js'
 import type { PreflightViolation } from '../types.js'
 
+import { effectivePageDims } from './effective-dims.js'
+
 /** 레이어가 bleed 영역(trim 경계 바깥)에 있는지 판별 */
 function isInBleedZone(
   x: number,
@@ -27,7 +29,7 @@ function isInBleedZone(
 
 export function bleedCheck(input: PdfBuildInput, profile: PreflightProfile): PreflightViolation[] {
   const violations: PreflightViolation[] = []
-  const { bleedMm, widthMm, heightMm } = input.format
+  const { bleedMm } = input.format
 
   // 1. bleed 값 최소 기준
   if (bleedMm < profile.bleedMm.min) {
@@ -51,6 +53,8 @@ export function bleedCheck(input: PdfBuildInput, profile: PreflightProfile): Pre
 
   // 3. 페이지별 레이어 bleed 침범 검사 (text/pose 레이어만 경고)
   for (const page of input.pages) {
+    // FOLLOWUP-COVER-03: 표지 등 독립 치수 페이지는 해당 치수 기준으로 검사
+    const { widthMm, heightMm } = effectivePageDims(input, page)
     const fabricJson = page.fabricJson as Record<string, unknown>
     const layers = fabricJson['layers']
     if (!Array.isArray(layers)) continue

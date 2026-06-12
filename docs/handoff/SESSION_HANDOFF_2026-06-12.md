@@ -25,7 +25,8 @@
 | OPS-CRON-01 | `dd14369` | vercel.json crons — hard-delete 매일 03:00 KST |
 | 배포 복구 | `fb7543b`+`b4287fd` | 레포 PUBLIC 복귀 → BLOCKED 24커밋 반영. admin `@storywork/schema` 미선언 의존성 수정 |
 | DESIGN-C-01~03 | `8027773`+`660c7db`+`dc262bb` | 디즈니 다이나믹 리디자인 — web 마케팅/admin/editor 크롬 |
-| FOLLOWUP-COVER-02 | (HEAD) | 표지 편집기 소비 — DB FormatPicker + 표지 페이지 + settings.cover |
+| FOLLOWUP-COVER-02 | `4cf39ee` | 표지 편집기 소비 — DB FormatPicker + 표지 페이지 + settings.cover |
+| FOLLOWUP-COVER-03 | (HEAD) | 표지 PDF 출판 통합 — pdf-engine 페이지별 치수 + preflight + 호출자 3곳 |
 
 ## 2. 핵심 아키텍처 결정 (이번 세션)
 
@@ -50,7 +51,7 @@
 ## 5. 다음 작업 후보 (우선순위)
 
 - **P1**: COMMS-01 Resend 이메일(Inquiry 답변 발송) · BOARD-05 신고 큐 · M4-01-03 LLM 보강 잔여
-- **P1 (표지 후속)**: 표지 페이지 PDF 출판 통합 — pdf-engine 이 cover 독립 치수 페이지를 어떻게 다룰지(현재 본문 치수 가정). preflight 표지 프로필.
+- ~~P1 (표지 후속): 표지 페이지 PDF 출판 통합~~ → ✅ 완료 (FOLLOWUP-COVER-03, 같은 날). 잔여: 인쇄소가 표지/내지 **분리 파일**(cover.pdf+content.pdf, Storige §19.4 패턴) 요구 시 2파일 출력 — 인쇄소 프로필 요구 발생 시 진행.
 - **P2**: M7 Stripe(게이트 2 후) · M8 SNS 카드 · M9 Lighthouse · PERF-WEB-04 RUM 재평가
 - **표지 set-오버라이드 소비**: resolveCoverConfig 는 TemplateSet 오버라이드를 지원하지만 현재 호출부는 Format 단독 — /editor/import(템플릿셋 플로) 연결은 후속.
 

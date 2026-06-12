@@ -36,6 +36,12 @@ export interface CoverInput {
   backgroundTone?: CoverTone
 }
 
+/** 페이지별 치수 오버라이드(mm) — 표지 등 독립 치수 페이지 (FOLLOWUP-COVER-03) */
+export interface PageDimsOverride {
+  widthMm: number
+  heightMm: number
+}
+
 /** 페이지 입력 */
 export interface PageInput {
   pageIndex: number
@@ -43,6 +49,11 @@ export interface PageInput {
   fabricJson: object
   /** 미리보기 썸네일 URL (사용 안 할 수도 있음) */
   thumbnail?: string
+  /**
+   * 페이지별 치수 오버라이드 — 표지(Project.settings.cover) 등.
+   * 미지정 시 format 치수. bleed/safe/dpi 는 항상 format 값 상속.
+   */
+  dims?: PageDimsOverride
 }
 
 /** buildPdf() 메인 입력 */

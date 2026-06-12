@@ -12,6 +12,7 @@ export type {
   CoverInput,
   CoverTone,
   PageInput,
+  PageDimsOverride,
 } from './types.js'
 
 export { MM_TO_PT, PDF_PRODUCER } from './types.js'

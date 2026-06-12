@@ -12,6 +12,8 @@ import type { PdfBuildInput } from '../../types.js'
 import type { PreflightProfile } from '../profiles.js'
 import type { PreflightViolation } from '../types.js'
 
+import { effectivePageDims } from './effective-dims.js'
+
 /** 레이어 bounds 가 safe area(safeMm 안쪽) 안에 완전히 들어오는지 */
 function isInsideSafeArea(
   x: number,
@@ -32,7 +34,7 @@ function isInsideSafeArea(
 
 export function safeCheck(input: PdfBuildInput, profile: PreflightProfile): PreflightViolation[] {
   const violations: PreflightViolation[] = []
-  const { safeMm, widthMm, heightMm } = input.format
+  const { safeMm } = input.format
 
   // 1. safeMm 값 최소 기준 검사
   if (safeMm < profile.safeMm.min) {
@@ -46,6 +48,8 @@ export function safeCheck(input: PdfBuildInput, profile: PreflightProfile): Pref
 
   // 2. 페이지별 레이어 safe area 침범 검사
   for (const page of input.pages) {
+    // FOLLOWUP-COVER-03: 표지 등 독립 치수 페이지는 해당 치수 기준으로 검사
+    const { widthMm, heightMm } = effectivePageDims(input, page)
     const fabricJson = page.fabricJson as Record<string, unknown>
     const layers = fabricJson['layers']
     if (!Array.isArray(layers)) continue
