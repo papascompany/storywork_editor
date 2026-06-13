@@ -13,6 +13,7 @@ import * as React from 'react'
 
 import { Footer } from '@/components/marketing/Footer'
 import { Header } from '@/components/marketing/Header'
+import { ShareBar } from '@/components/showcase/ShareBar'
 import { publicDisplayName } from '@/lib/display-name'
 import { prisma } from '@/lib/prisma'
 import { createWebServerClient } from '@/lib/supabase/server'
@@ -30,9 +31,26 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     select: { name: true },
   })
   if (!season) return { title: '공모전을 찾을 수 없습니다' }
+  const title = season.name
+  const description = `스토리워크 공모전 — ${title}. 나만의 스토리보드를 출품해보세요.`
+  const ogImage = '/api/og/default'
   return {
-    title: season.name,
-    description: `스토리워크 공모전 — ${season.name}`,
+    title,
+    description,
+    alternates: { canonical: `/contest/${seasonId}` },
+    openGraph: {
+      title,
+      description,
+      type: 'website',
+      url: `/contest/${seasonId}`,
+      images: [{ url: ogImage, width: 1200, height: 630, alt: title }],
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title,
+      description,
+      images: [ogImage],
+    },
   }
 }
 
@@ -228,6 +246,15 @@ export default async function ContestSeasonPage({ params }: Props) {
             >
               총 출품작
             </div>
+          </div>
+
+          {/* 공유 — 우측 정렬 */}
+          <div style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center' }}>
+            <ShareBar
+              title={`${season.name} — 스토리워크 공모전`}
+              text="스토리워크 공모전에 참여해보세요!"
+              subjectLabel="공모전"
+            />
           </div>
         </div>
 

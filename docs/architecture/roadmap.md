@@ -141,7 +141,8 @@
 - [ ] [M8-01] OG 이미지 자동 생성(nano-banana 2) — Lighthouse SEO 100 — @ui-designer
 - [x] [M8-02] 공모전 시즌 모듈 + admin CRUD — 사용자 목록/상세 페이지 완료, pg_cron 자동 동결은 BOARD-05로 별도 분리 — @admin-builder ✅ 2026-06-03 (commit 1ea593f)
 - [x] [M8-03] 뽐내기 갤러리 + 좋아요/댓글 — 무한 스크롤(cursor-based) + Reaction(like/heart/wow) + 댓글 CRUD 완료 — @ui-designer ✅ 2026-06-03 (commit 690a145)
-- [ ] [M8-04] SNS 공유 카드(카카오/X/페북) — 검증 — @ui-designer
+- [x] [M8-04] SNS 공유 — @ui-designer ✅ 2026-06-14 (무의존 채널). `ShareBar`(client) 신규: Web Share API(모바일 네이티브 시트, hydration-safe 피처 디텍션) + X(intent) + Facebook(sharer) + 링크 복사(clipboard+토스트). showcase 상세 + contest 상세에 배치 + openGraph/twitter 리치 카드 메타데이터(og:image=브랜드 default OG, metadataBase 절대화). 라이브 검증: X/Facebook/링크 원형 버튼 렌더 + SSR HTML + OG 절대 URL 확인(prod 임시 시드→스크린샷→삭제). 카카오톡 공유는 JS SDK+앱키(외부 의존) 필요 → [FOLLOWUP-66] 로 분리.
+- [ ] [FOLLOWUP-66] 카카오톡 공유 채널 — `ShareBar` 에 카카오 추가. Kakao JS SDK 로드 + `NEXT_PUBLIC_KAKAO_JS_KEY`(외부 앱키, 🚦 휴먼 게이트) 필요. 앱키 발급 후 SDK init + Kakao.Share.sendDefault(피드 템플릿) 연결 — @ui-designer
 
 ## BOARD — 공모전/공지/Q&A/갤러리 (2026-06-03)
 

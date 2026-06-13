@@ -15,6 +15,7 @@ import { ReactionBar } from './ReactionBar'
 import { Footer } from '@/components/marketing/Footer'
 import { Header } from '@/components/marketing/Header'
 import { ReportButton } from '@/components/showcase/ReportButton'
+import { ShareBar } from '@/components/showcase/ShareBar'
 import { publicDisplayName } from '@/lib/display-name'
 import { prisma } from '@/lib/prisma'
 import { createWebServerClient } from '@/lib/supabase/server'
@@ -32,9 +33,27 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     include: { project: { select: { title: true } } },
   })
   if (!showcase) return { title: '작품을 찾을 수 없습니다' }
+  const title = showcase.project.title
+  const description = `스토리워크 갤러리에 출품된 작품 — ${title}`
+  // 작품별 동적 OG 이미지는 M8-01(향후). 현재는 브랜드 기본 OG 카드 사용.
+  const ogImage = '/api/og/default'
   return {
-    title: showcase.project.title,
-    description: `스토리워크 갤러리 — ${showcase.project.title}`,
+    title,
+    description,
+    alternates: { canonical: `/showcase/${id}` },
+    openGraph: {
+      title,
+      description,
+      type: 'article',
+      url: `/showcase/${id}`,
+      images: [{ url: ogImage, width: 1200, height: 630, alt: title }],
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title,
+      description,
+      images: [ogImage],
+    },
   }
 }
 
@@ -164,11 +183,20 @@ export default async function ShowcaseDetailPage({ params }: Props) {
             fontSize: '13px',
             color: 'var(--mkt-ink)',
             opacity: 0.5,
-            marginBottom: '32px',
+            marginBottom: '20px',
           }}
         >
           {ownerName} · {formatDate(showcase.createdAt)}
         </p>
+
+        {/* 공유 */}
+        <div style={{ marginBottom: '32px' }}>
+          <ShareBar
+            title={showcase.project.title}
+            text={`스토리워크 갤러리 — ${showcase.project.title}`}
+            subjectLabel="작품"
+          />
+        </div>
 
         {/* 썸네일 */}
         {thumbnail && (
