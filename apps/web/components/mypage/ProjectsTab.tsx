@@ -13,6 +13,7 @@
  */
 import * as React from 'react'
 
+import { ContestSubmitCard } from './ContestSubmitCard'
 import { EmptyState } from './EmptyState'
 import { NewProjectCard, ProjectCard } from './ProjectCard'
 
@@ -25,11 +26,95 @@ export interface ProjectData {
   pageCount: number
 }
 
-interface ProjectsTabProps {
-  projects: ProjectData[]
+/** 공모전 출품 모드 컨텍스트 (BOARD-05). null 이면 일반 작품 목록 */
+export interface ContestSubmissionContext {
+  id: string
+  name: string
+  /** 출품 가능 여부 (진행 중 + 미동결) */
+  open: boolean
 }
 
-export function ProjectsTab({ projects }: ProjectsTabProps) {
+interface ProjectsTabProps {
+  projects: ProjectData[]
+  contestSubmission?: ContestSubmissionContext | null
+}
+
+export function ProjectsTab({ projects, contestSubmission = null }: ProjectsTabProps) {
+  // ── 공모전 출품 모드 ─────────────────────────────────────────────────────────
+  if (contestSubmission) {
+    return (
+      <section aria-label="공모전 출품 작품 선택">
+        <div
+          style={{
+            marginBottom: 'var(--mkt-space-lg)',
+            padding: '16px 20px',
+            borderRadius: 'var(--mkt-rounded-md)',
+            backgroundColor: 'var(--mkt-surface-soft)',
+            border: '1px solid var(--mkt-hairline)',
+          }}
+        >
+          <h2
+            style={{
+              fontFamily: 'var(--mkt-font-sans)',
+              fontSize: '18px',
+              fontWeight: 600,
+              color: 'var(--mkt-ink)',
+              margin: '0 0 4px',
+            }}
+          >
+            「{contestSubmission.name}」 출품
+          </h2>
+          <p
+            style={{
+              fontFamily: 'var(--mkt-font-sans)',
+              fontSize: '13px',
+              color: 'var(--mkt-ink)',
+              opacity: 0.6,
+              margin: 0,
+            }}
+          >
+            {contestSubmission.open
+              ? '출품할 작품을 선택해 "이 작품 출품" 버튼을 눌러주세요. (작품당 한 번)'
+              : '이 공모전은 출품이 마감되었습니다.'}
+          </p>
+        </div>
+
+        {projects.length === 0 ? (
+          <EmptyState />
+        ) : (
+          <div
+            style={{
+              display: 'grid',
+              gap: 'var(--mkt-space-md)',
+              gridTemplateColumns: 'repeat(2, 1fr)',
+            }}
+            className="projects-grid"
+          >
+            {projects.map((project) => (
+              <ContestSubmitCard
+                key={project.id}
+                contestId={contestSubmission.id}
+                open={contestSubmission.open}
+                id={project.id}
+                title={project.title}
+                thumbnail={project.thumbnail}
+                pageCount={project.pageCount}
+              />
+            ))}
+          </div>
+        )}
+
+        <style>{`
+          @media (min-width: 768px) { .projects-grid { grid-template-columns: repeat(3, 1fr); } }
+          @media (min-width: 1024px) { .projects-grid { grid-template-columns: repeat(4, 1fr); } }
+          @media (min-width: 1280px) { .projects-grid { grid-template-columns: repeat(5, 1fr); } }
+          @media (min-width: 1536px) { .projects-grid { grid-template-columns: repeat(6, 1fr); } }
+        `}</style>
+      </section>
+    )
+  }
+
+  // ── 일반 작품 목록 ───────────────────────────────────────────────────────────
   return (
     <section aria-label="내 작품 목록">
       {/* 헤더 영역 */}

@@ -431,6 +431,9 @@ model Showcase {
   reactions Reaction[]
   comments  Comment[]
 
+  // 동일 프로젝트의 같은 공모전 중복 출품 방지 (BOARD-05).
+  // contestId 가 NULL(갤러리) 인 행은 Postgres 가 각각 distinct 로 취급 → 갤러리엔 영향 없음.
+  @@unique([projectId, contestId])
   @@index([ownerId])
   @@index([mode, contestId])
   @@index([hidden])
@@ -458,9 +461,15 @@ model ContestSeason {
   closesAt  DateTime
   resultsAt DateTime?
   rules     String
+  /// 출품 동결 여부 — closesAt 경과 시 cron(/api/cron/freeze-seasons)이 true 로 전환 (BOARD-05).
+  /// 출품 시간 게이트는 엔드포인트가 권위를 가지며, frozen 은 영속 스냅샷 + admin 수동 제어용.
+  frozen    Boolean    @default(false)
   createdAt DateTime   @default(now())
   updatedAt DateTime   @updatedAt
   entries   Showcase[]
+
+  // cron 동결 대상 조회용: 미동결 + closesAt 경과
+  @@index([frozen, closesAt])
 }
 
 /// 인쇄소 사양 프리셋 (POD preflight 프로필)

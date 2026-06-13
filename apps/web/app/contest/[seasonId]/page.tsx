@@ -73,8 +73,9 @@ export default async function ContestSeasonPage({ params }: Props) {
     // 비로그인
   }
 
-  const isOngoing = now >= season.opensAt && now <= season.closesAt
-  const isEnded = now > season.closesAt
+  // frozen(자동 동결) 은 시간 경과와 동일하게 마감으로 취급 (BOARD-05)
+  const isOngoing = !season.frozen && now >= season.opensAt && now <= season.closesAt
+  const isEnded = season.frozen || now > season.closesAt
 
   return (
     <div style={{ backgroundColor: 'var(--mkt-canvas)', minHeight: '100dvh' }}>

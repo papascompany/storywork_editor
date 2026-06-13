@@ -9,6 +9,10 @@
     {
       "path": "/api/cron/hard-delete-users",
       "schedule": "0 18 * * *"
+    },
+    {
+      "path": "/api/cron/freeze-seasons",
+      "schedule": "0 1 * * *"
     }
   ]
 }

@@ -20,7 +20,13 @@ import { getCurrentUser } from '@/lib/users'
 
 export const dynamic = 'force-dynamic'
 
-export default async function MyPage() {
+interface MyPageProps {
+  searchParams: Promise<{ tab?: string; contestId?: string }>
+}
+
+export default async function MyPage({ searchParams }: MyPageProps) {
+  const { contestId } = await searchParams
+
   // ── 1. 인증 확인 ────────────────────────────────────────────────────────────
   const supabase = await createWebServerClient()
   const {
@@ -28,7 +34,7 @@ export default async function MyPage() {
   } = await supabase.auth.getUser()
 
   if (!authUser) {
-    redirect('/login?next=/mypage')
+    redirect(`/login?next=/mypage${contestId ? `?tab=projects%26contestId=${contestId}` : ''}`)
   }
 
   // ── 2. DB User upsert ────────────────────────────────────────────────────────
@@ -88,6 +94,27 @@ export default async function MyPage() {
     pageCount: p._count.pages,
   }))
 
+  // ── 3.5 공모전 출품 모드 (?contestId=) — 시즌명/개방여부 조회 (BOARD-05) ──────
+  let contestSubmission: { id: string; name: string; open: boolean } | null = null
+  if (contestId) {
+    try {
+      const season = await prisma.contestSeason.findUnique({
+        where: { id: contestId },
+        select: { id: true, name: true, opensAt: true, closesAt: true, frozen: true },
+      })
+      if (season) {
+        const now = new Date()
+        contestSubmission = {
+          id: season.id,
+          name: season.name,
+          open: !season.frozen && now >= season.opensAt && now <= season.closesAt,
+        }
+      }
+    } catch {
+      // 조회 실패 시 일반 모드로 fallthrough
+    }
+  }
+
   // ── 4. Shell 렌더 ─────────────────────────────────────────────────────────────
   const userId = dbUser?.id ?? authUser.id
   const email = dbUser?.email ?? authUser.email ?? ''
@@ -101,6 +128,7 @@ export default async function MyPage() {
       name={name}
       createdAt={createdAt}
       projects={projects}
+      contestSubmission={contestSubmission}
     />
   )
 }

@@ -21,7 +21,7 @@ import { BillingTab } from './BillingTab'
 import { MyDataTab } from './MyDataTab'
 import { ProfileTab } from './ProfileTab'
 import { ProjectsTab } from './ProjectsTab'
-import type { ProjectData } from './ProjectsTab'
+import type { ContestSubmissionContext, ProjectData } from './ProjectsTab'
 
 // ─── 탭 정의 ──────────────────────────────────────────────────────────────────
 
@@ -45,6 +45,8 @@ interface MyPageShellProps {
   createdAt: Date
   projects: ProjectData[]
   marketingConsent?: boolean
+  /** 공모전 출품 모드 컨텍스트 (?contestId= 진입 시). null 이면 일반 작품 목록 (BOARD-05) */
+  contestSubmission?: ContestSubmissionContext | null
 }
 
 // ─── 컴포넌트 ─────────────────────────────────────────────────────────────────
@@ -56,6 +58,7 @@ export function MyPageShell({
   createdAt,
   projects,
   marketingConsent = false,
+  contestSubmission = null,
 }: MyPageShellProps) {
   const router = useRouter()
   const searchParams = useSearchParams()
@@ -72,7 +75,7 @@ export function MyPageShell({
   function renderTab() {
     switch (activeTab) {
       case 'projects':
-        return <ProjectsTab projects={projects} />
+        return <ProjectsTab projects={projects} contestSubmission={contestSubmission} />
       case 'profile':
         return <ProfileTab userId={userId} email={email} name={name} createdAt={createdAt} />
       case 'billing':

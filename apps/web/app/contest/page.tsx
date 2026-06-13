@@ -27,7 +27,8 @@ function formatDateRange(opensAt: Date, closesAt: Date) {
 
 type SeasonStatus = 'ongoing' | 'upcoming' | 'ended'
 
-function getStatus(now: Date, opensAt: Date, closesAt: Date): SeasonStatus {
+function getStatus(now: Date, opensAt: Date, closesAt: Date, frozen: boolean): SeasonStatus {
+  if (frozen) return 'ended' // 자동 동결된 시즌은 종료 처리 (BOARD-05)
   if (now < opensAt) return 'upcoming'
   if (now >= opensAt && now <= closesAt) return 'ongoing'
   return 'ended'
@@ -49,9 +50,13 @@ export default async function ContestPage() {
     },
   })
 
-  const ongoing = seasons.filter((s) => getStatus(now, s.opensAt, s.closesAt) === 'ongoing')
-  const upcoming = seasons.filter((s) => getStatus(now, s.opensAt, s.closesAt) === 'upcoming')
-  const ended = seasons.filter((s) => getStatus(now, s.opensAt, s.closesAt) === 'ended')
+  const ongoing = seasons.filter(
+    (s) => getStatus(now, s.opensAt, s.closesAt, s.frozen) === 'ongoing',
+  )
+  const upcoming = seasons.filter(
+    (s) => getStatus(now, s.opensAt, s.closesAt, s.frozen) === 'upcoming',
+  )
+  const ended = seasons.filter((s) => getStatus(now, s.opensAt, s.closesAt, s.frozen) === 'ended')
 
   function SeasonCard({ season, status }: { season: (typeof seasons)[0]; status: SeasonStatus }) {
     const badge = STATUS_BADGE[status]
