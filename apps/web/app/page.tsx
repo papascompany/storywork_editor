@@ -18,6 +18,7 @@ import { Header } from '../components/marketing/Header'
 import { MarqueeStrip } from '../components/marketing/MarqueeStrip'
 import { PillButton } from '../components/marketing/PillButton'
 import { ScrollReveal } from '../components/marketing/ScrollReveal'
+import { FEATURED_FAQS } from '../lib/faq-data'
 import { getDerbymanScenes, getPoseShowcase } from '../lib/marketing-assets'
 
 const BASE_URL = 'https://storywork-editor-web.vercel.app'
@@ -319,44 +320,8 @@ function PersonaSection() {
 
 /* ── A.3 FAQ ─────────────────────────────────────────────────────────────── */
 function FaqSection() {
-  const faqs = [
-    {
-      q: 'AI가 자동 배치한 결과를 직접 수정할 수 있나요?',
-      a: '네. AI가 생성한 초안은 출발점일 뿐입니다. fabric.js 기반 편집기에서 포즈·배경·말풍선·텍스트를 모두 자유롭게 바꿀 수 있습니다. 마음에 안 드는 포즈는 한 클릭으로 교체, 위치와 크기도 드래그로 조정 가능합니다.',
-    },
-    {
-      q: '포즈 라이브러리의 저작권은 어떻게 되나요?',
-      a: '스토리워크 포즈 자산은 서비스 내 사용 및 POD 상업 출판까지 허용됩니다. 단, 자산 자체를 추출해 외부에서 재배포하는 것은 금지됩니다. 정확한 라이선스 조건은 이용약관을 참조해 주세요.',
-    },
-    {
-      q: 'POD 출판이란 무엇인가요?',
-      a: 'Print-On-Demand의 약자로, 주문이 들어올 때마다 소량 인쇄하는 방식입니다. 스토리워크는 인쇄소에 전달 가능한 재단선·여백이 포함된 PDF를 자동 생성합니다. 재고 없이 1권도 출판 가능합니다.',
-    },
-    {
-      q: '모바일에서도 편집이 가능한가요?',
-      a: '가능합니다. 터치 기반 모바일 편집을 지원하며 핀치 줌, 레이어 패널(BottomSheet), 인스펙터 풀스크린 모드가 제공됩니다. 다만 정밀 작업(레이어 세부 조정 등)은 데스크톱을 권장합니다.',
-    },
-    {
-      q: '내가 쓴 대본은 AI 학습에 사용되나요?',
-      a: '아니오. 이용자가 입력한 대본은 장면 분석 목적으로만 Claude API에 전달되며, Anthropic의 데이터 처리 정책에 따라 모델 학습에 사용되지 않습니다. 자세한 내용은 개인정보처리방침을 참조해 주세요.',
-    },
-    {
-      q: '지원하는 출판 판형(판형 프리셋)이 무엇인가요?',
-      a: '현재 B5(130×188mm), A5(148×210mm), 정사각형(170×170mm), 세로형(128×182mm)을 지원합니다. 재단 여백(bleed) 3mm가 자동 적용됩니다. 관리자 등록으로 사용자 정의 판형 추가도 가능합니다.',
-    },
-    {
-      q: '무료로 사용할 수 있는 범위는 어느 정도인가요?',
-      a: '베타 기간 중에는 모든 핵심 기능(편집기, AI 자동 배치, PDF 출판)을 무료로 이용할 수 있습니다. 정식 출시 후 플랜별 차등 제공으로 전환될 예정이며, 사전 공지 후 적용됩니다.',
-    },
-    {
-      q: '협업 기능은 지원하나요?',
-      a: '현재는 단독 편집 모드만 지원합니다. 2인 이상 실시간 협업(Yjs 기반)은 로드맵에 있으며, 이 버전에서는 파일 공유(JSON 내보내기/가져오기)로 협업을 대체할 수 있습니다.',
-    },
-    {
-      q: '제 캐릭터(리소스)를 직접 등록할 수 있나요?',
-      a: '크리에이터 플랜(예정)에서 가능합니다. PNG 투명 배경 이미지를 업로드하면 마이데이터 패널에 등록되어 편집기에서 바로 사용할 수 있습니다. 베타 기간에는 관리자 검수를 통해 시스템 라이브러리 등록도 신청할 수 있습니다.',
-    },
-  ]
+  // 단일 소스(lib/faq-data.ts)의 대표 질문만 랜딩에 노출. 전체는 /faq.
+  const faqs = FEATURED_FAQS
 
   return (
     <div
@@ -446,6 +411,23 @@ function FaqSection() {
               ))}
               <div style={{ borderTop: '1px solid var(--mkt-hairline)' }} aria-hidden="true" />
             </div>
+
+            <Link
+              href="/faq"
+              className="mkt-body-sm"
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '6px',
+                marginTop: 'var(--mkt-space-xl)',
+                color: 'var(--mkt-ink)',
+                fontWeight: 500,
+                textDecoration: 'underline',
+                textUnderlineOffset: '3px',
+              }}
+            >
+              전체 자주 묻는 질문 보기 →
+            </Link>
           </div>
 
           <style>{`

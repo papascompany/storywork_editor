@@ -150,7 +150,7 @@
 - [x] [BOARD-03] 공모전 시즌 사용자 페이지(/contest, /contest/[seasonId]) + admin — @architect ✅ 2026-06-03
 - [x] [BOARD-04] 갤러리(/showcase) + 댓글 + Reaction + admin 모더레이션 — @architect ✅ 2026-06-03
 - [ ] [BOARD-05] pg_cron 자동 동결 (시즌 closesAt 지나면 출품 자동 잠금) — @architect (P1, M8-02 후속)
-- [ ] [BOARD-06] FAQ 별도 페이지 + 카테고리 — @ui-designer (P1)
+- [x] [BOARD-06] FAQ 별도 페이지 + 카테고리 — @ui-designer ✅ 2026-06-12 — `lib/faq-data.ts` 단일 소스(5 카테고리·18문항)를 랜딩 FAQ(featured 8)와 `/faq` 전용 페이지가 공유. /faq: 카테고리 앵커 칩 네비 + 색구분 섹션 + 아코디언(스프링 +→×) + FAQPage JSON-LD(SEO) + sitemap/Footer 링크. 최근 기능(표지·신고·탈퇴 파기) 문항 보강. 신규 테스트 6, web 545 green.
 - [x] [BOARD-07] 신고 큐 (Comment/Showcase 신고 접수 + admin 처리) — @admin-builder ✅ 2026-06-12 — Report 모델 + 3 enum + Showcase.hidden(마이그레이션 `20260613000000_report_queue`, prod 적용). 접수: POST /api/reports(로그인 필수·세션 reporterId·멱등 createMany skipDuplicates) + ReportButton(사유 6종 모달, /showcase/[id] 작품 + 댓글 아이콘) + 공개 목록 3곳 hidden 필터. admin /reports: status 탭 큐 + 누적 신고수(groupBy) + hide(숨김+같은 대상 일괄 resolved)/dismiss/reviewing + recordAudit. 신규 테스트 13.
 
 ## LEGAL-OPS — 한국 법규 출시 필수 (P0, 출시 전 완료 필수)

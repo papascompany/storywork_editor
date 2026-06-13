@@ -29,6 +29,7 @@ const FOOTER_LINKS = {
     { label: '사례', href: '/showcase/derbyman' },
     { label: '공지사항', href: '/notices' },
     { label: '공모전', href: '/contest' },
+    { label: '자주 묻는 질문', href: '/faq' },
     { label: 'Q&A 문의', href: '/contact' },
   ],
   리소스: [
