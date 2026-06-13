@@ -9,6 +9,7 @@
  *
  * 상태: idle → submitting → done(이동) | duplicate | error
  */
+import { showToast } from '@storywork/ui'
 import { useRouter } from 'next/navigation'
 import * as React from 'react'
 
@@ -68,6 +69,8 @@ export function ContestSubmitCard({
 
       if (res.status === 201) {
         setState('done')
+        // 루트 ToastProvider 라 navigation 후에도 토스트가 유지된다.
+        showToast('출품이 완료되었습니다! 출품작 갤러리에서 확인하세요.', 'success')
         router.push(`/contest/${contestId}`)
         return
       }
