@@ -82,6 +82,30 @@ enum InquiryStatus {
   CLOSED
 }
 
+/// 신고 대상 종류 (BOARD-07)
+enum ReportTargetType {
+  showcase
+  comment
+}
+
+/// 신고 사유 (BOARD-07)
+enum ReportReason {
+  spam
+  abuse
+  sexual
+  violence
+  copyright
+  etc
+}
+
+/// 신고 처리 상태 (BOARD-07)
+enum ReportStatus {
+  pending
+  reviewing
+  resolved
+  dismissed
+}
+
 // ─────────────────────────────────────────────
 // Models
 // ─────────────────────────────────────────────
@@ -119,6 +143,7 @@ model User {
   notices          Notice[]
   inquiries        Inquiry[]
   comments         Comment[]
+  reports          Report[]         @relation("ReporterReports")
   printerProfiles    PrinterProfile[]
   companyInfoUpdates CompanyInfo[]
 
@@ -399,6 +424,8 @@ model Showcase {
   contestId String?
   contest   ContestSeason? @relation(fields: [contestId], references: [id])
   likes     Int            @default(0)
+  /// 신고 처리(숨김) 여부 — true 면 공개 갤러리에서 제외 (BOARD-07)
+  hidden    Boolean        @default(false)
   createdAt DateTime       @default(now())
   updatedAt DateTime       @updatedAt
   reactions Reaction[]
@@ -406,6 +433,7 @@ model Showcase {
 
   @@index([ownerId])
   @@index([mode, contestId])
+  @@index([hidden])
 }
 
 /// 쇼케이스 리액션 (좋아요 등)
@@ -532,6 +560,34 @@ model Comment {
   updatedAt  DateTime @updatedAt
 
   @@index([showcaseId, createdAt])
+}
+
+/// 신고 (Showcase/Comment 어뷰즈 신고 + admin 처리 큐) — BOARD-07
+/// targetId 는 다형(showcase|comment) 이라 FK 없이 문자열로 보관, 처리 시 조회.
+model Report {
+  id         String           @id @default(cuid())
+  targetType ReportTargetType
+  /// Showcase.id 또는 Comment.id (targetType 에 따라)
+  targetId   String
+  reason     ReportReason
+  /// 신고자 상세 설명 (선택)
+  detail     String?          @db.Text
+  /// 신고자 — 로그인 필수 (남용 방지). 탈퇴 시 SetNull
+  reporterId String?
+  reporter   User?            @relation("ReporterReports", fields: [reporterId], references: [id], onDelete: SetNull)
+  status     ReportStatus     @default(pending)
+  /// admin 처리 메모 (숨김/기각 사유)
+  resolution String?          @db.Text
+  /// 처리한 admin User.id
+  reviewerId String?
+  reviewedAt DateTime?
+  createdAt  DateTime         @default(now())
+  updatedAt  DateTime         @updatedAt
+
+  /// 같은 사용자가 같은 대상을 중복 신고하는 것을 방지 (멱등)
+  @@unique([targetType, targetId, reporterId])
+  @@index([status, createdAt])
+  @@index([targetType, targetId])
 }
 
 /// 회사 정보 (사업자 정보 + 운영자 연락처) — 싱글톤 (1 row only)

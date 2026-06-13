@@ -14,6 +14,7 @@ import { ReactionBar } from './ReactionBar'
 
 import { Footer } from '@/components/marketing/Footer'
 import { Header } from '@/components/marketing/Header'
+import { ReportButton } from '@/components/showcase/ReportButton'
 import { prisma } from '@/lib/prisma'
 import { createWebServerClient } from '@/lib/supabase/server'
 
@@ -201,15 +202,31 @@ export default async function ShowcaseDetailPage({ params }: Props) {
           }}
         />
 
-        {/* Reaction 바 */}
-        <ReactionBar
-          showcaseId={showcase.id}
-          reactionCounts={reactionCounts}
-          currentUserId={currentUserId}
-          userReactions={showcase.reactions
-            .filter((r) => currentUserId && r.userId === currentUserId)
-            .map((r) => r.kind)}
-        />
+        {/* Reaction 바 + 신고 */}
+        <div
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            gap: '12px',
+            flexWrap: 'wrap',
+          }}
+        >
+          <ReactionBar
+            showcaseId={showcase.id}
+            reactionCounts={reactionCounts}
+            currentUserId={currentUserId}
+            userReactions={showcase.reactions
+              .filter((r) => currentUserId && r.userId === currentUserId)
+              .map((r) => r.kind)}
+          />
+          <ReportButton
+            targetType="showcase"
+            targetId={showcase.id}
+            isAuthenticated={Boolean(currentUserId)}
+            label="작품 신고"
+          />
+        </div>
 
         <div
           style={{

@@ -31,6 +31,7 @@ const NAV_ITEMS: NavItemDef[] = [
   { href: '/inquiries', label: '문의 처리', exact: false },
   { href: '/contests', label: '공모전', exact: false },
   { href: '/showcase', label: '쇼케이스 관리', exact: false },
+  { href: '/reports', label: '신고 처리', exact: false },
   { href: '/printers', label: '인쇄소 프로필', exact: false },
   { href: '/users', label: '회원 관리', exact: false },
   { href: '/audit', label: '감사 로그', exact: false },

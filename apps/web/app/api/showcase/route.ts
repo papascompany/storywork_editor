@@ -24,6 +24,7 @@ export async function GET(request: Request): Promise<NextResponse> {
 
   try {
     const items = await prisma.showcase.findMany({
+      where: { hidden: false },
       orderBy,
       take: limit,
       ...(cursor ? { skip: 1, cursor: { id: cursor } } : {}),

@@ -23,6 +23,7 @@ export const metadata: Metadata = {
 export default async function ShowcasePage() {
   // 초기 20개 (최신순)
   const initial = await prisma.showcase.findMany({
+    where: { hidden: false },
     orderBy: { createdAt: 'desc' },
     take: 20,
     include: {

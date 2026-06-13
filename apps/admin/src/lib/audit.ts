@@ -25,6 +25,7 @@ export type AuditEntityType =
   | 'ContestSeason'
   | 'Showcase'
   | 'Comment'
+  | 'Report'
   | 'PrinterProfile'
   | 'CompanyInfo'
 

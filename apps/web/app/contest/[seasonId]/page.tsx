@@ -49,7 +49,7 @@ export default async function ContestSeasonPage({ params }: Props) {
       include: { _count: { select: { entries: true } } },
     }),
     prisma.showcase.findMany({
-      where: { contestId: seasonId, mode: 'contest' },
+      where: { contestId: seasonId, mode: 'contest', hidden: false },
       orderBy: { likes: 'desc' },
       take: 24,
       include: {

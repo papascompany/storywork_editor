@@ -9,6 +9,8 @@
  */
 import * as React from 'react'
 
+import { ReportButton } from '@/components/showcase/ReportButton'
+
 export interface CommentData {
   id: string
   body: string
@@ -163,6 +165,9 @@ export function CommentSection({
                 </span>
                 <span
                   style={{
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '4px',
                     fontFamily: 'var(--mkt-font-mono)',
                     fontSize: '11px',
                     color: 'var(--mkt-ink)',
@@ -170,6 +175,15 @@ export function CommentSection({
                   }}
                 >
                   {formatDate(comment.createdAt)}
+                  {/* 내 댓글/낙관적 댓글이 아니면 신고 가능 */}
+                  {!comment.id.startsWith('opt-') && (
+                    <ReportButton
+                      targetType="comment"
+                      targetId={comment.id}
+                      isAuthenticated={Boolean(currentUserId)}
+                      variant="icon"
+                    />
+                  )}
                 </span>
               </div>
               <p
