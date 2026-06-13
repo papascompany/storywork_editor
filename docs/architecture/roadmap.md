@@ -71,7 +71,7 @@
 
 - [x] [M4-01-01] analyze() 코어 + 형식 자동감지 (5형식) + SceneMeta — rule-only + LLM stub — @architect ✅ `49a224b`
 - [x] [M4-01-02] 골든셋 20 + F1 측정 — 룰-only: format 0.900, scene F1 0.899, char F1 1.000 — @architect ✅ `4556bfb`
-- [ ] [M4-01-03] LLM 보강 — Vercel AI Gateway + claude-sonnet-4-6 + prompt caching — F1 ≥ 0.85 — @scene-analyzer
+- [x] [M4-01-03] LLM 보강 — Vercel AI Gateway + claude-sonnet-4-6 + prompt caching — @scene-analyzer ✅ 2026-06-12 검증 — 코드는 이미 완성(`enhance.ts`/`system-prompt.ts` inlined, 커밋 a4adfc5+6a61857+de37d35), roadmap 만 미체크였음. `STORYWORK_LLM=1 STORYWORK_LLM_CACHE=1 pnpm --filter @storywork/ai-script test f1-score-llm` → **장면 F1 평균 0.899 ≥ 0.85 PASS** (캐시 20건 커밋, 키 불요·결정론·$0). CI 는 STORYWORK_LLM=0 으로 LLM 미호출(비용 보호). 라이브 LLM 은 AI_GATEWAY_API_KEY 발급 후 선택 활성(휴먼 게이트).
 
 - [x] [M4-02] `ai-recommend` 포즈/배경/말풍선 추천 — 만족도 100.0% (16/16, 목표 ≥ 70%) — @scene-analyzer ✅ 2026-06-03 (→ Step 1~5 커밋 참조)
 - [x] [M4-03] `ai-layout` compose() + 결정론 시드 ✅ 2026-06-03 — 충돌 0, safe 침범 0. 페이지 분할 5 규칙 (R1~R5) + Template 매칭 + Slot 배치 + lowDpi 제약 (M2-07 통합). 골든 5 시나리오 + lowDpi E2E 102/102 tests pass. `POST /api/script/compose` + 문서 2종 (`ai-layout-compose.md` + `full-pipeline.md`). 커밋: `5517071`+`1c5619b`+`5000889`+`9c6a2ea` — @layout-composer
@@ -151,7 +151,7 @@
 - [x] [BOARD-04] 갤러리(/showcase) + 댓글 + Reaction + admin 모더레이션 — @architect ✅ 2026-06-03
 - [ ] [BOARD-05] pg_cron 자동 동결 (시즌 closesAt 지나면 출품 자동 잠금) — @architect (P1, M8-02 후속)
 - [ ] [BOARD-06] FAQ 별도 페이지 + 카테고리 — @ui-designer (P1)
-- [ ] [BOARD-07] 신고 큐 (Comment/Showcase 신고 접수 + admin 처리) — @admin-builder (P1)
+- [x] [BOARD-07] 신고 큐 (Comment/Showcase 신고 접수 + admin 처리) — @admin-builder ✅ 2026-06-12 — Report 모델 + 3 enum + Showcase.hidden(마이그레이션 `20260613000000_report_queue`, prod 적용). 접수: POST /api/reports(로그인 필수·세션 reporterId·멱등 createMany skipDuplicates) + ReportButton(사유 6종 모달, /showcase/[id] 작품 + 댓글 아이콘) + 공개 목록 3곳 hidden 필터. admin /reports: status 탭 큐 + 누적 신고수(groupBy) + hide(숨김+같은 대상 일괄 resolved)/dismiss/reviewing + recordAudit. 신규 테스트 13.
 
 ## LEGAL-OPS — 한국 법규 출시 필수 (P0, 출시 전 완료 필수)
 

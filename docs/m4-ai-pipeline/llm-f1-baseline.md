@@ -1,6 +1,6 @@
 # LLM F1 Baseline — M4-01-03
 
-> 자동 생성: 2026-06-03T07:36:34.031Z
+> 자동 생성: 2026-06-13T02:31:44.074Z
 > 모델: claude-sonnet-4-6
 > 캐시 활성: STORYWORK_LLM_CACHE=1
 
