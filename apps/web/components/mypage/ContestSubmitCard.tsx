@@ -51,7 +51,8 @@ export function ContestSubmitCard({
   const [message, setMessage] = React.useState<string | null>(null)
 
   const placeholderColor = getPlaceholderColor(title)
-  const disabled = !open || pageCount === 0 || state === 'submitting' || state === 'done'
+  const disabled =
+    !open || pageCount === 0 || state === 'submitting' || state === 'done' || state === 'duplicate'
 
   async function handleSubmit() {
     if (disabled) return

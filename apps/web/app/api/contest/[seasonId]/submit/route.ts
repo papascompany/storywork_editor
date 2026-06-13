@@ -81,7 +81,7 @@ export async function POST(request: Request, { params }: RouteContext): Promise<
   // ── 프로젝트 검증 (소유권 + 출품 가능 여부) ──────────────────────────────────
   const project = await prisma.project.findUnique({
     where: { id: projectId },
-    select: { id: true, ownerId: true, _count: { select: { pages: true } } },
+    select: { id: true, ownerId: true, status: true, _count: { select: { pages: true } } },
   })
   if (!project) {
     return NextResponse.json({ error: '작품을 찾을 수 없습니다.' }, { status: 404 })
@@ -91,6 +91,13 @@ export async function POST(request: Request, { params }: RouteContext): Promise<
   }
   if (project._count.pages === 0) {
     return NextResponse.json({ error: '페이지가 없는 작품은 출품할 수 없습니다.' }, { status: 400 })
+  }
+  // 보관(archived)된 작품은 사용자가 숨김/정리 의도로 둔 것이므로 출품(=공개) 차단
+  if (project.status === 'archived') {
+    return NextResponse.json(
+      { error: '보관된 작품은 출품할 수 없습니다. 보관을 해제한 뒤 다시 시도해주세요.' },
+      { status: 403 },
+    )
   }
 
   // ── 중복 출품 방지 (앱 레벨 선검사 → 친절한 409) ────────────────────────────

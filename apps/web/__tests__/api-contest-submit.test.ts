@@ -57,8 +57,13 @@ describe('POST /api/contest/[seasonId]/submit', () => {
       closesAt: new Date(Date.now() + DAY),
       frozen: false,
     })
-    // 본인 소유 + 페이지 3개 프로젝트
-    mockProjectFind.mockResolvedValue({ id: 'p1', ownerId: 'u1', _count: { pages: 3 } })
+    // 본인 소유 + 페이지 3개 + 편집중 프로젝트
+    mockProjectFind.mockResolvedValue({
+      id: 'p1',
+      ownerId: 'u1',
+      status: 'editing',
+      _count: { pages: 3 },
+    })
     mockShowcaseFindFirst.mockResolvedValue(null)
     mockShowcaseCreate.mockResolvedValue({ id: 'sc1' })
   })
@@ -133,9 +138,26 @@ describe('POST /api/contest/[seasonId]/submit', () => {
   })
 
   it('페이지 0개 프로젝트 → 400', async () => {
-    mockProjectFind.mockResolvedValue({ id: 'p1', ownerId: 'u1', _count: { pages: 0 } })
+    mockProjectFind.mockResolvedValue({
+      id: 'p1',
+      ownerId: 'u1',
+      status: 'editing',
+      _count: { pages: 0 },
+    })
     const res = await call({ projectId: 'p1' })
     expect(res.status).toBe(400)
+  })
+
+  it('보관(archived) 작품 → 403', async () => {
+    mockProjectFind.mockResolvedValue({
+      id: 'p1',
+      ownerId: 'u1',
+      status: 'archived',
+      _count: { pages: 3 },
+    })
+    const res = await call({ projectId: 'p1' })
+    expect(res.status).toBe(403)
+    expect(mockShowcaseCreate).not.toHaveBeenCalled()
   })
 
   it('이미 출품한 작품 → 409', async () => {

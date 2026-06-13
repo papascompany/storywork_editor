@@ -10,6 +10,7 @@ import * as React from 'react'
 
 import { Footer } from '@/components/marketing/Footer'
 import { Header } from '@/components/marketing/Header'
+import { publicDisplayName } from '@/lib/display-name'
 import { prisma } from '@/lib/prisma'
 
 export const dynamic = 'force-dynamic'
@@ -132,7 +133,7 @@ export default async function NoticeDetailPage({ params }: Props) {
               opacity: 0.45,
             }}
           >
-            {notice.author.name ?? notice.author.email}
+            {publicDisplayName(notice.author.name, notice.author.email)}
           </span>
         </div>
 

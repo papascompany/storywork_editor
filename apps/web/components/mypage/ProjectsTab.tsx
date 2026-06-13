@@ -74,7 +74,7 @@ export function ProjectsTab({ projects, contestSubmission = null }: ProjectsTabP
             }}
           >
             {contestSubmission.open
-              ? '출품할 작품을 선택해 "이 작품 출품" 버튼을 눌러주세요. (작품당 한 번)'
+              ? '출품할 작품을 선택해 "이 작품 출품" 버튼을 눌러주세요. (작품당 한 번) · 출품 시 작품 제목·썸네일·작성자 표시명이 공개 갤러리에 노출됩니다.'
               : '이 공모전은 출품이 마감되었습니다.'}
           </p>
         </div>

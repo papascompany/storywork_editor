@@ -8,6 +8,7 @@
  */
 import { NextResponse } from 'next/server'
 
+import { publicDisplayName } from '@/lib/display-name'
 import { prisma } from '@/lib/prisma'
 
 export async function GET(request: Request): Promise<NextResponse> {
@@ -41,7 +42,7 @@ export async function GET(request: Request): Promise<NextResponse> {
       id: s.id,
       title: s.project.title,
       thumbnail: s.project.pages[0]?.thumbnail ?? null,
-      ownerName: s.owner.name ?? s.owner.email,
+      ownerName: publicDisplayName(s.owner.name, s.owner.email),
       likes: s.likes,
       reactionCount: s._count.reactions,
       commentCount: s._count.comments,

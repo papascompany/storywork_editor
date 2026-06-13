@@ -50,23 +50,26 @@ export async function GET(request: Request): Promise<NextResponse> {
 
   for (const season of targets) {
     try {
-      await prisma.contestSeason.update({
-        where: { id: season.id },
-        data: { frozen: true },
-      })
-
-      await prisma.auditLog.create({
-        data: {
-          actorId: 'system:cron',
-          action: 'contest.freeze',
-          target: `contestseason:${season.id}`,
-          payload: {
-            name: season.name,
-            closesAt: season.closesAt.toISOString(),
-            frozenAt: now.toISOString(),
+      // frozen 전환 + audit 를 원자적으로 — audit 실패 시 frozen 롤백되어 다음 실행에서 재시도된다.
+      // (비원자 처리 시 frozen=true 커밋 후 audit 누락 → 다음 cron 의 frozen=false 조건에서 빠져 영구 누락)
+      await prisma.$transaction([
+        prisma.contestSeason.update({
+          where: { id: season.id },
+          data: { frozen: true },
+        }),
+        prisma.auditLog.create({
+          data: {
+            actorId: 'system:cron',
+            action: 'contest.freeze',
+            target: `contestseason:${season.id}`,
+            payload: {
+              name: season.name,
+              closesAt: season.closesAt.toISOString(),
+              frozenAt: now.toISOString(),
+            },
           },
-        },
-      })
+        }),
+      ])
 
       results.push({ id: season.id, name: season.name, ok: true })
     } catch (err) {

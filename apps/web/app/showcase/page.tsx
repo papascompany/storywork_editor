@@ -11,6 +11,7 @@ import { ShowcaseGallery } from './ShowcaseGallery'
 
 import { Footer } from '@/components/marketing/Footer'
 import { Header } from '@/components/marketing/Header'
+import { publicDisplayName } from '@/lib/display-name'
 import { prisma } from '@/lib/prisma'
 
 export const dynamic = 'force-dynamic'
@@ -39,7 +40,7 @@ export default async function ShowcasePage() {
     id: s.id,
     title: s.project.title,
     thumbnail: s.project.pages[0]?.thumbnail ?? null,
-    ownerName: s.owner.name ?? s.owner.email,
+    ownerName: publicDisplayName(s.owner.name, s.owner.email),
     likes: s.likes,
     reactionCount: s._count.reactions,
     commentCount: s._count.comments,

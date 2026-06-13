@@ -15,6 +15,7 @@ import { ReactionBar } from './ReactionBar'
 import { Footer } from '@/components/marketing/Footer'
 import { Header } from '@/components/marketing/Header'
 import { ReportButton } from '@/components/showcase/ReportButton'
+import { publicDisplayName } from '@/lib/display-name'
 import { prisma } from '@/lib/prisma'
 import { createWebServerClient } from '@/lib/supabase/server'
 
@@ -88,7 +89,7 @@ export default async function ShowcaseDetailPage({ params }: Props) {
     // 비로그인
   }
 
-  const ownerName = showcase.owner.name ?? showcase.owner.email
+  const ownerName = publicDisplayName(showcase.owner.name, showcase.owner.email)
   const thumbnail = showcase.project.pages[0]?.thumbnail
 
   // reaction 집계
@@ -100,7 +101,7 @@ export default async function ShowcaseDetailPage({ params }: Props) {
   const serializedComments = comments.map((c) => ({
     id: c.id,
     body: c.body,
-    authorName: c.user.name ?? c.user.email,
+    authorName: publicDisplayName(c.user.name, c.user.email),
     createdAt: c.createdAt.toISOString(),
   }))
 

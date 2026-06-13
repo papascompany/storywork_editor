@@ -6,6 +6,7 @@
 import { CreateCommentSchema } from '@storywork/schema'
 import { NextResponse } from 'next/server'
 
+import { publicDisplayName } from '@/lib/display-name'
 import { prisma } from '@/lib/prisma'
 import { createWebServerClient } from '@/lib/supabase/server'
 import { getCurrentUser } from '@/lib/users'
@@ -70,7 +71,7 @@ export async function POST(request: Request, { params }: RouteContext): Promise<
       {
         id: comment.id,
         body: comment.body,
-        authorName: comment.user.name ?? comment.user.email,
+        authorName: publicDisplayName(comment.user.name, comment.user.email),
         createdAt: comment.createdAt.toISOString(),
       },
       { status: 201 },

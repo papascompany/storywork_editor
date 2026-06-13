@@ -12,6 +12,8 @@ vi.mock('@/lib/prisma', () => ({
   prisma: {
     contestSeason: { findMany: mockSeasonFindMany, update: mockSeasonUpdate },
     auditLog: { create: mockAuditCreate },
+    // $transaction([...]) — 배열 형태. 요소(이미 mock 이 평가한 promise)를 Promise.all 로 처리.
+    $transaction: (ops: unknown[]) => Promise.all(ops),
   },
 }))
 

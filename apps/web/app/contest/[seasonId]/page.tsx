@@ -13,6 +13,7 @@ import * as React from 'react'
 
 import { Footer } from '@/components/marketing/Footer'
 import { Header } from '@/components/marketing/Header'
+import { publicDisplayName } from '@/lib/display-name'
 import { prisma } from '@/lib/prisma'
 import { createWebServerClient } from '@/lib/supabase/server'
 
@@ -299,7 +300,7 @@ export default async function ContestSeasonPage({ params }: Props) {
             >
               {entries.map((entry) => {
                 const thumb = entry.project.pages[0]?.thumbnail
-                const ownerName = entry.owner.name ?? entry.owner.email
+                const ownerName = publicDisplayName(entry.owner.name, entry.owner.email)
                 return (
                   <Link
                     key={entry.id}
