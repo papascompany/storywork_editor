@@ -35,8 +35,8 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   if (!showcase) return { title: '작품을 찾을 수 없습니다' }
   const title = showcase.project.title
   const description = `스토리워크 갤러리에 출품된 작품 — ${title}`
-  // 작품별 동적 OG 이미지는 M8-01(향후). 현재는 브랜드 기본 OG 카드 사용.
-  const ogImage = '/api/og/default'
+  // 작품 제목이 담긴 전용 OG 카드 (edge-safe, 제목은 query 로 전달)
+  const ogImage = `/api/og/work?title=${encodeURIComponent(title)}&kind=showcase`
   return {
     title,
     description,

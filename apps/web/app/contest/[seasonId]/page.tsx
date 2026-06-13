@@ -33,7 +33,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   if (!season) return { title: '공모전을 찾을 수 없습니다' }
   const title = season.name
   const description = `스토리워크 공모전 — ${title}. 나만의 스토리보드를 출품해보세요.`
-  const ogImage = '/api/og/default'
+  const ogImage = `/api/og/work?title=${encodeURIComponent(title)}&kind=contest`
   return {
     title,
     description,
