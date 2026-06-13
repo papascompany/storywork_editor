@@ -63,6 +63,8 @@ export function useStoryCanvas(
       disposeRef.current = null
     }
     // format 은 초기화 시 고정. 변경 시 remount 필요 (의존성 배열 의도적으로 비움)
+    // containerRef/format/onReady 추가 시 캔버스 매 변경마다 재생성 → 의도적 제외
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   return refsRef

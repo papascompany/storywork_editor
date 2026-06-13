@@ -125,6 +125,10 @@ function FieldWidget({
   const label = meta.label ?? name
   const placeholder = meta.placeholder ?? ''
 
+  // 'tags' 위젯 전용 입력 상태 — Rules of Hooks 준수를 위해 조건 분기 밖(최상단)에서 호출한다.
+  // widget prop 은 필드 인스턴스마다 고정이므로 비-tags 위젯에서도 미사용 상태 1개만 보유(무해).
+  const [inputVal, setInputVal] = React.useState('')
+
   const commonInputProps = {
     id: fieldId,
     'aria-describedby': descId,
@@ -303,7 +307,6 @@ function FieldWidget({
 
   if (widget === 'tags') {
     const tags: string[] = Array.isArray(value) ? (value as string[]) : []
-    const [inputVal, setInputVal] = React.useState('')
 
     const addTag = (tag: string) => {
       const trimmed = tag.trim()

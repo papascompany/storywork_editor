@@ -154,6 +154,10 @@ function AddKpModal({ open, existingNames, onAdd, onClose }: AddKpModalProps) {
 
 // ─── KeypointEditor 본체 ──────────────────────────────────────────────────────
 
+/** 방향키 이동 스텝(정규화 좌표) — 모듈 상수라 hook deps 에서 제외 */
+const STEP = 1 / 1000
+const STEP_BIG = 10 / 1000
+
 export function KeypointEditor({
   imageUrl,
   width,
@@ -251,9 +255,6 @@ export function KeypointEditor({
   )
 
   // ── 키보드 핸들러 (방향키로 1px 이동, Shift+방향키 10px) ──
-  const STEP = 1 / 1000
-  const STEP_BIG = 10 / 1000
-
   const handleKpKeyDown = React.useCallback(
     (name: KPName, e: React.KeyboardEvent) => {
       if (readonly) return

@@ -563,8 +563,9 @@ export function MobileBottomSheet({
   useEffect(() => {
     if (typeof window === 'undefined' || !window.visualViewport) return
     const vv = window.visualViewport
+    // 시트 DOM 노드는 마운트 동안 고정 → effect 진입 시 1회 캡처해 cleanup 에서도 동일 노드 참조
+    const sheet = sheetRef.current
     const adjust = () => {
-      const sheet = sheetRef.current
       if (!sheet) return
       const overlap = window.innerHeight - vv.height - vv.offsetTop
       sheet.style.transform = overlap > 0 ? `translateY(-${overlap}px)` : ''
@@ -575,7 +576,6 @@ export function MobileBottomSheet({
     return () => {
       vv.removeEventListener('resize', adjust)
       vv.removeEventListener('scroll', adjust)
-      const sheet = sheetRef.current
       if (sheet) sheet.style.transform = ''
     }
   }, [])

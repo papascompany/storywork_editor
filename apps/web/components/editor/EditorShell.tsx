@@ -356,7 +356,9 @@ export function EditorShell() {
 
     // 복구 불가 → FormatPickerModal 표시
     setFormatPickerOpen(true)
-  }, [readyTick]) // 의도적 의존성 축소: project 변경 시 재실행 방지
+    // 의도적 의존성 축소: project 변경 시 재실행 방지 (마운트/복구 1회용 효과)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [readyTick])
 
   // ── 프로젝트 생성 시 파일명 동기화 ──────────────────────────────
   useEffect(() => {
@@ -445,7 +447,9 @@ export function EditorShell() {
       pageTransitionRef.current = false
       prevPageIndexRef.current = currentPageIndex
     }
-  }, [project?.currentPageIndex]) // 의도적: currentPageIndex 변경 시만 실행
+    // 의도적: currentPageIndex 변경 시만 실행 (project/updateCurrentPageJson 추가 시 페이지 전환 중복 실행)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [project?.currentPageIndex])
 
   // ── 페이지 자동 저장 (canvas 변경 감지 → debounce) ─────────────
   useEffect(() => {
@@ -482,7 +486,9 @@ export function EditorShell() {
       fabricCanvas.off('object:modified', handleChange)
       fabricCanvas.off('object:removed', handleChange)
     }
-  }, [canvasRef.current, project?.id]) // 의도적: canvas 마운트 또는 프로젝트 변경 시만
+    // 의도적: canvas 마운트 또는 프로젝트 변경 시만 (handleChange 가 최신 store getState 사용)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [canvasRef.current, project?.id])
 
   // ── FormatPickerModal: 프로젝트 생성 ────────────────────────────
   const handleFormatSelect = useCallback(
@@ -539,7 +545,9 @@ export function EditorShell() {
       dpi: format.dpi,
     })
     fitToViewport(canvas)
-  }, [project?.formatId]) // formatId 변경 시에만 실행
+    // formatId 변경 시에만 실행 (cover/currentPageIndex 는 prevFormatIdRef 가드로 의도적 제외)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [project?.formatId])
 
   // ── 페이지 네비게이션 헬퍼 ──────────────────────────────────────
   const handlePrevPage = useCallback(() => {

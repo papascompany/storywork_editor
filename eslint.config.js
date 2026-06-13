@@ -4,6 +4,7 @@ import nextPlugin from '@next/eslint-plugin-next'
 import tsPlugin from '@typescript-eslint/eslint-plugin'
 import tsParser from '@typescript-eslint/parser'
 import importPlugin from 'eslint-plugin-import'
+import reactHooks from 'eslint-plugin-react-hooks'
 
 /**
  * 패키지 역참조 금지 룰 (CLAUDE.md §3.1 + docs/modules/index.md 의존성 매트릭스)
@@ -292,11 +293,17 @@ export default [
     plugins: {
       '@typescript-eslint': tsPlugin,
       import: importPlugin,
+      'react-hooks': reactHooks,
     },
     rules: {
       // TypeScript가 타입 체크를 담당하므로 기본 JS 룰 비활성화 (TS 전용 룰로 대체)
       'no-undef': 'off',
       'no-unused-vars': 'off', // @typescript-eslint/no-unused-vars 로 대체
+
+      // React Hooks 규칙 (FOLLOWUP-60) — 조건부 hook 호출 + deps 누락 영구 차단.
+      // 의도적 reduced-deps 효과는 사이트별 eslint-disable-next-line + 사유 주석으로 명시.
+      'react-hooks/rules-of-hooks': 'error',
+      'react-hooks/exhaustive-deps': 'error',
 
       // TypeScript strict 규칙
       '@typescript-eslint/no-explicit-any': 'error',
@@ -346,6 +353,9 @@ export default [
       // 테스트/스토리 파일은 Next.js 런타임이 아님 — img/a 태그 직접 사용 허용
       '@next/next/no-img-element': 'off',
       '@next/next/no-html-link-for-pages': 'off',
+      // 테스트 헬퍼/렌더 콜백에서 hook 패턴이 흔함 — react-hooks 룰 완화
+      'react-hooks/rules-of-hooks': 'off',
+      'react-hooks/exhaustive-deps': 'off',
     },
   },
 
@@ -355,6 +365,8 @@ export default [
     rules: {
       '@next/next/no-img-element': 'off',
       '@next/next/no-html-link-for-pages': 'off',
+      'react-hooks/rules-of-hooks': 'off',
+      'react-hooks/exhaustive-deps': 'off',
     },
   },
 

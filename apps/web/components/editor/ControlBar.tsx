@@ -175,9 +175,10 @@ function PositionSizeSection({ props, canvas, history }: PositionSizeSectionProp
   const [lockRatio, setLockRatio] = useState(false)
   const ratioRef = useRef(props.width / props.height)
 
-  const getObj = (): FabricObject | undefined => {
-    return canvas.getObject(props.id) as FabricObject | undefined
-  }
+  const getObj = useCallback(
+    (): FabricObject | undefined => canvas.getObject(props.id) as FabricObject | undefined,
+    [canvas, props.id],
+  )
 
   const makeTransformCmd = useCallback(
     (
@@ -193,7 +194,7 @@ function PositionSizeSection({ props, canvas, history }: PositionSizeSectionProp
       const cmd = new TransformObjectCommand({ canvas, id: props.id, before, after })
       history.push(cmd)
     },
-    [canvas, history, props.id],
+    [canvas, history, props.id, getObj],
   )
 
   const handleX = (v: number) => makeTransformCmd({ left: canvas.mmToPx(v) })

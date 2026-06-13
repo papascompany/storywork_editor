@@ -172,6 +172,8 @@ export function usePoseSearch({
     },
     // deps: query, filterKey, pageSize — filterKey 는 JSON.stringify(filters) 로 안정화됨
     // (showToast 는 @storywork/ui 내부에서 싱글톤으로 안정화)
+    // raw filters 추가 시 객체 identity 로 매 렌더 재생성 → filterKey 로 의도적 대체
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     [query, filterKey, pageSize],
   )
 

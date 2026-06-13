@@ -50,8 +50,9 @@ export function useAutosave(
 
     // 오프라인 감지
     const handleOffline = () => setFailReason('offline')
+    // 함수형 업데이터로 최신 상태 참조 — failReason 클로저 캡처(stale) 회피
     const handleOnline = () => {
-      if (failReason === 'offline') setFailReason(null)
+      setFailReason((prev) => (prev === 'offline' ? null : prev))
     }
     window.addEventListener('offline', handleOffline)
     window.addEventListener('online', handleOnline)
