@@ -109,3 +109,58 @@ jobs:
           name: visual-regression-snapshots
           path: tests/visual-regression/snapshots/
           retention-days: 7
+
+  # ── 마이그레이션 baseline 스모크 (FOLLOWUP-65) ─────────────────────────────
+  # 빈 DB(pgvector)에 `prisma migrate deploy` 전체가 0 에러로 적용되는지 검증한다.
+  # baseline 부재(ALTER-only) drift 가 재발하면 이 잡이 실패한다.
+  migrate-smoke:
+    name: Migration baseline smoke (fresh DB)
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    services:
+      postgres:
+        image: pgvector/pgvector:pg16
+        env:
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: swtest
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+    env:
+      DATABASE_URL: postgresql://postgres:postgres@localhost:5432/swtest
+      DIRECT_URL: postgresql://postgres:postgres@localhost:5432/swtest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 9.15.0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: migrate deploy on empty DB (baseline gate)
+        run: pnpm prisma migrate deploy
+
+      - name: Verify schema drift = 0 after deploy
+        run: |
+          DIFF=$(pnpm prisma migrate diff --from-url "$DATABASE_URL" --to-schema-datamodel prisma/schema.prisma --script 2>/dev/null)
+          echo "$DIFF"
+          if echo "$DIFF" | grep -q "empty migration"; then
+            echo "✓ no drift — migrations reproduce schema.prisma exactly"
+          else
+            echo "::error::Schema drift detected after migrate deploy on fresh DB"
+            exit 1
+          fi
