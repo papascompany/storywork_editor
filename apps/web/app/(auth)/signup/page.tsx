@@ -12,6 +12,7 @@
 import Link from 'next/link'
 import { type CSSProperties, type FocusEvent, type FormEvent, useState } from 'react'
 
+import { ConsentCheckbox } from '@/components/legal/ConsentCheckbox'
 import { createWebBrowserClient } from '@/lib/supabase/client'
 
 const INPUT_STYLE: CSSProperties = {
@@ -35,6 +36,14 @@ const LABEL_STYLE: CSSProperties = {
   fontWeight: 480,
   letterSpacing: '-0.10px',
   color: 'var(--mkt-ink)',
+}
+
+const CONSENT_LINK_STYLE: CSSProperties = {
+  color: 'var(--mkt-ink)',
+  fontWeight: 480,
+  textDecoration: 'underline',
+  textUnderlineOffset: '2px',
+  opacity: 1,
 }
 
 function handleInputFocus(e: FocusEvent<HTMLInputElement>) {
@@ -157,7 +166,9 @@ export default function SignupPage() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [confirmPassword, setConfirmPassword] = useState('')
-  const [agreed, setAgreed] = useState(false)
+  // PIPA: 이용약관 동의와 개인정보 수집·이용 동의는 각각 별도 [필수] (LEGAL-04)
+  const [agreedTerms, setAgreedTerms] = useState(false)
+  const [agreedPrivacy, setAgreedPrivacy] = useState(false)
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
 
@@ -165,7 +176,8 @@ export default function SignupPage() {
     if (!email) return '이메일을 입력하세요.'
     if (password.length < 8) return '비밀번호는 8자 이상이어야 합니다.'
     if (password !== confirmPassword) return '비밀번호가 일치하지 않습니다.'
-    if (!agreed) return '이용약관 및 개인정보 처리방침에 동의해주세요.'
+    if (!agreedTerms) return '이용약관에 동의해주세요.'
+    if (!agreedPrivacy) return '개인정보 수집·이용에 동의해주세요.'
     return ''
   }
 
@@ -338,69 +350,35 @@ export default function SignupPage() {
             />
           </div>
 
-          {/* 약관 동의 */}
-          <div
-            style={{
-              display: 'flex',
-              alignItems: 'flex-start',
-              gap: 'var(--mkt-space-xs)',
-            }}
-          >
-            <input
-              id="agree"
-              type="checkbox"
-              name="agree"
-              checked={agreed}
-              onChange={(e) => setAgreed(e.target.checked)}
+          {/* 약관·개인정보 동의 — PIPA 분리 동의 (LEGAL-04) */}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--mkt-space-sm)' }}>
+            <ConsentCheckbox
+              id="agree-terms"
+              checked={agreedTerms}
+              onChange={setAgreedTerms}
               disabled={loading}
-              style={{
-                marginTop: '3px',
-                accentColor: 'var(--mkt-ink)',
-                width: '16px',
-                height: '16px',
-                flexShrink: 0,
-                cursor: 'pointer',
-              }}
-            />
-            <label
-              htmlFor="agree"
-              style={{
-                fontFamily: 'var(--mkt-font-sans)',
-                fontSize: '13px',
-                fontWeight: 330,
-                lineHeight: 1.5,
-                color: 'var(--mkt-ink)',
-                opacity: 0.65,
-                cursor: 'pointer',
-              }}
+              required
+              error={!!error && !agreedTerms}
             >
-              <a
-                href="#"
-                style={{
-                  color: 'var(--mkt-ink)',
-                  fontWeight: 480,
-                  textDecoration: 'underline',
-                  textUnderlineOffset: '2px',
-                  opacity: 1,
-                }}
-              >
-                이용약관
-              </a>
-              {' 및 '}
-              <a
-                href="#"
-                style={{
-                  color: 'var(--mkt-ink)',
-                  fontWeight: 480,
-                  textDecoration: 'underline',
-                  textUnderlineOffset: '2px',
-                  opacity: 1,
-                }}
-              >
-                개인정보 처리방침
-              </a>
+              <Link href="/legal/terms" target="_blank" style={CONSENT_LINK_STYLE}>
+                서비스 이용약관
+              </Link>
               에 동의합니다.
-            </label>
+            </ConsentCheckbox>
+
+            <ConsentCheckbox
+              id="agree-privacy"
+              checked={agreedPrivacy}
+              onChange={setAgreedPrivacy}
+              disabled={loading}
+              required
+              error={!!error && !agreedPrivacy}
+            >
+              <Link href="/legal/privacy" target="_blank" style={CONSENT_LINK_STYLE}>
+                개인정보 수집·이용
+              </Link>
+              에 동의합니다.
+            </ConsentCheckbox>
           </div>
 
           {/* 가입 버튼 */}

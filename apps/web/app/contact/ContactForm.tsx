@@ -9,8 +9,11 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import type { CreateInquiry } from '@storywork/schema'
 import { CreateInquirySchema } from '@storywork/schema'
+import Link from 'next/link'
 import * as React from 'react'
 import { useForm } from 'react-hook-form'
+
+import { ConsentCheckbox } from '@/components/legal/ConsentCheckbox'
 
 interface ContactFormProps {
   prefillEmail: string | null
@@ -20,6 +23,9 @@ interface ContactFormProps {
 export function ContactForm({ prefillEmail, userId }: ContactFormProps) {
   const [submitted, setSubmitted] = React.useState(false)
   const [serverError, setServerError] = React.useState<string | null>(null)
+  // PIPA: 개인정보(이메일) 수집 전 명시적 동의 필수 (LEGAL-04)
+  const [agreedPrivacy, setAgreedPrivacy] = React.useState(false)
+  const [consentError, setConsentError] = React.useState(false)
 
   const {
     register,
@@ -36,6 +42,11 @@ export function ContactForm({ prefillEmail, userId }: ContactFormProps) {
 
   const onSubmit = async (data: CreateInquiry) => {
     setServerError(null)
+    // 개인정보 수집·이용 동의 게이트 — 미동의 시 제출 차단
+    if (!agreedPrivacy) {
+      setConsentError(true)
+      return
+    }
     try {
       const res = await fetch('/api/inquiries', {
         method: 'POST',
@@ -203,6 +214,49 @@ export function ContactForm({ prefillEmail, userId }: ContactFormProps) {
         )}
       </div>
 
+      {/* 개인정보 수집·이용 동의 — PIPA 명시적 opt-in (LEGAL-04) */}
+      <div style={{ marginBottom: '20px' }}>
+        <ConsentCheckbox
+          id="contact-agree-privacy"
+          checked={agreedPrivacy}
+          onChange={(c) => {
+            setAgreedPrivacy(c)
+            if (c) setConsentError(false)
+          }}
+          required
+          error={consentError}
+        >
+          <Link
+            href="/legal/privacy"
+            target="_blank"
+            style={{
+              color: 'var(--mkt-ink)',
+              fontWeight: 480,
+              textDecoration: 'underline',
+              textUnderlineOffset: '2px',
+            }}
+          >
+            개인정보 수집·이용
+          </Link>
+          에 동의합니다. (수집 항목: 이메일 · 목적: 문의 답변 · 보유: 답변 완료 후 3년)
+        </ConsentCheckbox>
+        {consentError && (
+          <span
+            role="alert"
+            style={{
+              display: 'block',
+              fontFamily: 'var(--mkt-font-sans)',
+              fontSize: '12px',
+              color: '#d30005',
+              marginTop: '6px',
+              marginLeft: '24px',
+            }}
+          >
+            개인정보 수집·이용에 동의해주세요.
+          </span>
+        )}
+      </div>
+
       {/* 서버 오류 */}
       {serverError && (
         <div
@@ -243,19 +297,6 @@ export function ContactForm({ prefillEmail, userId }: ContactFormProps) {
       >
         {isSubmitting ? '전송 중...' : '문의 보내기'}
       </button>
-
-      <p
-        style={{
-          fontFamily: 'var(--mkt-font-sans)',
-          fontSize: '12px',
-          color: 'var(--mkt-ink)',
-          opacity: 0.4,
-          marginTop: '12px',
-          textAlign: 'center',
-        }}
-      >
-        제출 시 개인정보처리방침에 동의하는 것으로 간주됩니다.
-      </p>
     </form>
   )
 }

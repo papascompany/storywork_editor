@@ -143,6 +143,7 @@
 - [x] [M8-03] 뽐내기 갤러리 + 좋아요/댓글 — 무한 스크롤(cursor-based) + Reaction(like/heart/wow) + 댓글 CRUD 완료 — @ui-designer ✅ 2026-06-03 (commit 690a145)
 - [x] [M8-04] SNS 공유 — @ui-designer ✅ 2026-06-14 (무의존 채널). `ShareBar`(client) 신규: Web Share API(모바일 네이티브 시트, hydration-safe 피처 디텍션) + X(intent) + Facebook(sharer) + 링크 복사(clipboard+토스트). showcase 상세 + contest 상세에 배치 + openGraph/twitter 리치 카드 메타데이터(og:image=브랜드 default OG, metadataBase 절대화). 라이브 검증: X/Facebook/링크 원형 버튼 렌더 + SSR HTML + OG 절대 URL 확인(prod 임시 시드→스크린샷→삭제). 카카오톡 공유는 JS SDK+앱키(외부 의존) 필요 → [FOLLOWUP-66] 로 분리.
 - [ ] [FOLLOWUP-66] 카카오톡 공유 채널 — `ShareBar` 에 카카오 추가. Kakao JS SDK 로드 + `NEXT_PUBLIC_KAKAO_JS_KEY`(외부 앱키, 🚦 휴먼 게이트) 필요. 앱키 발급 후 SDK init + Kakao.Share.sendDefault(피드 템플릿) 연결 — @ui-designer
+- [ ] [FOLLOWUP-67] 동의 기록 영속 저장 (LEGAL-04 후속) — 현재 개인정보/약관 동의는 제출 게이트(미동의 시 차단)로만 처리하고 동의 시각·버전을 별도 저장하지 않는다. PIPA 분쟁 대비 증빙용으로 회원가입 시 `User.privacyConsentAt`/`termsConsentAt`, 문의 시 `Inquiry.privacyConsentAt` + 약관 버전 컬럼 추가(🚦 마이그레이션 휴먼 게이트). 법무 확정(FOLLOWUP-59) 후 필요성 재평가 — @architect
 
 ## BOARD — 공모전/공지/Q&A/갤러리 (2026-06-03)
 
@@ -159,7 +160,7 @@
 - [ ] [LEGAL-01] 개인정보처리방침 정식화 (법무 검토 + 실 약관) — FOLLOWUP-59 인계 — 🚦 휴먼 게이트
 - [ ] [LEGAL-02] 이용약관 정식화 + 전자상거래법 청약철회 조항 — 🚦 휴먼 게이트
 - [ ] [LEGAL-03] 쿠키 동의 배너 (GDPR 최소화 + 한국 정통망법) — @ui-designer
-- [ ] [LEGAL-04] 개인정보 수집·이용 동의 체크박스 (회원가입 + 문의 폼) — @ui-designer + @architect
+- [x] [LEGAL-04] 개인정보 수집·이용 동의 체크박스 (회원가입 + 문의 폼) — @ui-designer ✅ 2026-06-15. PIPA 명시적·분리 동의 준수. `components/legal/ConsentCheckbox`(공유, [필수] 빨강/[선택]) 신규. **회원가입**: 이용약관+개인정보 결합 동의 1개 → 분리된 [필수] 2개(/legal/terms·/legal/privacy 실링크, 기존 데드링크 `href="#"` 수정) + 미동의 시 해당 체크박스 강조. **문의 폼**: 묵시적 동의("제출 시 ... 간주됩니다", PIPA 위반) → 명시적 opt-in [필수] 체크박스(수집항목·목적·보유기간 명시) + 제출 게이트. 동의 타임스탬프 영속 저장은 [FOLLOWUP-67](마이그레이션, 휴먼게이트)로 분리. ⚠️ 로컬 node_modules/.bin 손상으로 CI 가 lint/tsc/build 권위 검증.
 - [ ] [LEGAL-05] 미성년자 이용 제한 고지 + 법정대리인 동의 처리 — 🚦 휴먼 게이트
 
 ### 완료
