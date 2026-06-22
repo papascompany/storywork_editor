@@ -45,29 +45,43 @@ export async function GET(req: NextRequest) {
     : 'createdAt'
   const orderByDir = sortDir === 'asc' ? 'asc' : 'desc'
 
-  // 필터 조건 구성
-  const where: AnyWhere = {}
+  // 필터를 차원별 절(clause)로 분리 — facet 카운트가 "해당 차원만 제외한 나머지 모든
+  // 활성 필터" 를 반영하도록 조합한다 (audit: facet 카운트 불일치 수정).
+  const kindClause: AnyWhere = kindsRaw.length > 0 ? { kind: { in: kindsRaw.map(kindToDb) } } : {}
+  const statusClause: AnyWhere = statusesRaw.length > 0 ? { status: { in: statusesRaw } } : {}
+  const lowDpiClause: AnyWhere =
+    lowDpiRaw === 'true' ? { lowDpi: true } : lowDpiRaw === 'false' ? { lowDpi: false } : {}
+  const ownerTypeClause: AnyWhere = ownerTypeRaw ? { ownerType: ownerTypeRaw } : {}
+  const searchClause: AnyWhere = search
+    ? { OR: [{ slug: { contains: search, mode: 'insensitive' } }, { tags: { has: search } }] }
+    : {}
 
-  if (kindsRaw.length > 0) {
-    where.kind = { in: kindsRaw.map(kindToDb) }
+  // 목록/총카운트용 전체 필터
+  const where: AnyWhere = {
+    ...kindClause,
+    ...statusClause,
+    ...lowDpiClause,
+    ...ownerTypeClause,
+    ...searchClause,
   }
-
-  if (statusesRaw.length > 0) {
-    where.status = { in: statusesRaw }
+  // facet 별 where — 카운트하려는 차원만 제외하고 나머지 활성 필터는 모두 적용
+  const whereExceptKind: AnyWhere = {
+    ...statusClause,
+    ...lowDpiClause,
+    ...ownerTypeClause,
+    ...searchClause,
   }
-
-  if (lowDpiRaw === 'true') {
-    where.lowDpi = true
-  } else if (lowDpiRaw === 'false') {
-    where.lowDpi = false
+  const whereExceptStatus: AnyWhere = {
+    ...kindClause,
+    ...lowDpiClause,
+    ...ownerTypeClause,
+    ...searchClause,
   }
-
-  if (ownerTypeRaw) {
-    where.ownerType = ownerTypeRaw
-  }
-
-  if (search) {
-    where.OR = [{ slug: { contains: search, mode: 'insensitive' } }, { tags: { has: search } }]
+  const whereExceptOwnerType: AnyWhere = {
+    ...kindClause,
+    ...statusClause,
+    ...lowDpiClause,
+    ...searchClause,
   }
 
   // 데이터 + 카운트 + facets 병렬 조회
@@ -101,21 +115,22 @@ export async function GET(req: NextRequest) {
         },
       }),
       prisma.resource.count({ where }),
-      // facets: kind 별 카운트 (현재 필터 기반)
+      // facets: kind 별 카운트 (kind 제외 모든 활성 필터 적용)
       prisma.resource.groupBy({
         by: ['kind'],
-        where: (statusesRaw.length > 0 ? { status: { in: statusesRaw } } : {}) as AnyWhere,
+        where: whereExceptKind,
         _count: { _all: true },
       }),
-      // facets: status 별 카운트
+      // facets: status 별 카운트 (status 제외 모든 활성 필터 적용)
       prisma.resource.groupBy({
         by: ['status'],
-        where: (kindsRaw.length > 0 ? { kind: { in: kindsRaw.map(kindToDb) } } : {}) as AnyWhere,
+        where: whereExceptStatus,
         _count: { _all: true },
       }),
-      // facets: ownerType 별 카운트
+      // facets: ownerType 별 카운트 (ownerType 제외 모든 활성 필터 적용)
       prisma.resource.groupBy({
         by: ['ownerType'],
+        where: whereExceptOwnerType,
         _count: { _all: true },
       }),
     ])
