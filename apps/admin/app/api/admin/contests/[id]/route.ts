@@ -49,6 +49,25 @@ export async function PATCH(request: Request, { params }: RouteContext): Promise
 
   const { name, opensAt, closesAt, resultsAt, rules } = parsed.data
 
+  // 시각 순서 검증 (audit: PATCH 가 POST 와 달리 temporal ordering 미검증).
+  // partial update 이므로 미지정 필드는 기존값으로 병합해 effective 값으로 검사한다.
+  const effOpensAt = opensAt !== undefined ? new Date(opensAt) : existing.opensAt
+  const effClosesAt = closesAt !== undefined ? new Date(closesAt) : existing.closesAt
+  const effResultsAt =
+    resultsAt !== undefined ? (resultsAt ? new Date(resultsAt) : null) : existing.resultsAt
+  if (effOpensAt >= effClosesAt) {
+    return NextResponse.json(
+      { error: '시작일(opensAt)은 마감일(closesAt)보다 빨라야 합니다.' },
+      { status: 422 },
+    )
+  }
+  if (effResultsAt && effClosesAt >= effResultsAt) {
+    return NextResponse.json(
+      { error: '결과 발표일(resultsAt)은 마감일(closesAt)보다 늦어야 합니다.' },
+      { status: 422 },
+    )
+  }
+
   try {
     const updated = await prisma.contestSeason.update({
       where: { id },
