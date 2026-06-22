@@ -84,8 +84,12 @@ export async function middleware(request: NextRequest): Promise<NextResponse> {
         goodbyeUrl.search = ''
         return NextResponse.redirect(goodbyeUrl)
       }
-    } catch {
-      // DB 오류 시 통과 (UX 우선 — 실제 탈퇴 확인은 서버 컴포넌트에서 재검증)
+    } catch (err) {
+      // DB 오류 시 통과(fail-open) — 가용성 우선. 단 운영 진단을 위해 반드시 로깅한다
+      // (audit: 빈 catch 가 장애를 은폐 + 탈퇴자 통과를 silent 로 허용했음).
+      // backstop: 30일 후 hard-delete cron 이 데이터 자체를 영구 파기.
+      // TODO(FOLLOWUP): 서버 컴포넌트/projects API 레이어에 deletedAt 재검증(defense-in-depth) 추가.
+      console.error('[middleware] deletedAt 확인 실패 — 접근 허용(fail-open):', err)
     }
   }
 

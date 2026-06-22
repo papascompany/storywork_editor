@@ -27,17 +27,14 @@
  */
 import { NextResponse } from 'next/server'
 
+import { verifyCronSecret } from '@/lib/cron-auth'
 import { prisma } from '@/lib/prisma'
 
 export const dynamic = 'force-dynamic'
 
 export async function GET(request: Request): Promise<NextResponse> {
-  // ── 인증: CRON_SECRET 헤더 확인 ─────────────────────────────────────────────
-  const cronSecret = process.env['CRON_SECRET']
-  const authHeader = request.headers.get('authorization')
-  const token = authHeader?.replace('Bearer ', '')
-
-  if (!cronSecret || token !== cronSecret) {
+  // ── 인증: CRON_SECRET 상수시간 검증 ─────────────────────────────────────────
+  if (!verifyCronSecret(request)) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
 
