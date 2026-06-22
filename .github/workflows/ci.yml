@@ -52,6 +52,11 @@ jobs:
       - name: Typecheck
         run: pnpm typecheck
 
+      # scripts/ 는 turbo 패키지가 아니라 pnpm typecheck 가 커버하지 못함 → 별도 게이트
+      # (audit: 운영 스크립트가 tsx 로만 실행돼 타입체크 사각지대였음)
+      - name: Typecheck scripts
+        run: pnpm typecheck:scripts
+
       - name: Test
         run: pnpm test
 
