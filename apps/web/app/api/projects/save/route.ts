@@ -138,26 +138,28 @@ export async function POST(req: Request): Promise<NextResponse> {
         return jsonError('이 프로젝트에 접근할 권한이 없습니다.', 403)
       }
 
-      // 프로젝트 메타 업데이트
-      await prisma.project.update({
-        where: { id: projectId },
-        data: { title, formatId, settings, updatedAt: now },
-      })
-
-      // 페이지 upsert — 기존 index 기준으로 업서트
-      // 기존 pages 를 모두 삭제 후 재생성 (단순 전략: 순서 보장)
-      await prisma.page.deleteMany({ where: { projectId } })
-      await prisma.page.createMany({
-        data: pages.map((p) => ({
-          projectId,
-          index: p.index,
-          // Prisma InputJsonValue 캐스팅: Record<string,unknown> → JSON
-          fabricJson: p.fabricJson as Parameters<
-            typeof prisma.page.create
-          >[0]['data']['fabricJson'],
-          thumbnail: p.thumbnail ?? null,
-        })),
-      })
+      // 프로젝트 메타 업데이트 + 페이지 재생성을 단일 트랜잭션으로 원자 처리.
+      // (비원자 처리 시 deleteMany 성공 후 createMany 실패하면 작품 페이지가 전멸 →
+      //  사용자 창작물 조용한 영구 소실. audit: projects/save 비원자적 저장 수정.)
+      // 페이지 전략: 기존 전체 삭제 후 재생성(순서/index 정합 보장).
+      await prisma.$transaction([
+        prisma.project.update({
+          where: { id: projectId },
+          data: { title, formatId, settings, updatedAt: now },
+        }),
+        prisma.page.deleteMany({ where: { projectId } }),
+        prisma.page.createMany({
+          data: pages.map((p) => ({
+            projectId,
+            index: p.index,
+            // Prisma InputJsonValue 캐스팅: Record<string,unknown> → JSON
+            fabricJson: p.fabricJson as Parameters<
+              typeof prisma.page.create
+            >[0]['data']['fabricJson'],
+            thumbnail: p.thumbnail ?? null,
+          })),
+        }),
+      ])
 
       savedProjectId = projectId
     } else {
