@@ -132,16 +132,18 @@ function parseArgs(): Args {
   // --click 은 반복 허용
   const clickSelectors: string[] = []
   for (let i = 0; i < argv.length; i++) {
-    if (argv[i] === '--click' && argv[i + 1]) {
+    if (argv[i] === '--click') {
       // semicolon 구분 지원
       const raw = argv[i + 1]
-      clickSelectors.push(
-        ...raw
-          .split(';')
-          .map((s) => s.trim())
-          .filter(Boolean),
-      )
-      i++
+      if (raw) {
+        clickSelectors.push(
+          ...raw
+            .split(';')
+            .map((s) => s.trim())
+            .filter(Boolean),
+        )
+        i++
+      }
     }
   }
 
@@ -165,7 +167,7 @@ function parseArgs(): Args {
   } else {
     const viewportRaw = get('--viewport') ?? '1280x900'
     const [vw, vh] = viewportRaw.toLowerCase().split('x').map(Number)
-    if (isNaN(vw) || isNaN(vh) || vw <= 0 || vh <= 0) {
+    if (vw === undefined || vh === undefined || isNaN(vw) || isNaN(vh) || vw <= 0 || vh <= 0) {
       console.error('[visual-check] --viewport 형식 오류 (예: 1280x900):', viewportRaw)
       process.exit(1)
     }

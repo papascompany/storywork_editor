@@ -86,7 +86,7 @@ async function main(): Promise<void> {
         dpi: seed.dpi,
         bleedMm: seed.bleedMm,
         safeMm: seed.safeMm,
-        gridDef: seed.gridDef,
+        // gridDef 는 모든 시드가 null → 생략(=DB NULL). Prisma Json? 는 JS null 직접 대입 불가.
       },
     })
 
