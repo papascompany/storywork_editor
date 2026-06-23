@@ -13,6 +13,7 @@
 /* eslint-disable import/order */
 import { type NextRequest, NextResponse } from 'next/server'
 import { z } from 'zod'
+import { isDemoModeEnabled } from '@/lib/feature-flags'
 import { createWebServerClient } from '@/lib/supabase/server'
 import { embedSearchQuery } from '../../_lib/embed-server'
 import { getPrismaClient } from '../../_lib/prisma'
@@ -52,14 +53,17 @@ export type SearchPosesBody = z.infer<typeof SearchBodySchema>
 export async function POST(req: NextRequest): Promise<NextResponse> {
   const startMs = Date.now()
 
-  // 0. 인증 확인 — 미인증 호출자의 유료 임베딩/DB 스캔 남용 차단
+  // 0. 인증 확인 — 미인증 호출자의 유료 임베딩/DB 스캔 남용 차단.
+  //    단, 데모 모드(admin 토글)에서는 익명 포즈 검색 허용(인증 우회 시연 — 읽기 전용).
   const supabase = await createWebServerClient()
   const {
     data: { user: authUser },
     error: authError,
   } = await supabase.auth.getUser()
   if (authError || !authUser) {
-    return NextResponse.json({ error: '로그인이 필요합니다.' }, { status: 401 })
+    if (!(await isDemoModeEnabled())) {
+      return NextResponse.json({ error: '로그인이 필요합니다.' }, { status: 401 })
+    }
   }
 
   // 1. 요청 파싱

@@ -31,6 +31,12 @@ vi.mock('@/lib/supabase/server', () => ({
   }),
 }))
 
+// 데모 모드 플래그 mock (기본 OFF → 평시 인증 유지)
+const { mockIsDemoMode } = vi.hoisted(() => ({ mockIsDemoMode: vi.fn() }))
+vi.mock('@/lib/feature-flags', () => ({
+  isDemoModeEnabled: mockIsDemoMode,
+}))
+
 // ─────────────────────────────────────────────
 // 타입 + import (mock 이후)
 // ─────────────────────────────────────────────
@@ -93,6 +99,7 @@ describe('POST /api/search/poses', () => {
       results: [sampleResource],
       total: 1,
     })
+    mockIsDemoMode.mockResolvedValue(false)
   })
 
   afterEach(() => {
@@ -115,6 +122,22 @@ describe('POST /api/search/poses', () => {
     })
     const { status } = await callRoute({ query: '서있는' })
     expect(status).toBe(401)
+  })
+
+  it('데모 모드 ON + 미인증 → 401 우회, 익명 포즈검색 허용(200)', async () => {
+    mockGetUser.mockResolvedValueOnce({ data: { user: null }, error: null })
+    mockIsDemoMode.mockResolvedValueOnce(true)
+    const { status } = await callRoute({ query: '서있는 여자' })
+    expect(status).toBe(200)
+    expect(mockBuildSearchQuery).toHaveBeenCalled()
+  })
+
+  it('데모 모드 OFF + 미인증 → 401 유지(평시)', async () => {
+    mockGetUser.mockResolvedValueOnce({ data: { user: null }, error: null })
+    mockIsDemoMode.mockResolvedValueOnce(false)
+    const { status } = await callRoute({ query: '서있는' })
+    expect(status).toBe(401)
+    expect(mockBuildSearchQuery).not.toHaveBeenCalled()
   })
 
   // ── 1. 기본 query 검색 ────────────────────

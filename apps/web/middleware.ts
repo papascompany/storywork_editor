@@ -12,10 +12,19 @@
 import type { NextRequest } from 'next/server'
 import { NextResponse } from 'next/server'
 
+import { isDemoModeEnabled } from './lib/feature-flags'
 import { createMiddlewareClient } from './lib/supabase/middleware'
 
 // 인증이 필요한 보호 경로 prefix 목록
 const PROTECTED_PREFIXES = ['/mypage', '/api/projects', '/editor']
+
+// 데모 모드(admin 토글) 시 익명 허용 경로 — 편집기 시연용.
+// /mypage 는 제외(로그인 본인 데이터 전제). DB 쓰기(/api/projects/save)는 route 에서 401 유지.
+const DEMO_BYPASS_PREFIXES = ['/editor', '/api/projects']
+
+function isDemoBypassPath(pathname: string): boolean {
+  return DEMO_BYPASS_PREFIXES.some((prefix) => pathname.startsWith(prefix))
+}
 
 // 탈퇴된 사용자 접근 시 /goodbye 로 리다이렉트할 경로 (인증 필요 경로와 동일)
 // /mypage/account 는 탈퇴 절차 페이지이므로 제외하지 않음 (이미 탈퇴 시 goodbye 행)
@@ -61,6 +70,11 @@ export async function middleware(request: NextRequest): Promise<NextResponse> {
   } = await supabase.auth.getUser()
 
   if (!user) {
+    // 데모 모드(admin 토글): /editor·/api/projects 는 익명 허용해 로그인 없이 시연.
+    // isDemoModeEnabled 는 fail-closed(조회 실패 시 false) → 평시 인증 그대로.
+    if (isDemoBypassPath(pathname) && (await isDemoModeEnabled())) {
+      return response
+    }
     const loginUrl = request.nextUrl.clone()
     loginUrl.pathname = '/login'
     loginUrl.searchParams.set('next', pathname)

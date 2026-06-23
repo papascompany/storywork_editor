@@ -11,6 +11,8 @@ import Link from 'next/link'
 
 import { prisma } from '../../src/lib/prisma'
 
+import { DemoModeToggle } from './DemoModeToggle'
+
 // ─── 날짜 포매터 ─────────────────────────────────────────────────────────────
 
 function formatKoreanDate(d: Date): string {
@@ -107,6 +109,9 @@ export default async function DashboardPage() {
           <span className="nike-caption-sm">등록됨 / 세트 {templateSetCount}</span>
         </article>
       </section>
+
+      {/* ─── 데모 모드 토글 (런타임 인증 우회 시연) ─── */}
+      <DemoModeToggle />
 
       {/* ─── 리소스 섹션 ─── */}
       <section className="mb-10">

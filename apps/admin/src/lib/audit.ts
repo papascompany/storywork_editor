@@ -28,6 +28,7 @@ export type AuditEntityType =
   | 'Report'
   | 'PrinterProfile'
   | 'CompanyInfo'
+  | 'FeatureFlag'
 
 export interface RecordAuditOptions {
   actorId: string

@@ -633,3 +633,14 @@ model CompanyInfo {
   createdAt              DateTime @default(now())
   updatedAt              DateTime @updatedAt
 }
+
+/// 런타임 기능 플래그 (admin 토글). 현재 사용: 'demoMode'(인증 우회 데모).
+/// 읽기는 web 서버(service-role/Prisma)만 — RLS ENABLE + 정책 없음으로 anon 직접 접근 차단.
+/// updatedById 는 plain String(FK 없음, AuditLog.actorId 패턴).
+model FeatureFlag {
+  key         String   @id
+  enabled     Boolean  @default(false)
+  updatedById String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
