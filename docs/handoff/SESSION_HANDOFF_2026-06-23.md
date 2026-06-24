@@ -5,11 +5,16 @@
 
 ---
 
-## 0. 한 줄 상태
+## 0. 한 줄 상태 (2026-06-23 최신: `574e5a9`)
 
-**main `3b52c09` = origin/main (0 ahead/behind) · 워킹트리 clean · web+admin 프로덕션 `01e2ba0` 라이브(200) · 전 커밋 CI green.** 진행 중 끊긴 코드 작업 없음 — 모두 커밋·푸시·배포 완료. "중단된 부분"은 곧 **의도적으로 분리한 후속(FOLLOWUP)과 휴먼게이트 대기 항목**.
+**main `574e5a9` = origin/main · 워킹트리 clean · web+admin 프로덕션 라이브(200) · 전 커밋 CI green · 로컬 lint/tsc/test 정상(디스크 복구됨).** 진행 중 끊긴 코드 작업 없음. "중단된 부분"은 **의도적으로 분리한 후속(FOLLOWUP)과 휴먼게이트 대기 항목**.
 
-> ⚠️ **정본 경로**: `/Users/yohan/Developer/claude/storywork` (이전 세션은 `/Users/yohan/Documents/claude/storywork` 클론에서 작업했으나 동일 origin·동일 커밋으로 동기됨. 앞으로 정본에서만 작업.)
+> ⚠️ **정본 경로**: `/Users/yohan/Developer/claude/storywork` (Documents 클론은 동일 origin·동기 — 앞으로 정본에서만 작업.)
+
+### 0.1 핸드오프 작성(37011cc) 이후 추가 완료
+- **[FOLLOWUP-68~70 문서화]** `9c31bb8` — 감사 잔여 점검 이슈를 [deferred-audit-issues.md](../architecture/deferred-audit-issues.md) 로 정리.
+- **[DEMO-01 데모 모드]** `574e5a9` — admin 런타임 토글로 인증 우회 시연(옵션B). `FeatureFlag` DB 플래그 + web 미들웨어/포즈검색 우회(fail-closed, 30s 캐시) + admin 대시보드 토글. **prod 마이그레이션 `20260623000000_feature_flag` 적용 완료** + end-to-end 실증(ON→/editor 200, OFF→307). 현재 **OFF(안전)**. 운영: [demo-mode.md](../runbooks/demo-mode.md).
+  - 데모 시연: admin 콘솔에서 "데모 모드 켜기" → `web/editor` 익명 체험 → 끝나면 "끄기"(~30초 반영).
 
 ---
 

@@ -368,4 +368,4 @@ UI 작업 시 다음 SOP 를 반드시 준수한다 (2026-05-15 회고 기반):
 
 ---
 
-_Last updated: 2026-06-23 · BOARD-05(공모전 출품+동결)/BOARD-06(FAQ)/M8-04(공유+OG)/LEGAL-04(개인정보 동의)/FOLLOWUP-64(react-hooks)/FOLLOWUP-65(마이그레이션 baseline) + 전수 감사(AUDIT-FIX-02, 8차원 서브에이전트 → 수정 8건: CRITICAL PIPA 파기 cron 등) 완료. Handoff: [docs/handoff/SESSION_HANDOFF_2026-06-23.md](docs/handoff/SESSION_HANDOFF_2026-06-23.md)_
+_Last updated: 2026-06-23 · BOARD-05/06·M8-04·LEGAL-04·FOLLOWUP-64/65 + 전수 감사(AUDIT-FIX-02, 8차원 → 수정 8건: CRITICAL PIPA 파기 cron 등) + DEMO-01(데모 모드 admin 런타임 토글, prod 적용·실증) 완료. Handoff: [docs/handoff/SESSION_HANDOFF_2026-06-23.md](docs/handoff/SESSION_HANDOFF_2026-06-23.md)_
