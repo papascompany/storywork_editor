@@ -261,6 +261,24 @@ src/
 
 ---
 
+## 17. `@storywork/edu-curriculum` (사업화 · M11/EDU — 신규, 미착수)
+**책임**: 교육 과정 모델(Course/Lesson/Enrollment/Progress), 수강·진도·수료, 편집기 연동 실습, B2B 단체 좌석.
+**계약**
+- 결제·정산은 `marketplace`(또는 billing)에 위임 — 본 모듈은 학습 도메인만.
+- 강의 콘텐츠는 `editor-template` 의 교육용 템플릿/튜토리얼 단계를 재사용(중복 구현 금지).
+**비책임**: 결제, 자산 거래, 편집기 코어.
+
+---
+
+## 18. `@storywork/marketplace` (사업화 · M11/MARKET, COMMERCE-01/03 — 신규, 미착수)
+**책임**: 외부 디자이너 자산 등록·검수·거래·수수료(25%)·정산·공급자 KPI.
+**계약**
+- 자산 검수는 admin 검수 큐(M3-04) + AI 2차 태깅(AI-ACT-02)을 재사용, 자산 스키마는 `Resource(ownerType='creator')` 확장.
+- 결제 Stripe(M7-01) 의존. 정산(월별 수익+세금계산서)은 🚦 휴먼 게이트(세무).
+**비책임**: 포즈 인입 파이프라인(=`pose-curator`), 편집기 렌더.
+
+---
+
 ## 의존성 매트릭스
 
 | from \ to | core | layers | history | template | pose | text | fx | export | ui | ai-script | ai-rec | ai-layout | pdf | schema | shared-ui | utils |
