@@ -77,7 +77,9 @@ export default function ResetPasswordPage() {
   }, [])
 
   const validate = (): string => {
-    if (newPassword.length < 8) return '비밀번호는 8자 이상이어야 합니다.'
+    if (newPassword.length < 10) return '비밀번호는 10자 이상이어야 합니다.'
+    if (!/[A-Za-z]/.test(newPassword) || !/[0-9]/.test(newPassword))
+      return '비밀번호는 영문과 숫자를 모두 포함해야 합니다.'
     if (newPassword !== confirmPassword) return '비밀번호가 일치하지 않습니다.'
     return ''
   }
@@ -270,7 +272,7 @@ export default function ResetPasswordPage() {
                 type="password"
                 name="new-password"
                 autoComplete="new-password"
-                placeholder="8자 이상 입력"
+                placeholder="10자 이상, 영문+숫자"
                 value={newPassword}
                 onChange={(e) => setNewPassword(e.target.value)}
                 disabled={loading}

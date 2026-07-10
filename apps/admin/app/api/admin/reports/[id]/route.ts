@@ -31,6 +31,10 @@ export async function PATCH(request: Request, { params }: RouteContext): Promise
   if (!report) {
     return NextResponse.json({ error: '신고를 찾을 수 없습니다.' }, { status: 404 })
   }
+  // 이미 종결(resolved/dismissed)된 신고는 재처리 금지 — 상태 불일치·중복 부작용 방지
+  if (report.status === 'resolved' || report.status === 'dismissed') {
+    return NextResponse.json({ error: '이미 처리된 신고입니다.' }, { status: 409 })
+  }
 
   let body: unknown
   try {

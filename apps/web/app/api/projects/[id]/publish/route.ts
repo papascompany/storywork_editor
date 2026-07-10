@@ -44,6 +44,7 @@ import { inngest } from '@storywork/workers'
 import { createWebServerClient } from '@/lib/supabase/server'
 import { getAdminClient } from '@/lib/supabase-admin'
 import { getPrismaClient } from '../../../_lib/prisma'
+import { guardDeletedUser } from '../../../_lib/require-active-user'
 /* eslint-enable import/order */
 
 // ─── 에러 응답 헬퍼 ───────────────────────────────────────────────────────────
@@ -99,6 +100,10 @@ export async function POST(
   if (!dbUser) {
     return jsonError('사용자 정보를 찾을 수 없습니다.', 404)
   }
+
+  // FOLLOWUP-69: 탈퇴(soft-deleted) 심층방어 — 미들웨어 fail-open 대비 서버 재검증
+  const deletedGuard = guardDeletedUser(dbUser)
+  if (deletedGuard) return deletedGuard
 
   const prisma = getPrismaClient()
 

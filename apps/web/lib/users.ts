@@ -23,6 +23,8 @@ export interface WebUser {
   avatarUrl: string | null
   createdAt: Date
   updatedAt: Date
+  /** soft-delete 시각 (null 이면 활성). 탈퇴 심층방어 재검증용 — FOLLOWUP-69 */
+  deletedAt: Date | null
 }
 
 // ─── 입력 검증 상수 ───────────────────────────────────────────────────────────
@@ -66,6 +68,7 @@ export async function getCurrentUser(authUser: {
       avatarUrl: true,
       createdAt: true,
       updatedAt: true,
+      deletedAt: true,
     },
   })
 
@@ -77,6 +80,7 @@ export async function getCurrentUser(authUser: {
     avatarUrl: user.avatarUrl ?? null,
     createdAt: user.createdAt,
     updatedAt: user.updatedAt,
+    deletedAt: user.deletedAt,
   }
 }
 
@@ -136,6 +140,7 @@ export async function updateUserProfile(
         avatarUrl: true,
         createdAt: true,
         updatedAt: true,
+        deletedAt: true,
       },
     })
 
@@ -149,6 +154,7 @@ export async function updateUserProfile(
         avatarUrl: updated.avatarUrl ?? null,
         createdAt: updated.createdAt,
         updatedAt: updated.updatedAt,
+        deletedAt: updated.deletedAt,
       },
     }
   } catch (err) {

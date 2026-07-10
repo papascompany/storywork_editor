@@ -15,16 +15,16 @@ const nextConfig: NextConfig = {
   // 포즈 썸네일 등 Supabase Storage 이미지 허용
   images: {
     remotePatterns: [
-      // Supabase Storage — 프로젝트 URL 패턴 전체 허용
+      // Supabase Storage — 실제 프로젝트 호스트로 고정 (와일드카드 금지)
       {
         protocol: 'https',
-        hostname: '*.supabase.co',
+        hostname: 'wjpyeqckuxyfeytuzgon.supabase.co',
         pathname: '/storage/v1/object/**',
       },
       // Supabase Storage public URL (signed URL 없이)
       {
         protocol: 'https',
-        hostname: '*.supabase.co',
+        hostname: 'wjpyeqckuxyfeytuzgon.supabase.co',
         pathname: '/storage/v1/render/**',
       },
       // localhost Supabase (로컬 개발 환경)

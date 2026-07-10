@@ -4,7 +4,7 @@
  * apps/web/app/(auth)/signup/page.tsx
  *
  * 일반 사용자 회원가입 페이지.
- * - 이메일 + 비밀번호(8자+) + 비밀번호 확인 + 약관 동의
+ * - 이메일 + 비밀번호(10자+·영문+숫자) + 비밀번호 확인 + 약관 동의
  * - Google / Kakao OAuth 자리 (disabled — PR4/5 에서 활성화)
  * - 성공 시 /signup/check-email 로 이동
  * - 마케팅 디자인 토큰(--mkt-*) 적용
@@ -174,7 +174,9 @@ export default function SignupPage() {
 
   const validate = (): string => {
     if (!email) return '이메일을 입력하세요.'
-    if (password.length < 8) return '비밀번호는 8자 이상이어야 합니다.'
+    if (password.length < 10) return '비밀번호는 10자 이상이어야 합니다.'
+    if (!/[A-Za-z]/.test(password) || !/[0-9]/.test(password))
+      return '비밀번호는 영문과 숫자를 모두 포함해야 합니다.'
     if (password !== confirmPassword) return '비밀번호가 일치하지 않습니다.'
     if (!agreedTerms) return '이용약관에 동의해주세요.'
     if (!agreedPrivacy) return '개인정보 수집·이용에 동의해주세요.'
@@ -310,14 +312,16 @@ export default function SignupPage() {
           <div className="flex flex-col gap-1.5">
             <label htmlFor="password" style={LABEL_STYLE}>
               비밀번호{' '}
-              <span style={{ fontWeight: 330, opacity: 0.5, fontSize: '12px' }}>(8자 이상)</span>
+              <span style={{ fontWeight: 330, opacity: 0.5, fontSize: '12px' }}>
+                (10자 이상, 영문+숫자)
+              </span>
             </label>
             <input
               id="password"
               type="password"
               name="password"
               autoComplete="new-password"
-              placeholder="8자 이상 입력"
+              placeholder="10자 이상, 영문+숫자"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               disabled={loading}
@@ -325,7 +329,7 @@ export default function SignupPage() {
               onFocus={handleInputFocus}
               onBlur={handleInputBlur}
               required
-              minLength={8}
+              minLength={10}
             />
           </div>
 

@@ -109,8 +109,9 @@ fi
 
 # ── awk 기반 패턴 탐지 ────────────────────────────────────────────────────────
 # 전략:
-#   1. @layer 블록 깊이(layer_depth)를 추적한다.
-#   2. layer_depth == 0 (레이어 바깥) 에서 universal selector 블록 시작을 감지.
+#   1. 전체 중괄호 깊이(depth)와 "@layer 블록 내부 여부"(in_layer 불리언)를 추적한다.
+#      최상위(depth 0)에서 @layer 가 열리면 in_layer=1, depth 가 0 으로 돌아오면 in_layer=0.
+#   2. in_layer == 0 (레이어 바깥) 에서 universal selector 블록 시작을 감지.
 #   3. universal selector 블록이 열린 후 닫히기 전에 padding/margin reset 이 있으면 위반.
 VIOLATIONS=()
 
@@ -120,78 +121,41 @@ for css_file in "${CSS_FILES[@]}"; do
   # awk 분석 — 결과: "줄번호" 형태로 위반 줄 번호 출력
   violation_lines=$(awk '
     BEGIN {
-      layer_depth = 0       # @layer 블록 중첩 깊이
-      brace_depth = 0       # 전체 중괄호 깊이
-      in_universal = 0      # @layer 밖 * { } 블록 내부 여부
-      universal_depth = 0   # universal 블록이 시작된 중괄호 깊이
-      universal_line = 0    # universal selector 가 시작된 줄 번호
+      depth = 0            # 전체 중괄호 중첩 깊이
+      in_layer = 0         # 최상위 @layer 블록 내부 여부
+      in_universal = 0     # @layer 밖 * { } 블록 내부 여부
+      universal_depth = 0  # universal 블록이 시작된 중괄호 깊이
     }
 
     {
-      line = $0
-      lineno = NR
+      # 이 줄에서 @layer 선언이 시작되는가? (여는 { 판정용)
+      line_is_layer = ($0 ~ /@layer[[:space:]]/)
 
-      # @layer 블록 시작 감지 (@layer base { 또는 @layer utilities { 등)
-      if (line ~ /@layer[[:space:]]/) {
-        # @layer 선언 자체는 layer_depth 를 아직 올리지 않음
-        # 여는 { 가 같은 줄에 있는지 확인
-        open_count = gsub(/\{/, "{", line)
-        close_count = gsub(/\}/, "}", line)
-
-        # 원래 라인을 다시 사용
-        line = $0
-
-        # @layer 줄의 { 수만큼 layer_depth 증가
-        n = split(line, chars, "")
-        for (i = 1; i <= n; i++) {
-          if (substr(line, i, 1) == "{") {
-            brace_depth++
-            if (index(line, "@layer") > 0 || layer_depth > 0) layer_depth++
-          } else if (substr(line, i, 1) == "}") {
-            if (layer_depth > 0) layer_depth--
-            brace_depth--
-          }
-        }
-        next
-      }
-
-      # @layer 바깥 — 중괄호 깊이 추적 + universal selector 탐지
-      n = split($0, chars, "")
-      col = 1
-      while (col <= length($0)) {
-        ch = substr($0, col, 1)
-
+      # 문자 단위로 중괄호 깊이 + @layer/universal 블록 상태 추적
+      n = length($0)
+      for (i = 1; i <= n; i++) {
+        ch = substr($0, i, 1)
         if (ch == "{") {
-          brace_depth++
-          col++
-          continue
+          if (depth == 0 && line_is_layer) in_layer = 1
+          depth++
+        } else if (ch == "}") {
+          if (in_universal && depth == universal_depth) in_universal = 0
+          depth--
+          if (depth <= 0) { depth = 0; in_layer = 0 }
         }
-
-        if (ch == "}") {
-          if (in_universal && brace_depth == universal_depth) {
-            in_universal = 0
-          }
-          if (layer_depth > 0) layer_depth--
-          brace_depth--
-          col++
-          continue
-        }
-
-        col++
       }
 
-      # layer 밖 universal selector 블록 탐지
+      # @layer 밖 universal selector 블록 시작 감지
       # 패턴: 줄이 "  *  {" 또는 "* {" 형태 (앞에 공백 허용, 뒤에 코멘트 허용)
-      if (layer_depth == 0 && $0 ~ /^[[:space:]]*\*[[:space:]]*\{/) {
+      if (!in_layer && $0 ~ /^[[:space:]]*\*[[:space:]]*\{/) {
         in_universal = 1
-        universal_depth = brace_depth
-        universal_line = lineno
+        universal_depth = depth
       }
 
       # universal 블록 안에서 padding: 0 또는 margin: 0 탐지
-      if (in_universal && layer_depth == 0) {
+      if (in_universal) {
         if ($0 ~ /padding[[:space:]]*:[[:space:]]*0/ || $0 ~ /margin[[:space:]]*:[[:space:]]*0/) {
-          print lineno
+          print NR
         }
       }
     }

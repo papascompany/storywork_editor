@@ -37,6 +37,7 @@ import { preflight } from '@storywork/pdf-engine'
 import type { PdfBuildInput, PageInput } from '@storywork/pdf-engine'
 import { createWebServerClient } from '@/lib/supabase/server'
 import { getPrismaClient } from '../../../_lib/prisma'
+import { guardDeletedUser } from '../../../_lib/require-active-user'
 import { initDbProfileLoader } from '@/lib/preflight/db-loader'
 /* eslint-enable import/order */
 
@@ -95,6 +96,10 @@ export async function POST(
   if (!dbUser) {
     return jsonError('사용자 정보를 찾을 수 없습니다.', 404)
   }
+
+  // FOLLOWUP-69: 탈퇴(soft-deleted) 심층방어 — 미들웨어 fail-open 대비 서버 재검증
+  const deletedGuard = guardDeletedUser(dbUser)
+  if (deletedGuard) return deletedGuard
 
   // 3. 프로젝트 + 포맷 + 페이지 로드
   let project: Awaited<ReturnType<typeof prisma.project.findUnique>>

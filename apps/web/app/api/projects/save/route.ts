@@ -21,9 +21,11 @@
 /* eslint-disable import/order */
 import { NextResponse } from 'next/server'
 import { z } from 'zod'
+import { PageJsonV1Schema } from '@storywork/schema/editor'
 import { createWebServerClient } from '@/lib/supabase/server'
 import { resolveFormatId } from '@/lib/format-mapping'
 import { getPrismaClient } from '../../_lib/prisma'
+import { guardDeletedUser } from '../../_lib/require-active-user'
 /* eslint-enable import/order */
 
 // ─── Zod 스키마 ───────────────────────────────────────────────────────────────
@@ -97,6 +99,10 @@ export async function POST(req: Request): Promise<NextResponse> {
     return jsonError('사용자 정보를 찾을 수 없습니다. 잠시 후 다시 시도해 주세요.', 404)
   }
 
+  // FOLLOWUP-69: 탈퇴(soft-deleted) 심층방어 — 미들웨어 fail-open 대비 서버 재검증
+  const deletedGuard = guardDeletedUser(dbUser)
+  if (deletedGuard) return deletedGuard
+
   // 3. 요청 바디 파싱 + Zod 검증
   let body: SaveProjectBody
   try {
@@ -113,6 +119,16 @@ export async function POST(req: Request): Promise<NextResponse> {
   const now = new Date()
   // 표지 설정 → Project.settings Json (cover 미사용 시 null 로 명시 저장)
   const settings = { cover: body.cover ?? null }
+
+  // 3.5. 각 페이지 fabricJson 을 PageJsonV1 스키마로 사전 검증 (빈 페이지 {} = 신규 페이지라 허용)
+  for (const page of pages) {
+    if (
+      Object.keys(page.fabricJson).length > 0 &&
+      !PageJsonV1Schema.safeParse(page.fabricJson).success
+    ) {
+      return jsonError(`페이지 데이터 형식이 올바르지 않습니다 (index=${page.index}).`, 400)
+    }
+  }
 
   // 4. Format 존재 확인
   const format = await prisma.format.findUnique({ where: { id: formatId } })

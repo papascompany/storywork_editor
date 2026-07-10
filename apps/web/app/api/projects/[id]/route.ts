@@ -13,6 +13,7 @@
 import { NextResponse } from 'next/server'
 import { createWebServerClient } from '@/lib/supabase/server'
 import { getPrismaClient } from '../../_lib/prisma'
+import { guardDeletedUser } from '../../_lib/require-active-user'
 /* eslint-enable import/order */
 
 // ─── 에러 응답 헬퍼 ───────────────────────────────────────────────────────────
@@ -56,6 +57,10 @@ export async function GET(
   if (!dbUser) {
     return jsonError('사용자 정보를 찾을 수 없습니다.', 404)
   }
+
+  // FOLLOWUP-69: 탈퇴(soft-deleted) 심층방어 — 미들웨어 fail-open 대비 서버 재검증
+  const deletedGuard = guardDeletedUser(dbUser)
+  if (deletedGuard) return deletedGuard
 
   const prisma = getPrismaClient()
 

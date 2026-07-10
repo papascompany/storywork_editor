@@ -119,7 +119,7 @@ describe('ResetPasswordPage', () => {
     })
   })
 
-  it('8자 미만 비밀번호는 검증 에러를 표시한다', async () => {
+  it('10자 미만 비밀번호는 검증 에러를 표시한다', async () => {
     render(<ResetPasswordPage />)
 
     await waitFor(() => {
@@ -135,7 +135,7 @@ describe('ResetPasswordPage', () => {
     fireEvent.click(screen.getByRole('button', { name: '비밀번호 변경' }))
 
     await waitFor(() => {
-      expect(screen.getByText('비밀번호는 8자 이상이어야 합니다.')).toBeDefined()
+      expect(screen.getByText('비밀번호는 10자 이상이어야 합니다.')).toBeDefined()
     })
 
     expect(mockUpdateUser).not.toHaveBeenCalled()

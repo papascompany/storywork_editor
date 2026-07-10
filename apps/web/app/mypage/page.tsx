@@ -49,6 +49,12 @@ export default async function MyPage({ searchParams }: MyPageProps) {
     // DB 오류 시 auth 정보로만 렌더 (작품 목록은 빈 배열)
   }
 
+  // ── 2.5 탈퇴(soft-deleted) 심층방어 (FOLLOWUP-69) ─────────────────────────────
+  // 미들웨어 deletedAt 차단이 fail-open 으로 뚫려도 서버에서 재검증 → /goodbye
+  if (dbUser?.deletedAt) {
+    redirect('/goodbye')
+  }
+
   // ── 3. 작품 목록 조회 ────────────────────────────────────────────────────────
   // DB user 가 있을 때만 조회, 없으면 빈 배열
   let rawProjects: {
