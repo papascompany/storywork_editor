@@ -7,11 +7,12 @@
 
 ---
 
-## FOLLOWUP-68 — Reaction.userId FK 부재 (data-integrity)
+## FOLLOWUP-68 — Reaction.userId FK 부재 ✅ 완료 (2026-06-29)
 - **현상**: `Reaction.userId` 가 User FK 없는 plain String. `prisma/schema.prisma` 에서 Comment.userId 는 정식 `@relation` FK(RESTRICT)인데 Reaction 은 비대칭으로 FK 없음.
 - **영향**: DB 레벨 참조무결성 미보장. 현재 회원 영구파기 cron(`/api/cron/hard-delete-users`)이 앱레벨 `reaction.deleteMany({where:{userId}})` 로 방어(AUDIT-FIX-02 #1에서 추가)하므로 즉각 피해는 없음. 다만 **향후 다른 User 삭제 경로(admin 도구·수동 SQL·신규 플로우)가 추가되면** FK가 없어 고아 Reaction(좋아요 PII)이 silent 로 잔존할 수 있음.
 - **조치**: schema 에 `user User @relation(fields:[userId], references:[id], onDelete:Cascade)` + User 에 `reactions Reaction[]` 역참조 추가 → 마이그레이션. 🚦 마이그레이션 = 휴먼 게이트.
 - **우선순위**: low~medium (예방적 무결성 강화).
+- **완료**: 마이그레이션 `20260629020000_reaction_user_fk`(고아 정리 + FK Cascade). prod 적용 대기(SQL Editor/migrate deploy).
 
 ## FOLLOWUP-69 — 탈퇴(deletedAt) 차단 심층방어 ✅ 완료 (2026-06-29, `e0496ab`)
 - **현상**: soft-deleted(탈퇴 예정) 사용자 차단이 `apps/web/middleware.ts` 단일 레이어. Supabase REST 조회가 네트워크/레이트리밋 장애 시 빈 catch 로 통과(fail-open) → 탈퇴 사용자가 `/mypage`·`/editor`·`/api/projects/*` 에 일시 접근 가능. (AUDIT-FIX-02 #5에서 **로깅은 추가**, fall-open 정책은 유지.)
@@ -31,4 +32,4 @@
 
 ---
 
-_갱신: 2026-06-29 · FOLLOWUP-69·70 전건 완료(`e0496ab`+`950fd75`) + SEC-RLS-01(Supabase advisor 대응). **잔여: FOLLOWUP-68**(Reaction FK, 🚦 마이그레이션)만 미완. 이전: 2026-06-23._
+_갱신: 2026-06-29 · 감사 후속 전건 완료 — FOLLOWUP-68(Reaction FK, `20260629020000`)·69·70 + SEC-RLS-01. **미완 없음** (FOLLOWUP-68 은 prod 적용만 대기). 이전: 2026-06-23._
