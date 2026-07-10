@@ -13,14 +13,15 @@
 - **조치**: schema 에 `user User @relation(fields:[userId], references:[id], onDelete:Cascade)` + User 에 `reactions Reaction[]` 역참조 추가 → 마이그레이션. 🚦 마이그레이션 = 휴먼 게이트.
 - **우선순위**: low~medium (예방적 무결성 강화).
 
-## FOLLOWUP-69 — 탈퇴(deletedAt) 차단 심층방어 (data-integrity / security-adjacent)
+## FOLLOWUP-69 — 탈퇴(deletedAt) 차단 심층방어 ✅ 완료 (2026-06-29, `e0496ab`)
 - **현상**: soft-deleted(탈퇴 예정) 사용자 차단이 `apps/web/middleware.ts` 단일 레이어. Supabase REST 조회가 네트워크/레이트리밋 장애 시 빈 catch 로 통과(fail-open) → 탈퇴 사용자가 `/mypage`·`/editor`·`/api/projects/*` 에 일시 접근 가능. (AUDIT-FIX-02 #5에서 **로깅은 추가**, fall-open 정책은 유지.)
 - **영향**: REST 장애 + 활성 탈퇴 세션 동시 조건이라 상시 악용은 아님. 30일 후 hard-delete cron 이 데이터 영구파기를 별도 보장. 단 차단이 단일 레이어 의존.
 - **조치**: 서버 컴포넌트/`/api/projects/*` 핸들러 레이어에 `deletedAt` 재검증 가드 추가(심층방어). 코드 마커: `apps/web/middleware.ts:91` TODO(FOLLOWUP).
 - **우선순위**: medium.
+- **완료**: `guardDeletedUser` 헬퍼 + projects API 5종·/mypage·`users.ts`(deletedAt) 서버 재검증. CI green.
 
-## FOLLOWUP-70 — 감사 잔여 하드닝 묶음 (저우선, verifier low~medium 하향)
-각 항목 독립적이며 즉각 위험 없음. 여유 시 일괄 처리 권장.
+## FOLLOWUP-70 — 감사 잔여 하드닝 묶음 ✅ 완료 (2026-06-29, `e0496ab`+`950fd75`)
+**✅ 6건 전건 적용 완료** (병렬 서브에이전트 분석). #1은 빈 페이지 `{}` 허용 가드로 저장 회귀 차단, #5는 진짜 production 한정 부팅게이트(preview 제외)로 보강. CRON_SECRET Vercel 등록 → 크론 가동.
 1. **Page.fabricJson 저장 검증** — `/api/projects/save` 에서 `PageJsonV1Schema.parseAsync` 로 저장 전 검증(현재 읽기측 throw-catch 로 격리됨). 깨진 JSON self-save 방지 + 즉시 400.
 2. **admin remotePatterns 호스트 핀** — `apps/admin/next.config.ts` 의 `*.supabase.co` 와일드카드 → 실제 프로젝트 호스트로 고정(오픈프록시/SSRF 표면 축소; dangerouslyAllowSVG 미설정이라 XSS 경로는 없음).
 3. **비밀번호 정책 강화** — 현재 8자 최소. 길이 10~12 상향 또는 복잡도(대문자+숫자) 또는 HIBP 노출 차단. (Supabase 자체 rate-limit 존재로 즉시 탈취는 아님.)
@@ -30,4 +31,4 @@
 
 ---
 
-_갱신: 2026-06-23 · 본 문서는 roadmap.md FOLLOWUP-68/70 의 상세 컨텍스트 버전. 처리 시 roadmap 체크박스도 함께 갱신._
+_갱신: 2026-06-29 · FOLLOWUP-69·70 전건 완료(`e0496ab`+`950fd75`) + SEC-RLS-01(Supabase advisor 대응). **잔여: FOLLOWUP-68**(Reaction FK, 🚦 마이그레이션)만 미완. 이전: 2026-06-23._
