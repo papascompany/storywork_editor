@@ -1237,6 +1237,7 @@ export function EditorShell() {
             closeRequest={mobileCloseRequest}
             onPageChange={(idx) => setCurrentPage(idx)}
             onApplyAlternative={handleApplyAlternative}
+            onAddPoseToCanvas={addPoseFromResource}
           />
         </div>
 

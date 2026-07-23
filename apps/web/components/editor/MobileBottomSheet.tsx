@@ -42,6 +42,8 @@ import {
 } from 'lucide-react'
 import React, { useCallback, useEffect, useRef, useState } from 'react'
 
+import type { ResourceSummary } from '../../app/api/_lib/search-types'
+
 import { ControlBar } from './ControlBar'
 import { applyZoom, fitToViewport, getZoomPercent, MIN_ZOOM, MAX_ZOOM } from './Footer'
 import type { ObjectProps } from './hooks/useSelection'
@@ -49,8 +51,13 @@ import { LayerPanel } from './LayerPanel'
 import { PagePanel } from './page-system/PagePanel'
 import { AlternativesSection } from './panels/alternatives-section'
 import { BackgroundPanel } from './panels/BackgroundPanel'
+import { BubblePanel } from './panels/BubblePanel'
 import { PlaceholderPanel } from './panels/PlaceholderPanel'
+import { PosePanel } from './panels/PosePanel'
 import { ShapePanel } from './panels/ShapePanel'
+import { TemplatePanel } from './panels/TemplatePanel'
+import { TextPanel } from './panels/TextPanel'
+import { WordFxPanel } from './panels/WordFxPanel'
 import type { AlternativeCandidate } from './store/useAlternativesStore'
 import { selectHasAlternatives, useAlternativesStore } from './store/useAlternativesStore'
 import { ACTIVE_TOOLS, TOOL_MILESTONE, type ToolId, useToolStore } from './store/useToolStore'
@@ -78,6 +85,8 @@ export type MobileBottomSheetProps = {
   onPageChange?: (index: number) => void
   /** M4-05: 한 클릭 교체 콜백 */
   onApplyAlternative?: (candidate: AlternativeCandidate) => void
+  /** M2-05: 포즈 리소스 → 캔버스 추가 (PosePanel, FeatureSidebar 와 동일 배선) */
+  onAddPoseToCanvas?: (pose: ResourceSummary) => void
 }
 
 // ── 높이 상수 ─────────────────────────────────
@@ -123,50 +132,35 @@ type ToolPanelProps = {
   canvas: StoryCanvas | null
   history: History | null
   layerTree: LayerTree | null
+  onAddPoseToCanvas?: (pose: ResourceSummary) => void
 }
 
-function ToolPanel({ toolId, canvas, history, layerTree }: ToolPanelProps & { toolId: ToolId }) {
+function ToolPanel({
+  toolId,
+  canvas,
+  history,
+  layerTree,
+  onAddPoseToCanvas,
+}: ToolPanelProps & { toolId: ToolId }) {
   switch (toolId) {
     case 'background':
       return <BackgroundPanel canvas={canvas} history={history} layerTree={layerTree} />
     case 'shape':
       return <ShapePanel canvas={canvas} history={history as any} />
     case 'template':
-      return (
-        <PlaceholderPanel
-          label="템플릿"
-          icon={<LayoutTemplate />}
-          milestone="M3"
-          description="판형 템플릿으로 빠르게 레이아웃을 구성합니다."
-        />
-      )
+      return <TemplatePanel canvas={canvas} />
     case 'pose':
       return (
-        <PlaceholderPanel
-          label="포즈"
-          icon={<UserSquare2 />}
-          milestone="M2"
-          description="1,000개 이상의 포즈 라이브러리에서 캐릭터를 배치합니다."
+        <PosePanel
+          canvas={canvas}
+          history={history as any}
+          onAddToCanvas={onAddPoseToCanvas ?? (() => {})}
         />
       )
     case 'bubble':
-      return (
-        <PlaceholderPanel
-          label="말풍선"
-          icon={<MessageCircle />}
-          milestone="M5"
-          description="대화 말풍선과 꼬리 자동 추적 기능을 제공합니다."
-        />
-      )
+      return <BubblePanel canvas={canvas} history={history as any} />
     case 'wordfx':
-      return (
-        <PlaceholderPanel
-          label="워드효과"
-          icon={<Sparkles />}
-          milestone="M5"
-          description="50종의 워드효과로 감정을 표현합니다."
-        />
-      )
+      return <WordFxPanel canvas={canvas} history={history as any} />
     case 'decoration':
       return (
         <PlaceholderPanel
@@ -177,14 +171,7 @@ function ToolPanel({ toolId, canvas, history, layerTree }: ToolPanelProps & { to
         />
       )
     case 'text':
-      return (
-        <PlaceholderPanel
-          label="텍스트"
-          icon={<Type />}
-          milestone="M5"
-          description="한글 최적화 텍스트 편집과 금칙어 처리를 지원합니다."
-        />
-      )
+      return <TextPanel canvas={canvas} history={history as any} />
     case 'upload':
       return (
         <PlaceholderPanel
@@ -264,9 +251,10 @@ type ToolsTabProps = {
   canvas: StoryCanvas | null
   history: History | null
   layerTree: LayerTree | null
+  onAddPoseToCanvas?: (pose: ResourceSummary) => void
 }
 
-function ToolsTab({ activeTool, canvas, history, layerTree }: ToolsTabProps) {
+function ToolsTab({ activeTool, canvas, history, layerTree, onAddPoseToCanvas }: ToolsTabProps) {
   const { tapTool } = useToolStore()
   // 패널 보기 여부 — select 는 패널 없음
   const showPanel = activeTool !== 'select' && ACTIVE_TOOLS.has(activeTool)
@@ -309,7 +297,13 @@ function ToolsTab({ activeTool, canvas, history, layerTree }: ToolsTabProps) {
           </span>
         </div>
         {/* 패널 */}
-        <ToolPanel toolId={activeTool} canvas={canvas} history={history} layerTree={layerTree} />
+        <ToolPanel
+          toolId={activeTool}
+          canvas={canvas}
+          history={history}
+          layerTree={layerTree}
+          onAddPoseToCanvas={onAddPoseToCanvas}
+        />
       </div>
     )
   }
@@ -502,6 +496,7 @@ export function MobileBottomSheet({
   closeRequest,
   onPageChange,
   onApplyAlternative,
+  onAddPoseToCanvas,
 }: MobileBottomSheetProps) {
   const hasAlternatives = useAlternativesStore(selectHasAlternatives)
   const [snap, setSnap] = useState<SheetSnap>('peek')
@@ -676,6 +671,7 @@ export function MobileBottomSheet({
                 canvas={canvas}
                 history={history}
                 layerTree={layerTree}
+                onAddPoseToCanvas={onAddPoseToCanvas}
               />
             )}
             {activeTab === 'inspector' && (
