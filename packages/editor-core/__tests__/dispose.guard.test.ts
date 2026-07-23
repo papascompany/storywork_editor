@@ -72,6 +72,39 @@ describe('H1+H2: dispose 가드', () => {
     await expect(canvas.loadJson(minimalJson)).resolves.toBeUndefined()
   })
 
+  it('컨테이너 마운트 후 dispose 하면 canvas 요소가 DOM 에서 제거된다', async () => {
+    const container = document.createElement('div')
+    document.body.appendChild(container)
+    const canvas = new StoryCanvas({ format: B5, container })
+    expect(container.querySelectorAll('canvas').length).toBeGreaterThan(0)
+
+    canvas.dispose()
+
+    await vi.waitFor(() => {
+      expect(container.querySelectorAll('canvas').length).toBe(0)
+    })
+    container.remove()
+  })
+
+  it('이중 마운트(mount→dispose→mount) 후 잔여 bare canvas 없이 새 캔버스만 남는다', async () => {
+    const container = document.createElement('div')
+    document.body.appendChild(container)
+
+    const first = new StoryCanvas({ format: B5, container })
+    first.dispose()
+    const second = new StoryCanvas({ format: B5, container })
+
+    // 첫 마운트의 잔여 canvas(래퍼 밖 직계 자식)가 비동기 정리로 사라져야 한다
+    await vi.waitFor(() => {
+      expect(container.querySelectorAll(':scope > canvas').length).toBe(0)
+    })
+    // 두 번째 인스턴스의 lower/upper 캔버스만 남는다
+    expect(container.querySelectorAll('canvas').length).toBe(2)
+
+    second.dispose()
+    container.remove()
+  })
+
   it('H1: dispose 전에 추가된 핸들러는 dispose 후 발화되지 않는다', () => {
     const canvas = new StoryCanvas({ format: B5 })
     const addedHandler = vi.fn()

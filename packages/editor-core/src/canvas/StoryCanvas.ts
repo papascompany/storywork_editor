@@ -258,7 +258,16 @@ export class StoryCanvas {
     if (this._disposed) return
     this._disposed = true
     this._unbindFabricEvents()
-    this._fabric.dispose()
+    // fabric dispose 는 .canvas-container 래퍼를 제거하면서 원본 canvas 요소를
+    // 마운트 컨테이너에 복원해 남긴다. StrictMode 이중 마운트(mount→dispose→mount)에서
+    // 이 잔여 canvas 가 새 마운트의 드로잉 서피스를 in-flow 로 밀어내므로,
+    // dispose 완료 후 요소를 DOM 에서 제거한다.
+    const el = this._fabric.lowerCanvasEl
+    void Promise.resolve(this._fabric.dispose())
+      .catch(() => undefined)
+      .then(() => {
+        el?.remove()
+      })
     this._objectMap.clear()
   }
 
