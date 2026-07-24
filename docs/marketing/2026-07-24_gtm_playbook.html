@@ -1,0 +1,544 @@
+<!--
+  StoryWork — 마케팅 실행 플레이북 (GTM SSOT)
+  작성: 2026-07-24 · marketing-strategy 스킬 5단계 산출물
+  근거: 실측 WebSearch/WebFetch 4트랙(경쟁사·한국 POD·웹툰/생존사·니치 GTM). 모든 수치에 출처+확신도.
+  자립형(외부 리소스 0) · 다크모드 대응 · 한국어 · 중립 팔레트(브랜드 토큰 미주입).
+-->
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>StoryWork GTM 플레이북 — 생성하지 않고, 조립합니다</title>
+<style>
+  :root{
+    color-scheme: light dark;
+    --bg:#F7F8F9; --surface:#FFFFFF; --surface2:#F1F3F4; --surface3:#E7EAEC;
+    --ink:#191C1E; --sub:#434849; --hint:#6E7679; --line:#E2E6E8;
+    --accent:#4B4ACF; --accent-soft:#EEEEFB; --good:#0B6B57; --good-soft:#E6F4EF;
+    --error:#B3261E; --error-soft:#FCECEA; --amber:#8a5a00; --amber-soft:#FBF0DA;
+    --night:#111318; --night-ink:#F1F3F7; --night-sub:#9AA3AD;
+    --display:'Plus Jakarta Sans',Pretendard,-apple-system,'Apple SD Gothic Neo','Noto Sans KR',system-ui,sans-serif;
+    --body:Pretendard,-apple-system,'Apple SD Gothic Neo','Noto Sans KR',system-ui,sans-serif;
+    --mono:ui-monospace,SFMono-Regular,Menlo,monospace;
+  }
+  @media (prefers-color-scheme: dark){
+    :root{
+      --bg:#0E1013; --surface:#181B1F; --surface2:#202429; --surface3:#2A2F35;
+      --ink:#E9ECEF; --sub:#B4BBC2; --hint:#828A92; --line:#2C3238;
+      --accent:#9B9AF5; --accent-soft:#1E1E38; --good:#5BD6B6; --good-soft:#123028;
+      --error:#F28A82; --error-soft:#3A1F1C; --amber:#E0B36A; --amber-soft:#332811;
+      --night:#060708; --night-ink:#F1F3F7; --night-sub:#8A929B;
+    }
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{font-family:var(--body);color:var(--ink);background:var(--bg);line-height:1.65;-webkit-font-smoothing:antialiased;overflow-x:hidden}
+  .wrap{max-width:1120px;margin:0 auto;padding:0 clamp(18px,4vw,40px)}
+  a{color:var(--accent)}
+
+  header.hero{background:var(--night);color:var(--night-ink);padding:clamp(46px,7vw,84px) 0 clamp(36px,5vw,58px);position:relative;overflow:hidden}
+  header.hero::after{content:"";position:absolute;right:-16vmax;bottom:-32vmax;width:56vmax;height:56vmax;border-radius:50%;background:radial-gradient(circle,color-mix(in srgb,var(--accent) 40%,transparent) 0%,transparent 62%)}
+  .hero .wrap{position:relative;z-index:1}
+  .brand{font-family:var(--display);font-weight:800;letter-spacing:.28em;font-size:12px;color:var(--night-sub);margin-bottom:18px}
+  h1{font-family:var(--display);font-weight:800;letter-spacing:-.02em;font-size:clamp(28px,4.8vw,50px);line-height:1.14;text-wrap:balance;color:var(--night-ink)}
+  h1 .hl{color:color-mix(in srgb,var(--accent) 62%,white)}
+  .hero .desc{color:var(--night-sub);margin-top:16px;font-size:15px;max-width:60ch}
+  .hero .meta{display:flex;flex-wrap:wrap;gap:8px;margin-top:22px}
+  .hero .meta span{font-family:var(--display);font-weight:700;font-size:11px;letter-spacing:.04em;padding:5px 12px;border-radius:999px;background:rgba(255,255,255,.08);color:var(--night-ink);border:1px solid rgba(255,255,255,.12)}
+
+  nav.toc{background:var(--surface);box-shadow:0 1px 0 var(--line);position:sticky;top:0;z-index:20}
+  nav.toc .wrap{display:flex;gap:4px;overflow-x:auto;padding:9px clamp(14px,4vw,40px)}
+  nav.toc a{font-family:var(--display);font-weight:700;font-size:11.5px;color:var(--sub);text-decoration:none;padding:7px 12px;border-radius:999px;white-space:nowrap}
+  nav.toc a:hover{background:var(--surface2)} nav.toc a.hot{background:var(--accent);color:#fff}
+
+  section{padding:clamp(34px,4.6vw,56px) 0;border-bottom:1px solid var(--line)}
+  section.tone{background:var(--surface2)} section.dark{background:var(--night);color:var(--night-ink);border-bottom:none}
+  section.dark h2,section.dark .desc{color:var(--night-ink)}
+  .eyebrow{display:inline-flex;align-items:center;gap:10px;font-family:var(--display);font-weight:700;font-size:11px;letter-spacing:.24em;color:var(--accent);text-transform:uppercase;margin-bottom:12px}
+  .eyebrow::before{content:"";width:22px;height:1.5px;background:var(--accent)}
+  h2{font-family:var(--display);font-size:clamp(22px,2.9vw,32px);font-weight:800;letter-spacing:-.02em;line-height:1.2;margin-bottom:8px;text-wrap:balance}
+  h3.sub{font-family:var(--display);font-size:16px;font-weight:800;margin:22px 0 4px}
+  .desc{color:var(--sub);font-size:14.5px;max-width:74ch}
+  .gap{margin-top:clamp(18px,2.6vw,28px)} .gap-s{margin-top:14px}
+
+  .grid{display:grid;gap:13px} .cols-2{grid-template-columns:repeat(2,1fr)} .cols-3{grid-template-columns:repeat(3,1fr)} .cols-4{grid-template-columns:repeat(4,1fr)}
+  .card{background:var(--surface);border:1px solid var(--line);border-radius:1.1rem;padding:18px 20px}
+  .card .k{font-family:var(--display);font-weight:700;font-size:10px;letter-spacing:.18em;color:var(--hint);text-transform:uppercase;margin-bottom:7px}
+  .card h3{font-family:var(--display);font-size:15.5px;font-weight:800;margin-bottom:6px;line-height:1.35}
+  .card p{font-size:13px;line-height:1.66;color:var(--sub)} .card p b{color:var(--ink)}
+  .card p+p{margin-top:7px}
+  .accent{background:var(--accent-soft);border-color:transparent} .warnbox{background:var(--amber-soft);border-color:transparent}
+  .goodbox{background:var(--good-soft);border-color:transparent}
+  .pill{display:inline-block;font-family:var(--display);font-weight:700;font-size:9.5px;letter-spacing:.1em;padding:3px 9px;border-radius:999px;background:var(--surface3);color:var(--sub);text-transform:uppercase;vertical-align:middle}
+  .pill.blue{background:var(--accent);color:#fff} .pill.green{background:var(--good-soft);color:var(--good)} .pill.red{background:var(--error-soft);color:var(--error)} .pill.amber{background:var(--amber-soft);color:var(--amber)}
+  .conf{font-family:var(--display);font-weight:700;font-size:9.5px;letter-spacing:.06em;padding:2px 7px;border-radius:5px}
+  .conf.h{background:var(--good-soft);color:var(--good)} .conf.m{background:var(--amber-soft);color:var(--amber)} .conf.l{background:var(--error-soft);color:var(--error)}
+
+  .stat{background:var(--surface);border:1px solid var(--line);border-radius:1.1rem;padding:16px 18px}
+  .stat .k{font-family:var(--display);font-weight:700;font-size:9.5px;letter-spacing:.14em;color:var(--hint);text-transform:uppercase}
+  .stat .v{font-family:var(--display);font-weight:800;font-size:clamp(20px,2.3vw,27px);letter-spacing:-.02em;margin:5px 0 3px;font-variant-numeric:tabular-nums;line-height:1.05}
+  .stat .v small{font-size:.5em;font-weight:700;color:var(--sub)} .stat p{font-size:11px;color:var(--hint);line-height:1.5}
+  .stat.hero-s{background:var(--accent);color:#fff;border-color:transparent} .stat.hero-s .k{color:color-mix(in srgb,white 72%,var(--accent))} .stat.hero-s p{color:color-mix(in srgb,white 82%,var(--accent))}
+
+  ul.todo{list-style:none;display:flex;flex-direction:column;gap:8px;font-size:13px;color:var(--sub)}
+  ul.todo li{padding-left:26px;position:relative}
+  ul.todo li::before{content:"";position:absolute;left:0;top:.28em;width:15px;height:15px;border-radius:5px;background:var(--surface);border:1.5px solid var(--hint)}
+  ul.todo li.done::before{background:var(--good);border-color:var(--good)}
+  ul.todo li .who{font-family:var(--display);font-weight:700;font-size:9.5px;color:var(--accent);margin-right:5px;letter-spacing:.04em}
+  ul.todo b{color:var(--ink)}
+  ul.bul{list-style:none;display:flex;flex-direction:column;gap:7px;font-size:13px;color:var(--sub)}
+  ul.bul li{padding-left:18px;position:relative} ul.bul li::before{content:"";position:absolute;left:2px;top:.6em;width:6px;height:6px;border-radius:50%;background:var(--accent)}
+  ul.bul b{color:var(--ink)}
+
+  .week{background:var(--surface);border:1px solid var(--line);border-radius:1rem;margin-top:12px;overflow:hidden}
+  .week .head{display:flex;align-items:center;gap:12px;flex-wrap:wrap;padding:13px 18px;background:var(--surface2)}
+  .week .head .n{font-family:var(--display);font-weight:800;font-size:12.5px;color:var(--accent)}
+  .week .head h4{font-family:var(--display);font-size:14.5px;font-weight:800;flex:1;min-width:180px}
+  .week .bd{padding:14px 18px;display:grid;grid-template-columns:1fr 260px;gap:16px}
+  .week .dod{background:var(--surface2);border-radius:10px;padding:12px 14px;font-size:11.8px;color:var(--sub)}
+  .week .dod .t{font-family:var(--display);font-weight:800;font-size:9.5px;letter-spacing:.12em;color:var(--good);text-transform:uppercase;display:block;margin-bottom:5px}
+  .week.peak .head{background:var(--accent)} .week.peak .head .n,.week.peak .head h4{color:#fff}
+
+  pre{background:var(--night);color:#D7E3EA;border-radius:12px;padding:14px 16px;overflow-x:auto;font-family:var(--mono);font-size:11.6px;line-height:1.7;margin-top:10px}
+  code.inline{font-family:var(--mono);font-size:.88em;background:var(--surface3);border-radius:5px;padding:1px 6px}
+  .tpl{background:var(--accent-soft);border-radius:12px;padding:14px 16px;font-size:13px;color:var(--ink);line-height:1.72;margin-top:10px}
+  .tpl .t{font-family:var(--display);font-weight:800;font-size:10px;letter-spacing:.14em;color:var(--accent);text-transform:uppercase;display:block;margin-bottom:6px}
+  .tpl .q{display:block;padding:7px 0;border-bottom:1px dashed color-mix(in srgb,var(--accent) 30%,transparent)}
+  .tpl .q:last-child{border-bottom:none}
+
+  table{width:100%;border-collapse:collapse;font-size:12.6px}
+  th,td{text-align:left;padding:10px 12px;vertical-align:top;border-bottom:1px solid var(--line)}
+  thead th{font-family:var(--display);font-size:9.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--hint);font-weight:700}
+  tbody tr:last-child td{border-bottom:none}
+  .tblwrap{overflow-x:auto;border:1px solid var(--line);border-radius:12px;margin-top:12px;background:var(--surface)}
+  td b{color:var(--ink)} .r{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
+  .yes{color:var(--good);font-weight:700} .no{color:var(--error);font-weight:700}
+
+  .srcs{font-size:11.5px;color:var(--sub);line-height:1.85}
+  .srcs li{margin-bottom:5px;padding-left:0}
+  .srcs a{word-break:break-all}
+  footer{background:var(--night);color:var(--night-sub);padding:32px 0;font-size:11.5px;border:none}
+  @media (max-width:880px){.cols-3,.cols-4{grid-template-columns:repeat(2,1fr)}.week .bd{grid-template-columns:1fr}}
+  @media (max-width:600px){.cols-2,.cols-3,.cols-4{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+
+<header class="hero"><div class="wrap">
+  <p class="brand">STORYWORK · GO-TO-MARKET PLAYBOOK</p>
+  <h1>생성하지 않고, <span class="hl">조립합니다</span> — 내 손으로 고칠 수 있고, 판권이 깨끗한 콘티</h1>
+  <p class="desc">AI가 대본을 읽어 장면을 나누고, <b>사람이 그린 라이선스 청정 포즈</b>로 콘티를 조립·편집해 POD 책으로 출판하는 웹 편집기. 이 문서는 실행 정본(SSOT)이며, 주간 리추얼에서 체크리스트를 갱신한다.</p>
+  <div class="meta">
+    <span>조사 4트랙 · 실측 웹검색</span>
+    <span>D-Day = 추석 시즌(9월 하순·일자 확인)</span>
+    <span>런웨이 9주</span>
+    <span>1차 시장 · 한국</span>
+    <span>현재: 유료고객 0 · 결제 가동 전</span>
+  </div>
+</div></header>
+
+<nav class="toc"><div class="wrap">
+  <a href="#core" class="hot">전략 요약</a>
+  <a href="#snapshot">시장 스냅샷</a>
+  <a href="#weak">약점</a>
+  <a href="#diff">차별화·핵심가치</a>
+  <a href="#niche">니치 쐐기</a>
+  <a href="#calendar">실행 캘린더</a>
+  <a href="#tactics">복붙 카피</a>
+  <a href="#korea">한국 채널</a>
+  <a href="#budget">예산</a>
+  <a href="#kpi">KPI</a>
+  <a href="#risk">리스크</a>
+  <a href="#evidence">근거·출처</a>
+</div></nav>
+
+<!-- ===== 전략 요약 ===== -->
+<section id="core"><div class="wrap">
+  <p class="eyebrow">Strategy in 1 Minute</p>
+  <h2>1분 전략 요약</h2>
+  <p class="desc">경쟁 지형은 둘로 갈라져 있다 — <b>생성형</b>(결과가 매번 달라지고·크레딧 불안·AI 역풍 노출)과 <b>클립아트 조립형</b>(유아적 화풍·POD 없음·한국어/웹툰 무관). StoryWork는 그 사이의 빈 칸, <b>"편집·재현되는 클린 에셋 조립 + POD 인쇄"</b>에 선다.</p>
+  <div class="grid cols-2 gap">
+    <div class="card accent"><p class="k">차별화 핵심 — 단 하나</p><h3>"AI가 그림을 생성"하지 않는다. 사람이 그린 자산을 AI가 <u>조립</u>한다.</h3><p>편집 가능·재현 가능·라이선스 청정·크레딧 없음 — 이 모든 이점이 '조립형'이라는 <b>하나의 구조</b>에서 파생된다. 모든 채널·카피·스크린샷이 이 문장 하나로 수렴한다.</p></div>
+    <div class="card"><p class="k">핵심가치 — 왜 믿고 사는가</p><h3>판권 안심 + 내가 통제하는 결과물</h3><p>웹툰·소설 창작자의 최대 공포는 "내 작업이 <b>AI산(産)으로 낙인</b>찍히고 저작권이 오염되는 것"(네이버웹툰 별점테러로 실증). StoryWork는 감사 가능한 <b>라이선스 증빙</b>과 객체 단위 편집권으로 그 공포를 정면으로 해소한다.</p></div>
+  </div>
+  <div class="grid cols-3 gap">
+    <div class="card"><p class="k">1순위 채널</p><h3>창작 커뮤니티 + 인스타 바이럴</h3><p>"문장 한 줄 → 3컷 콘티" 무료 미끼로 오가닉 확산(지브리 챌린지 메커니즘). 저비용·즉시 가동.</p></div>
+    <div class="card"><p class="k">핵심 타깃(구매자)</p><h3>웹소설·웹툰 지망 작가</h3><p>노벨피아·포스타입·도전만화의 아마추어 창작자 — "그림 실력/외주비 없이 내 작품을 시각화"가 절박한 층.</p></div>
+    <div class="card"><p class="k">수익 전환 축</p><h3>구독 + POD + (병행) 교육 B2B</h3><p>개인 B2C만으로는 정체(Wonder Unit·부크크 실증). 교육기관 무료 협약(미리캔버스 모델)을 초기부터 병행.</p></div>
+  </div>
+</div></section>
+
+<!-- ===== 시장 스냅샷 ===== -->
+<section id="snapshot" class="tone"><div class="wrap">
+  <p class="eyebrow">Market Snapshot · 실측</p>
+  <h2>숫자로 보는 시장</h2>
+  <p class="desc">모든 수치는 실제 웹검색으로 확인했다. 확신도(<span class="conf h">높음</span> <span class="conf m">중간</span> <span class="conf l">낮음</span>)와 출처는 하단 <a href="#evidence">근거·출처</a>에 대응한다.</p>
+  <div class="grid cols-4 gap">
+    <div class="stat hero-s"><p class="k">한국 웹툰산업 매출(2024)</p><p class="v">2.29<small>조원 · 콘진원 국가통계</small></p><p>웹소설 1.35조 별도 · <span class="conf h" style="background:rgba(255,255,255,.2);color:#fff">높음</span></p></div>
+    <div class="stat"><p class="k">부크크 POD 저자(2025.8)</p><p class="v">3.5<small>만명+ · 누적 4만종</small></p><p>10년 시장교육 = 낮은 행동장벽 · <span class="conf h">높음</span></p></div>
+    <div class="stat"><p class="k">미리캔버스 누적 가입</p><p class="v">1,600<small>만 · 韓</small></p><p>무료+교육청 협약 성장 · <span class="conf h">높음</span></p></div>
+    <div class="stat"><p class="k">지브리 챌린지 신규유저</p><p class="v">100<small>만 / 1시간</small></p><p>1주 7억 이미지 생성 · <span class="conf h">높음</span></p></div>
+    <div class="stat"><p class="k">웹툰작가 연재수입 중위</p><p class="v">3,800<small>만원/년(2023)</small></p><p>지불여력 있는 상위층 존재 · <span class="conf h">높음</span></p></div>
+    <div class="stat"><p class="k">노벨피아 누적 가입</p><p class="v">200<small>만+(2023.6)</small></p><p>작가 조회수당 정산으로 급성장 · <span class="conf m">중간</span></p></div>
+    <div class="stat"><p class="k">크몽 웹툰 콘티 외주가</p><p class="v">3~47<small>만원 / 1건</small></p><p>구독 앵커 대비 기준선 · <span class="conf h">높음</span></p></div>
+    <div class="stat"><p class="k">포스타입 크리에이터</p><p class="v">45<small>만 · 월 400만 거래</small></p><p>마켓 공급자 풀 · <span class="conf h">높음</span></p></div>
+  </div>
+</div></section>
+
+<!-- ===== 약점 진단 ===== -->
+<section id="weak"><div class="wrap">
+  <p class="eyebrow">Cold Diagnosis · 냉정하게</p>
+  <h2>약점 진단 — 치명도 순</h2>
+  <p class="desc">투자자·경쟁사의 시선으로 본다. 뒤집을 수 있는 약점은 방어 자산이 된다.</p>
+  <div class="grid cols-2 gap">
+    <div class="card"><p class="k"><span class="pill red">치명도 1</span></p><h3>"AI 창작"이라는 단어 자체가 타깃 커뮤니티의 트리거 워드</h3><p>StoryWork는 AI를 쓰지만(대본분석·자동배치), 이 프레임을 잘못 내세우면 네이버·카카오웹툰 <b>별점테러·보이콧·공모전 AI 금지</b>의 역풍을 그대로 맞는다. <b>뒤집기:</b> "생성 아님, 조립"을 전면화하면 오히려 <b>작가 편에 선 유일한 도구</b>가 된다.</p></div>
+    <div class="card"><p class="k"><span class="pill red">치명도 2</span></p><h3>유료고객 0 · 결제 미구현 — 전환 데이터 전무</h3><p>지불의사·CAC·LTV가 모두 가설. 3개년 수익추정(Y1 5,300만→Y3 4.6억)이 <b>검증 안 된 지면 위</b>에 있다. <b>대응:</b> 캘린더 W5 결제 가동 즉시 소액 테스트로 CAC 상한(객단가 30%)부터 실측.</p></div>
+    <div class="card"><p class="k"><span class="pill amber">치명도 3</span></p><h3>콜드스타트 — 빈 라이브러리 / 빈 페이지</h3><p>자산 1,270개가 전부 단일 '더미맨', 96%가 저해상도(lowDpi), three-quarter 뷰 47장 롱테일. 신규 유저는 "이걸로 뭘 만들지" 막막해진다(Canva·Notion이 템플릿으로 푼 문제). <b>대응:</b> 온보딩 <b>완성 샘플 콘티 3종</b>을 첫 화면에 노출.</p></div>
+    <div class="card"><p class="k"><span class="pill amber">치명도 4</span></p><h3>3초 설명 난이도 — 기능 과다</h3><p>대본분석·포즈조립·콘티·POD·마켓까지 한 문장이 안 된다. <b>대응:</b> 대외 카피는 <b>"대본을 콘티로, 콘티를 책으로"</b> 하나만 말한다. 나머지는 온보딩 이후로 미룬다.</p></div>
+    <div class="card"><p class="k"><span class="pill amber">치명도 5</span></p><h3>개인 B2C 단독 시장의 협소함 + 1회성 소비</h3><p>Wonder Unit 창업자 "시장이 니치하고 작다"며 유료화 포기, 부크크 매출 95%가 재구매 취약한 1회성 책. <b>대응:</b> 반복수요(교육기관 학기 단위·마켓 공급자)를 <b>초기부터</b> 병행 설계(M11을 뒤로 미루지 않는다).</p></div>
+    <div class="card goodbox"><p class="k"><span class="pill green">방어 자산</span></p><h3>이 약점들은 전부 '언어'와 '온보딩'으로 뒤집힌다</h3><p>치명적 약점 1·3·4는 돈이 아니라 <b>포지셔닝 언어와 첫 화면 설계</b>의 문제다. 즉 W1~W2에 저비용으로 해소 가능 — 자본이 아니라 실행의 문제라는 점이 오히려 기회다.</p></div>
+  </div>
+</div></section>
+
+<!-- ===== 차별화·핵심가치 + 경쟁 비교 ===== -->
+<section id="diff" class="tone"><div class="wrap">
+  <p class="eyebrow">The One Wedge</p>
+  <h2>차별화는 '하나'로 수렴한다</h2>
+  <p class="desc">경쟁사 전원이 못 하고(아래 표), 타깃의 최고 공포/구매 트리거와 연결되며(AI 낙인 회피), 모방하려면 StoryWork 고유 자산(1,000+ 라이선스 포즈 + 에셋 ID 파이프라인)이 필요한 <b>단 하나</b>.</p>
+  <div class="grid cols-3 gap">
+    <div class="card accent"><p class="k">편집 가능</p><h3>객체 단위로 내가 고친다</h3><p>fabric 레이어 = 이동·변형·그룹·교체. 생성형은 "컷 교체 = 재생성 도박".</p></div>
+    <div class="card accent"><p class="k">재현 가능</p><h3>같은 입력 = 같은 결과</h3><p>에셋 ID 기반(결정론 시드). 생성형의 "매번 다른 결과·크레딧 소진"이 없다.</p></div>
+    <div class="card accent"><p class="k">라이선스 청정</p><h3>판권 안심 · 표시의무에서 자유</h3><p>원천 LICENSE 명시. AI 기본법(2026.1 시행) 생성물 표시의무는 원칙적으로 생성형 대상 — 조립형은 구조적으로 유리.</p></div>
+  </div>
+
+  <h3 class="sub">경쟁 지형 — 가격 앵커 & 공백</h3>
+  <p class="desc">POD 인쇄를 1급 산출물로 내는 곳이 사실상 없다. 한국 AI 웹툰툴(투닝·툰스퀘어·투툰)이 있으나 <b>전부 생성형</b>이고, "조립형 + POD + 라이선스 청정"의 조합은 국내외 어디에도 없다.</p>
+  <div class="tblwrap">
+    <table>
+      <thead><tr><th>서비스</th><th>최저 유료(월)</th><th>무료티어</th><th>유형</th><th>POD 인쇄</th><th>재현/편집</th><th>확신</th></tr></thead>
+      <tbody>
+        <tr><td><b>StoryWork</b> <span class="pill blue">우리</span></td><td class="r">구독(연 18만)</td><td>예정</td><td><b>자산조립형</b></td><td class="yes">예 · 1급</td><td class="yes">둘 다</td><td>—</td></tr>
+        <tr><td>Boords</td><td class="r">$39~250</td><td class="no">없음</td><td>조립+보조AI</td><td class="no">디지털PDF만</td><td>부분</td><td><span class="conf h">높음</span></td></tr>
+        <tr><td>LTX Studio</td><td class="r">$15(상업 $35~)</td><td>있음(상업불가)</td><td>생성형</td><td class="no">아니오</td><td class="no">재생성</td><td><span class="conf m">중간</span></td></tr>
+        <tr><td>Katalist</td><td class="r">$19~99</td><td class="no">7일 체험</td><td>생성형</td><td class="no">아니오</td><td class="no">재생성</td><td><span class="conf h">높음</span></td></tr>
+        <tr><td>StoryboardThat</td><td class="r">$11.99</td><td>있음(워터마크)</td><td>클립아트</td><td class="yes">PDF 있음</td><td>조립</td><td><span class="conf h">높음</span></td></tr>
+        <tr><td>StoryTribe</td><td class="r">$4.99(연간전용)</td><td>있음(크레딧100)</td><td>하이브리드</td><td>확인실패</td><td>부분</td><td><span class="conf m">중간</span></td></tr>
+        <tr><td>Dashtoon</td><td class="r">≈$19</td><td>있음(일100장)</td><td>생성형</td><td class="no">자체플랫폼만</td><td class="no">재생성</td><td><span class="conf m">중간</span></td></tr>
+        <tr><td>Canva</td><td class="r">≈$15</td><td>있음</td><td>템플릿+생성AI</td><td class="no">범용(콘티 특화X)</td><td>부분</td><td><span class="conf h">높음</span></td></tr>
+        <tr><td>Wonder Unit</td><td class="r">무료(OSS)</td><td>완전무료</td><td>조립+보조</td><td class="no">아니오</td><td>조립</td><td><span class="conf h">높음</span></td></tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="grid cols-3 gap">
+    <div class="card"><p class="k">공백 1</p><p><b>"에셋ID 조립 + 완전 레이어 편집"</b> 동시 제공자가 없다 — 전원 생성형(재현 불가) 아니면 클립아트(유아적·커스터마이징 제한).</p></div>
+    <div class="card"><p class="k">공백 2</p><p><b>물리적 POD 인쇄를 1급 산출물</b>로 내는 곳이 없다. StoryboardThat만 PDF, Dashtoon은 플랫폼 락인.</p></div>
+    <div class="card"><p class="k">공백 3</p><p>생성형(LTX·Katalist·Dashtoon·국산 투닝) 전원이 <b>크레딧 불안·비용 불투명·AI 역풍</b>이라는 동일 약점. <b>조립형+POD 조합은 국내에 없다</b>.</p></div>
+  </div>
+  <div class="grid cols-2 gap">
+    <div class="card warnbox"><p class="k">국내 인접 경쟁자 — 정직 표기</p><p><b>AI 웹툰(생성형):</b> 투닝(tooning.io)·툰스퀘어·투툰 — 이미 "AI 웹툰" 키워드는 블루오션 아님. StoryWork는 "조립형·재현·POD·판권청정" 조합으로만 차별화된다. <b>자서전 셀프 POD:</b> 리본북·페스트북 — 단, <b>자동 삽화/장면분리가 없는 텍스트북</b>. StoryWork는 이들의 "그림 넣는 상위 자동화 버전".</p></div>
+    <div class="card goodbox"><p class="k">가격 스토리 — 자서전 세그먼트</p><p>자서전 <b>대필 표준가 1,500만~2,000만원</b>(수작업)이 앵커. "혼자, 그림까지, 대필의 1/100 값"이라는 명확한 가격 서사가 성립. 부크크·퍼플이 10년간 "자가출판은 특별하지 않다"는 시장교육을 끝내놓아 행동장벽이 가장 낮다.</p></div>
+  </div>
+</div></section>
+
+<!-- ===== 니치 쐐기 ===== -->
+<section id="niche"><div class="wrap">
+  <p class="eyebrow">Beachhead · 좁게 시작</p>
+  <h2>니치 쐐기 하나 — 웹소설·웹툰 지망 작가</h2>
+  <p class="desc">처음부터 넓게 가지 않는다. ASO/콘텐츠 공백 · 검증된 바이럴 포맷 · 저비용 채널이 겹치는 <b>가장 좁은 쐐기</b>로 시작해 플라이휠을 돌린다.</p>
+  <div class="grid cols-2 gap">
+    <div class="card accent"><p class="k">쐐기 정의</p><h3>"내 소설/대본 → 3컷 콘티" 무료 체험으로 SNS 확산</h3><p>노벨피아(130만)·포스타입(45만)·도전만화의 아마추어 작가가 <b>그림 실력·외주비(크몽 20만원) 없이</b> 자기 작품을 시각화. 문장 한 줄 → 즉석 콘티 → 워터마크 결과를 SNS 공유.</p></div>
+    <div class="card"><p class="k">왜 이 쐐기인가 — 4중 겹침</p>
+      <ul class="bul">
+        <li><b>바이럴 포맷 검증:</b> 지브리 챌린지 1시간 100만 신규 · 인스타툰 홍보만화 실수요</li>
+        <li><b>콘텐츠 공백:</b> "웹소설 홍보만화/내 소설 콘티" 정보성 콘텐츠 얕음</li>
+        <li><b>저비용 채널:</b> 창작 커뮤니티 직접 침투(광고비 0)</li>
+        <li><b>감정 트리거:</b> "시각화하고 싶지만 방법이 없다"는 절박함</li>
+      </ul>
+    </div>
+  </div>
+
+  <h3 class="sub">플라이휠 — 쐐기가 수익을 부른다</h3>
+  <pre>작가가 3컷 콘티 제작(무료 미끼)
+   → SNS 확산("내 소설이 콘티가 됐다")   … 무료 마케팅 루프
+   → 독자·다른 작가 유입 + 정식 편집기 진입
+   → 구독(연 18만) / 웹소설 홍보용 컷·POD 책 출판   … 첫 수익
+   → 작가가 자기 캐릭터·포즈 에셋을 마켓에 등록·판매(수수료 25%)   … 확장 수익</pre>
+
+  <h3 class="sub">시장접근 프레임</h3>
+  <div class="tblwrap"><table>
+    <thead><tr><th>축</th><th>결정</th><th>근거</th></tr></thead>
+    <tbody>
+      <tr><td><b>구매자</b></td><td>1차 웹소설·웹툰 지망 작가 / 2차 자서전·가족책(결제자=자녀) / 3차 창작 교육기관(B2B)</td><td>창작자 풀 밀집 + 지불여력 상위층 + 재구매 채널 분산</td></tr>
+      <tr><td><b>상품 프레임</b></td><td>"AI 창작툴"❌ → <b>"대본을 콘티로 바꿔 인쇄까지 하는 창작 워크플로"</b>. AI는 뒤에 숨긴다</td><td>AI 트리거 워드 역풍 회피(네이버웹툰 사태)</td></tr>
+      <tr><td><b>가격 프레임</b></td><td>"외주 콘티 1건(크몽 20만원) 값으로 1년 무제한". 저가 조립형 대비 <b>한국어+POD+웹툰풍 프리미엄</b></td><td>크몽 콘티 3~47만원(1회) 앵커 · 연 18만 구독이 외주 1건보다 쌈</td></tr>
+      <tr><td><b>채널</b></td><td>네이버(발견·설득) → 인스타/커뮤니티(창작자 전환) → 카카오(자서전 선물전달) → 교육 B2B(병행)</td><td>한국 커머스 파이프라인 구조(하단 §한국 채널)</td></tr>
+      <tr><td><b>니치 진입점</b></td><td>"3컷 콘티 원클릭" 1개 기능으로 좁게 진입 → 정식 편집기로 퍼널</td><td>입력 마찰 극소화가 바이럴의 공통 메커니즘</td></tr>
+    </tbody>
+  </table></div>
+
+  <div class="card warnbox gap"><p class="k"><span class="pill amber">쐐기 선택의 긴장 · 검증 필요</span></p><h3>획득은 '작가', 첫 수익은 '자서전' — 두 비트 전략</h3><p>조사에서 방향이 갈렸다. <b>작가 쐐기</b>는 제품 코어(대본→콘티 조립)에 정합하고 <b>바이럴·오가닉 획득</b>에 강하지만, 웹툰 커뮤니티는 AI 민감·소득 양극화(작가 70.8%가 편당 500만원 미만)로 <b>지불의사 검증이 오래 걸린다</b>. 반대로 <b>자서전/에세이 POD 쐐기</b>는 지불의사·가격서사(대필 2,000만원 대안)·행동장벽이 이미 검증됐고 POD가 우리만의 차별점이지만, 현재 포즈가 단일 '더미맨'이라 <b>제품 적합도가 아직 약하다</b>. <b>결론:</b> W1~W4는 작가 쐐기로 <u>무료 획득</u>, W5~W8은 자서전/가족책으로 <u>첫 유료 수익</u> — 두 세그먼트를 소액으로 동시 A/B해 전환율이 높은 쪽에 W9 이후 예산을 몰아준다. 어느 쪽도 저확신 위에 전 예산을 걸지 않는다.</p></div>
+</div></section>
+
+<!-- ===== 실행 캘린더 ===== -->
+<section id="calendar" class="tone"><div class="wrap">
+  <p class="eyebrow">Season Calendar · 9주</p>
+  <h2>시즌 실행 캘린더 — D-Day 추석</h2>
+  <p class="desc">쐐기(작가 획득)를 W1~W5에 돌려 플라이휠을 만들고, <b>추석(9월 하순, 정확 일자 확인 필요)</b>을 첫 유료 수익 모먼트(가족책·자서전 POD)로 삼는다. 각 카드 = 체크리스트(담당) + 완료기준(DoD). 유료예산 80%는 D-Day 전 3~4주(W5~W8)에 집중. <span class="pill amber">담당</span> 마케팅 / 개발 / 오너.</p>
+
+  <div class="week"><div class="head"><span class="n">W1</span><h4>포지셔닝 전환 + 콜드스타트 방어</h4><span class="pill">D-8주</span></div>
+    <div class="bd"><ul class="todo">
+      <li><span class="who">마케팅</span>대외 카피 전면 교체: <b>"생성 아님, 조립"</b> · "대본을 콘티로, 콘티를 책으로"</li>
+      <li><span class="who">개발</span>온보딩 첫 화면에 <b>완성 샘플 콘티 3종</b> 노출(빈 페이지 제거)</li>
+      <li><span class="who">마케팅</span>금지어휘 가이드 배포("AI가 그려준다"류 전면 금지)</li>
+      <li><span class="who">오너</span>추석 정확 일자 확인 → 역산 캘린더 확정</li>
+    </ul><div class="dod"><span class="t">완료 기준</span>랜딩·앱 내 카피에서 "AI 생성/그려준다" 문구 0건. 신규 가입 후 3분 내 첫 콘티 도달률 측정 세팅 완료.</div></div>
+  </div>
+
+  <div class="week"><div class="head"><span class="n">W2</span><h4>라이선스 증빙 + 정보성 SEO 자산</h4><span class="pill">D-7주</span></div>
+    <div class="bd"><ul class="todo">
+      <li><span class="who">마케팅</span>"우리 자산은 무단 스크래핑이 아니다" <b>라이선스 증빙 페이지</b> 제작</li>
+      <li><span class="who">마케팅</span>네이버 SEO 글 3편 발행(하단 카피뱅크): "웹소설 콘티 만드는 법" 등</li>
+      <li><span class="who">개발</span>"3컷 콘티 원클릭" 무료 체험(비로그인·워터마크) 기능 배선</li>
+    </ul><div class="dod"><span class="t">완료 기준</span>증빙 페이지 라이브 + SEO 글 3편 색인 요청 완료 + 무료 체험 기능 스테이징 통과.</div></div>
+  </div>
+
+  <div class="week"><div class="head"><span class="n">W3</span><h4>창작 커뮤니티 시딩 + 채널 개설</h4><span class="pill">D-6주</span></div>
+    <div class="bd"><ul class="todo">
+      <li><span class="who">마케팅</span>인스타/유튜브 쇼츠 계정 개설 + 릴스 4단 훅 5편 사전 제작</li>
+      <li><span class="who">오너</span>웹소설·웹툰 작가 <b>50~60명 직접 아웃리치</b>(아이디어스식 소수정예)</li>
+      <li><span class="who">마케팅</span>포스타입·노벨피아 작가 대상 DM 템플릿 발송(하단)</li>
+    </ul><div class="dod"><span class="t">완료 기준</span>앰배서더 후보 10인 확보 + 릴스 5편 예약 발행 세팅 + 커뮤니티 아웃리치 60건 발송.</div></div>
+  </div>
+
+  <div class="week"><div class="head"><span class="n">W4</span><h4>소프트런칭 + 바이럴 포맷 가동</h4><span class="pill">D-5주</span></div>
+    <div class="bd"><ul class="todo">
+      <li><span class="who">마케팅</span>"3컷 콘티 원클릭" 공개 + <b>"내 소설이 콘티가 됐다"</b> 챌린지 개시</li>
+      <li><span class="who">마케팅</span>앰배서더 10인 콘티 결과물 SNS 동시 확산</li>
+      <li><span class="who">개발</span>인앱 리뷰 프롬프트를 "첫 콘티 완성" 감동 모먼트에 배치(대가성 리뷰 금지)</li>
+    </ul><div class="dod"><span class="t">완료 기준</span>챌린지 참여 UGC 30건 + 무료 체험 완료율 baseline 측정 + 대기자 리스트 수집 시작.</div></div>
+  </div>
+
+  <div class="week peak"><div class="head"><span class="n">W5</span><h4>결제 가동 + 추석 프리런칭 <span class="pill amber">예산 투하 시작</span></h4><span class="pill" style="background:rgba(255,255,255,.25);color:#fff">D-4주</span></div>
+    <div class="bd"><ul class="todo">
+      <li><span class="who">개발</span>결제(구독+POD) 가동 · 소액 퍼포먼스 테스트로 <b>CAC 상한</b> 실측</li>
+      <li><span class="who">마케팅</span>자서전·가족책 상품 프리런칭("부모님 이야기를 그림책으로")</li>
+      <li><span class="who">마케팅</span>카카오 알림톡 템플릿 사전 승인 신청(정보성)</li>
+    </ul><div class="dod"><span class="t">완료 기준</span>첫 유료 결제 발생 + CAC ≤ 객단가 30% 확인(초과 시 크리에이티브 교체) + 알림톡 승인 접수.</div></div>
+  </div>
+
+  <div class="week peak"><div class="head"><span class="n">W6~7</span><h4>퍼포먼스 집행 피크</h4><span class="pill" style="background:rgba(255,255,255,.25);color:#fff">D-3~2주</span></div>
+    <div class="bd"><ul class="todo">
+      <li><span class="who">마케팅</span>인스타 릴스·네이버 파워링크(롱테일) 집행 — 성과 게이트로 예산 흐름</li>
+      <li><span class="who">마케팅</span>추석 선물 캠페인 본격화 + 카카오 친구톡(광고성) 분리 발송</li>
+      <li><span class="who">오너</span>주간 리추얼: 지표→예산 게이트 판정→카피 교체</li>
+    </ul><div class="dod"><span class="t">완료 기준</span>CAC 상한 내 유지된 채널만 확장. 추석 선물 상품 결제 전환율 baseline 확보.</div></div>
+  </div>
+
+  <div class="week peak"><div class="head"><span class="n">W8</span><h4>추석 주간 — POD 결제 피크</h4><span class="pill" style="background:rgba(255,255,255,.25);color:#fff">D-Day</span></div>
+    <div class="bd"><ul class="todo">
+      <li><span class="who">마케팅</span>카카오 선물하기·가족 단톡방 공유 카드 집중(귀성 전 마감 역산)</li>
+      <li><span class="who">개발</span>주문·제작·배송 알림톡 자동화 안정화(제작 리드타임 소명)</li>
+    </ul><div class="dod"><span class="t">완료 기준</span>시즌 결제 수(북극성) 목표 대비 실측 + 배송 지연 클레임 0건.</div></div>
+  </div>
+
+  <div class="week"><div class="head"><span class="n">W9</span><h4>회고 + 반복수요 채널 착수</h4><span class="pill">D+1주</span></div>
+    <div class="bd"><ul class="todo">
+      <li><span class="who">오너</span>회고: 채널별 CAC/전환/LTV 실측 → 차기 시즌(어버이날) 설계</li>
+      <li><span class="who">오너</span>교육 B2B 파일럿(웹툰학과·평생교육원 무료 SKU) 접촉 시작</li>
+      <li><span class="who">마케팅</span>마켓플레이스 공급자 온보딩(50~60명 직접 섭외) 설계 확정</li>
+    </ul><div class="dod"><span class="t">완료 기준</span>1페이지 회고 리포트 + 교육기관 3곳 미팅 예약 + 마켓 공급자 온보딩 플로우 문서화.</div></div>
+  </div>
+</div></section>
+
+<!-- ===== 복붙 카피/템플릿 ===== -->
+<section id="tactics"><div class="wrap">
+  <p class="eyebrow">Copy Bank · 그대로 복붙</p>
+  <h2>실물 카피 & 템플릿</h2>
+  <p class="desc">추상 조언이 아니라 "그대로 붙여 쓰는" 자산. 모든 카피는 단일 차별점("생성 아님, 조립")으로 수렴한다.</p>
+
+  <h3 class="sub">1) 네이버 정보성 SEO 제목 세트</h3>
+  <div class="tpl"><span class="t">유기 검색 선점용 · 광고비 없이 상위</span>
+    <span class="q">웹소설 콘티 만드는 법 — 그림 못 그려도 되는 3가지 방법</span>
+    <span class="q">내 소설을 웹툰 콘티로: 대본만 있으면 되는 무료 도구 비교</span>
+    <span class="q">웹툰 콘티 외주 비용 얼마? (크몽 견적 vs 직접 만들기)</span>
+    <span class="q">부모님 이야기를 그림책으로 만드는 법 — 자서전 대신 '그림 자서전'</span>
+  </div>
+
+  <h3 class="sub">2) 창작 커뮤니티 작가 아웃리치 DM</h3>
+  <div class="tpl"><span class="t">노벨피아·포스타입·도전만화 작가 대상 · 앰배서더 섭외</span>
+    안녕하세요 OO 작가님, 『작품명』 잘 보고 있는 독자이자 StoryWork 팀입니다.<br>
+    저희는 <b>AI로 그림을 생성하는 도구가 아니라</b>, 작가님 대본을 읽어 <b>사람이 그린 포즈로 콘티를 조립</b>해주는 편집기예요. 결과물은 작가님이 직접 고칠 수 있고, 자산 판권도 깨끗합니다.<br>
+    작품 홍보용 3컷 콘티를 무료로 만들어 드리고 싶은데, 써보시고 솔직한 피드백만 주시면 됩니다. (조건 없는 무상 체험이에요.)
+  </div>
+
+  <h3 class="sub">3) 인스타 릴스 4단 훅 스크립트</h3>
+  <div class="tpl"><span class="t">세로 9:16 · 자막 필수(무음 시청) · 저장/공유 CTA</span>
+    <b>[0–3초 훅]</b> "그림 1도 못 그리는데 내 소설이 콘티가 됐다"<br>
+    <b>[공감]</b> "외주 맡기면 20만원, 근데 매번 다시 그려야 하고…"<br>
+    <b>[해결·반전]</b> "대본 붙여넣기 → AI가 장면 나눔 → <b>사람이 그린 포즈로 조립</b> → 내가 고침"<br>
+    <b>[CTA]</b> "댓글에 <b>[콘티]</b> 남기면 무료 체험 링크 자동 발송 · 저장해두고 대본 생기면 해보세요"
+  </div>
+  <p class="desc gap-s"><b>DM 세대 역설 주의:</b> 35세+ 타깃엔 "DM 상담" 대신 <b>"댓글 키워드 → 자동 링크"</b> + 저장형 카드뉴스가 효율적. 20대엔 DM 병행.</p>
+
+  <h3 class="sub">4) 카카오 알림톡/친구톡 (자서전·가족책 시즌)</h3>
+  <div class="tpl"><span class="t">알림톡=정보성(사전승인) · 친구톡=광고성(분리 발송)</span>
+    <b>[알림톡·정보성]</b> "『부모님 그림 자서전』 제작이 시작됐어요. 오늘 사진 3장만 올려주시면 이번 주 콘티 초안을 보내드립니다."<br>
+    <b>[친구톡·광고성]</b> "추석 선물, 봉투 대신 <b>평생 남는 한 권</b>. 부모님 이야기를 그림책으로 — 지금 신청 시 배송 마감 D-일자 보장."
+  </div>
+
+  <h3 class="sub">5) PR 앵글 (데스크별)</h3>
+  <div class="grid cols-3 gap">
+    <div class="card"><p class="k">테크·스타트업</p><p>"생성형 역풍 속, <b>'AI가 그리지 않는' 창작툴</b>의 역발상 — 자산 조립형 국산 스토리보드"</p></div>
+    <div class="card"><p class="k">문화·창작</p><p>"별점테러 겪은 웹툰 생태계, <b>작가 판권을 지키는 도구</b>는 가능한가"</p></div>
+    <div class="card"><p class="k">시니어·가족</p><p>"자서전은 어렵다 — 사진 몇 장으로 <b>부모님 그림책</b> 만드는 법"</p></div>
+  </div>
+
+  <h3 class="sub">6) 금지어휘 & 정책 규칙</h3>
+  <div class="grid cols-2 gap">
+    <div class="card warnbox"><p class="k">금지</p><p><b>"AI가 그려준다 / AI 웹툰 / AI 작화 / 생성"</b> — 한국 창작 커뮤니티 트리거 워드(별점테러 실증). <b>"효과·수익 보장", "무료체험 유인 낚시"</b> — 표시광고법 리스크. <b>허위 긴급성</b> — 마감은 실제 리드타임 역산일만.</p></div>
+    <div class="card warnbox"><p class="k">스토어/리뷰 정책</p><p><b>리뷰 대가 금지</b>(Apple·Google 계정정지). 체험단엔 무상 체험만, 리뷰 조건 걸지 않는다. 평점은 <b>인앱 리뷰 프롬프트</b>(감동 모먼트 직후)로만 수집.</p></div>
+  </div>
+</div></section>
+
+<!-- ===== 한국 채널 딥다이브 ===== -->
+<section id="korea" class="tone"><div class="wrap">
+  <p class="eyebrow">Korea Deep-Dive</p>
+  <h2>한국 채널 역할 분담</h2>
+  <p class="desc">한국은 채널이 역할별로 갈린다 — 하나로 다 하려 하지 말고 파이프라인으로 잇는다.</p>
+  <div class="grid cols-4 gap">
+    <div class="card"><p class="k">네이버</p><h3>발견·설득</h3><p>검색이 시작점. 정보성 SEO로 유기 유입 선점(광고비 무한소모 방지) + 롱테일 파워링크. 광검색어는 레드오션.</p></div>
+    <div class="card"><p class="k">인스타 / 쇼츠</p><h3>창작자 전환</h3><p>릴스 4단 훅·저장형 카드뉴스. 35세+엔 "댓글 키워드→자동 링크". 챌린지 UGC 루프.</p></div>
+    <div class="card"><p class="k">카카오</p><h3>선물 전달</h3><p>선물하기가 국내 선물시장 최대 채널. 자서전·가족책 시즌 상품의 주전장. 알림톡 열람 90%+.</p></div>
+    <div class="card"><p class="k">창작 커뮤니티</p><h3>공급자 시딩</h3><p>노벨피아·포스타입·도전만화 직접 침투. 앰배서더·소규모 공모전(테스트베드)으로 저비용 시작.</p></div>
+  </div>
+
+  <h3 class="sub">이식할 검증된 GTM 패턴 (실측 벤치마크)</h3>
+  <div class="grid cols-2 gap">
+    <div class="card"><p class="k">미리캔버스 — 교육 무료 협약</p><p>2019 출시 → 1년 만에 100만 → 누적 <b>1,600만</b>. <b>11~17개 시·도 교육청 협약</b>(출처·시점 차이)으로 교사에 교육용 Pro 무료 + 강사 커뮤니티. → 웹툰학과·평생교육원에 <b>교육 SKU 무료 제공</b>으로 폐쇄 채널을 공짜로 뚫는다.</p></div>
+    <div class="card"><p class="k">아이디어스 — 소수정예 콜드스타트</p><p>작가 <b>60여 명</b>으로 시작, 대표가 직접 섭외 + 초기 거래 인위 활성화 + 성공사례 입소문 → 팬덤커머스 월 재구매 80%. → 마켓 공급자를 대량모집 대신 <b>50~60명 직접 섭외</b>부터.</p></div>
+    <div class="card"><p class="k">노벨피아 — 창작자 우선 인센티브</p><p>조회수당 정산(독점 12원)·정액제로 2년 만에 <b>130만 가입</b>. 대형 상금 전 <b>소규모 테스트베드 공모전</b>부터. → 마켓 초기 공급자에게 <b>파격 정산·낮은 수수료</b>를 한시적으로.</p></div>
+    <div class="card"><p class="k">지브리 챌린지 — 바이럴 메커니즘</p><p>기능 출시 <b>1시간 100만 신규·1주 7억 이미지</b>. 공통 메커니즘 = <b>입력 마찰 극소화(한 줄/사진 1장) + 결과 완성도 + 무료</b>. → "3컷 콘티 원클릭"을 정확히 이 형태로.</p></div>
+  </div>
+
+  <h3 class="sub">정서 트리거 카피 규율 (가족·시니어 세그먼트)</h3>
+  <div class="grid cols-2 gap">
+    <div class="card goodbox"><p class="k">허용 · gain frame(현재형 긍정)</p><p>"봉투는 잊혀지지만, 한 권은 남습니다" / "부모님 이야기를, 읽지 말고 <b>보게</b>" / "그림 실력 없이도, 내 이야기가 콘티가 된다"</p></div>
+    <div class="card warnbox"><p class="k">금지 · 공포·죄책감·낙인</p><p>"아프기 전에"❌ → "정정하실 때, 지금"✅. '시니어·실버·노후' 낙인 어휘 금지. 며느리 효도 의무 프레임❌ → <b>친정엄마×딸(자발·애정)</b> 프레임.</p></div>
+  </div>
+</div></section>
+
+<!-- ===== 예산 ===== -->
+<section id="budget"><div class="wrap">
+  <p class="eyebrow">Budget · 배분율</p>
+  <h2>예산 배분 — 성과 게이트 방식</h2>
+  <p class="desc">총액은 오너 결정이므로 <b>배분율</b>을 제시한다. 예산은 '기간'이 아니라 '성과'로 흐른다 — 초반 소액 테스트에서 CAC가 상한을 넘으면 확장 보류·크리에이티브 교체.</p>
+  <div class="tblwrap"><table>
+    <thead><tr><th>항목</th><th>배분</th><th class="r">시나리오 A (월 300만)</th><th class="r">시나리오 B (월 1,000만)</th><th>비고</th></tr></thead>
+    <tbody>
+      <tr><td><b>커뮤니티·앰배서더 시딩</b></td><td>35%</td><td class="r">105만</td><td class="r">350만</td><td>작가 아웃리치·소규모 공모전(오가닉 1순위)</td></tr>
+      <tr><td><b>퍼포먼스</b>(인스타·네이버)</td><td>30%</td><td class="r">90만</td><td class="r">300만</td><td>D-Day 3~4주 전 집중, 성과 게이트</td></tr>
+      <tr><td><b>콘텐츠·샘플 제작</b></td><td>20%</td><td class="r">60만</td><td class="r">200만</td><td>릴스·카드뉴스·완성 샘플 콘티</td></tr>
+      <tr><td><b>체험·원가</b>(POD 샘플)</td><td>15%</td><td class="r">45만</td><td class="r">150만</td><td>무상 체험·리뷰 시딩 실물</td></tr>
+    </tbody>
+  </table></div>
+  <p class="desc gap-s"><b>원칙:</b> 유료(퍼포먼스) 비중은 오가닉(커뮤니티) 검증 전엔 낮게. CAC 실측 후 상한 내 채널만 시나리오 B로 확장.</p>
+</div></section>
+
+<!-- ===== KPI ===== -->
+<section id="kpi" class="tone"><div class="wrap">
+  <p class="eyebrow">KPI · 북극성 + 리추얼</p>
+  <h2>측정 지표와 주간 리추얼</h2>
+  <div class="grid cols-4 gap">
+    <div class="stat hero-s"><p class="k">북극성(런칭기)</p><p class="v">완성 콘티<small> 저장·공유 수/주</small></p><p>활성화의 선행지표</p></div>
+    <div class="stat"><p class="k">북극성(수익기)</p><p class="v">결제 수<small> /주(구독+POD)</small></p><p>시즌 결제로 전환</p></div>
+    <div class="stat"><p class="k">CAC 상한</p><p class="v">≤ 30%<small> 객단가</small></p><p>구독 연18만 → ≤5.4만</p></div>
+    <div class="stat"><p class="k">보조</p><p class="v">활성화율<small> · 리뷰 · 공유율</small></p><p>첫 콘티 완성률/저장률</p></div>
+  </div>
+  <div class="grid cols-2 gap">
+    <div class="card"><p class="k">UTM 규칙 고정</p><p>채널×콘텐츠×시즌 3축으로 태깅. 커뮤니티/인스타/네이버/카카오를 소스로 분리해 CAC를 채널별로 실측(오가닉 vs 유료 분리).</p></div>
+    <div class="card"><p class="k">주간 리추얼 (월요일 30분)</p><p><b>①</b> 지표 확인(가입·완성·결제·CAC) <b>②</b> 예산 게이트 판정(상한 초과 채널 중단) <b>③</b> 카피/크리에이티브 1건 교체 <b>④</b> 캘린더 카드 체크박스 갱신.</p></div>
+  </div>
+</div></section>
+
+<!-- ===== 리스크 ===== -->
+<section id="risk"><div class="wrap">
+  <p class="eyebrow">Risk · 플랜B</p>
+  <h2>리스크 & 대응</h2>
+  <div class="tblwrap"><table>
+    <thead><tr><th>리스크</th><th>징후</th><th>플랜 B</th></tr></thead>
+    <tbody>
+      <tr><td><b>AI 백래시 역풍</b>(최우선)</td><td>커뮤니티에서 "결국 AI 아니냐" 반응·별점 하락</td><td>"생성 아님, 조립" 언어 일관 + <b>라이선스 증빙 전면화</b> + 원화가 크레딧 노출</td></tr>
+      <tr><td>결제·PG 지연</td><td>W5 결제 가동 미스</td><td>무료 <b>사전예약·웨이팅리스트</b>로 전환, 수요 선확보</td></tr>
+      <tr><td>콜드스타트 이탈</td><td>가입 후 첫 콘티 미도달률 높음</td><td>온보딩 <b>완성 샘플 3종</b> 강제 노출 + "3컷 원클릭" 우선 진입</td></tr>
+      <tr><td>CAC 상한 초과</td><td>퍼포먼스 CAC &gt; 객단가 30%</td><td>유료 축소·<b>오가닉(커뮤니티) 비중 확대</b>, 크리에이티브 교체</td></tr>
+      <tr><td>웹툰 커뮤니티가 끝내 거부</td><td>앰배서더 전환 저조</td><td><b>세그먼트 이동</b> — 자서전·가족책 + 교육 B2B로 무게 이동(플랜B 세그먼트)</td></tr>
+      <tr><td>Canva 등 거대 플랫폼 침투</td><td>"콘티/스토리보드" 기능 강화</td><td>한국어+웹툰풍+POD+<b>라이선스 청정</b>의 좁고 깊은 해자로 방어(범용과 정면 대결 회피)</td></tr>
+    </tbody>
+  </table></div>
+</div></section>
+
+<!-- ===== 근거·출처 ===== -->
+<section id="evidence" class="tone"><div class="wrap">
+  <p class="eyebrow">Evidence · 확신도 병기</p>
+  <h2>근거 & 출처</h2>
+  <p class="desc">모든 핵심 수치는 실제 WebSearch/WebFetch로 확인. 확인 실패 항목은 정직히 표기했고, 저확신 항목 위엔 전략 기둥을 세우지 않았다. 확신도: <span class="conf h">높음</span> <span class="conf m">중간</span> <span class="conf l">낮음</span>.</p>
+
+  <h3 class="sub">트랙 1 — 직접 경쟁사(가격·포지셔닝)</h3>
+  <ul class="srcs">
+    <li><span class="conf h">높음</span> Boords $39~250/mo, 무료티어 없음, "video agencies &amp; brand teams" — <a href="https://boords.com/pricing">boords.com/pricing</a> · <a href="https://boords.com/">boords.com</a></li>
+    <li><span class="conf h">높음</span> Katalist $19/$39/$99, 생성형, 7일 체험만 — <a href="https://www.katalist.ai/katalist-pricing">katalist.ai/katalist-pricing</a></li>
+    <li><span class="conf h">높음</span> StoryboardThat Free(워터마크)/$11.99, 클립아트, PDF 지원 — <a href="https://www.storyboardthat.com/purchase">storyboardthat.com/purchase</a></li>
+    <li><span class="conf h">높음</span> StoryTribe $4.99/$7.99(연간전용), 하이브리드, 유저 10만~40만(출처 불일치) — <a href="https://storytribeapp.com/pricing">storytribeapp.com/pricing</a></li>
+    <li><span class="conf h">높음</span> Wonder Unit Storyboarder 무료·OSS, 창업자 "market niche and small" — <a href="https://wonderunit.com/thoughts-on-free-and-open-source/">wonderunit.com/thoughts-on-free-and-open-source</a></li>
+    <li><span class="conf m">중간</span> LTX Studio $15/$35/$125(공식 페이지 fetch 실패, 2차 교차검증) — <a href="https://ltx.io/blog/ltx-studio-plans">ltx.io/blog/ltx-studio-plans</a></li>
+    <li><span class="conf m">중간</span> Dashtoon ≈$19, 생성형, 자체 플랫폼 배포 락인 — <a href="https://dashtoon.com/publish">dashtoon.com/publish</a></li>
+    <li><span class="conf h">높음</span> Canva 스토리보드 메이커+AI 캐릭터+Magic Design, ≈$15 Pro — <a href="https://www.canva.com/create/storyboards/">canva.com/create/storyboards</a></li>
+  </ul>
+
+  <h3 class="sub">트랙 2 — 한국 POD·웹툰·발견채널</h3>
+  <ul class="srcs">
+    <li><span class="conf h">높음</span> 웹툰산업 2024 매출 <b>2조 2,856억</b>(+4.4%, 콘진원 국가승인통계) · 2023년은 2.19조(+19.7%) — <a href="https://www.newspim.com/news/view/20251229000563">newspim.com</a> · <a href="https://www.mediatoday.co.kr/news/articleView.html?idxno=323505">mediatoday.co.kr</a></li>
+    <li><span class="conf h">높음</span> 웹소설산업 2024 <b>1조 3,500억</b> · 작가 70.8% 편당 500만원 미만(양극화)·연평균 소득 1,953만 — <a href="https://www.newspim.com/news/view/20250416000768">newspim.com</a> · <a href="https://biz.heraldcorp.com/article/3208676">heraldcorp.com</a></li>
+    <li><span class="conf h">높음</span> 부크크 POD 저자 <b>3.5만명+</b>(2025.8) · 교보 퍼플 수익배분 저자 60:교보 40 — <a href="https://www.hankyung.com/article/202509089299i">hankyung.com</a></li>
+    <li><span class="conf h">높음</span> <b>카카오 웹툰리그 2023.8 종료</b> → 아마추어 창작 선택지 네이버 도전만화 1곳으로(밀려난 창작자 = 틈새 타깃) — <a href="https://www.sedaily.com/NewsView/29TLYGJLDY">sedaily.com</a></li>
+    <li><span class="conf h">높음</span> 국내 인접경쟁: 자서전 셀프 POD 리본북·페스트북(텍스트북) · 대필 표준가 1,500~2,000만원 — <a href="https://rebornbook.co.kr/">rebornbook.co.kr</a> · <a href="https://festbook.co.kr/">festbook.co.kr</a></li>
+    <li><span class="conf m">중간</span> 국산 AI 웹툰툴(생성형): 투닝(tooning.io)·툰스퀘어·투툰 — "AI 웹툰" 키워드 레드오션 · <a href="https://tooning.io/">tooning.io</a></li>
+    <li><span class="conf h">높음</span> 크몽 웹툰 콘티 외주 3만~47만원/1건, 저작권양도 +20% — <a href="https://kmong.com/prices/%EC%9B%B9%ED%88%B0-%EC%BD%98%ED%8B%B0">kmong.com/prices/웹툰-콘티</a></li>
+    <li><span class="conf m">중간</span> 클래스101 6,000+ 클래스 / 콜로소 웹툰 실무강의(주호민·이종범·우연희 등) — <a href="https://class101.net/en">class101.net</a> · <a href="https://coloso.co.kr/">coloso.co.kr</a></li>
+    <li><span class="conf l">확인실패</span> 네이버 검색량·CPC(blackkiwi reCAPTCHA·키워드마스터 광고게이트로 확보 실패, CAPTCHA 우회 금지) → 네이버 키워드도구로 재확인 권장</li>
+  </ul>
+
+  <h3 class="sub">트랙 3 — 카테고리 생존사·AI 백래시</h3>
+  <ul class="srcs">
+    <li><span class="conf h">높음</span> 네이버·카카오웹툰 2023 AI 반감: AI 표지 철회, "신과함께 돌아온 기사왕님" 별점테러, 공모전 AI 활용 금지 신설 — <a href="https://www.newsis.com/view/NISX20230601_0002325153">newsis.com</a> · <a href="https://www.khan.co.kr/article/202306051714001">khan.co.kr</a> · <a href="https://www.popsci.co.kr/news/articleView.html?idxno=20895">popsci.co.kr</a></li>
+    <li><span class="conf h">높음</span> AI art 백래시 2024(Steam "AI 라벨=경고", Kickstarter 공시의무, ArtStation/DeviantArt/WotC 보이콧) — <a href="https://www.creativebloq.com/ai/ai-art/the-biggest-ai-art-controversies-of-2024">creativebloq.com</a></li>
+    <li><span class="conf h">높음</span> Canva/Notion 템플릿으로 콜드스타트 해소(빈 화면=이탈) — <a href="https://growthcasestudies.com/p/canva-templates">growthcasestudies.com/canva-templates</a></li>
+    <li><span class="conf l">확인실패</span> "하일권 사태" 개별 발언 논란 — 검색으로 확인 실패, 사실 단정 안 함</li>
+  </ul>
+
+  <h3 class="sub">트랙 4 — 니치 GTM 사례</h3>
+  <ul class="srcs">
+    <li><span class="conf h">높음</span> 미리캔버스 1년 100만→누적 1,600만, 17개 시·도 교육청 협약·교사 무료 Pro — <a href="https://www.asiae.co.kr/article/2025092510391322866">asiae.co.kr</a> · <a href="https://blog.miricanvas.com/teacher-community-get-special-benefits">blog.miricanvas.com</a></li>
+    <li><span class="conf h">높음</span> 지브리 챌린지 1시간 100만 신규·1주 7억 이미지·국내 챗GPT MAU +31.6% — <a href="https://news.nate.com/view/20250403n29867">nate.com</a> · <a href="https://www.khan.co.kr/article/202504130900031">khan.co.kr</a></li>
+    <li><span class="conf h">높음</span> 아이디어스 60여 명 작가 콜드스타트·팬덤커머스 재구매 80% — <a href="https://news.sbs.co.kr/news/endPage.do?news_id=N1007113320">news.sbs.co.kr</a></li>
+    <li><span class="conf m">중간</span> 노벨피아 조회수당 정산(독점 12원)·2년 130만 가입·작가정산금 500억 — <a href="https://economist.co.kr/2022/07/04/it/general/20220704190009698.html">economist.co.kr</a> · <a href="https://gametoc.hankyung.com/news/articleView.html?idxno=68899">gametoc.hankyung.com</a></li>
+    <li><span class="conf h">높음</span> 포스타입 45만 크리에이터·월 400만 거래 — <a href="https://www.postype.com/@blog/post/3851760">postype.com/@blog</a></li>
+    <li><span class="conf m">중간</span> 자서전 니치(기억의 서랍·남기다·엄마의 인터뷰·인생산책) 활성 — <a href="https://www.newswire.co.kr/newsRead.php?no=918851">newswire.co.kr</a> · <a href="https://namgidabook.com/">namgidabook.com</a></li>
+  </ul>
+
+  <h3 class="sub">정책 근거</h3>
+  <ul class="srcs">
+    <li><span class="conf h">높음</span> AI 기본법 2026.1.22 시행, 생성형 AI 결과물 표시 의무(계도기간 1년+) — 조립형은 원칙적 대상 밖 — <a href="https://www.help-me.kr/blog/article/korea-ai-act-2026-compliance-guide/">help-me.kr</a> · <a href="https://www.shinkim.com/kor/media/newsletter/3142">shinkim.com</a></li>
+  </ul>
+
+  <h3 class="sub">확인 실패 / 재확인 필요 (정직 표기)</h3>
+  <ul class="bul">
+    <li><b>추석 정확 일자</b>(2026) · 네이버 검색량·CPC(블랙키위/키워드도구) · 카카오 알림톡 단가·정책 — <b>실행 전 재확인</b>(시의성).</li>
+    <li>노벨피아 회원수 시점(200만 2023.6 vs 130만 2022 vs 150만 보도 혼재), 미리캔버스 교육청 협약 수(11 vs 17개), StoryTribe 유저 규모(10만~40만 출처 불일치) — 저확신, 전략 기둥으로 미사용.</li>
+    <li>망고보드 캠페인 성과·콜로소 대학 제휴 구체·와디즈 자서전 캠페인 지표 — 확인 실패.</li>
+    <li>StoryWork 3개년 수익추정(Y1 5,300만→Y3 4.6억)은 <b>내부 가설</b>(유료고객 0 출발) — 시장 근거 아님, W5 실측으로 대체.</li>
+  </ul>
+</div></section>
+
+<footer><div class="wrap">StoryWork · Go-To-Market Playbook · 2026.07 · marketing-strategy 스킬 5단계 산출물 · 실행 정본(SSOT), 주간 리추얼에서 체크리스트 갱신 · 소스코드 무수정(문서 전용)</div></footer>
+</body>
+</html>
