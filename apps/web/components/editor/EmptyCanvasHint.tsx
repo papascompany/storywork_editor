@@ -105,18 +105,23 @@ export function EmptyCanvasHint({ canvas, onActivatePoseTool }: EmptyCanvasHintP
           aria-hidden="true"
         />
 
-        {/* 텍스트 */}
+        {/* 텍스트 — 데스크톱/모바일 안내 문구 분기 (도구 위치가 다름) */}
         <div className="text-center">
           <p className="text-sm font-semibold text-[var(--color-text)]">디자인을 시작해보세요</p>
-          <p className="mt-1 text-[12px] text-[var(--color-text-muted)]">
+          {/* 데스크톱: 좌측 도구바 + ⌘K */}
+          <p className="mt-1 hidden text-[12px] text-[var(--color-text-muted)] md:block">
             왼쪽에서 도구를 선택하거나 빠른 검색을 사용하세요
+          </p>
+          {/* 모바일: 하단 도구 시트 안내 */}
+          <p className="mt-1 text-[12px] text-[var(--color-text-muted)] md:hidden">
+            아래 도구 버튼에서 포즈·배경을 추가해보세요
           </p>
         </div>
 
         {/* 칩 영역 */}
         <div className="flex flex-wrap items-center justify-center gap-2">
-          {/* ⌘K 안내 칩 */}
-          <div className="flex items-center gap-1 text-[11px] text-[var(--color-text-muted)]">
+          {/* ⌘K 안내 칩 — 터치 기기(모바일)에서는 숨김 */}
+          <div className="hidden items-center gap-1 text-[11px] text-[var(--color-text-muted)] md:flex">
             <kbd
               className={cn(
                 'inline-flex min-w-[1.25rem] items-center justify-center',

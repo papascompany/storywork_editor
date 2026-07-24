@@ -32,6 +32,11 @@ const MAX_ZOOM = 400
 const ZOOM_STEP = 10
 const FIT_MARGIN_PX = 32
 const THROTTLE_MS = 16
+// fit-to-viewport 전용 하한: 수동 줌 하한(MIN_ZOOM=25%)과 분리한다.
+// 좁은 모바일 뷰포트에서 인쇄 판형(B5=1535×2362px)의 fit 값이 25% 미만일 때
+// MIN_ZOOM 으로 강제하면 페이지가 뷰포트 밖으로 나가므로, fit 은 계산값을 그대로 쓰되
+// 무한 축소 방지용 최소 하한만 둔다.
+const FIT_MIN_ZOOM = 5
 
 // ─── 줌 헬퍼 ────────────────────────────────────────────────────────────────
 
@@ -118,7 +123,7 @@ function fitToViewport(canvas: StoryCanvas): void {
     (viewH - FIT_MARGIN_PX * 2) / pageH,
     MAX_ZOOM / 100,
   )
-  const clampedZoom = Math.max(MIN_ZOOM / 100, zoom)
+  const clampedZoom = Math.max(FIT_MIN_ZOOM / 100, zoom)
 
   // 중앙 정렬: panX/Y = (뷰포트 - 페이지 표시 크기) / 2
   const offsetX = (viewW - pageW * clampedZoom) / 2

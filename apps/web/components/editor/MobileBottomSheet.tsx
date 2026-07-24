@@ -90,7 +90,9 @@ export type MobileBottomSheetProps = {
 }
 
 // ── 높이 상수 ─────────────────────────────────
-const PEEK_HEIGHT = 56
+// peek: 핸들 행(≈48px) + 탭바(≈48px) 를 모두 노출해 도구 진입점 발견성 확보.
+// (56px 시절엔 탭바가 잘려 핸들 줄만 보였음)
+const PEEK_HEIGHT = 96
 const HALF_HEIGHT_CSS = '50dvh'
 const FULL_HEIGHT_CSS = '90dvh'
 
@@ -515,6 +517,16 @@ export function MobileBottomSheet({
     }
   }, [closeRequest])
 
+  // 포즈 추가 후 시트를 peek 로 접어 추가된 객체가 캔버스에서 바로 보이게 한다.
+  // (데스크톱은 이 컴포넌트가 렌더되지 않으므로 영향 없음)
+  const handleAddPoseFromSheet = useCallback(
+    (pose: ResourceSummary) => {
+      onAddPoseToCanvas?.(pose)
+      setSnap('peek')
+    },
+    [onAddPoseToCanvas],
+  )
+
   // ── 핸들 키보드 ──────────────────────────────
   const handleHandleKeyDown = useCallback((e: React.KeyboardEvent<HTMLButtonElement>) => {
     if (e.key === 'Enter' || e.key === ' ') {
@@ -671,7 +683,7 @@ export function MobileBottomSheet({
                 canvas={canvas}
                 history={history}
                 layerTree={layerTree}
-                onAddPoseToCanvas={onAddPoseToCanvas}
+                onAddPoseToCanvas={handleAddPoseFromSheet}
               />
             )}
             {activeTab === 'inspector' && (

@@ -87,12 +87,12 @@ const defaultProps = {
 // ── 테스트 ─────────────────────────────────────────────────────────────────
 
 describe('MobileBottomSheet — 기본 렌더 및 snap 전환', () => {
-  it('1. 마운트 시 peek 상태 (56px)', () => {
+  it('1. 마운트 시 peek 상태 (96px — 핸들+탭바 노출)', () => {
     render(<MobileBottomSheet {...defaultProps} />)
     const sheet = screen.getByTestId('mobile-bottom-sheet')
     expect(sheet).toBeInTheDocument()
     expect(sheet.dataset.snap).toBe('peek')
-    expect(sheet.style.height).toBe('56px')
+    expect(sheet.style.height).toBe('96px')
   })
 
   it('2. 핸들 클릭 → half (50dvh)', async () => {
@@ -134,7 +134,7 @@ describe('MobileBottomSheet — 기본 렌더 및 snap 전환', () => {
     }) // peek
     const sheet = screen.getByTestId('mobile-bottom-sheet')
     expect(sheet.dataset.snap).toBe('peek')
-    expect(sheet.style.height).toBe('56px')
+    expect(sheet.style.height).toBe('96px')
   })
 
   it('5. half 상태에서 Esc 키 → peek 복귀', async () => {
