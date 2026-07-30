@@ -1,0 +1,117 @@
+{
+  "v": 1,
+  "format": "png",
+  "size": {
+    "w": 750,
+    "h": 750
+  },
+  "keypoints": [
+    {
+      "name": "head",
+      "x": 0.503,
+      "y": 0.50066,
+      "weight": 0.344
+    },
+    {
+      "name": "left_eye",
+      "x": 0.58395,
+      "y": 0.5065,
+      "weight": 0.383
+    },
+    {
+      "name": "right_eye",
+      "x": 0.42205,
+      "y": 0.49483,
+      "weight": 0.3049
+    },
+    {
+      "name": "mouth",
+      "x": 0.4862,
+      "y": 0.64414,
+      "weight": 0.1306
+    },
+    {
+      "name": "neck",
+      "x": 0.49989,
+      "y": 0.3267,
+      "weight": 0.0948
+    },
+    {
+      "name": "left_shoulder",
+      "x": 0.60652,
+      "y": 0.3088,
+      "weight": 0.0921
+    },
+    {
+      "name": "right_shoulder",
+      "x": 0.39325,
+      "y": 0.3446,
+      "weight": 0.0975
+    },
+    {
+      "name": "left_wrist",
+      "x": 0.60419,
+      "y": 0.51584,
+      "weight": 0.1028
+    },
+    {
+      "name": "chest",
+      "x": 0.50024,
+      "y": 0.44672,
+      "weight": 0.104
+    },
+    {
+      "name": "torso",
+      "x": 0.50047,
+      "y": 0.52674,
+      "weight": 0.104
+    },
+    {
+      "name": "center",
+      "x": 0.50047,
+      "y": 0.52674,
+      "weight": 0.104
+    },
+    {
+      "name": "left_ankle",
+      "x": 0.62287,
+      "y": 0.44268,
+      "weight": 0.1071
+    },
+    {
+      "name": "right_ankle",
+      "x": 0.40337,
+      "y": 0.48393,
+      "weight": 0.1452
+    },
+    {
+      "name": "left_foot",
+      "x": 0.63714,
+      "y": 0.52596,
+      "weight": 0.201
+    },
+    {
+      "name": "right_foot",
+      "x": 0.40104,
+      "y": 0.48393,
+      "weight": 0.1408
+    }
+  ],
+  "bbox": {
+    "x": 0.32133,
+    "y": 0.24667,
+    "w": 0.35867,
+    "h": 0.364
+  },
+  "flippable": true,
+  "license": {
+    "id": "storywork-internal-2026",
+    "holder": "StoryWork",
+    "terms": "all-rights"
+  },
+  "_generator": {
+    "tool": "dwpose-enrich",
+    "model": "dw-ll_ucoco_384.onnx",
+    "v": 1
+  }
+}

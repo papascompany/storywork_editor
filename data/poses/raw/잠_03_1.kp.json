@@ -1,0 +1,119 @@
+{
+  "v": 1,
+  "format": "png",
+  "size": {
+    "w": 750,
+    "h": 750
+  },
+  "keypoints": [
+    {
+      "name": "head",
+      "x": 0.36222,
+      "y": 0.51661,
+      "weight": 0.1129
+    },
+    {
+      "name": "left_eye",
+      "x": 0.36872,
+      "y": 0.51734,
+      "weight": 0.1187
+    },
+    {
+      "name": "right_eye",
+      "x": 0.35572,
+      "y": 0.51589,
+      "weight": 0.1071
+    },
+    {
+      "name": "left_elbow",
+      "x": 0.57086,
+      "y": 0.60541,
+      "weight": 0.1305
+    },
+    {
+      "name": "right_elbow",
+      "x": 0.39615,
+      "y": 0.54188,
+      "weight": 0.1021
+    },
+    {
+      "name": "left_wrist",
+      "x": 0.57808,
+      "y": 0.59964,
+      "weight": 0.1407
+    },
+    {
+      "name": "right_wrist",
+      "x": 0.57519,
+      "y": 0.58087,
+      "weight": 0.121
+    },
+    {
+      "name": "left_hand",
+      "x": 0.6984,
+      "y": 0.62088,
+      "weight": 0.1588
+    },
+    {
+      "name": "right_hand",
+      "x": 0.69077,
+      "y": 0.63037,
+      "weight": 0.1372
+    },
+    {
+      "name": "left_ankle",
+      "x": 0.46401,
+      "y": 0.6083,
+      "weight": 0.1495
+    },
+    {
+      "name": "right_ankle",
+      "x": 0.43802,
+      "y": 0.61263,
+      "weight": 0.1166
+    },
+    {
+      "name": "left_foot",
+      "x": 0.36679,
+      "y": 0.65499,
+      "weight": 0.2461
+    },
+    {
+      "name": "right_foot",
+      "x": 0.37449,
+      "y": 0.6545,
+      "weight": 0.2172
+    },
+    {
+      "name": "mouth",
+      "x": 0.49,
+      "y": 0.3904,
+      "weight": 0.3,
+      "inferred": true
+    },
+    {
+      "name": "center",
+      "x": 0.49,
+      "y": 0.526,
+      "weight": 0.3,
+      "inferred": true
+    }
+  ],
+  "bbox": {
+    "x": 0.15733,
+    "y": 0.3,
+    "w": 0.66533,
+    "h": 0.452
+  },
+  "flippable": true,
+  "license": {
+    "id": "storywork-internal-2026",
+    "holder": "StoryWork",
+    "terms": "all-rights"
+  },
+  "_generator": {
+    "tool": "dwpose-enrich",
+    "model": "dw-ll_ucoco_384.onnx",
+    "v": 1
+  }
+}

@@ -1,0 +1,124 @@
+{
+  "v": 1,
+  "format": "png",
+  "size": {
+    "w": 750,
+    "h": 750
+  },
+  "keypoints": [
+    {
+      "name": "head",
+      "x": 0.41192,
+      "y": 0.37581,
+      "weight": 0.1912
+    },
+    {
+      "name": "left_eye",
+      "x": 0.46187,
+      "y": 0.36947,
+      "weight": 0.1903
+    },
+    {
+      "name": "right_eye",
+      "x": 0.36198,
+      "y": 0.38216,
+      "weight": 0.1921
+    },
+    {
+      "name": "mouth",
+      "x": 0.43227,
+      "y": 0.43964,
+      "weight": 0.1393
+    },
+    {
+      "name": "neck",
+      "x": 0.50786,
+      "y": 0.40594,
+      "weight": 0.0812
+    },
+    {
+      "name": "left_shoulder",
+      "x": 0.68862,
+      "y": 0.40436,
+      "weight": 0.1056
+    },
+    {
+      "name": "left_elbow",
+      "x": 0.64264,
+      "y": 0.45985,
+      "weight": 0.1046
+    },
+    {
+      "name": "left_wrist",
+      "x": 0.66484,
+      "y": 0.66123,
+      "weight": 0.1035
+    },
+    {
+      "name": "right_wrist",
+      "x": 0.66166,
+      "y": 0.6644,
+      "weight": 0.0935
+    },
+    {
+      "name": "left_hand",
+      "x": 0.73408,
+      "y": 0.53589,
+      "weight": 0.0886
+    },
+    {
+      "name": "right_hand",
+      "x": 0.43273,
+      "y": 0.73379,
+      "weight": 0.0893
+    },
+    {
+      "name": "left_ankle",
+      "x": 0.41906,
+      "y": 0.6644,
+      "weight": 0.1958
+    },
+    {
+      "name": "right_ankle",
+      "x": 0.39369,
+      "y": 0.65013,
+      "weight": 0.1864
+    },
+    {
+      "name": "left_foot",
+      "x": 0.47509,
+      "y": 0.72043,
+      "weight": 0.2041
+    },
+    {
+      "name": "right_foot",
+      "x": 0.4661,
+      "y": 0.71409,
+      "weight": 0.1963
+    },
+    {
+      "name": "center",
+      "x": 0.492,
+      "y": 0.50267,
+      "weight": 0.3,
+      "inferred": true
+    }
+  ],
+  "bbox": {
+    "x": 0.12667,
+    "y": 0.11733,
+    "w": 0.73067,
+    "h": 0.77067
+  },
+  "flippable": true,
+  "license": {
+    "id": "storywork-internal-2026",
+    "holder": "StoryWork",
+    "terms": "all-rights"
+  },
+  "_generator": {
+    "tool": "dwpose-enrich",
+    "model": "dw-ll_ucoco_384.onnx",
+    "v": 1
+  }
+}

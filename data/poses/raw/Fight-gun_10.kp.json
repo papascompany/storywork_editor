@@ -1,0 +1,125 @@
+{
+  "v": 1,
+  "format": "png",
+  "size": {
+    "w": 750,
+    "h": 750
+  },
+  "keypoints": [
+    {
+      "name": "head",
+      "x": 0.35747,
+      "y": 0.30885,
+      "weight": 0.0922
+    },
+    {
+      "name": "left_eye",
+      "x": 0.36671,
+      "y": 0.30885,
+      "weight": 0.0978
+    },
+    {
+      "name": "right_eye",
+      "x": 0.34824,
+      "y": 0.30885,
+      "weight": 0.0866
+    },
+    {
+      "name": "left_elbow",
+      "x": 0.51712,
+      "y": 0.31808,
+      "weight": 0.0872
+    },
+    {
+      "name": "left_wrist",
+      "x": 0.55803,
+      "y": 0.31412,
+      "weight": 0.105
+    },
+    {
+      "name": "right_wrist",
+      "x": 0.34824,
+      "y": 0.31281,
+      "weight": 0.1076
+    },
+    {
+      "name": "right_hand",
+      "x": 0.39366,
+      "y": 0.31909,
+      "weight": 0.0965
+    },
+    {
+      "name": "left_hip",
+      "x": 0.50657,
+      "y": 0.48037,
+      "weight": 0.081
+    },
+    {
+      "name": "left_knee",
+      "x": 0.51712,
+      "y": 0.64531,
+      "weight": 0.1224
+    },
+    {
+      "name": "right_knee",
+      "x": 0.51581,
+      "y": 0.65322,
+      "weight": 0.1325
+    },
+    {
+      "name": "left_ankle",
+      "x": 0.51317,
+      "y": 0.78253,
+      "weight": 0.1923
+    },
+    {
+      "name": "right_ankle",
+      "x": 0.51185,
+      "y": 0.78517,
+      "weight": 0.1832
+    },
+    {
+      "name": "left_foot",
+      "x": 0.50481,
+      "y": 0.82475,
+      "weight": 0.1931
+    },
+    {
+      "name": "right_foot",
+      "x": 0.50217,
+      "y": 0.82959,
+      "weight": 0.1851
+    },
+    {
+      "name": "mouth",
+      "x": 0.434,
+      "y": 0.2728,
+      "weight": 0.3,
+      "inferred": true
+    },
+    {
+      "name": "center",
+      "x": 0.434,
+      "y": 0.516,
+      "weight": 0.3,
+      "inferred": true
+    }
+  ],
+  "bbox": {
+    "x": 0.15867,
+    "y": 0.11067,
+    "w": 0.55067,
+    "h": 0.81067
+  },
+  "flippable": true,
+  "license": {
+    "id": "storywork-internal-2026",
+    "holder": "StoryWork",
+    "terms": "all-rights"
+  },
+  "_generator": {
+    "tool": "dwpose-enrich",
+    "model": "dw-ll_ucoco_384.onnx",
+    "v": 1
+  }
+}

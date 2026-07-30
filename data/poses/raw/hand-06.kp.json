@@ -1,0 +1,83 @@
+{
+  "v": 1,
+  "format": "png",
+  "size": {
+    "w": 750,
+    "h": 750
+  },
+  "keypoints": [
+    {
+      "name": "head",
+      "x": 0.55292,
+      "y": 0.45527,
+      "weight": 0.1001
+    },
+    {
+      "name": "left_eye",
+      "x": 0.56345,
+      "y": 0.45588,
+      "weight": 0.1126
+    },
+    {
+      "name": "right_eye",
+      "x": 0.5424,
+      "y": 0.45465,
+      "weight": 0.0876
+    },
+    {
+      "name": "left_ankle",
+      "x": 0.53125,
+      "y": 0.6466,
+      "weight": 0.1173
+    },
+    {
+      "name": "right_ankle",
+      "x": 0.5102,
+      "y": 0.64041,
+      "weight": 0.083
+    },
+    {
+      "name": "left_foot",
+      "x": 0.549,
+      "y": 0.67385,
+      "weight": 0.1411
+    },
+    {
+      "name": "right_foot",
+      "x": 0.54694,
+      "y": 0.67385,
+      "weight": 0.1108
+    },
+    {
+      "name": "mouth",
+      "x": 0.48667,
+      "y": 0.39867,
+      "weight": 0.3,
+      "inferred": true
+    },
+    {
+      "name": "center",
+      "x": 0.48667,
+      "y": 0.53267,
+      "weight": 0.3,
+      "inferred": true
+    }
+  ],
+  "bbox": {
+    "x": 0.20133,
+    "y": 0.30933,
+    "w": 0.57067,
+    "h": 0.44667
+  },
+  "flippable": true,
+  "license": {
+    "id": "storywork-internal-2026",
+    "holder": "StoryWork",
+    "terms": "all-rights"
+  },
+  "_generator": {
+    "tool": "dwpose-enrich",
+    "model": "dw-ll_ucoco_384.onnx",
+    "v": 1
+  }
+}

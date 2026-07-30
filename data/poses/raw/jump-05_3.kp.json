@@ -1,0 +1,118 @@
+{
+  "v": 1,
+  "format": "png",
+  "size": {
+    "w": 750,
+    "h": 750
+  },
+  "keypoints": [
+    {
+      "name": "head",
+      "x": 0.44304,
+      "y": 0.40378,
+      "weight": 0.2066
+    },
+    {
+      "name": "left_eye",
+      "x": 0.47192,
+      "y": 0.40566,
+      "weight": 0.2112
+    },
+    {
+      "name": "right_eye",
+      "x": 0.41416,
+      "y": 0.40189,
+      "weight": 0.202
+    },
+    {
+      "name": "mouth",
+      "x": 0.47663,
+      "y": 0.53249,
+      "weight": 0.2348
+    },
+    {
+      "name": "left_shoulder",
+      "x": 0.60504,
+      "y": 0.40943,
+      "weight": 0.0906
+    },
+    {
+      "name": "left_elbow",
+      "x": 0.54727,
+      "y": 0.51115,
+      "weight": 0.1321
+    },
+    {
+      "name": "right_elbow",
+      "x": 0.38904,
+      "y": 0.54003,
+      "weight": 0.0869
+    },
+    {
+      "name": "left_wrist",
+      "x": 0.49578,
+      "y": 0.4471,
+      "weight": 0.0866
+    },
+    {
+      "name": "left_hand",
+      "x": 0.80596,
+      "y": 0.50122,
+      "weight": 0.083
+    },
+    {
+      "name": "left_knee",
+      "x": 0.44681,
+      "y": 0.36171,
+      "weight": 0.0828
+    },
+    {
+      "name": "left_ankle",
+      "x": 0.44806,
+      "y": 0.51868,
+      "weight": 0.0923
+    },
+    {
+      "name": "right_ankle",
+      "x": 0.41164,
+      "y": 0.53752,
+      "weight": 0.0907
+    },
+    {
+      "name": "left_foot",
+      "x": 0.40411,
+      "y": 0.41989,
+      "weight": 0.1377
+    },
+    {
+      "name": "right_foot",
+      "x": 0.39909,
+      "y": 0.43245,
+      "weight": 0.1552
+    },
+    {
+      "name": "center",
+      "x": 0.47067,
+      "y": 0.44333,
+      "weight": 0.3,
+      "inferred": true
+    }
+  ],
+  "bbox": {
+    "x": 0.18133,
+    "y": 0.08267,
+    "w": 0.57867,
+    "h": 0.72133
+  },
+  "flippable": true,
+  "license": {
+    "id": "storywork-internal-2026",
+    "holder": "StoryWork",
+    "terms": "all-rights"
+  },
+  "_generator": {
+    "tool": "dwpose-enrich",
+    "model": "dw-ll_ucoco_384.onnx",
+    "v": 1
+  }
+}

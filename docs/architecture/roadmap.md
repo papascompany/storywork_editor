@@ -147,6 +147,10 @@
 
 - [x] [BUBBLE-02] 배치 비용함수 4항 정식화 + 자동 QA 대조기 — `bubble-cost.ts`(w1 화자 mouth 근접+꼬리 각도 / w2 얼굴 가림 / w3 읽기순서 단조성 / w4 패널 경계, 전부 결정론) + `assignBubblesByCost()` 순열 전수(슬롯≤7)·그리디 폴백으로 slot-assign 의 나이브 인덱스 매핑 교체(화자 위치 기반 교차 배치) + `bubble-qa.ts` IoU 매칭·가림 QA 평가기(mock 검출기 테스트). 신규 23 테스트, 기존 compose/slot-assign 무회귀 — @layout-composer ✅ 2026-07-30. **잔여**: ONNX 검출기 실연결(comic-translate YOLOv8m → ONNX 변환 + onnxruntime-node 의존성 + 가중치 다운로드)은 🚦 의존성·모델 반입 승인 게이트 — `BubbleDetector` 인터페이스 교체 지점 확보됨. 키포인트 실좌표 앵커는 CHAR-GEN-01(DWPose 보강) 후 `speakerAnchorFromPoseSlot` keypoints 인자로 자동 개선
 
+## CHAR-GEN — 캐릭터 에셋 파이프라인 (research 2026-07-21 §4.4, 착수 승인 2026-07-30)
+
+- [x] [CHAR-GEN-01] dwpose 키포인트 일괄 보강 — `scripts/enrich-keypoints.py`(uv+onnxruntime, 알파 bbox=person bbox 로 검출기 생략) → **1,058장 전량 25점 사이드카 생성**(파서 전수 검증 1,058/1,058 통과, 평균 21.3점/장, meanW 0.154, 검수큐 125건=11.8%). 파일럿 오버레이 실사로 SimCC 신뢰도 보정·bbox 이탈 가드·파생점 가중치 확정. **동물(사족)·사랑(2인)은 도메인 밖 제외**(3점 휴리스틱 유지 — POSE3D 3D 렌더 경로 대상). 선행: KP 규약 통일(admin 10종 하이픈→shared-schema 25종 언더스코어, 레거시 정규화, 보정 API 상한 10→25) — @pose-curator ✅ 2026-07-30. **잔여**: DB 반영은 `scripts/ingest-poses.ts` 재실행(upsert·사이드카 우선) — prod DATABASE_URL 필요, 휴먼게이트. 말풍선 앵커(BUBBLE-02 `speakerAnchorFromPoseSlot`)는 재적재 후 실측 키포인트로 자동 개선
+
 ## M7 — Creator Mode + Billing
 
 - [ ] [M7-01] Stripe 연결 + Webhook 멱등 — 재처리 테스트 — @architect

@@ -1,0 +1,165 @@
+{
+  "v": 1,
+  "format": "png",
+  "size": {
+    "w": 750,
+    "h": 750
+  },
+  "keypoints": [
+    {
+      "name": "head",
+      "x": 0.43073,
+      "y": 0.3543,
+      "weight": 0.2373
+    },
+    {
+      "name": "left_eye",
+      "x": 0.47254,
+      "y": 0.34908,
+      "weight": 0.2007
+    },
+    {
+      "name": "right_eye",
+      "x": 0.38893,
+      "y": 0.35953,
+      "weight": 0.2739
+    },
+    {
+      "name": "mouth",
+      "x": 0.45773,
+      "y": 0.41353,
+      "weight": 0.2089
+    },
+    {
+      "name": "neck",
+      "x": 0.5335,
+      "y": 0.52937,
+      "weight": 0.167
+    },
+    {
+      "name": "left_shoulder",
+      "x": 0.68679,
+      "y": 0.51456,
+      "weight": 0.1655
+    },
+    {
+      "name": "right_shoulder",
+      "x": 0.38022,
+      "y": 0.54417,
+      "weight": 0.1685
+    },
+    {
+      "name": "left_elbow",
+      "x": 0.74253,
+      "y": 0.54591,
+      "weight": 0.1744
+    },
+    {
+      "name": "right_elbow",
+      "x": 0.31751,
+      "y": 0.51108,
+      "weight": 0.0961
+    },
+    {
+      "name": "left_wrist",
+      "x": 0.76692,
+      "y": 0.60165,
+      "weight": 0.1892
+    },
+    {
+      "name": "right_wrist",
+      "x": 0.38719,
+      "y": 0.59643,
+      "weight": 0.0997
+    },
+    {
+      "name": "left_hand",
+      "x": 0.89424,
+      "y": 0.61642,
+      "weight": 0.1747
+    },
+    {
+      "name": "right_hand",
+      "x": 0.92726,
+      "y": 0.61509,
+      "weight": 0.083
+    },
+    {
+      "name": "chest",
+      "x": 0.5275,
+      "y": 0.62369,
+      "weight": 0.1542
+    },
+    {
+      "name": "torso",
+      "x": 0.52349,
+      "y": 0.68657,
+      "weight": 0.1542
+    },
+    {
+      "name": "center",
+      "x": 0.52349,
+      "y": 0.68657,
+      "weight": 0.1542
+    },
+    {
+      "name": "hip",
+      "x": 0.51347,
+      "y": 0.84378,
+      "weight": 0.1415
+    },
+    {
+      "name": "left_hip",
+      "x": 0.59447,
+      "y": 0.84552,
+      "weight": 0.1227
+    },
+    {
+      "name": "right_hip",
+      "x": 0.43247,
+      "y": 0.84204,
+      "weight": 0.1603
+    },
+    {
+      "name": "left_ankle",
+      "x": 0.48473,
+      "y": 0.6034,
+      "weight": 0.1119
+    },
+    {
+      "name": "right_ankle",
+      "x": 0.46557,
+      "y": 0.76713,
+      "weight": 0.1236
+    },
+    {
+      "name": "left_foot",
+      "x": 0.70305,
+      "y": 0.61733,
+      "weight": 0.0984
+    },
+    {
+      "name": "right_foot",
+      "x": 0.45802,
+      "y": 0.38682,
+      "weight": 0.0994
+    }
+  ],
+  "bbox": {
+    "x": 0.09733,
+    "y": 0.09467,
+    "w": 0.80267,
+    "h": 0.82933
+  },
+  "flippable": true,
+  "license": {
+    "id": "storywork-internal-2026",
+    "holder": "StoryWork",
+    "terms": "all-rights"
+  },
+  "_generator": {
+    "tool": "dwpose-enrich",
+    "model": "dw-ll_ucoco_384.onnx",
+    "v": 1
+  }
+}

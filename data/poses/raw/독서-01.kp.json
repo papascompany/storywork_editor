@@ -1,0 +1,117 @@
+{
+  "v": 1,
+  "format": "png",
+  "size": {
+    "w": 750,
+    "h": 750
+  },
+  "keypoints": [
+    {
+      "name": "head",
+      "x": 0.4775,
+      "y": 0.32875,
+      "weight": 0.1707
+    },
+    {
+      "name": "left_eye",
+      "x": 0.51625,
+      "y": 0.3275,
+      "weight": 0.1806
+    },
+    {
+      "name": "right_eye",
+      "x": 0.43875,
+      "y": 0.33,
+      "weight": 0.1609
+    },
+    {
+      "name": "mouth",
+      "x": 0.49344,
+      "y": 0.38583,
+      "weight": 0.0852
+    },
+    {
+      "name": "neck",
+      "x": 0.4425,
+      "y": 0.50313,
+      "weight": 0.0829
+    },
+    {
+      "name": "right_shoulder",
+      "x": 0.32625,
+      "y": 0.50375,
+      "weight": 0.0929
+    },
+    {
+      "name": "left_elbow",
+      "x": 0.63,
+      "y": 0.46625,
+      "weight": 0.0925
+    },
+    {
+      "name": "chest",
+      "x": 0.44625,
+      "y": 0.5035,
+      "weight": 0.0874
+    },
+    {
+      "name": "torso",
+      "x": 0.44875,
+      "y": 0.50375,
+      "weight": 0.0874
+    },
+    {
+      "name": "center",
+      "x": 0.44875,
+      "y": 0.50375,
+      "weight": 0.0874
+    },
+    {
+      "name": "hip",
+      "x": 0.455,
+      "y": 0.50438,
+      "weight": 0.0918
+    },
+    {
+      "name": "left_hip",
+      "x": 0.52625,
+      "y": 0.505,
+      "weight": 0.0822
+    },
+    {
+      "name": "right_hip",
+      "x": 0.38375,
+      "y": 0.50375,
+      "weight": 0.1015
+    },
+    {
+      "name": "left_foot",
+      "x": 0.635,
+      "y": 0.44417,
+      "weight": 0.105
+    },
+    {
+      "name": "right_foot",
+      "x": 0.48792,
+      "y": 0.44417,
+      "weight": 0.0828
+    }
+  ],
+  "bbox": {
+    "x": 0.212,
+    "y": 0.14533,
+    "w": 0.576,
+    "h": 0.70933
+  },
+  "flippable": true,
+  "license": {
+    "id": "storywork-internal-2026",
+    "holder": "StoryWork",
+    "terms": "all-rights"
+  },
+  "_generator": {
+    "tool": "dwpose-enrich",
+    "model": "dw-ll_ucoco_384.onnx",
+    "v": 1
+  }
+}

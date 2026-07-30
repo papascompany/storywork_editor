@@ -1,0 +1,111 @@
+{
+  "v": 1,
+  "format": "png",
+  "size": {
+    "w": 750,
+    "h": 750
+  },
+  "keypoints": [
+    {
+      "name": "head",
+      "x": 0.48086,
+      "y": 0.27683,
+      "weight": 0.1366
+    },
+    {
+      "name": "left_eye",
+      "x": 0.5713,
+      "y": 0.27552,
+      "weight": 0.119
+    },
+    {
+      "name": "right_eye",
+      "x": 0.39041,
+      "y": 0.27814,
+      "weight": 0.1542
+    },
+    {
+      "name": "mouth",
+      "x": 0.46808,
+      "y": 0.34248,
+      "weight": 0.0879
+    },
+    {
+      "name": "neck",
+      "x": 0.48807,
+      "y": 0.41708,
+      "weight": 0.0914
+    },
+    {
+      "name": "left_shoulder",
+      "x": 0.63291,
+      "y": 0.38956,
+      "weight": 0.0949
+    },
+    {
+      "name": "right_shoulder",
+      "x": 0.34323,
+      "y": 0.44461,
+      "weight": 0.0879
+    },
+    {
+      "name": "right_elbow",
+      "x": 0.39041,
+      "y": 0.64385,
+      "weight": 0.0931
+    },
+    {
+      "name": "left_hand",
+      "x": 0.83508,
+      "y": 0.28969,
+      "weight": 0.0899
+    },
+    {
+      "name": "chest",
+      "x": 0.4922,
+      "y": 0.42377,
+      "weight": 0.0817
+    },
+    {
+      "name": "torso",
+      "x": 0.49495,
+      "y": 0.42822,
+      "weight": 0.0817
+    },
+    {
+      "name": "center",
+      "x": 0.49495,
+      "y": 0.42822,
+      "weight": 0.0817
+    },
+    {
+      "name": "left_foot",
+      "x": 0.51756,
+      "y": 0.65258,
+      "weight": 0.1065
+    },
+    {
+      "name": "right_foot",
+      "x": 0.45071,
+      "y": 0.65477,
+      "weight": 0.0921
+    }
+  ],
+  "bbox": {
+    "x": 0.272,
+    "y": 0.07733,
+    "w": 0.51733,
+    "h": 0.80533
+  },
+  "flippable": true,
+  "license": {
+    "id": "storywork-internal-2026",
+    "holder": "StoryWork",
+    "terms": "all-rights"
+  },
+  "_generator": {
+    "tool": "dwpose-enrich",
+    "model": "dw-ll_ucoco_384.onnx",
+    "v": 1
+  }
+}

@@ -1,0 +1,107 @@
+{
+  "v": 1,
+  "format": "png",
+  "size": {
+    "w": 750,
+    "h": 750
+  },
+  "keypoints": [
+    {
+      "name": "head",
+      "x": 0.50966,
+      "y": 0.42405,
+      "weight": 0.0959
+    },
+    {
+      "name": "left_eye",
+      "x": 0.52695,
+      "y": 0.4251,
+      "weight": 0.097
+    },
+    {
+      "name": "right_eye",
+      "x": 0.49236,
+      "y": 0.423,
+      "weight": 0.0948
+    },
+    {
+      "name": "neck",
+      "x": 0.528,
+      "y": 0.48118,
+      "weight": 0.0888
+    },
+    {
+      "name": "left_shoulder",
+      "x": 0.63911,
+      "y": 0.4796,
+      "weight": 0.1091
+    },
+    {
+      "name": "left_elbow",
+      "x": 0.6412,
+      "y": 0.44711,
+      "weight": 0.0896
+    },
+    {
+      "name": "left_wrist",
+      "x": 0.58984,
+      "y": 0.47855,
+      "weight": 0.0889
+    },
+    {
+      "name": "left_ankle",
+      "x": 0.58879,
+      "y": 0.68714,
+      "weight": 0.1238
+    },
+    {
+      "name": "right_ankle",
+      "x": 0.5542,
+      "y": 0.71335,
+      "weight": 0.0875
+    },
+    {
+      "name": "left_foot",
+      "x": 0.6447,
+      "y": 0.5128,
+      "weight": 0.1531
+    },
+    {
+      "name": "right_foot",
+      "x": 0.53114,
+      "y": 0.44082,
+      "weight": 0.1223
+    },
+    {
+      "name": "mouth",
+      "x": 0.528,
+      "y": 0.3168,
+      "weight": 0.3,
+      "inferred": true
+    },
+    {
+      "name": "center",
+      "x": 0.528,
+      "y": 0.51,
+      "weight": 0.3,
+      "inferred": true
+    }
+  ],
+  "bbox": {
+    "x": 0.31733,
+    "y": 0.188,
+    "w": 0.42133,
+    "h": 0.644
+  },
+  "flippable": true,
+  "license": {
+    "id": "storywork-internal-2026",
+    "holder": "StoryWork",
+    "terms": "all-rights"
+  },
+  "_generator": {
+    "tool": "dwpose-enrich",
+    "model": "dw-ll_ucoco_384.onnx",
+    "v": 1
+  }
+}

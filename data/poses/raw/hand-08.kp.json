@@ -1,0 +1,118 @@
+{
+  "v": 1,
+  "format": "png",
+  "size": {
+    "w": 750,
+    "h": 750
+  },
+  "keypoints": [
+    {
+      "name": "head",
+      "x": 0.5668,
+      "y": 0.4083,
+      "weight": 0.1412
+    },
+    {
+      "name": "left_eye",
+      "x": 0.63147,
+      "y": 0.41287,
+      "weight": 0.1756
+    },
+    {
+      "name": "right_eye",
+      "x": 0.50213,
+      "y": 0.40373,
+      "weight": 0.1068
+    },
+    {
+      "name": "neck",
+      "x": 0.51455,
+      "y": 0.48015,
+      "weight": 0.0922
+    },
+    {
+      "name": "right_shoulder",
+      "x": 0.38456,
+      "y": 0.4795,
+      "weight": 0.1103
+    },
+    {
+      "name": "left_elbow",
+      "x": 0.64845,
+      "y": 0.48603,
+      "weight": 0.0825
+    },
+    {
+      "name": "right_hand",
+      "x": 0.56167,
+      "y": 0.09025,
+      "weight": 0.091
+    },
+    {
+      "name": "chest",
+      "x": 0.4975,
+      "y": 0.58147,
+      "weight": 0.1028
+    },
+    {
+      "name": "torso",
+      "x": 0.48613,
+      "y": 0.64901,
+      "weight": 0.1028
+    },
+    {
+      "name": "center",
+      "x": 0.48613,
+      "y": 0.64901,
+      "weight": 0.1028
+    },
+    {
+      "name": "hip",
+      "x": 0.45772,
+      "y": 0.81786,
+      "weight": 0.1135
+    },
+    {
+      "name": "left_hip",
+      "x": 0.52826,
+      "y": 0.81786,
+      "weight": 0.1123
+    },
+    {
+      "name": "right_hip",
+      "x": 0.38717,
+      "y": 0.81786,
+      "weight": 0.1147
+    },
+    {
+      "name": "left_foot",
+      "x": 0.60142,
+      "y": 0.439,
+      "weight": 0.1049
+    },
+    {
+      "name": "mouth",
+      "x": 0.50867,
+      "y": 0.2792,
+      "weight": 0.3,
+      "inferred": true
+    }
+  ],
+  "bbox": {
+    "x": 0.27867,
+    "y": 0.11867,
+    "w": 0.46,
+    "h": 0.80267
+  },
+  "flippable": true,
+  "license": {
+    "id": "storywork-internal-2026",
+    "holder": "StoryWork",
+    "terms": "all-rights"
+  },
+  "_generator": {
+    "tool": "dwpose-enrich",
+    "model": "dw-ll_ucoco_384.onnx",
+    "v": 1
+  }
+}

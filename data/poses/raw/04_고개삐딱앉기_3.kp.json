@@ -1,0 +1,118 @@
+{
+  "v": 1,
+  "format": "png",
+  "size": {
+    "w": 750,
+    "h": 750
+  },
+  "keypoints": [
+    {
+      "name": "head",
+      "x": 0.51428,
+      "y": 0.32694,
+      "weight": 0.1302
+    },
+    {
+      "name": "left_eye",
+      "x": 0.57438,
+      "y": 0.32694,
+      "weight": 0.1447
+    },
+    {
+      "name": "right_eye",
+      "x": 0.45417,
+      "y": 0.32694,
+      "weight": 0.1157
+    },
+    {
+      "name": "mouth",
+      "x": 0.50092,
+      "y": 0.65334,
+      "weight": 0.1145
+    },
+    {
+      "name": "neck",
+      "x": 0.48861,
+      "y": 0.52729,
+      "weight": 0.0998
+    },
+    {
+      "name": "left_shoulder",
+      "x": 0.59567,
+      "y": 0.52854,
+      "weight": 0.1046
+    },
+    {
+      "name": "right_shoulder",
+      "x": 0.38155,
+      "y": 0.52603,
+      "weight": 0.095
+    },
+    {
+      "name": "left_elbow",
+      "x": 0.6157,
+      "y": 0.70009,
+      "weight": 0.0836
+    },
+    {
+      "name": "left_wrist",
+      "x": 0.57063,
+      "y": 0.63623,
+      "weight": 0.099
+    },
+    {
+      "name": "right_hand",
+      "x": 0.38805,
+      "y": 0.69013,
+      "weight": 0.0889
+    },
+    {
+      "name": "left_ankle",
+      "x": 0.43289,
+      "y": 0.62996,
+      "weight": 0.1548
+    },
+    {
+      "name": "right_ankle",
+      "x": 0.42663,
+      "y": 0.61619,
+      "weight": 0.1779
+    },
+    {
+      "name": "left_foot",
+      "x": 0.55393,
+      "y": 0.66002,
+      "weight": 0.2249
+    },
+    {
+      "name": "right_foot",
+      "x": 0.39532,
+      "y": 0.66544,
+      "weight": 0.2435
+    },
+    {
+      "name": "center",
+      "x": 0.498,
+      "y": 0.506,
+      "weight": 0.3,
+      "inferred": true
+    }
+  ],
+  "bbox": {
+    "x": 0.24667,
+    "y": 0.12133,
+    "w": 0.50267,
+    "h": 0.76933
+  },
+  "flippable": true,
+  "license": {
+    "id": "storywork-internal-2026",
+    "holder": "StoryWork",
+    "terms": "all-rights"
+  },
+  "_generator": {
+    "tool": "dwpose-enrich",
+    "model": "dw-ll_ucoco_384.onnx",
+    "v": 1
+  }
+}

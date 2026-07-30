@@ -1,0 +1,119 @@
+{
+  "v": 1,
+  "format": "png",
+  "size": {
+    "w": 750,
+    "h": 750
+  },
+  "keypoints": [
+    {
+      "name": "head",
+      "x": 0.50645,
+      "y": 0.41836,
+      "weight": 0.1283
+    },
+    {
+      "name": "left_eye",
+      "x": 0.57007,
+      "y": 0.41894,
+      "weight": 0.1329
+    },
+    {
+      "name": "right_eye",
+      "x": 0.44283,
+      "y": 0.41778,
+      "weight": 0.1237
+    },
+    {
+      "name": "left_elbow",
+      "x": 0.57122,
+      "y": 0.66185,
+      "weight": 0.1173
+    },
+    {
+      "name": "right_elbow",
+      "x": 0.40004,
+      "y": 0.66416,
+      "weight": 0.1219
+    },
+    {
+      "name": "left_wrist",
+      "x": 0.42895,
+      "y": 0.70233,
+      "weight": 0.1093
+    },
+    {
+      "name": "right_wrist",
+      "x": 0.42664,
+      "y": 0.71968,
+      "weight": 0.113
+    },
+    {
+      "name": "left_hand",
+      "x": 0.53002,
+      "y": 0.67738,
+      "weight": 0.1111
+    },
+    {
+      "name": "right_hand",
+      "x": 0.46657,
+      "y": 0.67286,
+      "weight": 0.1149
+    },
+    {
+      "name": "left_ankle",
+      "x": 0.5851,
+      "y": 0.76826,
+      "weight": 0.1599
+    },
+    {
+      "name": "right_ankle",
+      "x": 0.39425,
+      "y": 0.77636,
+      "weight": 0.1783
+    },
+    {
+      "name": "left_foot",
+      "x": 0.572,
+      "y": 0.80797,
+      "weight": 0.2039
+    },
+    {
+      "name": "right_foot",
+      "x": 0.35454,
+      "y": 0.82147,
+      "weight": 0.211
+    },
+    {
+      "name": "mouth",
+      "x": 0.50067,
+      "y": 0.33413,
+      "weight": 0.3,
+      "inferred": true
+    },
+    {
+      "name": "center",
+      "x": 0.50067,
+      "y": 0.54733,
+      "weight": 0.3,
+      "inferred": true
+    }
+  ],
+  "bbox": {
+    "x": 0.28267,
+    "y": 0.192,
+    "w": 0.436,
+    "h": 0.71067
+  },
+  "flippable": true,
+  "license": {
+    "id": "storywork-internal-2026",
+    "holder": "StoryWork",
+    "terms": "all-rights"
+  },
+  "_generator": {
+    "tool": "dwpose-enrich",
+    "model": "dw-ll_ucoco_384.onnx",
+    "v": 1
+  }
+}

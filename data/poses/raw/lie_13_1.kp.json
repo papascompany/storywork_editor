@@ -1,0 +1,136 @@
+{
+  "v": 1,
+  "format": "png",
+  "size": {
+    "w": 750,
+    "h": 750
+  },
+  "keypoints": [
+    {
+      "name": "head",
+      "x": 0.7038,
+      "y": 0.37421,
+      "weight": 0.1497
+    },
+    {
+      "name": "left_eye",
+      "x": 0.72845,
+      "y": 0.37914,
+      "weight": 0.1561
+    },
+    {
+      "name": "right_eye",
+      "x": 0.67914,
+      "y": 0.36928,
+      "weight": 0.1433
+    },
+    {
+      "name": "mouth",
+      "x": 0.43138,
+      "y": 0.46104,
+      "weight": 0.0865
+    },
+    {
+      "name": "left_elbow",
+      "x": 0.59204,
+      "y": 0.41365,
+      "weight": 0.0932
+    },
+    {
+      "name": "right_elbow",
+      "x": 0.47699,
+      "y": 0.41201,
+      "weight": 0.0866
+    },
+    {
+      "name": "left_wrist",
+      "x": 0.62819,
+      "y": 0.42023,
+      "weight": 0.1018
+    },
+    {
+      "name": "right_wrist",
+      "x": 0.60025,
+      "y": 0.41037,
+      "weight": 0.0845
+    },
+    {
+      "name": "left_hand",
+      "x": 0.73354,
+      "y": 0.37609,
+      "weight": 0.1145
+    },
+    {
+      "name": "right_hand",
+      "x": 0.68556,
+      "y": 0.41381,
+      "weight": 0.1019
+    },
+    {
+      "name": "hip",
+      "x": 0.47535,
+      "y": 0.70127,
+      "weight": 0.089
+    },
+    {
+      "name": "left_hip",
+      "x": 0.47535,
+      "y": 0.69798,
+      "weight": 0.0899
+    },
+    {
+      "name": "right_hip",
+      "x": 0.47535,
+      "y": 0.70456,
+      "weight": 0.0881
+    },
+    {
+      "name": "left_ankle",
+      "x": 0.47206,
+      "y": 0.65689,
+      "weight": 0.1085
+    },
+    {
+      "name": "right_ankle",
+      "x": 0.67914,
+      "y": 0.63717,
+      "weight": 0.0819
+    },
+    {
+      "name": "left_foot",
+      "x": 0.66216,
+      "y": 0.46789,
+      "weight": 0.2127
+    },
+    {
+      "name": "right_foot",
+      "x": 0.52904,
+      "y": 0.45858,
+      "weight": 0.1883
+    },
+    {
+      "name": "center",
+      "x": 0.5,
+      "y": 0.50733,
+      "weight": 0.3,
+      "inferred": true
+    }
+  ],
+  "bbox": {
+    "x": 0.12133,
+    "y": 0.256,
+    "w": 0.75733,
+    "h": 0.50267
+  },
+  "flippable": true,
+  "license": {
+    "id": "storywork-internal-2026",
+    "holder": "StoryWork",
+    "terms": "all-rights"
+  },
+  "_generator": {
+    "tool": "dwpose-enrich",
+    "model": "dw-ll_ucoco_384.onnx",
+    "v": 1
+  }
+}

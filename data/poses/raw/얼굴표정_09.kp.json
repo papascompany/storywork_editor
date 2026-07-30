@@ -1,0 +1,93 @@
+{
+  "v": 1,
+  "format": "png",
+  "size": {
+    "w": 750,
+    "h": 750
+  },
+  "keypoints": [
+    {
+      "name": "head",
+      "x": 0.50339,
+      "y": 0.39053,
+      "weight": 0.2697
+    },
+    {
+      "name": "left_eye",
+      "x": 0.58395,
+      "y": 0.38897,
+      "weight": 0.2705
+    },
+    {
+      "name": "right_eye",
+      "x": 0.42283,
+      "y": 0.39208,
+      "weight": 0.269
+    },
+    {
+      "name": "mouth",
+      "x": 0.51325,
+      "y": 0.53835,
+      "weight": 0.1143
+    },
+    {
+      "name": "right_hand",
+      "x": 0.29781,
+      "y": 0.24349,
+      "weight": 0.1642
+    },
+    {
+      "name": "chest",
+      "x": 0.49728,
+      "y": 0.45206,
+      "weight": 0.0942
+    },
+    {
+      "name": "torso",
+      "x": 0.49658,
+      "y": 0.5102,
+      "weight": 0.0942
+    },
+    {
+      "name": "center",
+      "x": 0.49658,
+      "y": 0.5102,
+      "weight": 0.0942
+    },
+    {
+      "name": "right_hip",
+      "x": 0.40571,
+      "y": 0.58434,
+      "weight": 0.1268
+    },
+    {
+      "name": "left_foot",
+      "x": 0.5689,
+      "y": 0.42659,
+      "weight": 0.1386
+    },
+    {
+      "name": "right_foot",
+      "x": 0.42724,
+      "y": 0.43593,
+      "weight": 0.117
+    }
+  ],
+  "bbox": {
+    "x": 0.32133,
+    "y": 0.24667,
+    "w": 0.35867,
+    "h": 0.364
+  },
+  "flippable": true,
+  "license": {
+    "id": "storywork-internal-2026",
+    "holder": "StoryWork",
+    "terms": "all-rights"
+  },
+  "_generator": {
+    "tool": "dwpose-enrich",
+    "model": "dw-ll_ucoco_384.onnx",
+    "v": 1
+  }
+}

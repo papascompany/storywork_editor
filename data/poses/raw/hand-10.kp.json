@@ -1,0 +1,71 @@
+{
+  "v": 1,
+  "format": "png",
+  "size": {
+    "w": 750,
+    "h": 750
+  },
+  "keypoints": [
+    {
+      "name": "head",
+      "x": 0.4963,
+      "y": 0.43358,
+      "weight": 0.0936
+    },
+    {
+      "name": "left_eye",
+      "x": 0.52685,
+      "y": 0.43511,
+      "weight": 0.1011
+    },
+    {
+      "name": "right_eye",
+      "x": 0.46574,
+      "y": 0.43206,
+      "weight": 0.0862
+    },
+    {
+      "name": "left_hand",
+      "x": 0.74443,
+      "y": 0.24116,
+      "weight": 0.1288
+    },
+    {
+      "name": "right_hand",
+      "x": 0.49343,
+      "y": 0.31556,
+      "weight": 0.1205
+    },
+    {
+      "name": "mouth",
+      "x": 0.48,
+      "y": 0.35147,
+      "weight": 0.3,
+      "inferred": true
+    },
+    {
+      "name": "center",
+      "x": 0.48,
+      "y": 0.52067,
+      "weight": 0.3,
+      "inferred": true
+    }
+  ],
+  "bbox": {
+    "x": 0.24533,
+    "y": 0.23867,
+    "w": 0.46933,
+    "h": 0.564
+  },
+  "flippable": true,
+  "license": {
+    "id": "storywork-internal-2026",
+    "holder": "StoryWork",
+    "terms": "all-rights"
+  },
+  "_generator": {
+    "tool": "dwpose-enrich",
+    "model": "dw-ll_ucoco_384.onnx",
+    "v": 1
+  }
+}
