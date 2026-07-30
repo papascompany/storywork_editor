@@ -143,6 +143,10 @@
 - [ ] [SCRIPT-KO-02] 한국어 화자·청자 평가셋(PDNC 스키마) + Claude 폴백 계층 — 🚦 `AI_GATEWAY_API_KEY`
 - [ ] [SCRIPT-KO-03] CSN식 스코어러(klue/roberta) 자체 학습 — 🚦 말뭉치 약관·GPU
 
+## BUBBLE — 말풍선 배치 정식화 (research 2026-07-21 §4.3, 착수 승인 2026-07-30)
+
+- [x] [BUBBLE-02] 배치 비용함수 4항 정식화 + 자동 QA 대조기 — `bubble-cost.ts`(w1 화자 mouth 근접+꼬리 각도 / w2 얼굴 가림 / w3 읽기순서 단조성 / w4 패널 경계, 전부 결정론) + `assignBubblesByCost()` 순열 전수(슬롯≤7)·그리디 폴백으로 slot-assign 의 나이브 인덱스 매핑 교체(화자 위치 기반 교차 배치) + `bubble-qa.ts` IoU 매칭·가림 QA 평가기(mock 검출기 테스트). 신규 23 테스트, 기존 compose/slot-assign 무회귀 — @layout-composer ✅ 2026-07-30. **잔여**: ONNX 검출기 실연결(comic-translate YOLOv8m → ONNX 변환 + onnxruntime-node 의존성 + 가중치 다운로드)은 🚦 의존성·모델 반입 승인 게이트 — `BubbleDetector` 인터페이스 교체 지점 확보됨. 키포인트 실좌표 앵커는 CHAR-GEN-01(DWPose 보강) 후 `speakerAnchorFromPoseSlot` keypoints 인자로 자동 개선
+
 ## M7 — Creator Mode + Billing
 
 - [ ] [M7-01] Stripe 연결 + Webhook 멱등 — 재처리 테스트 — @architect

@@ -10,6 +10,8 @@
 import type { SceneRecommendation } from '@storywork/ai-recommend'
 import type { AnalyzedScene } from '@storywork/ai-script'
 
+import { assignBubblesByCost, speakerAnchorFromPoseSlot } from './bubble-cost.js'
+import type { SpeakerAnchor } from './bubble-cost.js'
 import { checkLowDpiConstraint, formatLowDpiWarning } from './constraints/low-dpi.js'
 import type {
   LayoutFormat,
@@ -222,8 +224,27 @@ export async function assignSlots(
     })
   }
 
-  // ── 말풍선/텍스트 슬롯 배치 ───────────────────────────────────────────────
+  // ── 말풍선/텍스트 슬롯 배치 (BUBBLE-02: 4항 비용함수 기반 line→slot 매핑) ──
+  // cost = w1·(화자 mouth 근접+꼬리 각도) + w2·얼굴 가림 + w3·읽기순서 + w4·경계 침범
   const lines = analyzedScene.lines
+
+  // 포즈 배치 결과에서 화자 앵커 구성 (키포인트 어댑터 부재 시 슬롯 휴리스틱)
+  const anchors = new Map<string, SpeakerAnchor>()
+  for (const a of assignments) {
+    if (a.kind === 'pose' && a.characterName && !anchors.has(a.characterName)) {
+      anchors.set(a.characterName, speakerAnchorFromPoseSlot(a.slot, a.characterName))
+    }
+  }
+
+  const { slotIndexByLine } = assignBubblesByCost({
+    lines,
+    slots: bubbleSlots,
+    anchors,
+    format,
+  })
+  const lineBySlot = new Map<number, number>()
+  for (const [li, si] of slotIndexByLine) lineBySlot.set(si, li)
+
   for (let i = 0; i < bubbleSlots.length; i++) {
     const bubbleSlot = bubbleSlots[i]
     if (!bubbleSlot) continue
@@ -232,7 +253,8 @@ export async function assignSlots(
       warnings.push(`[safe-area] 말풍선 슬롯 ${bubbleSlot.id} 가 safe area 를 침범합니다.`)
     }
 
-    const line = lines[i]
+    const lineIdx = lineBySlot.get(i)
+    const line = lineIdx !== undefined ? lines[lineIdx] : undefined
     if (!line) {
       // optional 슬롯이면 건너뜀
       if (bubbleSlot.optional) continue
@@ -244,7 +266,7 @@ export async function assignSlots(
       continue
     }
 
-    const bubbleCandidate = sceneRec.bubbles[i]
+    const bubbleCandidate = sceneRec.bubbles[lineIdx ?? i]
     assignments.push({
       slotId: bubbleSlot.id,
       slot: bubbleSlot,

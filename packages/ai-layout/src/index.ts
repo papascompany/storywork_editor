@@ -42,6 +42,35 @@ export type { TemplateMatchResult } from './template-match.js'
 export { assignSlots } from './slot-assign.js'
 export type { SlotAssignResult } from './slot-assign.js'
 
+// ── 말풍선 배치 비용함수 + 자동 QA (BUBBLE-02) ─────────────────────────────
+export {
+  assignBubblesByCost,
+  bubbleSlotCost,
+  proximityCost,
+  occlusionCost,
+  readingOrderCost,
+  boundaryCost,
+  speakerAnchorFromPoseSlot,
+  DEFAULT_BUBBLE_COST_WEIGHTS,
+} from './bubble-cost.js'
+export type {
+  AssignBubblesInput,
+  AssignBubblesResult,
+  BubbleCostBreakdown,
+  BubbleCostWeights,
+  NormPoint,
+  NormRect,
+  SpeakerAnchor,
+} from './bubble-cost.js'
+export { evaluateBubblePlacement, runBubbleQa } from './bubble-qa.js'
+export type {
+  BubbleDetector,
+  BubbleQaMatch,
+  BubbleQaOptions,
+  BubbleQaReport,
+  DetectedBubble,
+} from './bubble-qa.js'
+
 // ── 콘티 시트 합성기 (CONTI-02) ────────────────────────────────────────────
 export {
   composeContiSheets,
