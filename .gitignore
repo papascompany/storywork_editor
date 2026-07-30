@@ -99,3 +99,4 @@ tmp/perf/admin-auth.json
 # CHAR-GEN-01: DWPose 등 로컬 모델 가중치 (대용량 — 커밋 금지)
 data/models/
 data/poses/kp-overlays/
+__pycache__/

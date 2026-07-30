@@ -110,25 +110,26 @@ export const Readonly: Story = {
 // ─── 스토리 3: 모든 키포인트 ──────────────────────────────────────────────────
 
 export const AllKeypoints: Story = {
-  name: 'All Keypoints — 10종 표시',
+  name: 'All Keypoints — 주요 키포인트 표시',
   render: () => {
+    // KP 규약 통일(2026-07-30): shared-schema 25종 언더스코어 이름 사용
     const fullKeypoints: Keypoint[] = [
       { name: 'head', x: 0.5, y: 0.08 },
       { name: 'mouth', x: 0.5, y: 0.13 },
-      { name: 'left-shoulder', x: 0.35, y: 0.28 },
-      { name: 'right-shoulder', x: 0.65, y: 0.28 },
+      { name: 'left_shoulder', x: 0.35, y: 0.28 },
+      { name: 'right_shoulder', x: 0.65, y: 0.28 },
       { name: 'center', x: 0.5, y: 0.45 },
-      { name: 'waist', x: 0.5, y: 0.55 },
-      { name: 'left-hand', x: 0.2, y: 0.65 },
-      { name: 'right-hand', x: 0.8, y: 0.65 },
-      { name: 'left-foot', x: 0.38, y: 0.95 },
-      { name: 'right-foot', x: 0.62, y: 0.95 },
+      { name: 'hip', x: 0.5, y: 0.55 },
+      { name: 'left_hand', x: 0.2, y: 0.65 },
+      { name: 'right_hand', x: 0.8, y: 0.65 },
+      { name: 'left_foot', x: 0.38, y: 0.95 },
+      { name: 'right_foot', x: 0.62, y: 0.95 },
     ]
     const [kps, setKps] = React.useState<Keypoint[]>(fullKeypoints)
     return (
       <div className="p-4 max-w-lg">
         <h3 className="text-base font-semibold text-[var(--color-text)] mb-2">
-          모든 키포인트 (10종)
+          주요 키포인트 (10종 표시 — 전체 25종)
         </h3>
         <KeypointEditor
           imageUrl="https://placehold.co/750x1000/f0f0ff/6366f1?text=포즈+이미지"
