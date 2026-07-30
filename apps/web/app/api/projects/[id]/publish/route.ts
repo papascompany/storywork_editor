@@ -8,6 +8,8 @@
  *
  * 요청 body (JSON, 선택):
  *   { async?: boolean }  — 기본 false (동기 처리). true 이면 Inngest 잡 트리거.
+ *   { conti?: boolean }  — CONTI-02: true 이면 SceneDoc 기반 콘티 시트(2×4 그리드)를
+ *                          본문 앞에 prepend (동기 모드 전용, async 와 병용 불가).
  *
  * 인증:
  *   - Supabase 세션 확인 → 미인증 401
@@ -38,6 +40,8 @@
 
 /* eslint-disable import/order */
 import { NextResponse } from 'next/server'
+import { composeContiSheets } from '@storywork/ai-layout'
+import type { ContiCut } from '@storywork/ai-layout'
 import { buildPdf } from '@storywork/pdf-engine'
 import type { PdfBuildInput, PageInput } from '@storywork/pdf-engine'
 import { inngest } from '@storywork/workers'
@@ -74,11 +78,13 @@ export async function POST(
 
   // body 파싱 (선택: Content-Type 이 없을 수도 있음)
   let isAsync = false
+  let withConti = false
   try {
     const contentType = req.headers.get('content-type') ?? ''
     if (contentType.includes('application/json')) {
-      const body = (await req.json()) as { async?: boolean }
+      const body = (await req.json()) as { async?: boolean; conti?: boolean }
       isAsync = body.async === true
+      withConti = body.conti === true
     }
   } catch {
     // body 파싱 실패 → 기본값 동기
@@ -183,6 +189,12 @@ export async function POST(
         jobId,
         status: 'queued',
         realtimeChannel: `pdf-jobs:${jobId}`,
+        ...(withConti
+          ? {
+              warning:
+                '[conti] async 모드는 콘티 시트를 지원하지 않습니다. 동기 모드를 사용하세요.',
+            }
+          : {}),
       },
       { status: 202 },
     )
@@ -227,6 +239,108 @@ export async function POST(
     seed: 0,
   }
 
+  // ── CONTI-02: 콘티 시트를 본문 앞에 prepend (음수 pageIndex → 정렬 시 선두) ──
+  const contiWarnings: string[] = []
+  let contiPageCount = 0
+  if (withConti) {
+    try {
+      const sceneDoc = await prisma.sceneDoc.findUnique({
+        where: { projectId },
+        include: {
+          scenes: {
+            orderBy: { index: 'asc' },
+            include: { lines: { orderBy: { index: 'asc' } } },
+          },
+        },
+      })
+
+      if (!sceneDoc || sceneDoc.scenes.length === 0) {
+        contiWarnings.push(
+          '[conti] 대본 분석 데이터(SceneDoc)가 없어 콘티 시트를 생략했습니다. 자동 배치를 먼저 실행하세요.',
+        )
+      } else {
+        // 장면 → 본문 페이지/대표 포즈 매핑 (fabricJson._aiMeta.sceneIndices 기반)
+        const pageByScene = new Map<number, { pageIndex: number; resourceId?: string }>()
+        for (const p of pages) {
+          const fj = p['fabricJson'] as {
+            _aiMeta?: { sceneIndices?: number[] }
+            layers?: Array<{ kind?: string; data?: { resourceId?: string } }>
+          } | null
+          const sceneIndices = fj?._aiMeta?.sceneIndices ?? []
+          if (sceneIndices.length === 0) continue
+          const poseLayer = fj?.layers?.find((l) => l?.kind === 'pose' && l?.data?.resourceId)
+          for (const si of sceneIndices) {
+            if (pageByScene.has(si)) continue
+            pageByScene.set(si, {
+              pageIndex: p['index'] as number,
+              ...(poseLayer?.data?.resourceId ? { resourceId: poseLayer.data.resourceId } : {}),
+            })
+          }
+        }
+
+        // 대표 포즈 썸네일 URL 해석 — PNG 마스터만 (pdf-lib 는 WebP 임베드 불가)
+        const resourceIds = [
+          ...new Set(
+            [...pageByScene.values()]
+              .map((v) => v.resourceId)
+              .filter((v): v is string => typeof v === 'string'),
+          ),
+        ]
+        const resources =
+          resourceIds.length > 0
+            ? await prisma.resource.findMany({
+                where: { id: { in: resourceIds } },
+                select: { id: true, fileUrl: true, format: true },
+              })
+            : []
+        const urlByResource = new Map(
+          resources.filter((r) => r.format === 'png').map((r) => [r.id, r.fileUrl]),
+        )
+
+        const cuts: ContiCut[] = sceneDoc.scenes.map((sc, i) => {
+          const pageRef = pageByScene.get(sc.index)
+          const thumbUrl = pageRef?.resourceId ? urlByResource.get(pageRef.resourceId) : undefined
+          return {
+            cutNo: i + 1,
+            sceneIndex: sc.index,
+            summary: sc.summary,
+            lines: sc.lines.map((l) => ({ speaker: l.speaker, text: l.text })),
+            // shotLabel: CONTI-01(장면 메타 영속화) 이후 cameraAngleToShotLabel 로 채움
+            ...(pageRef ? { pageNo: pageRef.pageIndex + 1 } : {}),
+            ...(thumbUrl ? { poseThumbUrl: thumbUrl } : {}),
+          }
+        })
+
+        const sheets = composeContiSheets(cuts, {
+          format: {
+            id: project.formatId,
+            widthMm: format.widthMm,
+            heightMm: format.heightMm,
+            dpi: format.dpi,
+            bleedMm: format.bleedMm,
+            safeMm: format.safeMm,
+          },
+          seed: 0,
+          title: project.title,
+        })
+
+        contiPageCount = sheets.length
+        buildInput.pages = [
+          ...sheets.map(
+            (fabricJson, i): PageInput => ({
+              pageIndex: i - sheets.length,
+              fabricJson,
+            }),
+          ),
+          ...buildInput.pages,
+        ]
+      }
+    } catch (err) {
+      console.error('[publish/conti] 콘티 시트 합성 오류:', err)
+      contiWarnings.push('[conti] 콘티 시트 합성 중 오류가 발생해 생략했습니다.')
+    }
+  }
+
   // 6. PDF 빌드
   let buildResult: Awaited<ReturnType<typeof buildPdf>>
   try {
@@ -235,6 +349,7 @@ export async function POST(
     console.error('[publish] PDF 빌드 오류:', err)
     return jsonError('PDF 빌드 중 오류가 발생했습니다.', 500)
   }
+  buildResult.warnings.push(...contiWarnings)
 
   // 7. Supabase Storage 업로드
   // 경로: pdfs/{ownerId}/{projectId}-{timestamp}.pdf (RLS scope: ownerId)
@@ -276,6 +391,7 @@ export async function POST(
           seed: 0,
           producer: buildResult.metadata.producer,
           creationDate: buildResult.metadata.creationDate,
+          ...(withConti ? { conti: true, contiPageCount } : {}),
         },
         preflight: {
           warnings: buildResult.warnings,
@@ -293,6 +409,7 @@ export async function POST(
     pdfUrl,
     byteSize: buildResult.byteSize,
     pageCount: buildResult.pageCount,
+    ...(withConti ? { contiPageCount } : {}),
     warnings: buildResult.warnings,
   })
 }

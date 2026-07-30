@@ -217,6 +217,31 @@ export const DEFAULT_TEMPLATES: TemplateSpec[] = [
     ],
   },
   {
+    id: 'conti-2x4',
+    name: '콘티 2×4',
+    formatId: 'default-b5',
+    format: DEFAULT_FORMAT,
+    intent: '콘티 시트 (8컷 그리드) — CONTI-02',
+    // ai-layout conti-sheet.ts CONTI_GRID 와 동일 레이아웃의 정규화 근사.
+    // 상단 헤더 영역(제목 행)을 비우고 2열×4행 컷 프레임을 배치한다.
+    slots: Array.from({ length: 8 }, (_, i) => {
+      const col = i % 2
+      const row = Math.floor(i / 2)
+      return {
+        id: `cut-r${row + 1}c${col + 1}`,
+        kind: 'background' as const,
+        x: 0.05 + col * 0.475,
+        y: 0.09 + row * 0.225,
+        w: 0.425,
+        h: 0.2,
+        rotation: 0,
+        preferredTags: [],
+        locked: false,
+        hint: `컷 ${i + 1}`,
+      }
+    }),
+  },
+  {
     id: 'default-3panel',
     name: '3분할 컷',
     formatId: 'default-b5',

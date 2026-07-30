@@ -42,6 +42,15 @@ export type { TemplateMatchResult } from './template-match.js'
 export { assignSlots } from './slot-assign.js'
 export type { SlotAssignResult } from './slot-assign.js'
 
+// ── 콘티 시트 합성기 (CONTI-02) ────────────────────────────────────────────
+export {
+  composeContiSheets,
+  cameraAngleToShotLabel,
+  wrapTextMm,
+  CONTI_GRID,
+} from './conti-sheet.js'
+export type { ContiCut, ContiCutLine, ContiSheetOptions } from './conti-sheet.js'
+
 // ── lowDpi 제약 (ADR-0011a) ────────────────────────────────────────────────
 export {
   checkLowDpiConstraint,

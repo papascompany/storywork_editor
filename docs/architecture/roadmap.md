@@ -129,6 +129,14 @@
 
 **M6 마일스톤 4건 모두 완료** (M6-01 ~ M6-04)
 
+## CONTI — 콘티 자동생성 모듈 (research 2026-07-21 §2, 착수 승인 2026-07-30)
+
+> 정본: [docs/research/2026-07-21_conti_pose3d_oss_research.md](../research/2026-07-21_conti_pose3d_oss_research.md) §2
+
+- [ ] [CONTI-01] 장면 메타 실가동·영속화 — LLM enhance 콘티 경로 활성 + 샷사이즈 어휘 + SceneDoc.meta 장면별 메타 저장 + Inngest 비동기 — 🚦 `AI_GATEWAY_API_KEY` 게이트 — @scene-analyzer
+- [x] [CONTI-02] 콘티 시트 합성기 + PDF — `composeContiSheets()`(ai-layout, 2×4 그리드 순수함수·결정론) + `conti-2x4` 템플릿 + publish API `conti:true`(본문 앞 prepend, 동기 전용) — pdf-engine 무수정 통과, 단위 16 + 실물 PDF 스모크(결정론 byte-identical) — @layout-composer ✅ 2026-07-30. shotLabel 은 CONTI-01 이후 `cameraAngleToShotLabel` 훅으로 채움
+- [ ] [CONTI-03] 콘티 뷰 UI — import 마법사 "콘티 확정 → 페이지 생성" 순서 변경 + 컷 리스트/교체 UI — `/ui-spec` SOP 대상 — @ui-designer + @editor-engineer
+
 ## M7 — Creator Mode + Billing
 
 - [ ] [M7-01] Stripe 연결 + Webhook 멱등 — 재처리 테스트 — @architect
