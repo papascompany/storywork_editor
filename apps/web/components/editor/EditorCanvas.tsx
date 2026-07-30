@@ -189,10 +189,11 @@ export function EditorCanvas({
   const pageBox = usePageOverlay(canvas)
 
   // 포즈 도구 활성화 (EmptyCanvasHint 칩에서 호출)
-  const { setActive } = useToolStore()
+  // openToolPanel: 데스크톱 FeatureSidebar + 모바일 바텀시트를 모두 여는 신호
+  const { openToolPanel } = useToolStore()
   const handleActivatePoseTool = useCallback(() => {
-    setActive('pose')
-  }, [setActive])
+    openToolPanel('pose')
+  }, [openToolPanel])
 
   // 이미지 드래그앤드롭 (파일 기반)
   const {

@@ -517,6 +517,17 @@ export function MobileBottomSheet({
     }
   }, [closeRequest])
 
+  // ── 외부 openToolPanel 요청 (EmptyCanvasHint CTA 등) ──
+  // 스토어 카운터가 전역이라 마운트 시점의 잔존 값에는 반응하지 않고 변화에만 연다.
+  const sheetOpenRequest = useToolStore((s) => s.sheetOpenRequest)
+  const lastSheetOpenRequestRef = useRef(sheetOpenRequest)
+  useEffect(() => {
+    if (sheetOpenRequest === lastSheetOpenRequestRef.current) return
+    lastSheetOpenRequestRef.current = sheetOpenRequest
+    setActiveTab('tools')
+    setSnap((prev) => (prev === 'peek' ? 'half' : prev))
+  }, [sheetOpenRequest])
+
   // 포즈 추가 후 시트를 peek 로 접어 추가된 객체가 캔버스에서 바로 보이게 한다.
   // (데스크톱은 이 컴포넌트가 렌더되지 않으므로 영향 없음)
   const handleAddPoseFromSheet = useCallback(

@@ -18,6 +18,12 @@
  * 15. "뒤로" 버튼 → 그리드로 복귀
  * 16. peek 상태에서 줌 컨트롤 노출
  *
+ * openToolPanel (EmptyCanvasHint CTA 배선) 추가:
+ * 17. openToolPanel 요청 → tools 탭 + half 열림
+ * 18. 같은 도구 재요청(active 불변)에도 다시 열림
+ * 19. 마운트 이전 잔존 카운터에는 반응하지 않음
+ * 20. full 상태에서 재요청 시 축소되지 않음
+ *
  * ResizeObserver 가드 (C-1) 테스트:
  * 10. 1px 미만 변동 → setDimensions 호출 안 함
  * 11. 동일 크기 → setDimensions 호출 안 함
@@ -29,6 +35,7 @@ import React from 'react'
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 
 import { MobileBottomSheet } from '../components/editor/MobileBottomSheet'
+import { useToolStore } from '../components/editor/store/useToolStore'
 
 // ── 글로벌 모킹 ─────────────────────────────────────────────────────────────
 
@@ -232,6 +239,70 @@ describe('MobileBottomSheet — closeRequest', () => {
       rerender(<MobileBottomSheet {...defaultProps} closeRequest={1} />)
     })
     expect(screen.getByTestId('mobile-bottom-sheet').dataset.snap).toBe('peek')
+  })
+})
+
+describe('MobileBottomSheet — openToolPanel (EmptyCanvasHint CTA 배선)', () => {
+  beforeEach(() => {
+    useToolStore.setState({ active: 'select', sidebarOpen: false, sheetOpenRequest: 0 })
+  })
+
+  it('17. openToolPanel 요청 → tools 탭 + half 열림', async () => {
+    render(<MobileBottomSheet {...defaultProps} />)
+    // 다른 탭으로 전환 후 닫아둔 상태에서 요청이 tools 탭으로 되돌리는지 확인
+    const layersTab = screen.getByRole('tab', { name: '레이어' })
+    await act(async () => {
+      fireEvent.click(layersTab)
+    }) // half + layers 탭
+    await act(async () => {
+      fireEvent.keyDown(document, { key: 'Escape' })
+    }) // peek
+    expect(screen.getByTestId('mobile-bottom-sheet').dataset.snap).toBe('peek')
+
+    await act(async () => {
+      useToolStore.getState().openToolPanel('pose')
+    })
+
+    expect(screen.getByTestId('mobile-bottom-sheet').dataset.snap).toBe('half')
+    expect(screen.getByRole('tab', { name: '도구' })).toHaveAttribute('aria-selected', 'true')
+  })
+
+  it('18. 같은 도구 재요청(active 불변)에도 다시 열림', async () => {
+    render(<MobileBottomSheet {...defaultProps} />)
+    await act(async () => {
+      useToolStore.getState().openToolPanel('pose')
+    }) // half
+    await act(async () => {
+      fireEvent.keyDown(document, { key: 'Escape' })
+    }) // peek
+    expect(screen.getByTestId('mobile-bottom-sheet').dataset.snap).toBe('peek')
+
+    // active 는 이미 'pose' — 값 변화 없이 카운터만 증가해도 다시 열려야 한다
+    await act(async () => {
+      useToolStore.getState().openToolPanel('pose')
+    })
+    expect(screen.getByTestId('mobile-bottom-sheet').dataset.snap).toBe('half')
+  })
+
+  it('19. 마운트 이전의 잔존 카운터에는 반응하지 않음 (peek 유지)', () => {
+    useToolStore.setState({ sheetOpenRequest: 3 })
+    render(<MobileBottomSheet {...defaultProps} />)
+    expect(screen.getByTestId('mobile-bottom-sheet').dataset.snap).toBe('peek')
+  })
+
+  it('20. full 상태에서 재요청 시 축소되지 않음 (full 유지)', async () => {
+    render(<MobileBottomSheet {...defaultProps} />)
+    const handle = screen.getByRole('button', { name: /패널 열기|패널 닫기/ })
+    await act(async () => {
+      fireEvent.click(handle)
+    }) // half
+    await act(async () => {
+      fireEvent.click(handle)
+    }) // full
+    await act(async () => {
+      useToolStore.getState().openToolPanel('pose')
+    })
+    expect(screen.getByTestId('mobile-bottom-sheet').dataset.snap).toBe('full')
   })
 })
 

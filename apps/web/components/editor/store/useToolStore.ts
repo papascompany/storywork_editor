@@ -53,6 +53,11 @@ interface ToolStore {
   active: ToolId
   /** FeatureSidebar 열림 여부 */
   sidebarOpen: boolean
+  /**
+   * 모바일 바텀시트 열기 요청 카운터 (MobileBottomSheet 가 구독).
+   * active 가 이미 같은 도구여도 재요청이 전달되도록 값 동일성 대신 증가 신호를 쓴다.
+   */
+  sheetOpenRequest: number
 
   setActive: (tool: ToolId) => void
   setSidebarOpen: (open: boolean) => void
@@ -63,14 +68,23 @@ interface ToolStore {
    * - 'select' 는 sidebarOpen 을 false 로 (패널 없음)
    */
   tapTool: (tool: ToolId) => void
+  /**
+   * 외부 CTA(EmptyCanvasHint 등)에서 도구 패널을 확실히 여는 액션:
+   * 데스크톱은 FeatureSidebar 를 열고, 모바일은 sheetOpenRequest 로 바텀시트를 연다.
+   */
+  openToolPanel: (tool: ToolId) => void
 }
 
 export const useToolStore = create<ToolStore>((set, get) => ({
   active: 'select',
   sidebarOpen: false,
+  sheetOpenRequest: 0,
 
   setActive: (tool) => set({ active: tool }),
   setSidebarOpen: (open) => set({ sidebarOpen: open }),
+
+  openToolPanel: (tool) =>
+    set((s) => ({ active: tool, sidebarOpen: true, sheetOpenRequest: s.sheetOpenRequest + 1 })),
 
   tapTool: (tool) => {
     const { active, sidebarOpen } = get()
