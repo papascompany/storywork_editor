@@ -61,7 +61,7 @@ data/poses/_failed/
 
 # 메타 파일은 커밋 (라이선스 정책 + 사이드카는 SSOT)
 !data/poses/raw/LICENSE.json
-!data/poses/raw/*.kp.json
+!data/poses/raw/**/*.kp.json
 
 # 인입 산출물 (Storage 업로드)
 data/poses/processed/
@@ -95,3 +95,7 @@ tmp/perf/admin-auth.json
 .claire/
 .agents/
 .claude/worktrees/
+
+# CHAR-GEN-01: DWPose 등 로컬 모델 가중치 (대용량 — 커밋 금지)
+data/models/
+data/poses/kp-overlays/

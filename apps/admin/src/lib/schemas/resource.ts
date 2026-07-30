@@ -4,6 +4,7 @@
  * Resource (포즈/배경/소품 등) Zod 스키마 — admin 전용.
  * Prisma 의 ResourceKind/ResourceStatus enum 과 1:1 대응.
  */
+import { KPNameSchema } from '@storywork/schema'
 import { z } from 'zod'
 
 // ─── 열거 상수 ────────────────────────────────────────────────────────────────
@@ -20,27 +21,35 @@ export const RESOURCE_KINDS = [
 
 export const RESOURCE_STATUSES = ['draft', 'review', 'published', 'rejected'] as const
 
-export const KP_NAMES = [
-  'head',
-  'mouth',
-  'center',
-  'left-shoulder',
-  'right-shoulder',
-  'left-hand',
-  'right-hand',
-  'left-foot',
-  'right-foot',
-  'waist',
-] as const
+// SCRIPT-KO/CHAR-GEN 선행 정리(2026-07-30): KP 이름 규약을 shared-schema
+// KPNameSchema(25종, 언더스코어) 로 통일. admin 구 규약(10종 하이픈 + waist)은
+// 레거시 데이터 정규화 맵으로 흡수한다 (research 2026-07-21 §1.2 지적사항).
+export const KP_NAMES = KPNameSchema.options
 
-export type KPName = (typeof KP_NAMES)[number]
+export type KPName = z.infer<typeof KPNameSchema>
 export type ResourceKindValue = (typeof RESOURCE_KINDS)[number]
 export type ResourceStatusValue = (typeof RESOURCE_STATUSES)[number]
 
 // ─── 키포인트 스키마 ──────────────────────────────────────────────────────────
 
+/** 구 admin 규약 → shared-schema 규약 (하이픈→언더스코어, waist→hip) */
+const LEGACY_KP_NAME_MAP: Record<string, KPName> = {
+  'left-shoulder': 'left_shoulder',
+  'right-shoulder': 'right_shoulder',
+  'left-hand': 'left_hand',
+  'right-hand': 'right_hand',
+  'left-foot': 'left_foot',
+  'right-foot': 'right_foot',
+  waist: 'hip',
+}
+
+export function normalizeKpName(name: string): string {
+  return LEGACY_KP_NAME_MAP[name] ?? name
+}
+
 export const keypointSchema = z.object({
-  name: z.enum(KP_NAMES),
+  // 레거시 하이픈 이름은 검증 전에 정규화 — DB 기저장 데이터 하위호환
+  name: z.preprocess((v) => (typeof v === 'string' ? normalizeKpName(v) : v), KPNameSchema),
   x: z.number().min(0).max(1),
   y: z.number().min(0).max(1),
   weight: z.number().min(0).max(1).optional(),
@@ -103,7 +112,8 @@ export type ResourceBulk = z.infer<typeof resourceBulkSchema>
 // ─── 키포인트 보정 스키마 ─────────────────────────────────────────────────────
 
 export const resourceKeypointsSchema = z.object({
-  keypoints: z.array(keypointSchema).min(1).max(10),
+  // KP 규약 통일: 25종 전체 편집 허용 (구 10종 제한 해제)
+  keypoints: z.array(keypointSchema).min(1).max(25),
 })
 export type ResourceKeypoints = z.infer<typeof resourceKeypointsSchema>
 

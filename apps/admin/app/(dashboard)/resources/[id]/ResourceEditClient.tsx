@@ -11,7 +11,8 @@ import * as React from 'react'
 
 import { KeypointEditor } from '../../../../src/components/keypoint-editor/KeypointEditor'
 import type { AdminRole } from '../../../../src/lib/auth'
-import type { Keypoint } from '../../../../src/lib/schemas/resource'
+import { normalizeKpName } from '../../../../src/lib/schemas/resource'
+import type { Keypoint, KPName } from '../../../../src/lib/schemas/resource'
 
 // ─── 타입 ────────────────────────────────────────────────────────────────────
 
@@ -98,7 +99,11 @@ export function ResourceEditClient({ resource, userRole }: ResourceEditClientPro
   const [tags, setTags] = React.useState<string[]>(resource.tags)
   const [tagInput, setTagInput] = React.useState('')
   const [keypoints, setKeypoints] = React.useState<Keypoint[]>(
-    (resource.meta['keypoints'] as Keypoint[] | undefined) ?? [],
+    // 구 규약(하이픈/waist) 기저장 데이터를 25종 언더스코어 규약으로 정규화해 로드
+    ((resource.meta['keypoints'] as Keypoint[] | undefined) ?? []).map((kp) => ({
+      ...kp,
+      name: normalizeKpName(kp.name as string) as KPName,
+    })),
   )
 
   // 포즈 메타

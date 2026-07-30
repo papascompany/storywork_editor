@@ -30,30 +30,62 @@ export interface KeypointEditorProps {
 
 // ─── 키포인트 색상 매핑 ────────────────────────────────────────────────────────
 
+// KP 규약 통일(2026-07-30): shared-schema 25종 언더스코어 이름 기준.
+// 좌우 대칭 관절은 동일 계열 색의 명암 변형으로 구분한다.
 const KP_COLORS: Record<KPName, string> = {
   head: '#ef4444',
   mouth: '#f97316',
+  neck: '#fb7185',
+  left_eye: '#f43f5e',
+  right_eye: '#e11d48',
+  left_shoulder: '#8b5cf6',
+  right_shoulder: '#a855f7',
+  left_elbow: '#7c3aed',
+  right_elbow: '#9333ea',
+  left_wrist: '#6d28d9',
+  right_wrist: '#7e22ce',
+  left_hand: '#10b981',
+  right_hand: '#14b8a6',
+  chest: '#0ea5e9',
+  torso: '#0284c7',
   center: '#3b82f6',
-  'left-shoulder': '#8b5cf6',
-  'right-shoulder': '#a855f7',
-  'left-hand': '#10b981',
-  'right-hand': '#14b8a6',
-  'left-foot': '#f59e0b',
-  'right-foot': '#eab308',
-  waist: '#ec4899',
+  hip: '#ec4899',
+  left_hip: '#db2777',
+  right_hip: '#be185d',
+  left_knee: '#f59e0b',
+  right_knee: '#d97706',
+  left_ankle: '#ca8a04',
+  right_ankle: '#a16207',
+  left_foot: '#eab308',
+  right_foot: '#facc15',
 }
 
 const KP_LABELS: Record<KPName, string> = {
   head: '머리',
   mouth: '입',
+  neck: '목',
+  left_eye: '왼눈',
+  right_eye: '오른눈',
+  left_shoulder: '왼어깨',
+  right_shoulder: '오른어깨',
+  left_elbow: '왼팔꿈치',
+  right_elbow: '오른팔꿈치',
+  left_wrist: '왼손목',
+  right_wrist: '오른손목',
+  left_hand: '왼손',
+  right_hand: '오른손',
+  chest: '가슴',
+  torso: '몸통',
   center: '중심',
-  'left-shoulder': '왼어깨',
-  'right-shoulder': '오른어깨',
-  'left-hand': '왼손',
-  'right-hand': '오른손',
-  'left-foot': '왼발',
-  'right-foot': '오른발',
-  waist: '허리',
+  hip: '엉덩이',
+  left_hip: '왼골반',
+  right_hip: '오른골반',
+  left_knee: '왼무릎',
+  right_knee: '오른무릎',
+  left_ankle: '왼발목',
+  right_ankle: '오른발목',
+  left_foot: '왼발',
+  right_foot: '오른발',
 }
 
 // ─── 새 키포인트 추가 모달 ───────────────────────────────────────────────────
@@ -332,7 +364,7 @@ export function KeypointEditor({
             const isDragging = draggingName === kp.name
 
             return (
-              <g key={kp.name} aria-label={`키포인트: ${KP_LABELS[kp.name]}`}>
+              <g key={kp.name} aria-label={`키포인트: ${KP_LABELS[kp.name] ?? kp.name}`}>
                 {/* 외곽 원 (inferred: 점선) */}
                 <circle
                   cx={kp.x}
@@ -353,7 +385,7 @@ export function KeypointEditor({
                   onFocus={() => setFocusedName(kp.name)}
                   tabIndex={readonly ? undefined : 0}
                   role={readonly ? undefined : 'button'}
-                  aria-label={`${KP_LABELS[kp.name]} 키포인트${kp.inferred ? ' (추정)' : ''}`}
+                  aria-label={`${KP_LABELS[kp.name] ?? kp.name} 키포인트${kp.inferred ? ' (추정)' : ''}`}
                   style={{
                     outline: isFocused ? `2px solid ${color}` : undefined,
                     filter: isFocused ? `drop-shadow(0 0 4px ${color})` : undefined,
@@ -370,7 +402,7 @@ export function KeypointEditor({
                   style={{ userSelect: 'none', fontFamily: 'sans-serif' }}
                   pointerEvents="none"
                 >
-                  {KP_LABELS[kp.name]}
+                  {KP_LABELS[kp.name] ?? kp.name}
                 </text>
               </g>
             )
@@ -396,8 +428,8 @@ export function KeypointEditor({
                 kp.inferred && 'border border-dashed',
               )}
               style={{
-                backgroundColor: KP_COLORS[kp.name],
-                borderColor: kp.inferred ? KP_COLORS[kp.name] : undefined,
+                backgroundColor: KP_COLORS[kp.name] ?? '#6366f1',
+                borderColor: kp.inferred ? (KP_COLORS[kp.name] ?? '#6366f1') : undefined,
               }}
             />
             {KP_LABELS[kp.name]}
