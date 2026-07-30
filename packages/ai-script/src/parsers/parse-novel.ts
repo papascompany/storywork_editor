@@ -8,25 +8,21 @@
  *  2. 씬 구분자 키워드 (그날, 다음날, 한편, 그 후, 얼마 후...)
  *  3. 문장 수 임계값 초과 (기본: 8문장)
  *
- * 화자 추론:
- *  - 따옴표/꺾쇠 직전의 동사구 패턴: "xxx가/은/이 말했다/했다/외쳤다..."
+ * 화자 추론 (SCRIPT-KO-01 — ko-speech.ts 1층 룰 엔진):
+ *  - 발화동사 어간 패턴(활용형 커버) 선행/후행 귀속 + 행동 귀속 + 대명사 + 교대 보정
+ *  - 캐릭터 ID 레지스트리로 별칭(호격·애칭 '이'·성+이름) canonical 병합
  *  - "xxx: 내용" 형식 (스크린플레이 섞임 대응)
  */
 
 import type { AnalyzedLine, AnalyzedScene, SceneMeta } from '../types.js'
 
+import { attributeParagraph, createAttributionContext, recordMentions } from './ko-speech.js'
+import type { AttributionContext } from './ko-speech.js'
 import { buildSlug, buildSummary, extractEmotion, isLikelyName } from './utils.js'
 
 // ─────────────────────────────────────────────
 // 패턴
 // ─────────────────────────────────────────────
-
-/** 따옴표 대화 (한글식 + ASCII) */
-const QUOTE_RE = /["""「『]([^"""」』\n]{1,200})["""」』]/g
-
-/** 발화 동사 패턴 — "이름 + 이/가/은/은 + 동사" */
-const SPEECH_VERB_RE =
-  /([가-힣]{2,8})[이가은는]\s+(?:말했다|했다|외쳤다|소리쳤다|속삭였다|물었다|대답했다|대꾸했다|고함쳤다|투덜거렸다|중얼거렸다)/
 
 /** 씬 구분자 키워드 */
 const SCENE_BREAK_KEYWORDS = /^(그날|다음\s*날|한편|그\s*후|얼마\s*후|그로부터|\*\s*\*\s*\*|#|---)/m
@@ -52,32 +48,31 @@ function splitParagraphs(text: string): string[] {
 // 단락에서 대화 추출
 // ─────────────────────────────────────────────
 
-function extractLinesFromParagraph(para: string): AnalyzedLine[] {
+function extractLinesFromParagraph(para: string, ctx: AttributionContext): AnalyzedLine[] {
   const result: AnalyzedLine[] = []
   let lineIdx = 0
 
-  // 직접 화자 패턴 우선
+  // 직접 화자 패턴 우선 ("이름: 대사")
   const directMatch = DIRECT_SPEAKER_RE.exec(para)
   if (directMatch) {
+    const raw = directMatch[1] ?? ''
+    const speaker = isLikelyName(raw) ? ctx.registry.confirmPerson(raw) : raw
+    if (speaker && speaker !== ctx.lastSpeaker) {
+      ctx.prevSpeaker = ctx.lastSpeaker
+      ctx.lastSpeaker = speaker
+    }
     result.push({
       index: lineIdx++,
-      speaker: directMatch[1],
+      speaker,
       text: directMatch[2]?.trim() ?? '',
     })
     return result
   }
 
-  // 따옴표 대화 추출
-  let quoteMatch: RegExpExecArray | null
-  const localRe = new RegExp(QUOTE_RE.source, 'g')
-  while ((quoteMatch = localRe.exec(para)) !== null) {
-    const dialogueText = quoteMatch[1] ?? ''
-    // 발화 동사에서 화자 추론
-    const beforeQuote = para.slice(0, quoteMatch.index)
-    const speechMatch = SPEECH_VERB_RE.exec(beforeQuote)
-    const speaker = speechMatch && isLikelyName(speechMatch[1] ?? '') ? speechMatch[1] : undefined
-
-    result.push({ index: lineIdx++, speaker, text: dialogueText })
+  // ko-speech 1층 룰 엔진으로 인용 추출 + 화자 귀속
+  const attributed = attributeParagraph(para, ctx)
+  for (const q of attributed) {
+    result.push({ index: lineIdx++, speaker: q.speaker, text: q.text })
   }
 
   // 대화가 없으면 단락 전체를 서술 행으로
@@ -92,17 +87,29 @@ function extractLinesFromParagraph(para: string): AnalyzedLine[] {
 // 단락을 장면으로 묶기
 // ─────────────────────────────────────────────
 
-function groupParasIntoScenes(paragraphs: string[], sentenceThreshold = 8): string[][] {
-  const groups: string[][] = []
+interface SceneGroup {
+  /** 이 그룹 직전의 씬 구분자 단락들 — 장면 라인에서는 제외되지만
+   *  화자귀속 레지스트리에는 언급을 공급한다 ("그날 저녁, 민수가…") */
+  breakParas: string[]
+  paras: string[]
+}
+
+function groupParasIntoScenes(paragraphs: string[], sentenceThreshold = 8): SceneGroup[] {
+  const groups: SceneGroup[] = []
   let current: string[] = []
+  let pendingBreaks: string[] = []
   let sentenceCount = 0
 
   for (const para of paragraphs) {
-    // 씬 구분자 키워드
+    // 씬 구분자 키워드 (장면 수 계약 유지 — 단락은 그룹에 넣지 않는다)
     if (SCENE_BREAK_KEYWORDS.test(para)) {
-      if (current.length > 0) groups.push(current)
+      if (current.length > 0) {
+        groups.push({ breakParas: pendingBreaks, paras: current })
+        pendingBreaks = []
+      }
       current = []
       sentenceCount = 0
+      pendingBreaks.push(para)
       continue
     }
 
@@ -113,13 +120,14 @@ function groupParasIntoScenes(paragraphs: string[], sentenceThreshold = 8): stri
 
     // 문장 임계값 초과 시 새 장면 시작
     if (sentenceCount >= sentenceThreshold) {
-      groups.push(current)
+      groups.push({ breakParas: pendingBreaks, paras: current })
+      pendingBreaks = []
       current = []
       sentenceCount = 0
     }
   }
 
-  if (current.length > 0) groups.push(current)
+  if (current.length > 0) groups.push({ breakParas: pendingBreaks, paras: current })
   return groups
 }
 
@@ -133,12 +141,21 @@ export function parseNovel(text: string, sentenceThreshold = 8): AnalyzedScene[]
 
   const sceneGroups = groupParasIntoScenes(paragraphs, sentenceThreshold)
 
-  return sceneGroups.map((paras, idx): AnalyzedScene => {
+  // 귀속 컨텍스트는 작품 전체에서 공유 (레지스트리·교대 상태가 장면 경계를 넘어 유지)
+  const ctx = createAttributionContext()
+
+  return sceneGroups.map((group, idx): AnalyzedScene => {
+    const { paras } = group
     const allLines: AnalyzedLine[] = []
     let lineIdx = 0
 
+    // 씬 구분자 단락의 인물 언급을 레지스트리에 공급 (서사 순서 유지)
+    for (const breakPara of group.breakParas) {
+      recordMentions(breakPara, ctx.registry)
+    }
+
     for (const para of paras) {
-      const extracted = extractLinesFromParagraph(para)
+      const extracted = extractLinesFromParagraph(para, ctx)
       for (const l of extracted) {
         allLines.push({ ...l, index: lineIdx++ })
       }

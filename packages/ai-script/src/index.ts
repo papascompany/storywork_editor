@@ -9,6 +9,16 @@ export { analyze } from './analyze.js'
 export { detectFormat } from './parsers/detect-format.js'
 export { parseNovel } from './parsers/parse-novel.js'
 export { parseScreenplay } from './parsers/parse-screenplay.js'
+// SCRIPT-KO-01: 한국어 화자귀속 1층 룰 엔진
+export {
+  attributeParagraph,
+  createAttributionContext,
+  extractDialogueQuotes,
+  recordMentions,
+  CharacterRegistry,
+  SPEECH_VERB_RE,
+} from './parsers/ko-speech.js'
+export type { AttributedQuote, AttributionContext, ExtractedQuote } from './parsers/ko-speech.js'
 export type {
   AnalyzeOptions,
   AnalyzeResult,

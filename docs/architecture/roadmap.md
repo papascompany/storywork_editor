@@ -137,6 +137,12 @@
 - [x] [CONTI-02] 콘티 시트 합성기 + PDF — `composeContiSheets()`(ai-layout, 2×4 그리드 순수함수·결정론) + `conti-2x4` 템플릿 + publish API `conti:true`(본문 앞 prepend, 동기 전용) — pdf-engine 무수정 통과, 단위 16 + 실물 PDF 스모크(결정론 byte-identical) — @layout-composer ✅ 2026-07-30. shotLabel 은 CONTI-01 이후 `cameraAngleToShotLabel` 훅으로 채움
 - [ ] [CONTI-03] 콘티 뷰 UI — import 마법사 "콘티 확정 → 페이지 생성" 순서 변경 + 컷 리스트/교체 UI — `/ui-spec` SOP 대상 — @ui-designer + @editor-engineer
 
+## SCRIPT-KO — 한국어 화자귀속 3단 하이브리드 (research 2026-07-21 §4.1, 착수 승인 2026-07-30)
+
+- [x] [SCRIPT-KO-01] 1층 룰 강화 — 발화동사 어간 패턴(활용형 커버, 기존 11종 고정형→44 어간군) + 따옴표 delimiter 플러그인(곧은/굽은·「」·『』·대시) + BookNLP식 캐릭터 ID 레지스트리(애칭 '이'·호격·성+이름 병합) + 인물성(animacy) 술어 게이트 + 행동/대명사/교대 귀속 — golden novel 대사 13줄 기준 귀속 1→12(오귀속 0), scene F1 0.899·format 0.900 무회귀. Kiwi(LGPL v3)는 별도 프로세스 인프라 결정 필요로 어댑터 경계만 유지(SPEECH_VERB_RE 교체 지점 주석) — @scene-analyzer ✅ 2026-07-30
+- [ ] [SCRIPT-KO-02] 한국어 화자·청자 평가셋(PDNC 스키마) + Claude 폴백 계층 — 🚦 `AI_GATEWAY_API_KEY`
+- [ ] [SCRIPT-KO-03] CSN식 스코어러(klue/roberta) 자체 학습 — 🚦 말뭉치 약관·GPU
+
 ## M7 — Creator Mode + Billing
 
 - [ ] [M7-01] Stripe 연결 + Webhook 멱등 — 재처리 테스트 — @architect
