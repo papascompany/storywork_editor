@@ -14,11 +14,18 @@ import type { CharacterMapEntry } from './types'
 
 interface CharacterMappingTableProps {
   entries: CharacterMapEntry[]
+  /** 분석 진행 중 — 버튼 비활성화 (중복 요청 방지) */
+  isGenerating?: boolean
   onBack: () => void
   onNext: () => void
 }
 
-export function CharacterMappingTable({ entries, onBack, onNext }: CharacterMappingTableProps) {
+export function CharacterMappingTable({
+  entries,
+  isGenerating = false,
+  onBack,
+  onNext,
+}: CharacterMappingTableProps) {
   return (
     <div className="flex flex-col gap-6">
       <div className="flex flex-col gap-1">
@@ -69,16 +76,18 @@ export function CharacterMappingTable({ entries, onBack, onNext }: CharacterMapp
         <button
           type="button"
           onClick={onBack}
-          className="text-sm text-neutral-500 hover:text-neutral-700"
+          disabled={isGenerating}
+          className="text-sm text-neutral-500 hover:text-neutral-700 disabled:opacity-50"
         >
           ← 이전
         </button>
         <button
           type="button"
           onClick={onNext}
-          className="rounded-lg bg-blue-600 px-6 py-2.5 text-sm font-semibold text-white hover:bg-blue-700"
+          disabled={isGenerating}
+          className="rounded-lg bg-blue-600 px-6 py-2.5 text-sm font-semibold text-white hover:bg-blue-700 disabled:cursor-not-allowed disabled:bg-neutral-300"
         >
-          자동 생성 →
+          콘티 생성 →
         </button>
       </div>
     </div>

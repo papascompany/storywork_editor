@@ -68,7 +68,7 @@ export function PreviewPages({ result, formatLabel, onOpenEditor, onBack }: Prev
           onClick={onBack}
           className="text-sm text-neutral-500 hover:text-neutral-700"
         >
-          ← 다시 생성
+          ← 콘티로 돌아가기
         </button>
         <button
           type="button"

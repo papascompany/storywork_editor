@@ -29,17 +29,51 @@ vi.mock('next/navigation', () => ({
 
 // ─── Import (vi.mock 호이스팅 이후 — eslint-disable 유지) ─────────────────────
 
+import { ContiBoard } from '../../components/editor/script-importer/ContiBoard'
 import { PipelineWarnings } from '../../components/editor/script-importer/PipelineWarnings'
 import { PreviewPages } from '../../components/editor/script-importer/PreviewPages'
 import { ScriptImporterShell } from '../../components/editor/script-importer/ScriptImporterShell'
 import { ScriptInputArea } from '../../components/editor/script-importer/ScriptInputArea'
-import type { FullPipelineResponse } from '../../components/editor/script-importer/types'
+import type {
+  ContiAnalyzeResponse,
+  FullPipelineResponse,
+} from '../../components/editor/script-importer/types'
 
 const mockUseRouter = vi.mocked(useRouter)
 
 // ─── 픽스처 ──────────────────────────────────────────────────────────────────
 
 const SAMPLE_SCRIPT = '철수: 안녕하세요!\n영희: 반갑습니다!\n철수: 오늘 날씨가 좋네요.'
+
+const MOCK_ANALYZE_RESULT: ContiAnalyzeResponse = {
+  scenes: [
+    {
+      index: 0,
+      slug: 'scene-01',
+      summary: '철수와 영희의 인사',
+      lines: [
+        { index: 0, speaker: '철수', text: '안녕하세요!' },
+        { index: 1, speaker: '영희', text: '반갑습니다!' },
+      ],
+      characters: ['철수', '영희'],
+      meta: { emotion: 'happy' },
+    },
+    {
+      index: 1,
+      slug: 'scene-02',
+      summary: '날씨 이야기',
+      lines: [{ index: 0, speaker: '철수', text: '오늘 날씨가 좋네요.' }],
+      characters: ['철수'],
+      meta: { emotion: 'neutral' },
+    },
+  ],
+  characters: [
+    { name: '철수', mentionCount: 2 },
+    { name: '영희', mentionCount: 1 },
+  ],
+  seed: 0,
+  modelVersion: 'rule-only',
+}
 
 const MOCK_PIPELINE_RESULT: FullPipelineResponse = {
   projectId: 'proj-test-001',
@@ -54,6 +88,34 @@ const MOCK_PIPELINE_RESULT: FullPipelineResponse = {
   warnings: [],
   seed: 777,
   redirectTo: '/editor?projectId=proj-test-001',
+}
+
+/** fetch mock: 1번째 호출 = analyze(콘티), 2번째 호출 = full-pipeline */
+function mockAnalyzeThenPipeline(): ReturnType<typeof vi.fn> {
+  const fetchMock = vi
+    .fn()
+    .mockResolvedValueOnce({
+      ok: true,
+      json: () => Promise.resolve(MOCK_ANALYZE_RESULT),
+    } as Response)
+    .mockResolvedValueOnce({
+      ok: true,
+      json: () => Promise.resolve(MOCK_PIPELINE_RESULT),
+    } as Response)
+  global.fetch = fetchMock as unknown as typeof fetch
+  return fetchMock
+}
+
+/** Step 1~3 통과 후 콘티 단계 진입 헬퍼 */
+async function walkToConti(user: ReturnType<typeof userEvent.setup>): Promise<void> {
+  const textarea = screen.getByRole('textbox', { name: /대본 붙여넣기/ })
+  await user.type(textarea, SAMPLE_SCRIPT)
+  await user.click(screen.getByRole('button', { name: /다음/ }))
+  await user.click(screen.getByRole('button', { name: /다음/ }))
+  await user.click(screen.getByRole('button', { name: /콘티 생성/ }))
+  await waitFor(() => {
+    expect(screen.getByRole('button', { name: /페이지 생성/ })).toBeDefined()
+  })
 }
 
 // ─── 테스트 ──────────────────────────────────────────────────────────────────
@@ -213,7 +275,7 @@ describe('PreviewPages', () => {
     expect(onOpenEditor).toHaveBeenCalledOnce()
   })
 
-  it('"다시 생성" 버튼 → onBack 호출', async () => {
+  it('"콘티로 돌아가기" 버튼 → onBack 호출', async () => {
     const user = userEvent.setup()
     const onBack = vi.fn()
 
@@ -226,9 +288,97 @@ describe('PreviewPages', () => {
       />,
     )
 
-    const backBtn = screen.getByRole('button', { name: /다시 생성/ })
+    const backBtn = screen.getByRole('button', { name: /콘티로 돌아가기/ })
     await user.click(backBtn)
     expect(onBack).toHaveBeenCalledOnce()
+  })
+})
+
+describe('ContiBoard — 콘티 확정 단계 (CONTI-03)', () => {
+  const baseProps = {
+    conti: MOCK_ANALYZE_RESULT,
+    excludedSceneIndices: [] as number[],
+    onToggleExclude: vi.fn(),
+    onRegenerate: vi.fn(),
+    showRegenerate: false,
+    onConfirm: vi.fn(),
+    onBack: vi.fn(),
+    isGenerating: false,
+    seed: 0,
+  }
+
+  it('컷 카드 목록 렌더 — 지문·화자·대사·감정', () => {
+    render(<ContiBoard {...baseProps} />)
+    expect(screen.getByText(/철수와 영희의 인사/)).toBeDefined()
+    expect(screen.getByText(/날씨 이야기/)).toBeDefined()
+    expect(screen.getByText('기쁨')).toBeDefined()
+    expect(screen.getByText(/안녕하세요!/)).toBeDefined()
+    expect(screen.getAllByText(/2컷/).length).toBeGreaterThan(0)
+  })
+
+  it('rule-only(showRegenerate=false)에서는 재생성 버튼 미노출', () => {
+    render(<ContiBoard {...baseProps} />)
+    expect(screen.queryByRole('button', { name: /다르게 재생성/ })).toBeNull()
+  })
+
+  it('제외 토글 클릭 → onToggleExclude(sceneIndex)', async () => {
+    const user = userEvent.setup()
+    const onToggleExclude = vi.fn()
+    render(<ContiBoard {...baseProps} onToggleExclude={onToggleExclude} />)
+
+    await user.click(screen.getByRole('button', { name: '1번 컷 제외' }))
+    expect(onToggleExclude).toHaveBeenCalledWith(0)
+  })
+
+  it('제외된 컷은 복원 버튼 + 사용 컷 수 감소 반영', () => {
+    render(<ContiBoard {...baseProps} excludedSceneIndices={[1]} />)
+    expect(screen.getByRole('button', { name: '2번 컷 복원' })).toBeDefined()
+    expect(screen.getAllByText(/1컷/).length).toBeGreaterThan(0)
+    expect(screen.getByRole('button', { name: /1컷으로 페이지 생성/ })).toBeDefined()
+  })
+
+  it('전체 제외 시 확정 버튼 비활성화', () => {
+    render(<ContiBoard {...baseProps} excludedSceneIndices={[0, 1]} />)
+    expect(screen.getByRole('button', { name: /페이지 생성/ })).toBeDisabled()
+  })
+
+  it('"다르게 재생성" → onRegenerate 호출 (LLM 분석 모드)', async () => {
+    const user = userEvent.setup()
+    const onRegenerate = vi.fn()
+    render(<ContiBoard {...baseProps} showRegenerate onRegenerate={onRegenerate} />)
+
+    await user.click(screen.getByRole('button', { name: /다르게 재생성/ }))
+    expect(onRegenerate).toHaveBeenCalledOnce()
+    expect(screen.getByText(/변주 #0/)).toBeDefined()
+  })
+
+  it('0컷 콘티 → 막다른 상태 안내 렌더', () => {
+    render(<ContiBoard {...baseProps} conti={{ ...MOCK_ANALYZE_RESULT, scenes: [] }} />)
+    expect(screen.getByText(/컷을 만들지 못했습니다/)).toBeDefined()
+    expect(screen.queryByRole('button', { name: /페이지 생성/ })).toBeNull()
+  })
+
+  it('긴 대사 펼치기 — "더 보기" 토글로 전체 대사 노출', async () => {
+    const user = userEvent.setup()
+    const baseScene = MOCK_ANALYZE_RESULT.scenes[0]
+    if (!baseScene) throw new Error('fixture scene missing')
+    const longConti = {
+      ...MOCK_ANALYZE_RESULT,
+      scenes: [
+        {
+          ...baseScene,
+          lines: Array.from({ length: 5 }, (_, i) => ({
+            index: i,
+            speaker: '철수',
+            text: `대사 ${i + 1}`,
+          })),
+        },
+      ],
+    }
+    render(<ContiBoard {...baseProps} conti={longConti} />)
+    expect(screen.queryByText(/대사 5/)).toBeNull()
+    await user.click(screen.getByRole('button', { name: /대사 2개 더 보기/ }))
+    expect(screen.getByText(/대사 5/)).toBeDefined()
   })
 })
 
@@ -252,11 +402,12 @@ describe('ScriptImporterShell — Wizard 흐름', () => {
     expect(screen.getByText(/판형 선택/)).toBeDefined()
   })
 
-  it('진행 표시 (스텝 인디케이터) 렌더', () => {
+  it('진행 표시 (스텝 인디케이터) 렌더 — 5단계', () => {
     render(<ScriptImporterShell />)
     expect(screen.getByText(/대본 입력/)).toBeDefined()
     expect(screen.getByText(/판형 확인/)).toBeDefined()
     expect(screen.getByText(/캐릭터 매핑/)).toBeDefined()
+    expect(screen.getByText(/콘티 확정/)).toBeDefined()
     expect(screen.getByText(/미리보기/)).toBeDefined()
   })
 
@@ -293,42 +444,156 @@ describe('ScriptImporterShell — Wizard 흐름', () => {
     expect(screen.getAllByText(/캐릭터 매핑/).length).toBeGreaterThan(0)
   })
 
-  it('생성 성공 → Step 4 미리보기', async () => {
+  it('콘티 생성 → Step 4 콘티 확정 (무영속 분석 결과 표시)', async () => {
     const user = userEvent.setup()
-
-    global.fetch = vi.fn().mockResolvedValueOnce({
-      ok: true,
-      json: () => Promise.resolve(MOCK_PIPELINE_RESULT),
-    } as Response)
+    const fetchMock = mockAnalyzeThenPipeline()
 
     render(<ScriptImporterShell />)
+    await walkToConti(user)
 
-    // Step 1
-    const textarea = screen.getByRole('textbox', { name: /대본 붙여넣기/ })
-    await user.type(textarea, SAMPLE_SCRIPT)
-    await user.click(screen.getByRole('button', { name: /다음/ }))
+    // 콘티 단계: 컷 카드 + analyze 만 호출됨 (full-pipeline 미호출)
+    expect(screen.getByText(/철수와 영희의 인사/)).toBeDefined()
+    expect(fetchMock).toHaveBeenCalledTimes(1)
+    const analyzeCall = fetchMock.mock.calls[0] as [string, { body: string }]
+    expect(analyzeCall[0]).toBe('/api/script/analyze')
+    const analyzeBody = JSON.parse(analyzeCall[1].body) as { seed: number; projectId?: string }
+    expect(analyzeBody.seed).toBe(0) // ADR-0007: 초기 시드 0 고정
+    expect(analyzeBody.projectId).toBeUndefined() // 무영속 모드
+  })
 
-    // Step 2
-    await user.click(screen.getByRole('button', { name: /다음/ }))
+  it('콘티 확정 → full-pipeline 호출(excludeSceneIndices 포함) → 미리보기', async () => {
+    const user = userEvent.setup()
+    const fetchMock = mockAnalyzeThenPipeline()
 
-    // Step 3 → 자동 생성
-    await user.click(screen.getByRole('button', { name: /자동 생성/ }))
+    render(<ScriptImporterShell />)
+    await walkToConti(user)
+
+    // 2번 컷 제외 후 확정
+    await user.click(screen.getByRole('button', { name: '2번 컷 제외' }))
+    await user.click(screen.getByRole('button', { name: /1컷으로 페이지 생성/ }))
 
     await waitFor(() => {
       expect(screen.getByText(/자동 생성 완료/)).toBeDefined()
     })
-
     expect(screen.getByText(/2페이지/)).toBeDefined()
+
+    const pipelineCall = fetchMock.mock.calls[1] as [string, { body: string }]
+    expect(pipelineCall[0]).toBe('/api/script/full-pipeline')
+    const body = JSON.parse(pipelineCall[1].body) as {
+      seed: number
+      excludeSceneIndices: number[]
+    }
+    expect(body.seed).toBe(0) // 콘티와 같은 시드 유지 (결정론 일치)
+    expect(body.excludeSceneIndices).toEqual([1])
   })
 
-  it('생성 실패 → 에러 메시지 표시', async () => {
+  it('"다르게 재생성" → 시드 +1 로 analyze 재호출 + 동일 콘티면 제외 목록 보존 (LLM 모드)', async () => {
+    const user = userEvent.setup()
+    const llmResult = { ...MOCK_ANALYZE_RESULT, modelVersion: 'claude-sonnet-4-6' }
+    const fetchMock = vi.fn().mockResolvedValue({
+      ok: true,
+      json: () => Promise.resolve(llmResult),
+    } as Response)
+    global.fetch = fetchMock as unknown as typeof fetch
+
+    render(<ScriptImporterShell />)
+    await walkToConti(user)
+
+    // 컷 제외 후 재생성 — 동일 콘티가 돌아오면 제외가 보존되어야 한다
+    await user.click(screen.getByRole('button', { name: '2번 컷 제외' }))
+    await user.click(screen.getByRole('button', { name: /다르게 재생성/ }))
+    await waitFor(() => {
+      expect(fetchMock).toHaveBeenCalledTimes(2)
+    })
+    const secondBody = JSON.parse(
+      (fetchMock.mock.calls[1] as [string, { body: string }])[1].body,
+    ) as { seed: number }
+    expect(secondBody.seed).toBe(1)
+    expect(screen.getByRole('button', { name: '2번 컷 복원' })).toBeDefined()
+  })
+
+  it('콘티 → 이전 → 콘티 생성 재진입: 재분석 없이 복귀 + 제외 보존', async () => {
+    const user = userEvent.setup()
+    const fetchMock = mockAnalyzeThenPipeline()
+
+    render(<ScriptImporterShell />)
+    await walkToConti(user)
+    await user.click(screen.getByRole('button', { name: '2번 컷 제외' }))
+
+    await user.click(screen.getByRole('button', { name: /이전/ }))
+    await user.click(screen.getByRole('button', { name: /콘티 생성/ }))
+
+    // 동일 대본·시드 — 네트워크 재호출 없이 콘티 복귀, 제외 유지
+    expect(fetchMock).toHaveBeenCalledTimes(1)
+    expect(screen.getByRole('button', { name: '2번 컷 복원' })).toBeDefined()
+  })
+
+  it('재확정 시 직전 projectId 재사용 — 중복 프로젝트 생성 방지', async () => {
+    const user = userEvent.setup()
+    const fetchMock = vi
+      .fn()
+      .mockResolvedValueOnce({
+        ok: true,
+        json: () => Promise.resolve(MOCK_ANALYZE_RESULT),
+      } as Response)
+      .mockResolvedValue({
+        ok: true,
+        json: () => Promise.resolve(MOCK_PIPELINE_RESULT),
+      } as Response)
+    global.fetch = fetchMock as unknown as typeof fetch
+
+    render(<ScriptImporterShell />)
+    await walkToConti(user)
+    await user.click(screen.getByRole('button', { name: /페이지 생성/ }))
+    await waitFor(() => {
+      expect(screen.getByText(/자동 생성 완료/)).toBeDefined()
+    })
+
+    // 콘티로 돌아가 재확정 → 두 번째 full-pipeline 호출에 projectId 포함
+    await user.click(screen.getByRole('button', { name: /콘티로 돌아가기/ }))
+    await user.click(screen.getByRole('button', { name: /페이지 생성/ }))
+    await waitFor(() => {
+      expect(fetchMock).toHaveBeenCalledTimes(3)
+    })
+    const secondConfirm = JSON.parse(
+      (fetchMock.mock.calls[2] as [string, { body: string }])[1].body,
+    ) as { projectId?: string }
+    expect(secondConfirm.projectId).toBe('proj-test-001')
+  })
+
+  it('콘티 확정(full-pipeline) 실패 → 콘티 단계에 에러 배너(role=alert)', async () => {
+    const user = userEvent.setup()
+    const fetchMock = vi
+      .fn()
+      .mockResolvedValueOnce({
+        ok: true,
+        json: () => Promise.resolve(MOCK_ANALYZE_RESULT),
+      } as Response)
+      .mockResolvedValueOnce({
+        ok: false,
+        status: 500,
+        json: () => Promise.resolve({ error: '페이지 생성에 실패했습니다.' }),
+      } as Response)
+    global.fetch = fetchMock as unknown as typeof fetch
+
+    render(<ScriptImporterShell />)
+    await walkToConti(user)
+    await user.click(screen.getByRole('button', { name: /페이지 생성/ }))
+
+    await waitFor(() => {
+      expect(screen.getByRole('alert')).toBeDefined()
+      expect(screen.getByText(/페이지 생성에 실패했습니다./)).toBeDefined()
+    })
+  })
+
+  it('콘티 생성 실패 → 에러 메시지 표시', async () => {
     const user = userEvent.setup()
 
     global.fetch = vi.fn().mockResolvedValueOnce({
       ok: false,
       status: 500,
       json: () => Promise.resolve({ error: '서버 오류가 발생했습니다.' }),
-    } as Response)
+    } as Response) as unknown as typeof fetch
 
     render(<ScriptImporterShell />)
 
@@ -336,11 +601,27 @@ describe('ScriptImporterShell — Wizard 흐름', () => {
     await user.type(textarea, SAMPLE_SCRIPT)
     await user.click(screen.getByRole('button', { name: /다음/ }))
     await user.click(screen.getByRole('button', { name: /다음/ }))
-    await user.click(screen.getByRole('button', { name: /자동 생성/ }))
+    await user.click(screen.getByRole('button', { name: /콘티 생성/ }))
 
     await waitFor(() => {
       expect(screen.getByText(/서버 오류가 발생했습니다./)).toBeDefined()
     })
+  })
+
+  it('미리보기 "콘티로 돌아가기" → 콘티 단계 복귀 (시드·컷 유지)', async () => {
+    const user = userEvent.setup()
+    mockAnalyzeThenPipeline()
+
+    render(<ScriptImporterShell />)
+    await walkToConti(user)
+    await user.click(screen.getByRole('button', { name: /페이지 생성/ }))
+    await waitFor(() => {
+      expect(screen.getByText(/자동 생성 완료/)).toBeDefined()
+    })
+
+    await user.click(screen.getByRole('button', { name: /콘티로 돌아가기/ }))
+    // 재분석 없이 콘티 카드가 다시 보인다
+    expect(screen.getByText(/철수와 영희의 인사/)).toBeDefined()
   })
 
   it('미리보기에서 "편집기에서 열기" → router.push 호출', async () => {
@@ -355,19 +636,11 @@ describe('ScriptImporterShell — Wizard 흐름', () => {
     })
 
     const user = userEvent.setup()
-
-    global.fetch = vi.fn().mockResolvedValueOnce({
-      ok: true,
-      json: () => Promise.resolve(MOCK_PIPELINE_RESULT),
-    } as Response)
+    mockAnalyzeThenPipeline()
 
     render(<ScriptImporterShell />)
-
-    const textarea = screen.getByRole('textbox', { name: /대본 붙여넣기/ })
-    await user.type(textarea, SAMPLE_SCRIPT)
-    await user.click(screen.getByRole('button', { name: /다음/ }))
-    await user.click(screen.getByRole('button', { name: /다음/ }))
-    await user.click(screen.getByRole('button', { name: /자동 생성/ }))
+    await walkToConti(user)
+    await user.click(screen.getByRole('button', { name: /페이지 생성/ }))
 
     await waitFor(() => {
       expect(screen.getByText(/자동 생성 완료/)).toBeDefined()

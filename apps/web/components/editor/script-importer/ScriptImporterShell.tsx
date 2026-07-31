@@ -4,12 +4,18 @@
  * ScriptImporterShell — 대본 → 자동 페이지 생성 Wizard 메인 (M4-04 Step 2)
  * React 명시 import: vitest JSX transform 호환
  *
- * Wizard 5단계 흐름:
+ * Wizard 5단계 흐름 (CONTI-03: 대본 → 콘티 확정 → 페이지 생성):
  *   Step 1 (input)        : 대본 입력 + 판형 선택
  *   Step 2 (format-check) : 판형 + 자동 감지 형식 확인
  *   Step 3 (character-map): 화자 → 캐릭터 매핑
- *   Step 4 (preview)      : 생성 결과 미리보기 + warnings
+ *   Step 4 (conti)        : 무영속 분석 → 컷 확인·제외·재생성 후 확정
+ *   Step 5 (preview)      : 생성 결과 미리보기 + warnings
  *   → /editor?projectId=...
+ *
+ * 영속화(full-pipeline)는 콘티 확정 후 1회만 일어난다 — 되돌아가 재생성해도
+ * SceneDoc/Page 를 덮어쓰지 않는다 (research 2026-07-21 §2.2).
+ *
+ * 시드(ADR-0007): 초기 0 고정. 콘티 단계 "다르게 재생성"만 +1.
  *
  * M4-05 영역(alternatives UI)과 충돌하지 않도록
  * alternatives 관련 UI 는 이 파일에 포함하지 않는다.
@@ -19,11 +25,18 @@ import { useRouter } from 'next/navigation'
 import React, { useCallback, useState } from 'react'
 
 import { CharacterMappingTable } from './CharacterMappingTable'
+import { ContiBoard } from './ContiBoard'
 import { PipelineWarnings } from './PipelineWarnings'
 import { PreviewPages } from './PreviewPages'
 import { ScriptInputArea } from './ScriptInputArea'
 import { FORMAT_PRESETS } from './types'
-import type { CharacterMapEntry, FullPipelineResponse, WizardState, WizardStep } from './types'
+import type {
+  CharacterMapEntry,
+  ContiAnalyzeResponse,
+  FullPipelineResponse,
+  WizardState,
+  WizardStep,
+} from './types'
 
 // ─── 대본에서 화자 추출 ──────────────────────────────────────────────────────
 
@@ -52,10 +65,11 @@ const STEP_LABELS: Record<WizardStep, string> = {
   input: '대본 입력',
   'format-check': '판형 확인',
   'character-map': '캐릭터 매핑',
+  conti: '콘티 확정',
   preview: '미리보기',
 }
 
-const STEP_ORDER: WizardStep[] = ['input', 'format-check', 'character-map', 'preview']
+const STEP_ORDER: WizardStep[] = ['input', 'format-check', 'character-map', 'conti', 'preview']
 
 // ─── ScriptImporterShell ─────────────────────────────────────────────────────
 
@@ -68,9 +82,15 @@ export function ScriptImporterShell() {
     selectedFormatId: FORMAT_PRESETS[0]?.id ?? 'preset-b5-novel',
     detectedFormat: null,
     characterEntries: [],
-    seed: Math.floor(Math.random() * 10_000),
+    // ADR-0007: 시드 0 고정 — 같은 대본은 언제나 같은 콘티로 시작.
+    // 변주는 콘티 단계의 "다르게 재생성"(+1)으로만.
+    seed: 0,
     isGenerating: false,
     generationError: null,
+    conti: null,
+    analyzedScriptRaw: null,
+    excludedSceneIndices: [],
+    projectId: null,
     result: null,
   })
 
@@ -93,7 +113,88 @@ export function ScriptImporterShell() {
     updateState({ step: 'character-map', characterEntries: entries })
   }, [state.scriptRaw, updateState])
 
-  // ── Step 3 → 4: 자동 생성 ────────────────────────────────────────────────
+  // ── Step 3 → 4: 콘티 생성 (무영속 분석 — DB 를 건드리지 않음) ────────────
+  const runAnalyze = useCallback(
+    async (seed: number) => {
+      updateState({ isGenerating: true, generationError: null })
+
+      try {
+        const res = await fetch('/api/script/analyze', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            scriptRaw: state.scriptRaw,
+            seed,
+            format: 'auto',
+            llmEnabled: false,
+            maxAlternatives: 0,
+          }),
+        })
+
+        if (!res.ok) {
+          const err = (await res.json()) as { error?: string }
+          updateState({
+            isGenerating: false,
+            generationError: err.error ?? `오류 발생 (${res.status})`,
+          })
+          return
+        }
+
+        const data = (await res.json()) as ContiAnalyzeResponse
+        // 컷 구조가 실제로 바뀐 경우에만 제외 목록 초기화 — 동일 결과가
+        // 돌아왔는데 사용자의 제외 작업을 지우지 않는다 (리뷰 후속)
+        setState((prev) => {
+          const signature = (scenes: ContiAnalyzeResponse['scenes']): string =>
+            scenes.map((s) => `${s.index}:${s.slug}`).join('|')
+          const unchanged =
+            prev.conti !== null && signature(prev.conti.scenes) === signature(data.scenes)
+          return {
+            ...prev,
+            isGenerating: false,
+            conti: data,
+            analyzedScriptRaw: prev.scriptRaw,
+            seed,
+            excludedSceneIndices: unchanged ? prev.excludedSceneIndices : [],
+            step: 'conti',
+          }
+        })
+      } catch (err) {
+        updateState({
+          isGenerating: false,
+          generationError: err instanceof Error ? err.message : '알 수 없는 오류가 발생했습니다.',
+        })
+      }
+    },
+    [state.scriptRaw, updateState],
+  )
+
+  // ── Step 3 진입 핸들러 — 동일 대본·시드면 재분석 없이 콘티로 복귀 ─────────
+  const handleEnterConti = useCallback(() => {
+    if (state.conti && state.analyzedScriptRaw === state.scriptRaw) {
+      // ADR-0007: 같은 입력 + 같은 seed = 같은 콘티 — 네트워크 왕복과
+      // 제외 목록 초기화 없이 바로 복귀
+      updateState({ step: 'conti', generationError: null })
+      return
+    }
+    void runAnalyze(state.seed)
+  }, [state.conti, state.analyzedScriptRaw, state.scriptRaw, state.seed, runAnalyze, updateState])
+
+  // ── 콘티 재생성 (시드 +1 — ADR-0007 결정론 유지) ─────────────────────────
+  const handleRegenerate = useCallback(() => {
+    void runAnalyze(state.seed + 1)
+  }, [runAnalyze, state.seed])
+
+  // ── 컷 제외/복원 토글 ─────────────────────────────────────────────────────
+  const handleToggleExclude = useCallback((sceneIndex: number) => {
+    setState((prev) => ({
+      ...prev,
+      excludedSceneIndices: prev.excludedSceneIndices.includes(sceneIndex)
+        ? prev.excludedSceneIndices.filter((i) => i !== sceneIndex)
+        : [...prev.excludedSceneIndices, sceneIndex],
+    }))
+  }, [])
+
+  // ── Step 4 → 5: 콘티 확정 → 페이지 생성 (여기서만 영속화) ────────────────
   const handleGenerate = useCallback(async () => {
     updateState({ isGenerating: true, generationError: null })
 
@@ -110,11 +211,14 @@ export function ScriptImporterShell() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           scriptRaw: state.scriptRaw,
+          // 재확정 시 기존 프로젝트 재사용(덮어쓰기) — '새 콘티' 중복 누적 방지
+          ...(state.projectId ? { projectId: state.projectId } : {}),
           formatId: state.selectedFormatId,
           title: `새 콘티 — ${new Date().toLocaleDateString('ko-KR')}`,
           characterMapping,
           seed: state.seed,
           llmEnabled: false,
+          excludeSceneIndices: state.excludedSceneIndices,
         }),
       })
 
@@ -128,7 +232,12 @@ export function ScriptImporterShell() {
       }
 
       const data = (await res.json()) as FullPipelineResponse
-      updateState({ isGenerating: false, result: data, step: 'preview' })
+      updateState({
+        isGenerating: false,
+        result: data,
+        projectId: data.projectId,
+        step: 'preview',
+      })
     } catch (err) {
       updateState({
         isGenerating: false,
@@ -254,27 +363,56 @@ export function ScriptImporterShell() {
           {state.step === 'character-map' && (
             <>
               {state.generationError && (
-                <div className="mb-4 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+                <div
+                  role="alert"
+                  className="mb-4 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700"
+                >
                   {state.generationError}
                 </div>
               )}
               <CharacterMappingTable
                 entries={state.characterEntries}
+                isGenerating={state.isGenerating}
                 onBack={() => updateState({ step: 'format-check', generationError: null })}
-                onNext={() => {
-                  void handleGenerate()
-                }}
+                onNext={handleEnterConti}
               />
               {state.isGenerating && (
                 <div className="mt-4 flex items-center justify-center gap-2 text-sm text-neutral-500">
                   <span className="inline-block h-4 w-4 animate-spin rounded-full border-2 border-neutral-300 border-t-blue-600" />
-                  AI 가 페이지를 생성 중입니다…
+                  대본을 콘티로 분석 중입니다…
                 </div>
               )}
             </>
           )}
 
-          {/* Step 4: 미리보기 */}
+          {/* Step 4: 콘티 확정 (CONTI-03) */}
+          {state.step === 'conti' && state.conti && (
+            <>
+              {state.generationError && (
+                <div
+                  role="alert"
+                  className="mb-4 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700"
+                >
+                  {state.generationError}
+                </div>
+              )}
+              <ContiBoard
+                conti={state.conti}
+                excludedSceneIndices={state.excludedSceneIndices}
+                onToggleExclude={handleToggleExclude}
+                onRegenerate={handleRegenerate}
+                showRegenerate={state.conti.modelVersion !== 'rule-only'}
+                onConfirm={() => {
+                  void handleGenerate()
+                }}
+                onBack={() => updateState({ step: 'character-map', generationError: null })}
+                isGenerating={state.isGenerating}
+                seed={state.seed}
+              />
+            </>
+          )}
+
+          {/* Step 5: 미리보기 */}
           {state.step === 'preview' && state.result && (
             <>
               <PipelineWarnings warnings={state.result.warnings} />
@@ -284,15 +422,21 @@ export function ScriptImporterShell() {
                 formatLabel={formatLabel}
                 onOpenEditor={handleOpenEditor}
                 onBack={() =>
-                  updateState({
-                    step: 'character-map',
-                    result: null,
-                    seed: Math.floor(Math.random() * 10_000),
-                  })
+                  // 시드 유지한 채 콘티로 복귀 — 랜덤 재시드 제거 (ADR-0007)
+                  updateState({ step: 'conti', result: null, generationError: null })
                 }
               />
             </>
           )}
+        </div>
+
+        {/* 스크린리더 진행 상태 알림 (aria-live) */}
+        <div role="status" aria-live="polite" className="sr-only">
+          {state.isGenerating
+            ? state.step === 'conti'
+              ? '페이지를 생성하고 있습니다.'
+              : '대본을 콘티로 분석하고 있습니다.'
+            : ''}
         </div>
 
         {/* 하단 링크 */}

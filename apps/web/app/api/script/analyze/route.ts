@@ -5,14 +5,17 @@
  * AnalyzeResult JSON 을 반환한다.
  *
  * 요청:
- *   { projectId: string, scriptRaw: string, seed?: number, format?: ScriptInputFormat, llmEnabled?: boolean }
+ *   { projectId?: string, scriptRaw: string, seed?: number, format?: ScriptInputFormat, llmEnabled?: boolean }
+ *
+ *   projectId 미지정 시(CONTI-03 콘티 미리보기): DB 를 일절 건드리지 않는
+ *   무영속(stateless) 분석 — 마법사의 "대본 → 콘티 확정" 단계가 사용한다.
  *
  * 응답:
  *   AnalyzeResult JSON (scenes, characters, alternatives, seed, modelVersion)
  *
  * 인증:
  *   - Supabase 세션 확인 → 미인증 401
- *   - 본인 Project 소유권 확인 → 403
+ *   - projectId 지정 시 본인 Project 소유권 확인 → 403
  *
  * Rate limit (placeholder):
  *   - 분당 N=10회 제한 (추후 plan 별 차등)
@@ -30,17 +33,23 @@ import { createWebServerClient } from '@/lib/supabase/server'
 import { analyze } from '@storywork/ai-script'
 import type { AnalyzeResult, ScriptInputFormat } from '@storywork/ai-script'
 import { getPrismaClient } from '../../_lib/prisma'
+import { checkRateLimit } from '../../_lib/rate-limit'
 /* eslint-enable import/order */
 
 // ─── 상수 ─────────────────────────────────────────────────────────────────────
 
-const RATE_LIMIT_PER_MIN = 10 // placeholder — 추후 plan 별 차등
+const RATE_LIMIT_PER_MIN = 10
 
 // ─── 요청 스키마 ──────────────────────────────────────────────────────────────
 
 const AnalyzeRequestSchema = z.object({
-  projectId: z.string().min(1),
-  scriptRaw: z.string().min(1).max(50_000),
+  /** 미지정 시 무영속(stateless) 분석 — CONTI-03 콘티 미리보기 */
+  projectId: z.string().min(1).optional(),
+  scriptRaw: z
+    .string()
+    .min(1)
+    .max(50_000)
+    .refine((s) => s.trim().length > 0, { message: '대본 내용이 비어 있습니다.' }),
   seed: z.number().int().optional(),
   format: z
     .enum(['auto', 'novel', 'screenplay', 'essay', 'diary', 'light-novel'])
@@ -63,12 +72,17 @@ async function findUserByEmail(email: string) {
   return prisma.user.findUnique({ where: { email } })
 }
 
-// ─── Rate limit placeholder ───────────────────────────────────────────────────
+// ─── Rate limit — 인메모리 슬라이딩 윈도 (Upstash 이관 전 스톱갭) ────────────
 
-function logRateLimitCheck(userId: string): void {
-  // TODO(M4-02): 실제 rate limiting 구현 (Redis 또는 Upstash)
-  // 현재는 콘솔 로그만 남기는 placeholder
-  console.warn(`[rate-limit] userId=${userId}, limit=${RATE_LIMIT_PER_MIN}/min`)
+function enforceRateLimit(userId: string): NextResponse | null {
+  const check = checkRateLimit(`analyze:${userId}`, RATE_LIMIT_PER_MIN, 60_000)
+  if (!check.allowed) {
+    return NextResponse.json(
+      { error: '요청이 너무 잦습니다. 잠시 후 다시 시도해 주세요.' },
+      { status: 429, headers: { 'Retry-After': String(check.retryAfterSec) } },
+    )
+  }
+  return null
 }
 
 // ─── SceneDoc + Scene DB 저장 ────────────────────────────────────────────────
@@ -165,26 +179,31 @@ export async function POST(req: Request): Promise<NextResponse> {
 
   const { projectId, scriptRaw, seed, format, llmEnabled, maxAlternatives } = parsed.data
 
-  // 4. 소유권 검증
-  const prisma = getPrismaClient()
-  const project = await prisma.project.findUnique({
-    where: { id: projectId },
-    select: { id: true, ownerId: true },
-  })
+  // 4. 소유권 검증 (projectId 지정 시에만 — 무영속 모드는 건너뜀)
+  if (projectId) {
+    const prisma = getPrismaClient()
+    const project = await prisma.project.findUnique({
+      where: { id: projectId },
+      select: { id: true, ownerId: true },
+    })
 
-  if (!project) {
-    return jsonError('프로젝트를 찾을 수 없습니다.', 404)
+    if (!project) {
+      return jsonError('프로젝트를 찾을 수 없습니다.', 404)
+    }
+
+    if (project.ownerId !== dbUser.id) {
+      return jsonError('접근 권한이 없습니다.', 403)
+    }
   }
 
-  if (project.ownerId !== dbUser.id) {
-    return jsonError('접근 권한이 없습니다.', 403)
-  }
+  // 5. Rate limit (인메모리 슬라이딩 윈도 — 인스턴스별 한계는 rate-limit.ts 참조)
+  const limited = enforceRateLimit(dbUser.id)
+  if (limited) return limited
 
-  // 5. Rate limit 로그 (placeholder)
-  logRateLimitCheck(dbUser.id)
-
-  // 6. LLM 비용 로그 (모니터링 placeholder)
-  const effectiveLlm = llmEnabled ?? process.env['STORYWORK_LLM'] === '1'
+  // 6. LLM 게이트 — env 가 하드 게이트. 클라이언트 body 는 "끄는 방향"만 가능
+  //    (STORYWORK_LLM=0 인데 body llmEnabled:true 로 비용 게이트를 우회하는 것 차단)
+  const envLlm = process.env['STORYWORK_LLM'] === '1' || process.env['STORYWORK_LLM'] === 'true'
+  const effectiveLlm = envLlm && (llmEnabled ?? true)
   console.warn(
     `[ai-script] analyze start: projectId=${projectId}, format=${format}, llmEnabled=${effectiveLlm}, seed=${seed ?? 0}`,
   )
@@ -196,7 +215,7 @@ export async function POST(req: Request): Promise<NextResponse> {
       seed: seed ?? 0,
       format: format as ScriptInputFormat,
       maxAlternatives: maxAlternatives ?? 3,
-      llmEnabled,
+      llmEnabled: effectiveLlm,
     })
   } catch (err) {
     console.error('[ai-script] analyze 실패:', err)
@@ -208,13 +227,16 @@ export async function POST(req: Request): Promise<NextResponse> {
     `[ai-script] analyze done: projectId=${projectId}, scenes=${result.scenes.length}, modelVersion=${result.modelVersion}`,
   )
 
-  // 9. DB 저장 (SceneDoc + Scene + Line)
-  try {
-    await upsertSceneDoc(projectId, scriptRaw, result)
-  } catch (err) {
-    console.error('[ai-script] DB 저장 실패:', err)
-    // DB 저장 실패해도 분석 결과는 반환 (클라이언트 활용 가능)
-    return NextResponse.json({ ...result, _dbSaveError: true })
+  // 9. DB 저장 (SceneDoc + Scene + Line) — projectId 지정 시에만.
+  //    무영속 모드(CONTI-03)는 분석 결과만 반환하고 DB 를 건드리지 않는다.
+  if (projectId) {
+    try {
+      await upsertSceneDoc(projectId, scriptRaw, result)
+    } catch (err) {
+      console.error('[ai-script] DB 저장 실패:', err)
+      // DB 저장 실패해도 분석 결과는 반환 (클라이언트 활용 가능)
+      return NextResponse.json({ ...result, _dbSaveError: true })
+    }
   }
 
   return NextResponse.json(result)

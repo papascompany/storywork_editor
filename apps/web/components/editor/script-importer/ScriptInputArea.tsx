@@ -33,7 +33,8 @@ export function ScriptInputArea({
   onNext,
 }: ScriptInputAreaProps) {
   const charCount = scriptRaw.length
-  const isValid = charCount >= 1 && charCount <= MAX_CHARS
+  // 공백/개행만 있는 대본은 0컷 dead-end 로 이어지므로 trim 기준으로 검증
+  const isValid = scriptRaw.trim().length >= 1 && charCount <= MAX_CHARS
 
   return (
     <div className="flex flex-col gap-6">

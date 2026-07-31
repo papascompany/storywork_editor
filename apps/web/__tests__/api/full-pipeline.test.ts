@@ -389,7 +389,7 @@ describe('POST /api/script/full-pipeline', () => {
 
     expect(status).toBe(404)
     const d = data as { error: string }
-    expect(d.error).toContain('Format')
+    expect(d.error).toContain('판형')
   })
 
   // ── 5. 기존 프로젝트 (projectId) ──────────────────────────────────
@@ -503,5 +503,120 @@ describe('POST /api/script/full-pipeline', () => {
     const { GET } = await import('../../app/api/script/full-pipeline/route')
     const res = GET()
     expect(res.status).toBe(405)
+  })
+
+  // ── 11. CONTI-03: excludeSceneIndices ─────────────────────────────
+
+  it('excludeSceneIndices: 제외된 컷을 뺀 scenes 로 recommend 호출', async () => {
+    const { status } = await callRoute({
+      scriptRaw: '철수: 안녕!\n영희: 반가워!',
+      formatId: 'preset-b5-novel',
+      title: '콘티 제외 테스트',
+      seed: 0,
+      excludeSceneIndices: [1],
+    })
+
+    expect(status).toBe(200)
+    const analyzedArg = mockRecommend.mock.calls[0]?.[0] as AnalyzeResult
+    expect(analyzedArg.scenes).toHaveLength(1)
+    expect(analyzedArg.scenes[0]?.index).toBe(0)
+  })
+
+  it('excludeSceneIndices: 전체 컷 제외 → 400', async () => {
+    const { status, data } = await callRoute({
+      scriptRaw: '철수: 안녕!',
+      formatId: 'preset-b5-novel',
+      title: '전체 제외 테스트',
+      seed: 0,
+      excludeSceneIndices: [0, 1],
+    })
+
+    expect(status).toBe(400)
+    expect((data as { error: string }).error).toMatch(/모든 컷을 제외/)
+    expect(mockRecommend).not.toHaveBeenCalled()
+  })
+
+  it('excludeSceneIndices 미지정 → 전체 scenes 그대로 (하위 호환)', async () => {
+    const { status } = await callRoute({
+      scriptRaw: '철수: 안녕!',
+      formatId: 'preset-b5-novel',
+      title: '하위 호환 테스트',
+      seed: 0,
+    })
+
+    expect(status).toBe(200)
+    const analyzedArg = mockRecommend.mock.calls[0]?.[0] as AnalyzeResult
+    expect(analyzedArg.scenes).toHaveLength(2)
+  })
+
+  it('excludeSceneIndices: 제외 후 미등장 캐릭터는 characters 에서 제거', async () => {
+    const baseScene = makeMockAnalyzeResult(1).scenes[0]
+    if (!baseScene) throw new Error('fixture scene missing')
+    mockAnalyze.mockResolvedValueOnce({
+      ...makeMockAnalyzeResult(2),
+      scenes: [
+        { ...baseScene, index: 0, characters: ['철수'] },
+        { ...baseScene, index: 1, slug: 'scene-01b', characters: ['영희'] },
+      ],
+      characters: [
+        { name: '철수', mentionCount: 1 },
+        { name: '영희', mentionCount: 1 },
+      ],
+    })
+
+    const { status } = await callRoute({
+      scriptRaw: '철수: 안녕!\n영희: 반가워!',
+      formatId: 'preset-b5-novel',
+      title: '캐릭터 재계산 테스트',
+      seed: 0,
+      excludeSceneIndices: [1],
+    })
+
+    expect(status).toBe(200)
+    const analyzedArg = mockRecommend.mock.calls[0]?.[0] as AnalyzeResult
+    expect(analyzedArg.characters.map((c) => c.name)).toEqual(['철수'])
+  })
+
+  // ── 12. LLM 하드 게이트 + rate limit ──────────────────────────────
+
+  it('LLM 하드 게이트: env 미설정이면 body llmEnabled:true 여도 rule-only 강제', async () => {
+    delete process.env['STORYWORK_LLM']
+    const { status } = await callRoute({
+      scriptRaw: '철수: 안녕!',
+      formatId: 'preset-b5-novel',
+      title: 'llm 게이트 테스트',
+      llmEnabled: true,
+    })
+    expect(status).toBe(200)
+    expect(mockAnalyze).toHaveBeenCalledWith(
+      '철수: 안녕!',
+      expect.objectContaining({ llmEnabled: false }),
+    )
+  })
+
+  it('공백/개행만 있는 대본 → 400', async () => {
+    const { status } = await callRoute({
+      scriptRaw: '  \n\n ',
+      formatId: 'preset-b5-novel',
+      title: '공백 테스트',
+    })
+    expect(status).toBe(400)
+  })
+
+  it('rate limit: 분당 5회 초과 → 429', async () => {
+    for (let i = 0; i < 5; i++) {
+      const { status } = await callRoute({
+        scriptRaw: '철수: 안녕!',
+        formatId: 'preset-b5-novel',
+        title: `레이트 ${i}`,
+      })
+      expect(status).toBe(200)
+    }
+    const { status } = await callRoute({
+      scriptRaw: '철수: 안녕!',
+      formatId: 'preset-b5-novel',
+      title: '레이트 초과',
+    })
+    expect(status).toBe(429)
   })
 })

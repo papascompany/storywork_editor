@@ -7,7 +7,9 @@
 
 // ─── Wizard 단계 ──────────────────────────────────────────────────────────────
 
-export type WizardStep = 'input' | 'format-check' | 'character-map' | 'preview'
+// CONTI-03: 'conti'(콘티 확정) 단계 — 무영속 분석 결과를 확인·확정한 뒤에만
+// full-pipeline(영속화)을 호출한다 (대본 → 콘티 확정 → 페이지 생성)
+export type WizardStep = 'input' | 'format-check' | 'character-map' | 'conti' | 'preview'
 
 // ─── 판형 프리셋 ──────────────────────────────────────────────────────────────
 
@@ -75,6 +77,31 @@ export interface FullPipelineResponse {
   redirectTo: string
 }
 
+// ─── 콘티(무영속 분석) 응답 — /api/script/analyze 의 소비 필드만 (CONTI-03) ────
+
+export interface ContiLine {
+  index: number
+  speaker?: string
+  text: string
+}
+
+export interface ContiScene {
+  index: number
+  slug: string
+  summary: string
+  lines: ContiLine[]
+  characters: string[]
+  meta: { emotion?: string }
+}
+
+export interface ContiAnalyzeResponse {
+  scenes: ContiScene[]
+  characters: Array<{ name: string; mentionCount: number }>
+  seed: number
+  /** 'rule-only' | LLM 모델명 — rule-only 는 시드 변주가 no-op 이라 재생성 버튼 숨김 */
+  modelVersion: string
+}
+
 // ─── Wizard 전체 상태 ─────────────────────────────────────────────────────────
 
 export interface WizardState {
@@ -83,8 +110,23 @@ export interface WizardState {
   selectedFormatId: string
   detectedFormat: string | null
   characterEntries: CharacterMapEntry[]
+  /**
+   * 결정론 시드 (ADR-0007) — 초기 0 고정. 콘티 단계의 "재생성" 버튼만 +1 한다.
+   * (구 Math.random 시드는 재현 불가라 제거 — research 2026-07-21 §2.2)
+   */
   seed: number
   isGenerating: boolean
   generationError: string | null
+  /** 콘티(무영속 분석) 결과 — conti 단계 데이터 소스 */
+  conti: ContiAnalyzeResponse | null
+  /** conti 를 만든 대본 스냅샷 — 동일 대본 재진입 시 재분석/제외 초기화 방지 */
+  analyzedScriptRaw: string | null
+  /** 콘티 확정에서 제외한 컷(Scene.index) */
+  excludedSceneIndices: number[]
+  /**
+   * 확정으로 생성된 Project.id — 재확정 시 재사용(덮어쓰기)해
+   * '새 콘티' 중복 프로젝트가 누적되지 않게 한다
+   */
+  projectId: string | null
   result: FullPipelineResponse | null
 }

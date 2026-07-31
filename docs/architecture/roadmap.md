@@ -135,7 +135,7 @@
 
 - [ ] [CONTI-01] 장면 메타 실가동·영속화 — LLM enhance 콘티 경로 활성 + 샷사이즈 어휘 + SceneDoc.meta 장면별 메타 저장 + Inngest 비동기 — 🚦 `AI_GATEWAY_API_KEY` 게이트 — @scene-analyzer
 - [x] [CONTI-02] 콘티 시트 합성기 + PDF — `composeContiSheets()`(ai-layout, 2×4 그리드 순수함수·결정론) + `conti-2x4` 템플릿 + publish API `conti:true`(본문 앞 prepend, 동기 전용) — pdf-engine 무수정 통과, 단위 16 + 실물 PDF 스모크(결정론 byte-identical) — @layout-composer ✅ 2026-07-30. shotLabel 은 CONTI-01 이후 `cameraAngleToShotLabel` 훅으로 채움
-- [ ] [CONTI-03] 콘티 뷰 UI — import 마법사 "콘티 확정 → 페이지 생성" 순서 변경 + 컷 리스트/교체 UI — `/ui-spec` SOP 대상 — @ui-designer + @editor-engineer
+- [x] [CONTI-03] 콘티 뷰 UI — import 마법사 5단계화("대본→콘티 확정→페이지 생성"): 무영속 분석(`/api/script/analyze` projectId 옵셔널) → `ContiBoard` 컷 리스트(제외 토글·대사 펼치기·0컷 안내) → 확정 시에만 full-pipeline 영속화(`excludeSceneIndices`·재확정 시 projectId 재사용으로 중복 프로젝트 방지). 시드 0 고정 + 랜덤 재시드 제거(ADR-0007). 36-에이전트 적대 리뷰 27건 반영: LLM env 하드 게이트(body llmEnabled 상향 오버라이드 차단), 인메모리 rate limit(analyze 10/min·full-pipeline 5/min), WCAG AA 대비/aria-live/role=alert/모바일 랩, 재생성 버튼은 rule-only에서 숨김(시드 변주 no-op — CONTI-01 LLM 활성 후 자동 노출). Storybook tailwind 미배선(기존 격차)도 수정. 테스트: 마법사 33·API 34·rate-limit 4 — @ui-designer + @editor-engineer ✅ 2026-07-31. **잔여**: 컷 DnD 재정렬·마법사 내 컷 교체(2차, 편집기 M4-05 가 담당), Upstash 실 rate limit(SEC-RATE-01 — 인메모리 스톱갭은 인스턴스별 한계), 사용자당 프로젝트 수 상한(제품 결정)
 
 ## SCRIPT-KO — 한국어 화자귀속 3단 하이브리드 (research 2026-07-21 §4.1, 착수 승인 2026-07-30)
 

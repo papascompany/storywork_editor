@@ -55,6 +55,7 @@ import type { RecommendResult } from '@storywork/ai-recommend'
 import { compose } from '@storywork/ai-layout'
 import type { ComposeResult, LayoutFormat } from '@storywork/ai-layout'
 import { getPrismaClient } from '../../_lib/prisma'
+import { checkRateLimit } from '../../_lib/rate-limit'
 import { resolveFormatId } from '@/lib/format-mapping'
 /* eslint-enable import/order */
 
@@ -66,13 +67,26 @@ export const dynamic = 'force-dynamic'
 
 const FullPipelineRequestSchema = z
   .object({
-    scriptRaw: z.string().min(1).max(50_000),
+    scriptRaw: z
+      .string()
+      .min(1)
+      .max(50_000)
+      .refine((s) => s.trim().length > 0, { message: '대본 내용이 비어 있습니다.' }),
     projectId: z.string().nullable().optional(),
-    formatId: z.string().min(1),
+    // 로그 인젝션·에러 반사 차단 — preset 문자열('preset-b5-novel')과 cuid 모두 통과
+    formatId: z
+      .string()
+      .min(1)
+      .max(64)
+      .regex(/^[A-Za-z0-9:_-]+$/),
     title: z.string().min(1).max(200).optional(),
     characterMapping: z.record(z.string(), z.string()).optional(),
     seed: z.number().int().optional(),
     llmEnabled: z.boolean().optional(),
+    /** CONTI-03: 콘티 확정 단계에서 제외한 컷(Scene.index) — 같은 seed 분석 기준.
+     *  상한은 분석 가능한 최대 장면 수를 여유 있게 상회해야 한다 (컷 230개 중
+     *  205개 제외 같은 정상 요청이 400 나지 않도록) */
+    excludeSceneIndices: z.array(z.number().int().min(0)).max(5_000).optional(),
   })
   .refine((d) => d.projectId || d.title, { message: 'projectId 또는 title 둘 중 하나 필수' })
 
@@ -124,8 +138,20 @@ export async function POST(req: Request): Promise<NextResponse> {
     return jsonError('요청 본문이 유효하지 않습니다.', 400)
   }
 
-  const { scriptRaw, projectId, title, characterMapping, seed = 0, llmEnabled = false } = body
+  const { scriptRaw, projectId, title, characterMapping, seed = 0 } = body
+  // LLM 게이트 — env 가 하드 게이트. 클라이언트 body 는 "끄는 방향"만 가능
+  const envLlm = process.env['STORYWORK_LLM'] === '1' || process.env['STORYWORK_LLM'] === 'true'
+  const llmEnabled = envLlm && (body.llmEnabled ?? true)
   const resolvedFormatId = resolveFormatId(body.formatId)
+
+  // Rate limit (인메모리 슬라이딩 윈도 — 인스턴스별 한계는 rate-limit.ts 참조)
+  const rl = checkRateLimit(`full-pipeline:${dbUser.id}`, 5, 60_000)
+  if (!rl.allowed) {
+    return NextResponse.json(
+      { error: '요청이 너무 잦습니다. 잠시 후 다시 시도해 주세요.' },
+      { status: 429, headers: { 'Retry-After': String(rl.retryAfterSec) } },
+    )
+  }
 
   const prisma = getPrismaClient()
 
@@ -135,7 +161,7 @@ export async function POST(req: Request): Promise<NextResponse> {
     select: { id: true, widthMm: true, heightMm: true, dpi: true, bleedMm: true, safeMm: true },
   })
   if (!dbFormat) {
-    return jsonError(`Format 을 찾을 수 없습니다: ${resolvedFormatId}`, 404)
+    return jsonError('지정한 판형을 찾을 수 없습니다.', 404)
   }
 
   const format: LayoutFormat = {
@@ -180,6 +206,26 @@ export async function POST(req: Request): Promise<NextResponse> {
   }
 
   console.warn(`[full-pipeline] analyze done: scenes=${analyzed.scenes.length}`)
+
+  // 6-b. CONTI-03: 콘티 확정 단계에서 제외한 컷 필터링.
+  //      같은 seed 재분석은 결정론(ADR-0007)이므로 콘티 미리보기의 index 와 일치한다.
+  const excludeSet = new Set(body.excludeSceneIndices ?? [])
+  if (excludeSet.size > 0) {
+    const remaining = analyzed.scenes.filter((s) => !excludeSet.has(s.index))
+    if (remaining.length === 0) {
+      return jsonError('모든 컷을 제외할 수는 없습니다. 최소 1개 컷이 필요합니다.', 400)
+    }
+    // 제외 후 실제 등장 캐릭터만 남긴다 (SceneDoc.meta.characterCount 정합)
+    const remainingNames = new Set(remaining.flatMap((s) => s.characters))
+    analyzed = {
+      ...analyzed,
+      scenes: remaining,
+      characters: analyzed.characters.filter((c) => remainingNames.has(c.name)),
+    }
+    console.warn(
+      `[full-pipeline] conti exclude: ${excludeSet.size}컷 제외 → scenes=${remaining.length}`,
+    )
+  }
 
   // 7. recommend() — 포즈/배경 추천
   let recommended: RecommendResult
