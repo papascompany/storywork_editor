@@ -1,7 +1,7 @@
 # 세션 핸드오프 — 2026-07-30
 
 > 이전: [SESSION_HANDOFF_2026-07-25.md](SESSION_HANDOFF_2026-07-25.md)
-> 이번 세션 = (D) 검증 PASS + CTA 배선 + **CONTI-02** + **SCRIPT-KO-01** + **BUBBLE-02** + **CHAR-GEN-01** — P0 4건 전부 완료.
+> 이번 세션(~07-31) = (D) 검증 PASS + CTA 배선 + **CONTI-02** + **SCRIPT-KO-01** + **BUBBLE-02** + **CHAR-GEN-01** + **CONTI-03** — 연구 P0 4건 + 콘티 뷰 UI 완료.
 
 ## 0. 한 줄 상태 (main = origin · 워킹트리 clean · CI green · web/admin prod 라이브)
 
@@ -30,6 +30,11 @@
   - 도메인 게이트(오버레이 실사): **동물(사족)·사랑(2인) 제외** — 인체 단일 스키마 밖, 3점 휴리스틱 유지(POSE3D 경로 대상)
   - KP 규약 통일: admin 10종 하이픈 → shared-schema 25종 언더스코어 SSOT, 레거시 정규화(waist→hip), 보정 API 상한 10→25
 
+- **`0ae5642` feat(web)**: **CONTI-03** 콘티 확정 단계 — import 마법사 5단계화 (07-31, ultracode 워크플로).
+  - 무영속 분석(`/api/script/analyze` projectId 옵셔널) → `ContiBoard` 컷 리스트(제외 토글·대사 펼치기·0컷 안내) → **확정 시에만 full-pipeline 영속화**(`excludeSceneIndices`) — 재실행 덮어쓰기 리스크 구조적 회피(research §2.2). 시드 0 고정 + preview 랜덤 재시드 제거(ADR-0007)
+  - **36-에이전트 적대 리뷰 27건 반영**: 재확정 시 projectId 재사용(중복 프로젝트 방지) · 동일 콘티 회신 시 제외 보존 + 동일 대본 재진입 시 재분석 생략 · **LLM env 하드 게이트**(body llmEnabled 상향 오버라이드 차단 — analyze/full-pipeline 공통) · **인메모리 rate limit**(analyze 10/min·full-pipeline 5/min, 429) · WCAG AA(제외 카드 대비·aria-live·role=alert·flex-wrap·dvh 상한) · 재생성 버튼 rule-only 숨김(시드 변주 no-op — CONTI-01 후 자동 노출) · formatId 반사 차단 · 제외 후 캐릭터 메타 재계산 · trim 검증
+  - 부수: **storybook tailwind postcss 미배선 수정**(웹 스토리 부재로 숨어 있던 유틸리티 사일런트 누락 — CLAUDE.md §9 함정의 storybook 변종) + ContiBoard 4스토리 + launch.json storybook 항목
+
 ## 2. 검증 상태
 
 - CTA 배선: 유닛 28/28 + 실기 모바일 375·데스크톱 1280 + CI run 30509939271 **success**.
@@ -37,18 +42,19 @@
 - SCRIPT-KO-01: ko-speech 신규 33건 포함 ai-script 107 green + 다운스트림(ai-recommend/ai-layout/web) turbo 27태스크 green + golden 실측 전/후 비교(1→12/13, 오귀속 0) + CI run 30522057962 **success**.
 - BUBBLE-02: 신규 23건 포함 ai-layout 141 green + compose/slot-assign 골든 무회귀 + turbo 21태스크 green + CI run 30549678265 **success**.
 - CHAR-GEN-01: 사이드카 1,058건 `parsePoseSidecar` 전수 검증 통과 + 파일럿/동물/사랑 오버레이 시각 실사 + admin turbo 6/6 + 키포인트 테스트 green(신규 정규화 5). admin UI(25종 에디터)는 컴포넌트 테스트로 검증 — 실기 브라우저 확인은 인증·DB 데이터 의존으로 생략(다음 admin 세션에서 확인 권장).
+- CONTI-03: 마법사 33 + API 34(무영속·LLM 게이트·429·trim·캐릭터 재계산) + rate-limit 4 green · turbo 21태스크 green · Storybook 시각 검증(기본/제외/생성중/재생성 — 375px 포함) + CI run 30604903535 **success**.
 - 한글 PDF 렌더는 기존 `PRETENDARD_TTF_PATH` 서버 계약(M6) 그대로 — 미설정 환경은 한글/△ 스킵 경고가 정상. **prod env 에 이 변수 설정 여부 확인 권장**(콘티·본문 텍스트 공통 전제).
 - 실기 브라우저 검증 팁: 하이드레이션 완료 전 클릭 유실(판형 모달 2회 재현) — read_page 후 ref 클릭 권장.
 
 ## 3. 미진행 · 다음 큐
 
-- 🟢 즉시 착수: **CONTI-03**(콘티 뷰 UI — `/ui-spec` SOP 대상) / admin 25종 키포인트 에디터 실기 확인
+- 🟢 즉시 착수: admin 25종 키포인트 에디터 실기 확인 / 콘티 컷 DnD 재정렬·컷 교체(CONTI-03 2차 — 편집기 M4-05 연계)
 - 🔴 대표님 액션: **FOLLOWUP-68 prod 적용**(migrate deploy) / **PERF-ADMIN-03**(perf:admin 실행) / **prod `PRETENDARD_TTF_PATH` 확인** / (신규) **키포인트 DB 재적재** — `pnpm tsx scripts/ingest-poses.ts` 재실행(upsert·사이드카 우선, prod DATABASE_URL 필요). 재적재 시 말풍선 화자 앵커(BUBBLE-02)가 실측 키포인트로 자동 개선
-- 🚦 게이트 대기: **CONTI-01** 포함 LLM 실가동(`AI_GATEWAY_API_KEY`) / POSE3D-01(결제 승인) / **BUBBLE-02 ONNX 검출기 실연결**(onnxruntime-node 의존성+가중치 반입) / FOLLOWUP-60(법무) / M7·EDU·MARKET
+- 🚦 게이트 대기: **CONTI-01** 포함 LLM 실가동(`AI_GATEWAY_API_KEY` — 활성 시 콘티 재생성 버튼·샷사이즈 자동 활성) / POSE3D-01(결제 승인) / **BUBBLE-02 ONNX 검출기 실연결**(onnxruntime-node 의존성+가중치 반입) / **SEC-RATE-01** Upstash 실 rate limit(인메모리 스톱갭은 인스턴스별 한계) / 사용자당 프로젝트 수 상한(제품 결정) / FOLLOWUP-60(법무) / M7·EDU·MARKET
 - 📋 제품 의사결정 3건: 웹툰 모드 vs POD 우선순위 · 생성 에셋 마켓 정책 · SSOT 갱신(자산 수치 단일화, nano-banana 표기)
 
 ## 4. 환경/함정 노트
 
 7-25 핸드오프 §4 그대로 유지(커밋 컨벤션·마이그레이션 이원화·디스크·lint-staged·MCP 인증). 디스크는 현재 29% 사용으로 여유. 추가: pdf-lib `\n` 멀티라인 lineHeight 함정(§1 CONTI-02 참조) — pdf-engine 에 텍스트 넣을 때 줄당 레이어로.
 
-_갱신: 2026-07-30 · (D) 종결 + CTA(`0fac9bc`) + CONTI-02(`dbb5e5a`) + SCRIPT-KO-01(`1a7429a`) + BUBBLE-02(`613c9cf`) + CHAR-GEN-01(`f725030`+데이터). **연구 P0 큐 4건 전부 종결**. 남은 근시일 = CONTI-03 착수 + 키포인트 DB 재적재·FOLLOWUP-68(대표님)._
+_갱신: 2026-07-31 · (D) 종결 + CTA(`0fac9bc`) + CONTI-02(`dbb5e5a`) + SCRIPT-KO-01(`1a7429a`) + BUBBLE-02(`613c9cf`) + CHAR-GEN-01(`f725030`+데이터) + **CONTI-03(`0ae5642`)**. **연구 P0 큐 4건 + 콘티 뷰 UI 전부 종결**. 남은 근시일 = 키포인트 DB 재적재·FOLLOWUP-68·PRETENDARD_TTF_PATH(대표님) + admin 키포인트 에디터 실기 확인._
