@@ -383,14 +383,27 @@ export function KeypointEditor({
                   }
                   onKeyDown={(e) => handleKpKeyDown(kp.name, e as unknown as React.KeyboardEvent)}
                   onFocus={() => setFocusedName(kp.name)}
+                  onBlur={() => setFocusedName((prev) => (prev === kp.name ? null : prev))}
                   tabIndex={readonly ? undefined : 0}
                   role={readonly ? undefined : 'button'}
                   aria-label={`${KP_LABELS[kp.name] ?? kp.name} 키포인트${kp.inferred ? ' (추정)' : ''}`}
-                  style={{
-                    outline: isFocused ? `2px solid ${color}` : undefined,
-                    filter: isFocused ? `drop-shadow(0 0 4px ${color})` : undefined,
-                  }}
+                  // CSS outline 은 viewBox 0..1 SVG 에서 user unit 으로 해석되어
+                  // 포커스 시 캔버스 전체를 덮는다 — 포커스 링은 아래 SVG 원으로 표현
+                  style={{ outline: 'none' }}
                 />
+                {/* 포커스 링 (키보드/클릭 포커스 표시 — SVG 좌표계 네이티브) */}
+                {isFocused && (
+                  <circle
+                    cx={kp.x}
+                    cy={kp.y}
+                    r={0.035}
+                    fill="none"
+                    stroke={color}
+                    strokeWidth={0.004}
+                    opacity={0.55}
+                    pointerEvents="none"
+                  />
+                )}
                 {/* 중심 점 */}
                 <circle cx={kp.x} cy={kp.y} r={0.008} fill={color} pointerEvents="none" />
                 {/* 라벨 */}
