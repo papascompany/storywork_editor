@@ -35,7 +35,7 @@
   - **36-에이전트 적대 리뷰 27건 반영**: 재확정 시 projectId 재사용(중복 프로젝트 방지) · 동일 콘티 회신 시 제외 보존 + 동일 대본 재진입 시 재분석 생략 · **LLM env 하드 게이트**(body llmEnabled 상향 오버라이드 차단 — analyze/full-pipeline 공통) · **인메모리 rate limit**(analyze 10/min·full-pipeline 5/min, 429) · WCAG AA(제외 카드 대비·aria-live·role=alert·flex-wrap·dvh 상한) · 재생성 버튼 rule-only 숨김(시드 변주 no-op — CONTI-01 후 자동 노출) · formatId 반사 차단 · 제외 후 캐릭터 메타 재계산 · trim 검증
   - 부수: **storybook tailwind postcss 미배선 수정**(웹 스토리 부재로 숨어 있던 유틸리티 사일런트 누락 — CLAUDE.md §9 함정의 storybook 변종) + ContiBoard 4스토리 + launch.json storybook 항목
 
-- **CONTI-03b (07-31)**: 컷 DnD 재정렬(핸들 ⠿+↑/↓, sceneOrder→서버 재정렬·reindex) + **컷 교체 활성화**(M4-05 대안 UI 생산자 갭 해소 — compose 가 포즈 후보를 layer meta 로 영속, full-pipeline 이 실자산 검증+thumbnail 주입). admin 25종 에디터 실기 확인 중 **SVG 포커스 링 캔버스 플러딩** 기존 결함 발견·수정(`5b8c645`). 24-에이전트 적대 리뷰 15건 반영: 무동작 교체(thumbnail 부재)·외부 드래그 오재정렬(Number('')===0)·signature 퇴화(stale 순서 승계)·SCENE_ORDER_MISMATCH 막다른 길(자동 재분석 복구)·SR 순서 통지·경계 버튼 포커스 소실(aria-disabled)·reasoning 영속 노출 등.
+- **`81eaae9` feat(web)**: **CONTI-03b (07-31)** 컷 DnD 재정렬(핸들 ⠿+↑/↓, sceneOrder→서버 재정렬·reindex) + **컷 교체 활성화**(M4-05 대안 UI 생산자 갭 해소 — compose 가 포즈 후보를 layer meta 로 영속, full-pipeline 이 실자산 검증+thumbnail 주입). admin 25종 에디터 실기 확인 중 **SVG 포커스 링 캔버스 플러딩** 기존 결함 발견·수정(`5b8c645`). 24-에이전트 적대 리뷰 15건 반영: 무동작 교체(thumbnail 부재)·외부 드래그 오재정렬(Number('')===0)·signature 퇴화(stale 순서 승계)·SCENE_ORDER_MISMATCH 막다른 길(자동 재분석 복구)·SR 순서 통지·경계 버튼 포커스 소실(aria-disabled)·reasoning 영속 노출 등.
 
 ## 2. 검증 상태
 
@@ -45,6 +45,8 @@
 - BUBBLE-02: 신규 23건 포함 ai-layout 141 green + compose/slot-assign 골든 무회귀 + turbo 21태스크 green + CI run 30549678265 **success**.
 - CHAR-GEN-01: 사이드카 1,058건 `parsePoseSidecar` 전수 검증 통과 + 파일럿/동물/사랑 오버레이 시각 실사 + admin turbo 6/6 + 키포인트 테스트 green(신규 정규화 5). admin UI(25종 에디터)는 컴포넌트 테스트로 검증 — 실기 브라우저 확인은 인증·DB 데이터 의존으로 생략(다음 admin 세션에서 확인 권장).
 - CONTI-03: 마법사 33 + API 34(무영속·LLM 게이트·429·trim·캐릭터 재계산) + rate-limit 4 green · turbo 21태스크 green · Storybook 시각 검증(기본/제외/생성중/재생성 — 375px 포함) + CI run 30604903535 **success**.
+- CONTI-03b: 마법사 36 + API 27(재정렬·reindex·불일치 400·thumbnail 주입/placeholder 제거 tx 캡처) + ai-layout 143(양 경로 메타 계약) green · turbo 24태스크 green · Storybook 실기(⠿ 핸들·재정렬·제외 안내문) + CI run 30818124709 **success**.
+- admin 키포인트 에디터 실기: Storybook 실구동으로 25종 라벨/색상·AddKpModal·waist→hip 확인 + SVG 포커스 링 플러딩 결함 발견·수정(`5b8c645`, CI **success**). admin 콘솔 자체(로그인+TOTP)는 자격증명 필요로 미수행.
 - 한글 PDF 렌더는 기존 `PRETENDARD_TTF_PATH` 서버 계약(M6) 그대로 — 미설정 환경은 한글/△ 스킵 경고가 정상. **prod env 에 이 변수 설정 여부 확인 권장**(콘티·본문 텍스트 공통 전제).
 - 실기 브라우저 검증 팁: 하이드레이션 완료 전 클릭 유실(판형 모달 2회 재현) — read_page 후 ref 클릭 권장.
 
