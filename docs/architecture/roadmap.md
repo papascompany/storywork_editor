@@ -150,7 +150,7 @@
 
 ## CHAR-GEN — 캐릭터 에셋 파이프라인 (research 2026-07-21 §4.4, 착수 승인 2026-07-30)
 
-- [x] [CHAR-GEN-01] dwpose 키포인트 일괄 보강 — `scripts/enrich-keypoints.py`(uv+onnxruntime, 알파 bbox=person bbox 로 검출기 생략) → **1,058장 전량 25점 사이드카 생성**(파서 전수 검증 1,058/1,058 통과, 평균 21.3점/장, meanW 0.154, 검수큐 125건=11.8%). 파일럿 오버레이 실사로 SimCC 신뢰도 보정·bbox 이탈 가드·파생점 가중치 확정. **동물(사족)·사랑(2인)은 도메인 밖 제외**(3점 휴리스틱 유지 — POSE3D 3D 렌더 경로 대상). 선행: KP 규약 통일(admin 10종 하이픈→shared-schema 25종 언더스코어, 레거시 정규화, 보정 API 상한 10→25) — @pose-curator ✅ 2026-07-30. **잔여**: DB 반영은 `scripts/ingest-poses.ts` 재실행(upsert·사이드카 우선) — prod DATABASE_URL 필요, 휴먼게이트. 말풍선 앵커(BUBBLE-02 `speakerAnchorFromPoseSlot`)는 재적재 후 실측 키포인트로 자동 개선
+- [x] [CHAR-GEN-01] dwpose 키포인트 일괄 보강 — `scripts/enrich-keypoints.py`(uv+onnxruntime, 알파 bbox=person bbox 로 검출기 생략) → **1,058장 전량 25점 사이드카 생성**(파서 전수 검증 1,058/1,058 통과, 평균 21.3점/장, meanW 0.154, 검수큐 125건=11.8%). 파일럿 오버레이 실사로 SimCC 신뢰도 보정·bbox 이탈 가드·파생점 가중치 확정. **동물(사족)·사랑(2인)은 도메인 밖 제외**(3점 휴리스틱 유지 — POSE3D 3D 렌더 경로 대상). 선행: KP 규약 통일(admin 10종 하이픈→shared-schema 25종 언더스코어, 레거시 정규화, 보정 API 상한 10→25) — @pose-curator ✅ 2026-07-30. **잔여 해소 ✅ 2026-08-03**: 재적재 완료(1,260/1,260, prod) — 단 6월 적재분과 slug 불일치로 이중화 발생 → 스테일 1,268행 정리(작품 참조 2행 보존, 최종 1,262행, `scripts/cleanup-stale-poses.ts`). 말풍선 앵커는 실측 25점 키포인트 가동
 
 ## M7 — Creator Mode + Billing
 
