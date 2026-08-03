@@ -17,6 +17,7 @@
  * ADR-0008: 벡터 우선. needsRaster=true 이미지는 현재 warning 추가 후 스킵.
  */
 
+import fontkit from '@pdf-lib/fontkit'
 import type { PDFDocument, PDFPage } from 'pdf-lib'
 import { StandardFonts, rgb, degrees, type PDFFont, type PDFImage } from 'pdf-lib'
 
@@ -361,11 +362,19 @@ export async function createRenderContext(
 ): Promise<PageRenderContext> {
   const defaultFont = await doc.embedFont(StandardFonts.Helvetica)
 
+  const warnings: string[] = []
   let embedFont: PDFFont | null = null
   if (embedFontBytes) {
     try {
-      embedFont = await doc.embedFont(embedFontBytes, { subset: true })
-    } catch {
+      // 커스텀 폰트 임베드는 fontkit 등록이 선행돼야 함 (미등록 시 pdf-lib throw)
+      doc.registerFontkit(fontkit)
+      // subset:true 금지 — @pdf-lib/fontkit 서브셋터가 한글 폰트에서 글리프를
+      // 깨뜨림(일부 글자만 렌더). 전체 임베드(+~3MB/PDF)가 유일한 정상 경로.
+      embedFont = await doc.embedFont(embedFontBytes, { subset: false })
+    } catch (e) {
+      warnings.push(
+        `[page-renderer] 폰트 임베드 실패 — Helvetica 폴백 (한글 스킵 가능): ${String(e)}`,
+      )
       embedFont = null
     }
   }
@@ -377,6 +386,6 @@ export async function createRenderContext(
     imageCache: new Map(),
     pageHeightPt: (heightMm + 2 * bleedMm) * MM_TO_PT,
     bleedPt: bleedMm * MM_TO_PT,
-    warnings: [],
+    warnings,
   }
 }

@@ -6,6 +6,14 @@ const nextConfig: NextConfig = {
   // 모노레포 루트를 명시해 lockfile 감지 경고 제거
   outputFileTracingRoot: path.join(__dirname, '../../'),
 
+  // PDF 한글 렌더용 Pretendard 폰트를 서버리스 번들에 포함
+  // (pdf-engine loadPretendardFont 가 cwd candidates 로 자동 발견 — 키는 micromatch
+  //  글롭이라 [id] 동적 세그먼트는 * 로 매칭)
+  outputFileTracingIncludes: {
+    '/api/projects/*/publish': ['../../packages/pdf-engine/assets/fonts/**/*'],
+    '/api/inngest': ['../../packages/pdf-engine/assets/fonts/**/*'],
+  },
+
   // 외부 이미지 도메인 허용 (Supabase Storage)
   images: {
     remotePatterns: [
