@@ -62,6 +62,7 @@ function assignmentToFabricLayer(
   format: LayoutFormat,
   seed: number,
   assignIndex: number,
+  sceneIndex?: number,
 ): FabricLayer | null {
   const { slot } = assignment
 
@@ -110,10 +111,19 @@ function assignmentToFabricLayer(
         slotId: slot.id,
         locked: false,
         visible: true,
+        // kind/resourceId/alternatives 는 M4-05 편집기 컷 교체 UI 의 파싱 계약
+        // (useAlternativesStore.parseAlternatives — meta.kind 필수)
         meta: {
+          kind: 'pose',
+          resourceId: assignment.resourceId,
           characterName: assignment.characterName,
+          // 멀티 장면 경로와 대칭 — 향후 장면 컨텍스트 재추천의 참조점
+          sceneIndex,
           lowDpiViolation: assignment.lowDpiViolation ?? false,
           effectiveDpi: assignment.effectiveDpi,
+          ...(assignment.poseAlternatives && assignment.poseAlternatives.length > 0
+            ? { alternatives: assignment.poseAlternatives }
+            : {}),
         },
       },
       fabric: {
@@ -238,7 +248,13 @@ async function buildPageFabricJson(
           const assignment = assignments[ai]
           if (!assignment || usedSlotIds.has(assignment.slotId)) continue
           usedSlotIds.add(assignment.slotId)
-          const layer = assignmentToFabricLayer(assignment, format, seed, pageIndex * 100 + ai)
+          const layer = assignmentToFabricLayer(
+            assignment,
+            format,
+            seed,
+            pageIndex * 100 + ai,
+            sceneIdx,
+          )
           if (layer) layers.push(layer)
         }
       }
@@ -376,10 +392,23 @@ async function buildPageFabricJson(
           slotId: poseSlot.id,
           locked: false,
           visible: true,
+          // M4-05 컷 교체 파싱 계약 (단일 장면 경로와 동일)
           meta: {
+            kind: 'pose',
+            resourceId,
             characterName: charName,
             sceneIndex: sceneIdx,
             lowDpiViolation,
+            ...(poseCandidates.length > 0
+              ? {
+                  alternatives: poseCandidates.slice(0, 5).map((c) => ({
+                    resourceId: c.resourceId,
+                    poseAction: c.poseAction,
+                    confidence: c.confidence,
+                    characterName: charName,
+                  })),
+                }
+              : {}),
           },
         },
         fabric: {

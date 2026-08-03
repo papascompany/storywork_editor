@@ -87,6 +87,9 @@ const FullPipelineRequestSchema = z
      *  상한은 분석 가능한 최대 장면 수를 여유 있게 상회해야 한다 (컷 230개 중
      *  205개 제외 같은 정상 요청이 400 나지 않도록) */
     excludeSceneIndices: z.array(z.number().int().min(0)).max(5_000).optional(),
+    /** CONTI-03 2차: 컷 표시 순서(Scene.index 순열) — DnD 재정렬 결과.
+     *  제외 컷을 포함해도 무방 (서버가 제외 필터 후 상대 순서만 사용) */
+    sceneOrder: z.array(z.number().int().min(0)).max(5_000).optional(),
   })
   .refine((d) => d.projectId || d.title, { message: 'projectId 또는 title 둘 중 하나 필수' })
 
@@ -227,6 +230,37 @@ export async function POST(req: Request): Promise<NextResponse> {
     )
   }
 
+  // 6-c. CONTI-03 2차: 컷 재정렬(DnD). sceneOrder 는 콘티 표시 순서의
+  //      원본 Scene.index 순열 — 제외 필터 후 남은 컷과 정확히 일치해야 한다.
+  //      재정렬 후 index 를 순차 재부여해 페이지 분할·SceneDoc·콘티 시트가
+  //      모두 사용자 확정 순서를 따르게 한다.
+  if (body.sceneOrder && body.sceneOrder.length > 0) {
+    const orderFiltered = body.sceneOrder.filter((i) => !excludeSet.has(i))
+    const remainingIndices = new Set(analyzed.scenes.map((s) => s.index))
+    const isPermutation =
+      orderFiltered.length === remainingIndices.size &&
+      new Set(orderFiltered).size === orderFiltered.length &&
+      orderFiltered.every((i) => remainingIndices.has(i))
+    if (!isPermutation) {
+      // code 는 클라이언트 복구 분기용 (마법사: 콘티 자동 재분석 유도)
+      return NextResponse.json(
+        {
+          error: '컷 순서가 콘티와 일치하지 않습니다. 콘티를 다시 분석해 주세요.',
+          code: 'SCENE_ORDER_MISMATCH',
+        },
+        { status: 400 },
+      )
+    }
+
+    const byIndex = new Map(analyzed.scenes.map((s) => [s.index, s]))
+    const reordered = orderFiltered
+      .map((i) => byIndex.get(i))
+      .filter((s): s is NonNullable<typeof s> => s !== undefined)
+      .map((s, newIndex) => ({ ...s, index: newIndex }))
+    analyzed = { ...analyzed, scenes: reordered }
+    console.warn(`[full-pipeline] conti reorder: ${reordered.length}컷 순서 재부여`)
+  }
+
   // 7. recommend() — 포즈/배경 추천
   let recommended: RecommendResult
   try {
@@ -261,6 +295,50 @@ export async function POST(req: Request): Promise<NextResponse> {
   console.warn(
     `[full-pipeline] compose done: pages=${composed.pages.length}, warnings=${composed.warnings.length}`,
   )
+
+  // 8-b. M4-05 컷 교체 후보 정합: 실존 자산만 유지 + 파생본 URL(thumbnail) 주입.
+  //      thumbnail 은 편집기 적용 분기(EditorShell — FabricImage.fromURL)의 이미지
+  //      소스이므로 고해상 파생본(webp2x→webp1x→fileUrl) 우선. rule-placeholder 등
+  //      실자산이 아닌 후보는 제거 — 후보가 남지 않으면 alternatives 자체를 지워
+  //      편집기 대안 섹션이 렌더되지 않게 한다(무동작 교체 방지).
+  try {
+    const altIds = new Set<string>()
+    for (const page of composed.pages) {
+      for (const layer of page.fabricJson.layers) {
+        const meta = layer.data?.meta as
+          | { alternatives?: Array<{ resourceId: string }> }
+          | undefined
+        for (const alt of meta?.alternatives ?? []) altIds.add(alt.resourceId)
+      }
+    }
+    if (altIds.size > 0) {
+      const resources = await prisma.resource.findMany({
+        where: { id: { in: [...altIds] } },
+        select: { id: true, fileUrl: true, variants: true },
+      })
+      const urlById = new Map(
+        resources.map((r) => {
+          const v = r.variants as { webp2x?: string; webp1x?: string } | null
+          return [r.id, v?.webp2x ?? v?.webp1x ?? r.fileUrl] as const
+        }),
+      )
+      for (const page of composed.pages) {
+        for (const layer of page.fabricJson.layers) {
+          const meta = layer.data?.meta as Record<string, unknown> | undefined
+          const alts = meta?.['alternatives'] as Array<{ resourceId: string }> | undefined
+          if (!meta || !alts) continue
+          const enriched = alts
+            .filter((a) => urlById.has(a.resourceId))
+            .map((a) => ({ ...a, thumbnail: urlById.get(a.resourceId) }))
+          if (enriched.length > 0) meta['alternatives'] = enriched
+          else delete meta['alternatives']
+        }
+      }
+    }
+  } catch (err) {
+    // 후보 정합 실패는 페이지 생성 자체를 막지 않는다 — alternatives 없이 진행
+    console.error('[full-pipeline] alternatives 정합 오류(무시하고 진행):', err)
+  }
 
   // 9. DB 저장 트랜잭션
   let savedProjectId: string

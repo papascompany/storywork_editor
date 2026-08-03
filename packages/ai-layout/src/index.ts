@@ -22,6 +22,7 @@ export type {
   LayoutTemplate,
   PageDraft,
   PageFabricJson,
+  PoseAlternativeMeta,
   ResourceTagAdapter,
   SlotAssignment,
   TemplateHint,

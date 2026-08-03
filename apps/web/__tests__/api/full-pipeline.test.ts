@@ -133,6 +133,34 @@ function makeMockFabricJson(pageIndex: number): PageFabricJson {
           zIndex: 0,
         },
       },
+      {
+        id: `layer-pose-${pageIndex}`,
+        kind: 'pose',
+        data: {
+          resourceId: `resource-pose-${pageIndex}`,
+          slotId: 'pose-slot',
+          locked: false,
+          visible: true,
+          // 8-b alternatives 정합 검증용 — 실자산 + rule-placeholder 혼합
+          meta: {
+            kind: 'pose',
+            resourceId: `resource-pose-${pageIndex}`,
+            alternatives: [
+              { resourceId: `resource-pose-${pageIndex}`, confidence: 0.8 },
+              { resourceId: 'rule-placeholder:standing', confidence: 0.5 },
+            ],
+          },
+        },
+        fabric: {
+          type: 'image',
+          leftMm: 10,
+          topMm: 10,
+          widthMm: 60,
+          heightMm: 80,
+          src: `resource://resource-pose-${pageIndex}`,
+          zIndex: 1,
+        },
+      },
     ],
     _aiMeta: {
       generatedBy: 'ai-layout',
@@ -216,6 +244,10 @@ function makeMockPrisma(
       findUnique: vi
         .fn()
         .mockResolvedValue(overrides.project !== undefined ? overrides.project : null),
+    },
+    resource: {
+      // 8-b alternatives 정합용 — 기본은 실자산 없음(placeholder 후보 전부 제거 경로)
+      findMany: vi.fn().mockResolvedValue([]),
     },
     $transaction:
       overrides.transaction ??
@@ -575,6 +607,140 @@ describe('POST /api/script/full-pipeline', () => {
     expect(status).toBe(200)
     const analyzedArg = mockRecommend.mock.calls[0]?.[0] as AnalyzeResult
     expect(analyzedArg.characters.map((c) => c.name)).toEqual(['철수'])
+  })
+
+  // ── 11-b. sceneOrder (CONTI-03 2차: 컷 재정렬) ────────────────────
+
+  it('sceneOrder: 재정렬 순서대로 scenes 재배열 + index 순차 재부여', async () => {
+    const { status } = await callRoute({
+      scriptRaw: '철수: 안녕!',
+      formatId: 'preset-b5-novel',
+      title: '재정렬 테스트',
+      seed: 0,
+      sceneOrder: [1, 0],
+    })
+
+    expect(status).toBe(200)
+    const analyzedArg = mockRecommend.mock.calls[0]?.[0] as AnalyzeResult
+    // 원본 scene-01(index 1)이 앞으로 오고, index 는 0/1 로 재부여
+    expect(analyzedArg.scenes.map((s) => s.slug)).toEqual(['scene-01', 'scene-00'])
+    expect(analyzedArg.scenes.map((s) => s.index)).toEqual([0, 1])
+  })
+
+  it('sceneOrder 가 남은 컷과 불일치하면 400', async () => {
+    const { status } = await callRoute({
+      scriptRaw: '철수: 안녕!',
+      formatId: 'preset-b5-novel',
+      title: '불일치 테스트',
+      seed: 0,
+      sceneOrder: [0, 5],
+    })
+    expect(status).toBe(400)
+  })
+
+  it('sceneOrder 에 제외 컷이 섞여 있어도 상대 순서만 사용', async () => {
+    const { status } = await callRoute({
+      scriptRaw: '철수: 안녕!',
+      formatId: 'preset-b5-novel',
+      title: '제외+재정렬 테스트',
+      seed: 0,
+      excludeSceneIndices: [0],
+      sceneOrder: [1, 0],
+    })
+    expect(status).toBe(200)
+    const analyzedArg = mockRecommend.mock.calls[0]?.[0] as AnalyzeResult
+    expect(analyzedArg.scenes.map((s) => s.slug)).toEqual(['scene-01'])
+    expect(analyzedArg.scenes.map((s) => s.index)).toEqual([0])
+  })
+
+  // ── 11-c. M4-05 컷 교체 후보 정합 (thumbnail 주입/placeholder 제거) ──
+
+  /** 저장된 page.fabricJson 들에서 pose 레이어 meta 수집 */
+  function collectSavedPoseMetas(
+    tx: ReturnType<typeof makeMockTx>,
+  ): Array<Record<string, unknown>> {
+    return tx.page.create.mock.calls
+      .map(
+        (c) =>
+          (
+            c[0] as {
+              data: {
+                fabricJson: {
+                  layers: Array<{ kind: string; data: { meta?: Record<string, unknown> } }>
+                }
+              }
+            }
+          ).data.fabricJson,
+      )
+      .flatMap((fj) => fj.layers.filter((l) => l.kind === 'pose').map((l) => l.data.meta ?? {}))
+  }
+
+  it('alternatives: 실자산이면 파생본 URL(thumbnail) 주입 (webp1x → fileUrl 폴백)', async () => {
+    const tx = makeMockTx()
+    const prismaMock = makeMockPrisma({
+      transaction: vi
+        .fn()
+        .mockImplementation(async (fn: (t: typeof tx) => Promise<unknown>) => fn(tx)),
+    })
+    prismaMock.resource.findMany.mockResolvedValue([
+      {
+        id: 'resource-pose-0',
+        fileUrl: 'https://cdn.example.com/pose-0.png',
+        variants: { webp1x: 'https://cdn.example.com/pose-0.webp' },
+      },
+      {
+        id: 'resource-pose-1',
+        fileUrl: 'https://cdn.example.com/pose-1.png',
+        variants: null,
+      },
+    ])
+    mockGetPrismaClient.mockReturnValue(prismaMock as never)
+
+    const { status } = await callRoute({
+      scriptRaw: '철수: 안녕!',
+      formatId: 'preset-b5-novel',
+      title: '썸네일 주입 테스트',
+      seed: 0,
+    })
+    expect(status).toBe(200)
+
+    const metas = collectSavedPoseMetas(tx)
+    const alts = metas.flatMap(
+      (m) => (m['alternatives'] as Array<{ resourceId: string; thumbnail?: string }>) ?? [],
+    )
+    expect(alts.length).toBeGreaterThan(0)
+    const byId = new Map(alts.map((a) => [a.resourceId, a.thumbnail]))
+    if (byId.has('resource-pose-0')) {
+      expect(byId.get('resource-pose-0')).toBe('https://cdn.example.com/pose-0.webp')
+    }
+    if (byId.has('resource-pose-1')) {
+      expect(byId.get('resource-pose-1')).toBe('https://cdn.example.com/pose-1.png')
+    }
+    // 모든 영속 후보는 thumbnail 을 갖는다 (무동작 교체 방지 계약)
+    for (const a of alts) expect(a.thumbnail).toBeTruthy()
+  })
+
+  it('alternatives: 실자산이 하나도 없으면 alternatives 필드 제거 (대안 섹션 미렌더)', async () => {
+    const tx = makeMockTx()
+    const prismaMock = makeMockPrisma({
+      transaction: vi
+        .fn()
+        .mockImplementation(async (fn: (t: typeof tx) => Promise<unknown>) => fn(tx)),
+    })
+    // resource.findMany → [] (기본): rule-placeholder 후보 전부 제거
+    mockGetPrismaClient.mockReturnValue(prismaMock as never)
+
+    const { status } = await callRoute({
+      scriptRaw: '철수: 안녕!',
+      formatId: 'preset-b5-novel',
+      title: '후보 제거 테스트',
+      seed: 0,
+    })
+    expect(status).toBe(200)
+
+    const metas = collectSavedPoseMetas(tx)
+    expect(metas.length).toBeGreaterThan(0)
+    for (const m of metas) expect(m['alternatives']).toBeUndefined()
   })
 
   // ── 12. LLM 하드 게이트 + rate limit ──────────────────────────────

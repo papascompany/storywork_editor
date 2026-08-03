@@ -298,6 +298,8 @@ describe('ContiBoard — 콘티 확정 단계 (CONTI-03)', () => {
   const baseProps = {
     conti: MOCK_ANALYZE_RESULT,
     excludedSceneIndices: [] as number[],
+    sceneOrder: MOCK_ANALYZE_RESULT.scenes.map((s) => s.index),
+    onReorder: vi.fn(),
     onToggleExclude: vi.fn(),
     onRegenerate: vi.fn(),
     showRegenerate: false,
@@ -350,6 +352,34 @@ describe('ContiBoard — 콘티 확정 단계 (CONTI-03)', () => {
     await user.click(screen.getByRole('button', { name: /다르게 재생성/ }))
     expect(onRegenerate).toHaveBeenCalledOnce()
     expect(screen.getByText(/변주 #0/)).toBeDefined()
+  })
+
+  it('↑/↓ 버튼 → onReorder(표시 위치) 호출, 경계에서 비활성', async () => {
+    const user = userEvent.setup()
+    const onReorder = vi.fn()
+    render(<ContiBoard {...baseProps} onReorder={onReorder} />)
+
+    // disabled 대신 aria-disabled — 경계 도달 시 키보드 포커스 소실 방지 (리뷰 후속)
+    expect(screen.getByRole('button', { name: '1번 컷 위로 이동' })).toHaveAttribute(
+      'aria-disabled',
+      'true',
+    )
+    expect(screen.getByRole('button', { name: '2번 컷 아래로 이동' })).toHaveAttribute(
+      'aria-disabled',
+      'true',
+    )
+
+    await user.click(screen.getByRole('button', { name: '1번 컷 아래로 이동' }))
+    expect(onReorder).toHaveBeenCalledWith(0, 1)
+    await user.click(screen.getByRole('button', { name: '2번 컷 위로 이동' }))
+    expect(onReorder).toHaveBeenCalledWith(1, 0)
+  })
+
+  it('sceneOrder 순서대로 컷 렌더 (역순이면 번호 재부여)', () => {
+    render(<ContiBoard {...baseProps} sceneOrder={[1, 0]} />)
+    const cards = screen.getAllByTestId(/conti-cut-/)
+    expect(cards[0]).toHaveAttribute('data-testid', 'conti-cut-1')
+    expect(cards[1]).toHaveAttribute('data-testid', 'conti-cut-0')
   })
 
   it('0컷 콘티 → 막다른 상태 안내 렌더', () => {
@@ -559,6 +589,25 @@ describe('ScriptImporterShell — Wizard 흐름', () => {
       (fetchMock.mock.calls[2] as [string, { body: string }])[1].body,
     ) as { projectId?: string }
     expect(secondConfirm.projectId).toBe('proj-test-001')
+  })
+
+  it('컷 재정렬 후 확정 → body.sceneOrder 에 표시 순서 반영', async () => {
+    const user = userEvent.setup()
+    const fetchMock = mockAnalyzeThenPipeline()
+
+    render(<ScriptImporterShell />)
+    await walkToConti(user)
+
+    await user.click(screen.getByRole('button', { name: '1번 컷 아래로 이동' }))
+    await user.click(screen.getByRole('button', { name: /페이지 생성/ }))
+
+    await waitFor(() => {
+      expect(fetchMock).toHaveBeenCalledTimes(2)
+    })
+    const body = JSON.parse((fetchMock.mock.calls[1] as [string, { body: string }])[1].body) as {
+      sceneOrder: number[]
+    }
+    expect(body.sceneOrder).toEqual([1, 0])
   })
 
   it('콘티 확정(full-pipeline) 실패 → 콘티 단계에 에러 배너(role=alert)', async () => {

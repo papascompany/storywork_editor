@@ -395,3 +395,52 @@ describe('fabricJson._aiMeta', () => {
     expect(meta?.seed).toBe(42)
   })
 })
+
+// ─────────────────────────────────────────────
+// CONTI-03 2차: 컷 교체 — pose 레이어 meta.alternatives 영속
+// ─────────────────────────────────────────────
+
+describe('compose() — pose 레이어 컷 교체 메타 (M4-05 파싱 계약)', () => {
+  async function collectPoseLayers(sceneDefs: Parameters<typeof makeAnalyzed>[0]) {
+    const analyzed = makeAnalyzed(sceneDefs)
+    const recommended = makeRecommended(
+      sceneDefs.map((d) => d.index),
+      { charNames: sceneDefs[0]?.characters ?? ['주인공'] },
+    )
+    const result = await compose(analyzed, recommended, BASE_OPTS)
+    return result.pages.flatMap((p) => p.fabricJson.layers.filter((l) => l.kind === 'pose'))
+  }
+
+  function assertAlternativesMeta(poseLayers: Awaited<ReturnType<typeof collectPoseLayers>>): void {
+    expect(poseLayers.length).toBeGreaterThan(0)
+    for (const layer of poseLayers) {
+      const meta = layer.data.meta as {
+        kind?: string
+        resourceId?: string
+        alternatives?: Array<{ resourceId: string; confidence: number }>
+      }
+      expect(meta.kind).toBe('pose')
+      expect(meta.alternatives).toBeDefined()
+      expect(meta.alternatives?.length).toBeGreaterThan(0)
+      // 선택된 후보가 alternatives 목록 안에 존재 (selectedIndex 결정 계약)
+      expect(meta.alternatives?.some((a) => a.resourceId === meta.resourceId)).toBe(true)
+    }
+  }
+
+  it('단일 장면 경로: pose 레이어 meta 에 kind/resourceId/alternatives 기록', async () => {
+    assertAlternativesMeta(
+      await collectPoseLayers([
+        { index: 0, cameraAngle: 'closeup', emotion: 'happy', characters: ['철수'] },
+      ]),
+    )
+  })
+
+  it('멀티 장면 경로(1on1 합병): pose 레이어에도 동일 메타 기록', async () => {
+    assertAlternativesMeta(
+      await collectPoseLayers([
+        { index: 0, location: '학교', cameraAngle: 'medium', characters: ['철수', '영희'] },
+        { index: 1, location: '학교', cameraAngle: 'medium', characters: ['철수', '영희'] },
+      ]),
+    )
+  })
+})

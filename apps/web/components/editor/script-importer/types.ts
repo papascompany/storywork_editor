@@ -123,6 +123,8 @@ export interface WizardState {
   analyzedScriptRaw: string | null
   /** 콘티 확정에서 제외한 컷(Scene.index) */
   excludedSceneIndices: number[]
+  /** 컷 표시 순서(Scene.index 순열) — DnD/버튼 재정렬 결과. 콘티 구조 변경 시 리셋 */
+  sceneOrder: number[]
   /**
    * 확정으로 생성된 Project.id — 재확정 시 재사용(덮어쓰기)해
    * '새 콘티' 중복 프로젝트가 누적되지 않게 한다

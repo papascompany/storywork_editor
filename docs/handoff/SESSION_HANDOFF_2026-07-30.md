@@ -35,6 +35,8 @@
   - **36-에이전트 적대 리뷰 27건 반영**: 재확정 시 projectId 재사용(중복 프로젝트 방지) · 동일 콘티 회신 시 제외 보존 + 동일 대본 재진입 시 재분석 생략 · **LLM env 하드 게이트**(body llmEnabled 상향 오버라이드 차단 — analyze/full-pipeline 공통) · **인메모리 rate limit**(analyze 10/min·full-pipeline 5/min, 429) · WCAG AA(제외 카드 대비·aria-live·role=alert·flex-wrap·dvh 상한) · 재생성 버튼 rule-only 숨김(시드 변주 no-op — CONTI-01 후 자동 노출) · formatId 반사 차단 · 제외 후 캐릭터 메타 재계산 · trim 검증
   - 부수: **storybook tailwind postcss 미배선 수정**(웹 스토리 부재로 숨어 있던 유틸리티 사일런트 누락 — CLAUDE.md §9 함정의 storybook 변종) + ContiBoard 4스토리 + launch.json storybook 항목
 
+- **CONTI-03b (07-31)**: 컷 DnD 재정렬(핸들 ⠿+↑/↓, sceneOrder→서버 재정렬·reindex) + **컷 교체 활성화**(M4-05 대안 UI 생산자 갭 해소 — compose 가 포즈 후보를 layer meta 로 영속, full-pipeline 이 실자산 검증+thumbnail 주입). admin 25종 에디터 실기 확인 중 **SVG 포커스 링 캔버스 플러딩** 기존 결함 발견·수정(`5b8c645`). 24-에이전트 적대 리뷰 15건 반영: 무동작 교체(thumbnail 부재)·외부 드래그 오재정렬(Number('')===0)·signature 퇴화(stale 순서 승계)·SCENE_ORDER_MISMATCH 막다른 길(자동 재분석 복구)·SR 순서 통지·경계 버튼 포커스 소실(aria-disabled)·reasoning 영속 노출 등.
+
 ## 2. 검증 상태
 
 - CTA 배선: 유닛 28/28 + 실기 모바일 375·데스크톱 1280 + CI run 30509939271 **success**.
@@ -48,7 +50,7 @@
 
 ## 3. 미진행 · 다음 큐
 
-- 🟢 즉시 착수: admin 25종 키포인트 에디터 실기 확인 / 콘티 컷 DnD 재정렬·컷 교체(CONTI-03 2차 — 편집기 M4-05 연계)
+- 🟢 즉시 착수: (소진 — 근시일 코드 큐 없음. CONTI-01·SCRIPT-KO-02 는 API 키 게이트)
 - 🔴 대표님 액션: **FOLLOWUP-68 prod 적용**(migrate deploy) / **PERF-ADMIN-03**(perf:admin 실행) / **prod `PRETENDARD_TTF_PATH` 확인** / (신규) **키포인트 DB 재적재** — `pnpm tsx scripts/ingest-poses.ts` 재실행(upsert·사이드카 우선, prod DATABASE_URL 필요). 재적재 시 말풍선 화자 앵커(BUBBLE-02)가 실측 키포인트로 자동 개선
 - 🚦 게이트 대기: **CONTI-01** 포함 LLM 실가동(`AI_GATEWAY_API_KEY` — 활성 시 콘티 재생성 버튼·샷사이즈 자동 활성) / POSE3D-01(결제 승인) / **BUBBLE-02 ONNX 검출기 실연결**(onnxruntime-node 의존성+가중치 반입) / **SEC-RATE-01** Upstash 실 rate limit(인메모리 스톱갭은 인스턴스별 한계) / 사용자당 프로젝트 수 상한(제품 결정) / FOLLOWUP-60(법무) / M7·EDU·MARKET
 - 📋 제품 의사결정 3건: 웹툰 모드 vs POD 우선순위 · 생성 에셋 마켓 정책 · SSOT 갱신(자산 수치 단일화, nano-banana 표기)
@@ -57,4 +59,4 @@
 
 7-25 핸드오프 §4 그대로 유지(커밋 컨벤션·마이그레이션 이원화·디스크·lint-staged·MCP 인증). 디스크는 현재 29% 사용으로 여유. 추가: pdf-lib `\n` 멀티라인 lineHeight 함정(§1 CONTI-02 참조) — pdf-engine 에 텍스트 넣을 때 줄당 레이어로.
 
-_갱신: 2026-07-31 · (D) 종결 + CTA(`0fac9bc`) + CONTI-02(`dbb5e5a`) + SCRIPT-KO-01(`1a7429a`) + BUBBLE-02(`613c9cf`) + CHAR-GEN-01(`f725030`+데이터) + **CONTI-03(`0ae5642`)**. **연구 P0 큐 4건 + 콘티 뷰 UI 전부 종결**. 남은 근시일 = 키포인트 DB 재적재·FOLLOWUP-68·PRETENDARD_TTF_PATH(대표님) + admin 키포인트 에디터 실기 확인._
+_갱신: 2026-07-31 · (D) 종결 + CTA(`0fac9bc`) + CONTI-02(`dbb5e5a`) + SCRIPT-KO-01(`1a7429a`) + BUBBLE-02(`613c9cf`) + CHAR-GEN-01(`f725030`+) + CONTI-03(`0ae5642`) + admin 에디터 실기(`5b8c645`) + **CONTI-03b(DnD 재정렬·컷 교체 활성화)**. **연구 P0 4건 + 콘티 뷰 1·2차 전부 종결**. 남은 근시일 = 대표님 액션 4건(키포인트 DB 재적재·FOLLOWUP-68·PERF-ADMIN-03·PRETENDARD_TTF_PATH) — 코드 큐는 게이트 해제 대기._

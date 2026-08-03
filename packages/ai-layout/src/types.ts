@@ -158,6 +158,17 @@ export interface PageFabricJson {
 // 슬롯 배치 결과 (내부용)
 // ─────────────────────────────────────────────
 
+/** M4-05 컷 교체용 포즈 후보 — layer.data.meta.alternatives 계약(RawAlternative)과 호환.
+ *  reasoning 은 추천 엔진 내부 정보라 영속하지 않는다(보안 리뷰 후속).
+ *  thumbnail 은 full-pipeline 이 Resource 파생본 URL 로 주입(캔버스 적용 소스). */
+export interface PoseAlternativeMeta {
+  resourceId: string
+  poseAction?: string
+  confidence: number
+  characterName?: string
+  thumbnail?: string
+}
+
 export interface SlotAssignment {
   slotId: string
   slot: LayoutSlot
@@ -172,6 +183,8 @@ export interface SlotAssignment {
   lowDpiViolation?: boolean
   /** effectiveDpi 계산값 */
   effectiveDpi?: number
+  /** 포즈 후보 목록 (CONTI-03 2차: 편집기 컷 교체 UI 데이터 소스) */
+  poseAlternatives?: PoseAlternativeMeta[]
 }
 
 // ─────────────────────────────────────────────

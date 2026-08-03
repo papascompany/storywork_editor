@@ -221,6 +221,13 @@ export async function assignSlots(
       characterName: charName,
       lowDpiViolation,
       effectiveDpi,
+      // M4-05 컷 교체: 후보 K개를 레이어 메타로 영속 (편집기 대안 패널 데이터 소스)
+      poseAlternatives: poseCandidates.slice(0, 5).map((c) => ({
+        resourceId: c.resourceId,
+        poseAction: c.poseAction,
+        confidence: c.confidence,
+        characterName: charName,
+      })),
     })
   }
 

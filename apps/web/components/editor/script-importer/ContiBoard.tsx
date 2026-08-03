@@ -12,7 +12,8 @@
  * 재생성 버튼은 showRegenerate 일 때만 노출 — rule-only 분석은 시드가 장면
  * 분할에 영향을 주지 않아 no-op 이므로 숨긴다 (CONTI-01 LLM 활성 후 노출).
  *
- * 컷 재정렬(DnD)·컷 교체(alternatives)는 2차 범위 — 편집기 M4-05 가 담당.
+ * 컷 재정렬은 CONTI-03 2차로 본 컴포넌트에 구현 — 드래그 핸들(⠿) DnD + ↑/↓ 버튼.
+ * 컷 교체(alternatives)는 확정 후 편집기 M4-05 대안 패널이 담당.
  */
 
 import React from 'react'
@@ -37,6 +38,10 @@ export interface ContiBoardProps {
   conti: ContiAnalyzeResponse
   /** 제외된 컷 index 목록 */
   excludedSceneIndices: number[]
+  /** 컷 표시 순서(Scene.index 순열) — 비어 있으면 분석 순서 사용 */
+  sceneOrder: number[]
+  /** 컷 재정렬 (표시 위치 from → to) — DnD·위/아래 버튼 공용 */
+  onReorder: (fromPos: number, toPos: number) => void
   /** 컷 제외/복원 토글 */
   onToggleExclude: (sceneIndex: number) => void
   /** 재생성 — 시드+1 로 무영속 분석 재호출 */
@@ -60,11 +65,26 @@ function ContiCutCard({
   cutNo,
   excluded,
   onToggleExclude,
+  onMoveUp,
+  onMoveDown,
+  canMoveUp,
+  canMoveDown,
+  dragHandleProps,
 }: {
   scene: ContiScene
   cutNo: number
   excluded: boolean
   onToggleExclude: () => void
+  onMoveUp: () => void
+  onMoveDown: () => void
+  canMoveUp: boolean
+  canMoveDown: boolean
+  /** ⠿ 드래그 핸들에만 부여되는 DnD 속성 — 카드 본문 텍스트 선택을 보존 */
+  dragHandleProps?: {
+    draggable: boolean
+    onDragStart: (e: React.DragEvent) => void
+    onDragEnd: () => void
+  }
 }) {
   // 검토용 펼치기 — 로컬 UI 상태 (제외 토글만 부모 소유)
   const [expanded, setExpanded] = React.useState(false)
@@ -83,9 +103,17 @@ function ContiCutCard({
         excluded ? 'border-dashed border-neutral-300 bg-neutral-50' : 'border-neutral-200 bg-white'
       }`}
     >
-      {/* 헤더: 컷 번호 + 감정 + 화자 + 제외 토글 */}
+      {/* 헤더: 드래그 핸들 + 컷 번호 + 감정 + 화자 + 이동/제외 */}
       <div className="flex items-start justify-between gap-2">
         <div className="flex min-w-0 flex-wrap items-center gap-2">
+          <span
+            {...dragHandleProps}
+            aria-hidden="true"
+            title="드래그로 순서 이동"
+            className="shrink-0 cursor-grab select-none text-neutral-400 active:cursor-grabbing"
+          >
+            ⠿
+          </span>
           <span
             className={`inline-flex h-6 min-w-6 shrink-0 items-center justify-center rounded-full px-1.5 text-xs font-bold ${
               excluded ? 'bg-neutral-300 text-neutral-600 line-through' : 'bg-blue-600 text-white'
@@ -109,18 +137,43 @@ function ContiCutCard({
             </span>
           ))}
         </div>
-        <button
-          type="button"
-          aria-label={excluded ? `${cutNo}번 컷 복원` : `${cutNo}번 컷 제외`}
-          onClick={onToggleExclude}
-          className={`shrink-0 rounded-md border px-2.5 py-1 text-xs font-medium ${
-            excluded
-              ? 'border-blue-400 text-blue-700 hover:bg-blue-50'
-              : 'border-neutral-300 text-neutral-600 hover:bg-neutral-50 hover:text-neutral-800'
-          }`}
-        >
-          {excluded ? '복원' : '제외'}
-        </button>
+        <div className="flex shrink-0 items-center gap-1">
+          {/* disabled 대신 aria-disabled — 경계 도달 시 키보드 포커스 소실 방지 */}
+          <button
+            type="button"
+            aria-label={`${cutNo}번 컷 위로 이동`}
+            aria-disabled={!canMoveUp}
+            onClick={canMoveUp ? onMoveUp : undefined}
+            className={`rounded-md border border-neutral-300 px-1.5 py-1 text-xs text-neutral-600 ${
+              canMoveUp ? 'hover:bg-neutral-50' : 'cursor-not-allowed opacity-40'
+            }`}
+          >
+            ↑
+          </button>
+          <button
+            type="button"
+            aria-label={`${cutNo}번 컷 아래로 이동`}
+            aria-disabled={!canMoveDown}
+            onClick={canMoveDown ? onMoveDown : undefined}
+            className={`rounded-md border border-neutral-300 px-1.5 py-1 text-xs text-neutral-600 ${
+              canMoveDown ? 'hover:bg-neutral-50' : 'cursor-not-allowed opacity-40'
+            }`}
+          >
+            ↓
+          </button>
+          <button
+            type="button"
+            aria-label={excluded ? `${cutNo}번 컷 복원` : `${cutNo}번 컷 제외`}
+            onClick={onToggleExclude}
+            className={`rounded-md border px-2.5 py-1 text-xs font-medium ${
+              excluded
+                ? 'border-blue-400 text-blue-700 hover:bg-blue-50'
+                : 'border-neutral-300 text-neutral-600 hover:bg-neutral-50 hover:text-neutral-800'
+            }`}
+          >
+            {excluded ? '복원' : '제외'}
+          </button>
+        </div>
       </div>
 
       {/* 지문 — 제외 상태에서도 복원 판단을 위해 AA 대비 유지 */}
@@ -163,6 +216,8 @@ function ContiCutCard({
 export function ContiBoard({
   conti,
   excludedSceneIndices,
+  sceneOrder,
+  onReorder,
   onToggleExclude,
   onRegenerate,
   showRegenerate,
@@ -173,6 +228,52 @@ export function ContiBoard({
 }: ContiBoardProps) {
   const excludedSet = new Set(excludedSceneIndices)
   const includedCount = conti.scenes.length - excludedSet.size
+
+  // 표시 순서: sceneOrder(Scene.index 순열) → scene 해석. 비었거나 불일치 시 분석 순서 폴백
+  const sceneByIndex = new Map(conti.scenes.map((s) => [s.index, s]))
+  const orderedScenes =
+    sceneOrder.length === conti.scenes.length
+      ? sceneOrder
+          .map((i) => sceneByIndex.get(i))
+          .filter((s): s is NonNullable<typeof s> => s !== undefined)
+      : conti.scenes
+  const displayScenes = orderedScenes.length === conti.scenes.length ? orderedScenes : conti.scenes
+
+  // DnD 시각 상태 (PagePanel 패턴 — HTML5 native DnD, 드래그 소스는 ⠿ 핸들 한정)
+  // 외부 드래그(OS 파일·텍스트 선택)는 커스텀 MIME + draggingPos 가드로 차단.
+  const CUT_DND_MIME = 'application/x-storywork-cut'
+  const [draggingPos, setDraggingPos] = React.useState<number | null>(null)
+  const [dragOverPos, setDragOverPos] = React.useState<number | null>(null)
+
+  const handleDragStart = (e: React.DragEvent, pos: number) => {
+    e.dataTransfer.effectAllowed = 'move'
+    e.dataTransfer.setData(CUT_DND_MIME, String(pos))
+    // Safari 호환: 최소 1개의 표준 타입도 함께 설정
+    e.dataTransfer.setData('text/plain', String(pos))
+    setDraggingPos(pos)
+  }
+  const handleDragOver = (e: React.DragEvent, pos: number) => {
+    // 내부 컷 드래그만 drop 대상으로 허용
+    if (draggingPos === null && !e.dataTransfer.types.includes(CUT_DND_MIME)) return
+    e.preventDefault()
+    e.dataTransfer.dropEffect = 'move'
+    setDragOverPos(pos)
+  }
+  const handleDragLeave = (e: React.DragEvent, pos: number) => {
+    if (!e.currentTarget.contains(e.relatedTarget as Node)) {
+      setDragOverPos((p) => (p === pos ? null : p))
+    }
+  }
+  const handleDragEnd = () => {
+    setDraggingPos(null)
+    setDragOverPos(null)
+  }
+  const handleDrop = (e: React.DragEvent, pos: number) => {
+    e.preventDefault()
+    // from 은 상태 기준 — 외부 드래그의 text/plain('' → Number('')===0) 오인 방지
+    if (draggingPos !== null && draggingPos !== pos) onReorder(draggingPos, pos)
+    handleDragEnd()
+  }
 
   // 0컷 — 분석이 컷을 만들지 못한 막다른 상태 안내
   if (conti.scenes.length === 0) {
@@ -207,8 +308,8 @@ export function ContiBoard({
       <div className="flex flex-col gap-1">
         <h3 className="text-sm font-semibold text-neutral-700">콘티 확정</h3>
         <p className="text-xs text-neutral-500">
-          대본이 {conti.scenes.length}개 컷으로 분석되었습니다. 필요 없는 컷은 제외한 뒤 페이지를
-          생성하세요. 페이지는 확정 후에만 만들어집니다.
+          대본이 {conti.scenes.length}개 컷으로 분석되었습니다. 필요 없는 컷은 제외하고, 드래그(또는
+          ↑↓ 버튼)로 순서를 바꾼 뒤 페이지를 생성하세요. 페이지는 확정 후에만 만들어집니다.
         </p>
       </div>
 
@@ -241,19 +342,44 @@ export function ContiBoard({
         role="list"
         aria-label="콘티 컷 목록"
       >
-        {conti.scenes.map((scene, i) => (
-          <div role="listitem" key={scene.slug}>
+        {displayScenes.map((scene, i) => (
+          <div
+            role="listitem"
+            key={scene.slug}
+            onDragOver={(e) => handleDragOver(e, i)}
+            onDragLeave={(e) => handleDragLeave(e, i)}
+            onDrop={(e) => handleDrop(e, i)}
+            className={`select-text ${
+              draggingPos === i
+                ? 'opacity-60'
+                : dragOverPos === i && draggingPos !== null
+                  ? 'rounded-lg ring-2 ring-blue-400'
+                  : ''
+            }`}
+          >
             <ContiCutCard
               scene={scene}
               cutNo={i + 1}
               excluded={excludedSet.has(scene.index)}
               onToggleExclude={() => onToggleExclude(scene.index)}
+              onMoveUp={() => onReorder(i, i - 1)}
+              onMoveDown={() => onReorder(i, i + 1)}
+              canMoveUp={i > 0}
+              canMoveDown={i < displayScenes.length - 1}
+              dragHandleProps={{
+                draggable: true,
+                onDragStart: (e: React.DragEvent) => handleDragStart(e, i),
+                onDragEnd: handleDragEnd,
+              }}
             />
           </div>
         ))}
       </div>
 
       {/* 하단 액션 — 360px 에서 랩 허용 */}
+      {excludedSet.size > 0 && (
+        <p className="text-[11px] text-neutral-500">제외한 컷은 최종 페이지 번호에서 빠집니다.</p>
+      )}
       <div className="flex flex-wrap items-center justify-between gap-2">
         <button
           type="button"

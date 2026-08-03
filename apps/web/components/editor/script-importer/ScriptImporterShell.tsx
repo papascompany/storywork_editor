@@ -90,6 +90,7 @@ export function ScriptImporterShell() {
     conti: null,
     analyzedScriptRaw: null,
     excludedSceneIndices: [],
+    sceneOrder: [],
     projectId: null,
     result: null,
   })
@@ -144,10 +145,14 @@ export function ScriptImporterShell() {
         // 컷 구조가 실제로 바뀐 경우에만 제외 목록 초기화 — 동일 결과가
         // 돌아왔는데 사용자의 제외 작업을 지우지 않는다 (리뷰 후속)
         setState((prev) => {
+          // slug 는 index 에서 유도되므로 내용 필드(summary·대사 수)를 포함해야
+          // '컷 개수만 같은 다른 대본'을 동일 콘티로 오판하지 않는다 (리뷰 후속)
           const signature = (scenes: ContiAnalyzeResponse['scenes']): string =>
-            scenes.map((s) => `${s.index}:${s.slug}`).join('|')
+            scenes.map((s) => `${s.index}:${s.summary}:${s.lines.length}`).join('|')
           const unchanged =
-            prev.conti !== null && signature(prev.conti.scenes) === signature(data.scenes)
+            prev.conti !== null &&
+            prev.analyzedScriptRaw === prev.scriptRaw &&
+            signature(prev.conti.scenes) === signature(data.scenes)
           return {
             ...prev,
             isGenerating: false,
@@ -155,6 +160,7 @@ export function ScriptImporterShell() {
             analyzedScriptRaw: prev.scriptRaw,
             seed,
             excludedSceneIndices: unchanged ? prev.excludedSceneIndices : [],
+            sceneOrder: unchanged ? prev.sceneOrder : data.scenes.map((s) => s.index),
             step: 'conti',
           }
         })
@@ -194,6 +200,30 @@ export function ScriptImporterShell() {
     }))
   }, [])
 
+  // 스크린리더 통지용 보조 메시지 (순서 이동 등 — aria-live 영역에서 낭독)
+  const [liveMessage, setLiveMessage] = useState('')
+
+  // ── 컷 재정렬 (DnD / 위·아래 버튼 — 표시 순서 이동) ──────────────────────
+  const handleReorder = useCallback((fromPos: number, toPos: number) => {
+    setLiveMessage(`컷을 ${toPos + 1}번째 위치로 이동했습니다.`)
+    setState((prev) => {
+      if (
+        fromPos === toPos ||
+        fromPos < 0 ||
+        toPos < 0 ||
+        fromPos >= prev.sceneOrder.length ||
+        toPos >= prev.sceneOrder.length
+      ) {
+        return prev
+      }
+      const next = [...prev.sceneOrder]
+      const [moved] = next.splice(fromPos, 1)
+      if (moved === undefined) return prev
+      next.splice(toPos, 0, moved)
+      return { ...prev, sceneOrder: next }
+    })
+  }, [])
+
   // ── Step 4 → 5: 콘티 확정 → 페이지 생성 (여기서만 영속화) ────────────────
   const handleGenerate = useCallback(async () => {
     updateState({ isGenerating: true, generationError: null })
@@ -219,11 +249,26 @@ export function ScriptImporterShell() {
           seed: state.seed,
           llmEnabled: false,
           excludeSceneIndices: state.excludedSceneIndices,
+          sceneOrder: state.sceneOrder,
         }),
       })
 
       if (!res.ok) {
-        const err = (await res.json()) as { error?: string }
+        const err = (await res.json()) as { error?: string; code?: string }
+        if (err.code === 'SCENE_ORDER_MISMATCH') {
+          // 서버 분석 결과가 콘티와 어긋남(배포 간 파서 변경 등) —
+          // 오래된 콘티를 버리고 자동 재분석으로 복구 (막다른 길 방지)
+          setState((prev) => ({
+            ...prev,
+            conti: null,
+            analyzedScriptRaw: null,
+            excludedSceneIndices: [],
+            sceneOrder: [],
+            generationError: '콘티가 최신 분석과 달라 다시 분석했습니다. 순서를 확인해 주세요.',
+          }))
+          void runAnalyze(state.seed)
+          return
+        }
         updateState({
           isGenerating: false,
           generationError: err.error ?? `오류 발생 (${res.status})`,
@@ -244,7 +289,7 @@ export function ScriptImporterShell() {
         generationError: err instanceof Error ? err.message : '알 수 없는 오류가 발생했습니다.',
       })
     }
-  }, [state, updateState])
+  }, [state, updateState, runAnalyze])
 
   // ── 편집기 진입 ───────────────────────────────────────────────────────────
   const handleOpenEditor = useCallback(() => {
@@ -399,6 +444,8 @@ export function ScriptImporterShell() {
               <ContiBoard
                 conti={state.conti}
                 excludedSceneIndices={state.excludedSceneIndices}
+                sceneOrder={state.sceneOrder}
+                onReorder={handleReorder}
                 onToggleExclude={handleToggleExclude}
                 onRegenerate={handleRegenerate}
                 showRegenerate={state.conti.modelVersion !== 'rule-only'}
@@ -436,7 +483,7 @@ export function ScriptImporterShell() {
             ? state.step === 'conti'
               ? '페이지를 생성하고 있습니다.'
               : '대본을 콘티로 분석하고 있습니다.'
-            : ''}
+            : liveMessage}
         </div>
 
         {/* 하단 링크 */}

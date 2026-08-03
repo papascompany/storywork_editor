@@ -78,13 +78,25 @@ function InteractiveTemplate({
   showRegenerate?: boolean
 }) {
   const [excluded, setExcluded] = React.useState<number[]>([])
+  const [order, setOrder] = React.useState<number[]>(SAMPLE_CONTI.scenes.map((s) => s.index))
   const [seed, setSeed] = React.useState(0)
+
+  const reorder = (from: number, to: number) =>
+    setOrder((prev) => {
+      const next = [...prev]
+      const [moved] = next.splice(from, 1)
+      if (moved === undefined) return prev
+      next.splice(to, 0, moved)
+      return next
+    })
 
   return (
     <div className="mx-auto max-w-2xl rounded-xl border border-neutral-200 bg-white p-6 shadow-sm">
       <ContiBoard
         conti={SAMPLE_CONTI}
         excludedSceneIndices={excluded}
+        sceneOrder={order}
+        onReorder={reorder}
         onToggleExclude={(idx) =>
           setExcluded((prev) =>
             prev.includes(idx) ? prev.filter((i) => i !== idx) : [...prev, idx],
@@ -121,6 +133,8 @@ export const WithExcluded: Story = {
           <ContiBoard
             conti={SAMPLE_CONTI}
             excludedSceneIndices={excluded}
+            sceneOrder={SAMPLE_CONTI.scenes.map((s) => s.index)}
+            onReorder={() => undefined}
             onToggleExclude={(idx) =>
               setExcluded((prev) =>
                 prev.includes(idx) ? prev.filter((i) => i !== idx) : [...prev, idx],
