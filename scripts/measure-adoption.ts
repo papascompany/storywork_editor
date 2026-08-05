@@ -6,9 +6,9 @@
  * (analyze → recommend → compose)에 통과시켜 채택률 리포트를 만든다.
  *
  * 실행:
- *   pnpm tsx scripts/measure-adoption.ts                 # 요약 출력
- *   pnpm tsx scripts/measure-adoption.ts --json out.json # 리포트 파일로 저장
- *   pnpm tsx scripts/measure-adoption.ts --verbose       # 페이지별 blocker 상세
+ *   pnpm adoption:measure                # 요약 출력
+ *   pnpm adoption:measure -- --verbose   # 페이지별 blocker 상세
+ *   pnpm adoption:baseline               # data/eval/adoption-baseline.json 갱신
  *
  * 지표 정의는 packages/ai-layout/src/adoption.ts 의 문서 주석이 정본이다.
  * (요약: blocker 0 페이지 비율 = 프록시 채택률. 실사용 로그 도입 시 교체 예정)
@@ -19,12 +19,10 @@
 import fs from 'node:fs'
 import path from 'node:path'
 
-// 워크스페이스 패키지의 빌드 산출물을 사용한다.
-// 소스 수정 후에는 `pnpm turbo run build --filter=@storywork/ai-layout ...` 선행 필요.
-import { aggregateAdoption, compose, measureAdoption } from '../packages/ai-layout/dist/index.js'
-import type { AdoptionResult, LayoutFormat } from '../packages/ai-layout/dist/index.js'
-import { recommend } from '../packages/ai-recommend/dist/index.js'
-import { analyze } from '../packages/ai-script/dist/index.js'
+import { aggregateAdoption, compose, measureAdoption } from '@storywork/ai-layout'
+import type { AdoptionResult, LayoutFormat } from '@storywork/ai-layout'
+import { recommend } from '@storywork/ai-recommend'
+import { analyze } from '@storywork/ai-script'
 
 // ─────────────────────────────────────────────
 // 설정

@@ -47,7 +47,9 @@
     "perf:admin:prod": "tsx --tsconfig tsconfig.scripts.json scripts/perf-admin-measure.ts --env prod",
     "perf:admin:save-auth": "tsx --tsconfig tsconfig.scripts.json scripts/perf-admin-save-auth.ts",
     "perf:web": "tsx --tsconfig tsconfig.scripts.json scripts/perf-web-measure.ts --env local",
-    "perf:web:prod": "tsx --tsconfig tsconfig.scripts.json scripts/perf-web-measure.ts --env prod"
+    "perf:web:prod": "tsx --tsconfig tsconfig.scripts.json scripts/perf-web-measure.ts --env prod",
+    "adoption:measure": "tsx --tsconfig tsconfig.scripts.json scripts/measure-adoption.ts",
+    "adoption:baseline": "tsx --tsconfig tsconfig.scripts.json scripts/measure-adoption.ts --json data/eval/adoption-baseline.json"
   },
   "devDependencies": {
     "@commitlint/cli": "^19.0.0",

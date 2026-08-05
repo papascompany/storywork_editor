@@ -1,6 +1,6 @@
 # 자동배치 채택률 baseline — 2026-08-05 (AI-ACT-04)
 
-> 측정: `pnpm tsx scripts/measure-adoption.ts --json data/eval/adoption-baseline.json`
+> 측정: `pnpm adoption:baseline`
 > 코퍼스: `data/eval/scripts/` 21편 / **217장면** · 판형 B5(preset-b5-novel) · seed 0 · LLM/DB 미사용(룰 only, 재현 가능)
 > 지표 정의 정본: [`packages/ai-layout/src/adoption.ts`](../../packages/ai-layout/src/adoption.ts)
 
@@ -84,9 +84,8 @@ preset-wide            말풍선 슬롯 2
 ## 5. 재현
 
 ```bash
-pnpm turbo run build --filter=@storywork/ai-layout --filter=@storywork/ai-recommend --filter=@storywork/ai-script
-pnpm tsx scripts/measure-adoption.ts --verbose            # 페이지별 blocker 상세
-pnpm tsx scripts/measure-adoption.ts --json out.json      # 기계 판독 리포트
+pnpm adoption:measure -- --verbose     # 페이지별 blocker 상세
+pnpm adoption:baseline                 # data/eval/adoption-baseline.json 갱신
 ```
 
 측정은 LLM·DB 를 쓰지 않아 키 없이 결정론적으로 재현된다(같은 seed → 같은 수치).
