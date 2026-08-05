@@ -366,7 +366,7 @@
   · **골든 G5 기대값 정정**: 장면4×대사4=16 을 1페이지 four-cut(슬롯 4)으로 고정한 테스트가 **대사 12개 유실을 정답으로 박아두고 있었음**. 합병 해제 4페이지 + 16개 전량 배치로 교체, R2 커버리지는 page-split 30케이스 + 신규 G5b(수용량 안이면 합병 유지)가 유지
   · 실물 검증(지표 아닌 좌표): screenplay 20페이지·말풍선 72개 — safe area 밖 0 · 상호 겹침 0 · 빈 텍스트 0. 신규 테스트 31 (`capacity.test.ts` 25 + 회귀 가드 3 + 골든 3), ai-layout 191 green
   · 리포트 [docs/eval/adoption-layout03-2026-08-05.md](../eval/adoption-layout03-2026-08-05.md) · 회귀 가드 하한을 목표선(60%/95%)으로 상향
-- [ ] [SCRIPT-KO-03] 대사/지문 구분 (`AnalyzedLine.kind`) — LAYOUT-03 실측 후속. 현재 `AnalyzedLine` 에 대사/지문 구분이 없어 **장면 헤딩(`S#1. …`)과 지문이 말풍선 슬롯을 차지**한다(화자 없음 비율: essay 96.2% · diary 90.7% · novel 56.5% · screenplay 27.2%). 페이지 수 증가(217→255)의 상당 부분이 여기서 옴 — 지문은 캡션/내레이션 박스로 분리 배치 — @scene-analyzer
+- [ ] [SCRIPT-KO-04] 대사/지문 구분 (`AnalyzedLine.kind`) — LAYOUT-03 실측 후속. (등록 시 ID 가 기존 SCRIPT-KO-03(CSN 스코어러)과 충돌해 04 로 정정) 현재 `AnalyzedLine` 에 대사/지문 구분이 없어 **장면 헤딩(`S#1. …`)과 지문이 말풍선 슬롯을 차지**한다(화자 없음 비율: essay 96.2% · diary 90.7% · novel 56.5% · screenplay 27.2%). 페이지 수 증가(217→255)의 상당 부분이 여기서 옴 — 지문은 캡션/내레이션 박스로 분리 배치 — @scene-analyzer
 - [ ] [LAYOUT-04] 배치 **품질** 지표 (LAYOUT-03 후속) — 채택률 프록시가 100% 로 포화돼 변별력 상실. 구도 균형·시선 흐름·컷당 대사 밀도 등 품질 축 측정 도입(실사용 로그 FOLLOWUP-60 도입 시 실측 채택률로 교체하고 프록시는 선행지표로 강등) — @layout-composer + @qa-tester
 
 ### (B) EDU — 교육 커리큘럼 (신규, 후반 일정 — M9 이후 착수)

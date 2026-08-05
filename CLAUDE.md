@@ -381,4 +381,5 @@ UI 작업 시 다음 SOP 를 반드시 준수한다 (2026-05-15 회고 기반):
 
 ---
 
-_Last updated: 2026-06-29 · 사업화 BM 정립(「혁신 소상공인 AI 활용지원사업」 연계) — 교육 커리큘럼 + 디자인 마켓플레이스를 '공정 외부화'로 추가, AI 실가동 시퀀스 재정의(SW-BIZ), 수익 시뮬레이션(Y1≈5,300만→Y3≈4.6억), [ADR-0016](docs/architecture/decisions.md) + §1.4 + roadmap SW-BIZ + plan.html. 이전: 2026-06-23 BOARD-05/06·M8-04·LEGAL-04·AUDIT-FIX-02·DEMO-01. Handoff: [docs/handoff/SESSION_HANDOFF_2026-06-23.md](docs/handoff/SESSION_HANDOFF_2026-06-23.md)_
+_Last updated: 2026-06-29 · 사업화 BM 정립(「혁신 소상공인 AI 활용지원사업」 연계) — 교육 커리큘럼 + 디자인 마켓플레이스를 '공정 외부화'로 추가, AI 실가동 시퀀스 재정의(SW-BIZ), 수익 시뮬레이션(Y1≈5,300만→Y3≈4.6억), [ADR-0016](docs/architecture/decisions.md) + §1.4 + roadmap SW-BIZ + plan.html. 이전: 2026-06-23 BOARD-05/06·M8-04·LEGAL-04·AUDIT-FIX-02·DEMO-01.
+**최신 Handoff(항상 여기부터): [docs/handoff/SESSION_HANDOFF_2026-08-05.md](docs/handoff/SESSION_HANDOFF_2026-08-05.md) · 새 세션 시작: [docs/handoff/RESUME_PROMPT.md](docs/handoff/RESUME_PROMPT.md)**_
