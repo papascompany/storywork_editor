@@ -350,7 +350,14 @@
   · `llm-tagger.ts` 신설 — M2-03b 의 실효 목적인 **신규 자산 fallback**. 캐시 우선 + `STORYWORK_LLM` env 하드 게이트(CI $0) + 키 부재 시 null 폴백(enhance.ts 선례), 사전 118종 어휘 sanitize(LLM 창작 키워드 차단), confidence 0.6 상한(사전 매칭보다 항상 낮게), 캐시 키에 모델 ID 포함(모델 변경 시 stale 제안 차단), `selectTaggingTargets()` 로 skip 자산 배제를 코드에 고정
   · **골든셋 10 케이스/16 조합 → 50 케이스/102 조합**(5 카테고리: 일상·감정·액션·소품·다인). 통합 후 실 하네스 재측정 **만족도 102/102 = 100%**(목표 70%). 신규 테스트 14 + satisfaction 51 green
 - [ ] [AI-ACT-03] 라이브 LLM 대본분석 활성(M4-01-03, `AI_GATEWAY_API_KEY`) + 프롬프트 캐싱 대본 1건당 분석비 측정 — 🚦 외부 API 키 — @scene-analyzer
-- [ ] [AI-ACT-04] 자동배치 1차본 채택률 측정 체계(실사용 대본 200장면 평가셋) + baseline→target 리포트 — @layout-composer + @qa-tester
+- [x] [AI-ACT-04] 자동배치 1차본 채택률 측정 체계 + baseline→target 리포트 — @layout-composer + @qa-tester ✅ 2026-08-05.
+  · 평가 코퍼스 `data/eval/scripts/` **21편 / 217장면**(novel·screenplay·light-novel·diary·essay 5형식, 장면 수는 실제 analyze 로 실측 검증)
+  · `ai-layout/adoption.ts` — 채택률 조작적 정의(**blocker 0 페이지 비율**)와 측정기. 실사용 로그 부재를 명시한 프록시이며 로그 도입 시 교체 계약을 문서에 고정. `dialogue-loss`·`speaker-missing` 은 compose 경고가 못 잡던 신규 지표(fabricJson↔원본 대조)
+  · `scripts/measure-adoption.ts` — 전 파이프라인 통과 후 리포트(요약/verbose/JSON). LLM·DB 미사용으로 키 없이 결정론 재현
+  · **baseline 실측: 채택률 13.8%(30/217) · 대사 보존 52.2%** — 기존 e2e 가 green 이던 구간에서 **대본 대사 절반이 유실**되고 있었음을 발견. 원인은 템플릿 말풍선 슬롯(1~3) < 장면당 대사(5~10). screenplay 최악(보존 29.9%·채택 0%), essay 최선(92.3%)
+  · 리포트 [docs/eval/adoption-baseline-2026-08-05.md](../eval/adoption-baseline-2026-08-05.md) + 회귀 가드 테스트(하한 고정, 개선 시 상향)
+  · target: 채택률 60% · 대사 보존 95% — 달성 경로는 아래 LAYOUT-03
+- [ ] [LAYOUT-03] 대사 수용량 기반 배치 개선 (AI-ACT-04 baseline 후속 — 최대 병목) — ① 장면 대사가 슬롯 수용량 초과 시 **같은 장면 다중 페이지 분할** ② `matchTemplate` 에 대사 수/인원 수 입력해 수용량 맞는 템플릿 선택(`empty-slot` 61건도 함께 해소) ③ 부족 시 safe area 안에서 **말풍선 슬롯 동적 생성**(위치는 BUBBLE-02 비용함수) — DoD: 채택률 ≥60% · 대사 보존 ≥95% (measure-adoption 재측정) — @layout-composer
 
 ### (B) EDU — 교육 커리큘럼 (신규, 후반 일정 — M9 이후 착수)
 StoryWork 편집기를 '대본만으로 웹툰 만들기' 교육 과정으로 패키징 — 자사 제작 노하우의 외부화. 모듈: [`edu-curriculum`](../modules/index.md).

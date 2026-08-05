@@ -43,6 +43,16 @@ export type { TemplateMatchResult } from './template-match.js'
 export { assignSlots } from './slot-assign.js'
 export type { SlotAssignResult } from './slot-assign.js'
 
+// ── 자동배치 채택률 측정 (AI-ACT-04) ──────────────────────────────────────
+export { aggregateAdoption, measureAdoption } from './adoption.js'
+export type {
+  AdoptionOptions,
+  AdoptionResult,
+  BlockerKind,
+  PageAdoption,
+  SoftSignalKind,
+} from './adoption.js'
+
 // ── 말풍선 배치 비용함수 + 자동 QA (BUBBLE-02) ─────────────────────────────
 export {
   assignBubblesByCost,

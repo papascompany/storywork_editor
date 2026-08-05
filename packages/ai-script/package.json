@@ -1,14 +1,15 @@
 {
   "name": "@storywork/ai-script",
   "version": "0.0.0",
+  "type": "module",
   "description": "대본 → SceneDoc 변환, 장면/대사 분리 에이전트",
   "main": "./dist/index.js",
-  "module": "./dist/index.mjs",
+  "module": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
-      "import": "./dist/index.mjs",
+      "import": "./dist/index.js",
       "require": "./dist/index.js"
     }
   },

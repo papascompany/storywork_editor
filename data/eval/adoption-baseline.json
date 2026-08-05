@@ -1,0 +1,191 @@
+{
+  "generatedBy": "scripts/measure-adoption.ts",
+  "metric": "proxy-adoption-rate (blocker-free page ratio)",
+  "format": "preset-b5-novel",
+  "corpusFiles": 21,
+  "totalScenes": 217,
+  "totalPages": 217,
+  "adoptionRate": 0.1382488479262673,
+  "dialogueRetention": 0.5218978102189781,
+  "blockerCounts": {
+    "empty-slot": 61,
+    "safe-area": 0,
+    "dpi-error": 0,
+    "dialogue-loss": 152,
+    "speaker-missing": 0
+  },
+  "softSignalCounts": {
+    "dpi-warning": 0,
+    "low-dpi-fallback": 0
+  },
+  "perFile": [
+    {
+      "file": "action-fantasy/01-tower-siege.txt",
+      "format": "light-novel",
+      "scenes": 9,
+      "pages": 9,
+      "adoptionRate": 0.2222222222222222,
+      "dialogueRetention": 0.6666666666666666
+    },
+    {
+      "file": "action-fantasy/02-dragon-chase.txt",
+      "format": "light-novel",
+      "scenes": 10,
+      "pages": 10,
+      "adoptionRate": 0.6,
+      "dialogueRetention": 0.7142857142857143
+    },
+    {
+      "file": "action-fantasy/03-ruin-gate.txt",
+      "format": "novel",
+      "scenes": 9,
+      "pages": 9,
+      "adoptionRate": 0.4444444444444444,
+      "dialogueRetention": 0.782608695652174
+    },
+    {
+      "file": "action-fantasy/04-blade-oath.txt",
+      "format": "novel",
+      "scenes": 9,
+      "pages": 9,
+      "adoptionRate": 0.3333333333333333,
+      "dialogueRetention": 0.782608695652174
+    },
+    {
+      "file": "action-fantasy/05-frost-wall.txt",
+      "format": "light-novel",
+      "scenes": 10,
+      "pages": 10,
+      "adoptionRate": 0.4,
+      "dialogueRetention": 0.6666666666666666
+    },
+    {
+      "file": "daily-novel/01-school-seat.txt",
+      "format": "novel",
+      "scenes": 10,
+      "pages": 10,
+      "adoptionRate": 0.1,
+      "dialogueRetention": 0.5882352941176471
+    },
+    {
+      "file": "daily-novel/02-office-overtime.txt",
+      "format": "novel",
+      "scenes": 10,
+      "pages": 10,
+      "adoptionRate": 0,
+      "dialogueRetention": 0.5263157894736842
+    },
+    {
+      "file": "daily-novel/03-family-boxes.txt",
+      "format": "novel",
+      "scenes": 10,
+      "pages": 10,
+      "adoptionRate": 0,
+      "dialogueRetention": 0.5555555555555556
+    },
+    {
+      "file": "daily-novel/04-bookshop-rain.txt",
+      "format": "novel",
+      "scenes": 9,
+      "pages": 9,
+      "adoptionRate": 0.1111111111111111,
+      "dialogueRetention": 0.5142857142857142
+    },
+    {
+      "file": "daily-novel/05-laundromat-tuesday.txt",
+      "format": "novel",
+      "scenes": 11,
+      "pages": 11,
+      "adoptionRate": 0,
+      "dialogueRetention": 0.5882352941176471
+    },
+    {
+      "file": "drama-screenplay/01-golden-hour.txt",
+      "format": "screenplay",
+      "scenes": 10,
+      "pages": 10,
+      "adoptionRate": 0,
+      "dialogueRetention": 0.30303030303030304
+    },
+    {
+      "file": "drama-screenplay/02-summer-noodle-house.txt",
+      "format": "screenplay",
+      "scenes": 10,
+      "pages": 10,
+      "adoptionRate": 0,
+      "dialogueRetention": 0.2777777777777778
+    },
+    {
+      "file": "drama-screenplay/03-third-floor-meeting-room.txt",
+      "format": "screenplay",
+      "scenes": 10,
+      "pages": 10,
+      "adoptionRate": 0,
+      "dialogueRetention": 0.2898550724637681
+    },
+    {
+      "file": "drama-screenplay/04-witness.txt",
+      "format": "screenplay",
+      "scenes": 10,
+      "pages": 10,
+      "adoptionRate": 0,
+      "dialogueRetention": 0.32786885245901637
+    },
+    {
+      "file": "drama-screenplay/05-night-study-escape.txt",
+      "format": "screenplay",
+      "scenes": 10,
+      "pages": 10,
+      "adoptionRate": 0,
+      "dialogueRetention": 0.29850746268656714
+    },
+    {
+      "file": "mixed-formats/diary-01-night-shift.txt",
+      "format": "diary",
+      "scenes": 15,
+      "pages": 15,
+      "adoptionRate": 0.13333333333333333,
+      "dialogueRetention": 0.7894736842105263
+    },
+    {
+      "file": "mixed-formats/diary-02-classroom.txt",
+      "format": "diary",
+      "scenes": 15,
+      "pages": 15,
+      "adoptionRate": 0.2,
+      "dialogueRetention": 0.8108108108108109
+    },
+    {
+      "file": "mixed-formats/essay-01-laundry-corner.txt",
+      "format": "essay",
+      "scenes": 6,
+      "pages": 6,
+      "adoptionRate": 0.16666666666666666,
+      "dialogueRetention": 0.9230769230769231
+    },
+    {
+      "file": "mixed-formats/essay-02-driving-lesson.txt",
+      "format": "essay",
+      "scenes": 6,
+      "pages": 6,
+      "adoptionRate": 0,
+      "dialogueRetention": 0.9230769230769231
+    },
+    {
+      "file": "mixed-formats/light-novel-01-crack-in-the-yard.txt",
+      "format": "light-novel",
+      "scenes": 14,
+      "pages": 14,
+      "adoptionRate": 0.21428571428571427,
+      "dialogueRetention": 0.7777777777777778
+    },
+    {
+      "file": "mixed-formats/light-novel-02-ninth-floor.txt",
+      "format": "light-novel",
+      "scenes": 14,
+      "pages": 14,
+      "adoptionRate": 0,
+      "dialogueRetention": 0.6
+    }
+  ]
+}
