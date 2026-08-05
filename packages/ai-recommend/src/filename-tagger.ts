@@ -68,6 +68,12 @@ export interface FilenameTagResult {
   confidence: number
   /** 하나라도 매칭되면 true */
   matched: boolean
+  /**
+   * 적재 제외 폴더(subfolderTags.skip)라서 태깅을 건너뛴 경우 true.
+   * matched=false 와 구분해야 한다 — skip 은 '사전 공백'이 아니라 정책적 제외라
+   * 매칭률 지표의 분모에서 빠지고, AI 2차 태깅(M2-03b) 대상도 아니다.
+   */
+  skipped: boolean
 }
 
 // ─────────────────────────────────────────────
@@ -235,7 +241,7 @@ export function tagFromFilename(
     const subEntry = dictionary.subfolderTags[subfolder.normalize('NFC')]
     if (subEntry) {
       if (subEntry.skip) {
-        // skip 폴더 — 매칭 없음으로 처리
+        // skip 폴더 — 적재 제외 정책. 미매칭(사전 공백)과 구분해 표기한다.
         return {
           action: undefined,
           bodyType: undefined,
@@ -245,6 +251,7 @@ export function tagFromFilename(
           tags: [],
           confidence: 0,
           matched: false,
+          skipped: true,
         }
       }
       if (subEntry.bodyType && !bodyType) {
@@ -287,6 +294,7 @@ export function tagFromFilename(
     tags,
     confidence,
     matched: matchCount > 0 || subfolderMatched,
+    skipped: false,
   }
 }
 
@@ -308,6 +316,7 @@ export function tagFromSubfolder(subfolder: string, dict?: FilenameDictionary): 
       tags: [],
       confidence: 0,
       matched: false,
+      skipped: subEntry?.skip === true,
     }
   }
   return {
@@ -319,5 +328,6 @@ export function tagFromSubfolder(subfolder: string, dict?: FilenameDictionary): 
     tags: subEntry.tags ?? [],
     confidence: 0.65,
     matched: true,
+    skipped: false,
   }
 }

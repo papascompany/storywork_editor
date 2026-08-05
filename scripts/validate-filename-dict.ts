@@ -62,6 +62,8 @@ interface FilenameTagResult {
   tags: string[]
   confidence: number
   matched: boolean
+  /** 적재 제외 폴더(subfolderTags.skip) — 미매칭과 구분 */
+  skipped: boolean
 }
 
 // ─────────────────────────────────────────────
@@ -167,6 +169,7 @@ function tagFromFilename(
           tags: [],
           confidence: 0,
           matched: false,
+          skipped: true,
         }
       }
       if (subEntry.bodyType && !bodyType) {
@@ -202,6 +205,7 @@ function tagFromFilename(
     tags,
     confidence,
     matched: matchCount > 0 || subfolderMatched,
+    skipped: false,
   }
 }
 
@@ -255,11 +259,14 @@ interface ValidationResult {
   total: number
   matched: number
   unmatched: number
+  /** 적재 제외(skip 폴더) 파일 수 — 매칭률 분모에서 제외 */
+  skipped: number
   matchRate: number
   actionDist: Record<string, number>
   viewDist: Record<string, number>
   bodyTypeDist: Record<string, number>
   unmatchedFiles: string[]
+  skippedFiles: string[]
   matchedFiles: Array<{ filename: string; result: FilenameTagResult }>
 }
 
@@ -268,6 +275,7 @@ function runValidation(files: ScannedFile[], dict: FilenameDictionary): Validati
   const viewDist: Record<string, number> = {}
   const bodyTypeDist: Record<string, number> = {}
   const unmatchedFiles: string[] = []
+  const skippedFiles: string[] = []
   const matchedFiles: Array<{ filename: string; result: FilenameTagResult }> = []
 
   for (const { filename, subfolder } of files) {
@@ -278,6 +286,9 @@ function runValidation(files: ScannedFile[], dict: FilenameDictionary): Validati
       if (result.action) actionDist[result.action] = (actionDist[result.action] ?? 0) + 1
       if (result.view) viewDist[result.view] = (viewDist[result.view] ?? 0) + 1
       if (result.bodyType) bodyTypeDist[result.bodyType] = (bodyTypeDist[result.bodyType] ?? 0) + 1
+    } else if (result.skipped) {
+      // 적재 제외 폴더 — 사전 공백이 아니므로 매칭률 분모에서 제외
+      skippedFiles.push(filename)
     } else {
       unmatchedFiles.push(filename)
     }
@@ -286,16 +297,21 @@ function runValidation(files: ScannedFile[], dict: FilenameDictionary): Validati
   const total = files.length
   const matched = matchedFiles.length
   const unmatched = unmatchedFiles.length
+  const skipped = skippedFiles.length
+  // 매칭률 분모 = 실제 적재 대상 (전체 − skip)
+  const denominator = total - skipped
 
   return {
     total,
     matched,
     unmatched,
-    matchRate: total > 0 ? matched / total : 0,
+    skipped,
+    matchRate: denominator > 0 ? matched / denominator : 0,
     actionDist,
     viewDist,
     bodyTypeDist,
     unmatchedFiles,
+    skippedFiles,
     matchedFiles,
   }
 }
@@ -314,7 +330,10 @@ function printValidationResult(result: ValidationResult, topN: number): void {
   console.log(divider)
   console.log(`  전체 파일:     ${pc.bold(String(result.total))} 개`)
   console.log(`  매칭 성공:     ${pc.green(String(result.matched))} 개`)
-  console.log(`  매칭 실패:     ${pc.red(String(result.unmatched))} 개`)
+  console.log(`  매칭 실패:     ${pc.red(String(result.unmatched))} 개  ← AI 2차 태깅(M2-03b) 대상`)
+  console.log(
+    `  적재 제외:     ${pc.gray(String(result.skipped))} 개  (skip 폴더 — 매칭률 분모에서 제외)`,
+  )
   console.log(`  매칭률:        ${pctColored}  (목표 ≥ 70%)`)
 
   if (result.matchRate >= 0.7) {

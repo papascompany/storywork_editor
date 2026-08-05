@@ -345,7 +345,10 @@
 ### (A) AI 실가동·정밀화 시퀀스 — 개발 순서 재정의 (근시일 — 그랜트 STEP1)
 이미 구축된 기반(M2/M4) 위에서 **'신규 개발'이 아니라 '실가동·정밀화'** 로 순서를 재정의한다.
 - [ ] [AI-ACT-01] 시험용(mock) 임베딩 → 실 임베딩(voyage-3/text-embedding-3) 전환 + 1,058종 pgvector 재인덱싱 — 50쿼리 평가셋 검색정확도 baseline — 🚦 외부 API 키 (M2-04 후속) — @pose-curator + @scene-analyzer
-- [ ] [AI-ACT-02] 미매칭 자산 AI 2차 태깅 캐시 가동(M2-03b) + 자동배치 평가용 골든셋 16 → 50+ 확장 — @scene-analyzer
+- [x] [AI-ACT-02] 미매칭 자산 AI 2차 태깅 캐시 가동(M2-03b) + 자동배치 평가용 골든셋 확장 — @scene-analyzer ✅ 2026-08-05.
+  · **전제 오류 실측 정정**: "미매칭 17건 = LLM 태깅 대상"은 착시였다 — 17건 전부 `중복` 폴더(사전 `skip:true`·LICENSE `include:false`·prod DB 미적재)이고 `stand` 규칙이 이미 커버. 원인은 tagger 가 **정책적 skip 과 사전 공백 미매칭을 둘 다 `matched:false`** 로 뭉뚱그린 것 → `FilenameTagResult.skipped` 분리 + 검증 스크립트가 skip 을 매칭률 분모에서 제외 → **실 매칭률 98.7% → 100%**(1,243/1,243), 현행 LLM 태깅 대상 **0건** 확정
+  · `llm-tagger.ts` 신설 — M2-03b 의 실효 목적인 **신규 자산 fallback**. 캐시 우선 + `STORYWORK_LLM` env 하드 게이트(CI $0) + 키 부재 시 null 폴백(enhance.ts 선례), 사전 118종 어휘 sanitize(LLM 창작 키워드 차단), confidence 0.6 상한(사전 매칭보다 항상 낮게), 캐시 키에 모델 ID 포함(모델 변경 시 stale 제안 차단), `selectTaggingTargets()` 로 skip 자산 배제를 코드에 고정
+  · **골든셋 10 케이스/16 조합 → 50 케이스/102 조합**(5 카테고리: 일상·감정·액션·소품·다인). 통합 후 실 하네스 재측정 **만족도 102/102 = 100%**(목표 70%). 신규 테스트 14 + satisfaction 51 green
 - [ ] [AI-ACT-03] 라이브 LLM 대본분석 활성(M4-01-03, `AI_GATEWAY_API_KEY`) + 프롬프트 캐싱 대본 1건당 분석비 측정 — 🚦 외부 API 키 — @scene-analyzer
 - [ ] [AI-ACT-04] 자동배치 1차본 채택률 측정 체계(실사용 대본 200장면 평가셋) + baseline→target 리포트 — @layout-composer + @qa-tester
 

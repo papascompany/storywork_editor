@@ -1,5 +1,5 @@
 /**
- * satisfaction.test.ts — M4-02 추천 만족도 측정 (골든셋 10개)
+ * satisfaction.test.ts — 추천 만족도 측정 (골든셋 50개 / 102 조합)
  *
  * 만족도 기준:
  *   각 (sceneIndex, character) 조합에서
@@ -120,7 +120,7 @@ describe('골든셋 만족도 측정 (M4-02)', () => {
   }
 
   // 전체 만족도 집계 테스트
-  it('전체 골든셋 10 — 평균 만족도 ≥ 70%', async () => {
+  it('전체 골든셋 50 — 평균 만족도 ≥ 70%', async () => {
     const opts: RecommendInternalOptions = {
       seed: 0,
       candidatesPerCharacter: 5,

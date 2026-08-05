@@ -21,6 +21,16 @@ export {
   tagFromSubfolder,
 } from './filename-tagger.js'
 
+// llm-tagger — 미매칭 자산 AI 2차 태깅 (M2-03b / AI-ACT-02)
+export type { LlmTagOptions, LlmTagSuggestion } from './llm-tagger.js'
+export {
+  buildTagPrompt,
+  knownActionSet,
+  sanitizeSuggestion,
+  selectTaggingTargets,
+  tagWithLlm,
+} from './llm-tagger.js'
+
 // 타입 (M4-02)
 export type {
   BackgroundCandidate,
