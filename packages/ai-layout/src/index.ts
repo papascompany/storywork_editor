@@ -22,15 +22,16 @@ export type {
   LayoutTemplate,
   PageDraft,
   PageFabricJson,
+  PageGroup,
   PoseAlternativeMeta,
   ResourceTagAdapter,
+  SceneLineRange,
   SlotAssignment,
   TemplateHint,
 } from './types.js'
 
 // ── 단계별 함수 (디버깅/테스트용) ─────────────────────────────────────────
 export { splitScenes } from './page-split.js'
-export type { PageGroup } from './page-split.js'
 
 export {
   matchTemplate,
@@ -38,7 +39,21 @@ export {
   PRESET_TEMPLATES,
   filterSlotsByKind,
 } from './template-match.js'
-export type { TemplateMatchResult } from './template-match.js'
+export type { TemplateMatchOptions, TemplateMatchResult } from './template-match.js'
+
+// ── 대사 수용량 기반 페이지 계획 (LAYOUT-03) ──────────────────────────────
+export { planCapacityPages, sceneHint, sceneSpeakers } from './capacity.js'
+export type { CapacityPlanContext } from './capacity.js'
+export {
+  generateBubbleSlots,
+  pageBubbleCapacity,
+  withGeneratedBubbleSlots,
+  bubbleSlotsOf,
+  poseSlotsOf,
+  requiredPoseSlotsOf,
+  MAX_BUBBLES_PER_PAGE,
+  GENERATED_SLOT_PREFIX,
+} from './bubble-slots.js'
 
 export { assignSlots } from './slot-assign.js'
 export type { SlotAssignResult } from './slot-assign.js'

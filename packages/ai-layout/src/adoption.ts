@@ -183,9 +183,15 @@ export function measureAdoption(
       }
     }
 
-    // 2. 대사 유실 — 원본 장면의 대사가 페이지에 실렸는가
+    // 2. 대사 유실 — 이 페이지가 담당하는 대사가 실렸는가
+    //    한 장면이 여러 페이지로 나뉘면(LAYOUT-03) 페이지는 자기 구간만 책임진다.
+    //    구간의 합집합이 장면 전체이므로 코퍼스 보존율 산식은 그대로 성립한다.
     const placed = placedDialogues(page)
-    const sceneLines = page.sceneIndices.flatMap((i) => sceneByIndex.get(i)?.lines ?? [])
+    const sceneLines = page.lineRanges
+      ? page.lineRanges.flatMap((r) =>
+          (sceneByIndex.get(r.sceneIndex)?.lines ?? []).slice(r.start, r.end),
+        )
+      : page.sceneIndices.flatMap((i) => sceneByIndex.get(i)?.lines ?? [])
     const dialogueTotal = sceneLines.length
     let dialoguePlaced = 0
     for (const line of sceneLines) {

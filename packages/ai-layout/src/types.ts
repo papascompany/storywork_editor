@@ -66,6 +66,31 @@ export type TemplateHint =
   | 'default'
 
 // ─────────────────────────────────────────────
+// 페이지 그룹 (page-split → capacity → compose)
+// ─────────────────────────────────────────────
+
+/**
+ * 한 페이지가 담당하는 장면의 대사 구간 (LAYOUT-03).
+ * 장면 대사가 페이지 수용량을 넘어 여러 페이지로 나뉠 때만 생긴다.
+ * `[start, end)` — Array.slice 규약.
+ */
+export interface SceneLineRange {
+  sceneIndex: number
+  start: number
+  end: number
+}
+
+export interface PageGroup {
+  pageIndex: number
+  sceneIndices: number[]
+  templateHint: TemplateHint
+  /** 수용량 패스가 확정한 Template ID (LAYOUT-03). 없으면 compose 가 직접 매칭 */
+  templateId?: string
+  /** 장면별 대사 구간 (LAYOUT-03). 없으면 장면의 전체 대사를 담당한다 */
+  lineRanges?: SceneLineRange[]
+}
+
+// ─────────────────────────────────────────────
 // compose() 입력 옵션
 // ─────────────────────────────────────────────
 
@@ -110,6 +135,12 @@ export interface PageDraft {
   fabricJson: PageFabricJson
   /** 이 페이지에 포함된 scene 인덱스 목록 */
   sceneIndices: number[]
+  /**
+   * 이 페이지가 담당하는 대사 구간 (LAYOUT-03).
+   * 한 장면이 여러 페이지로 나뉜 경우에만 존재하며, 없으면 장면 전체를 담당한다.
+   * 채택률 측정(adoption.ts)이 "이 페이지가 책임지는 대사"를 판정하는 근거다.
+   */
+  lineRanges?: SceneLineRange[]
   /** 페이지별 경고 (lowDpi 경고 등) */
   warnings: string[]
 }

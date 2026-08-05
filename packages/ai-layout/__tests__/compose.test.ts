@@ -312,12 +312,51 @@ describe('G5: 4컷 만화', () => {
     }
   })
 
-  it('4개 closeup → 1 페이지 four-cut (R2)', async () => {
+  // LAYOUT-03 이전에는 이 픽스처(장면 4개 × 대사 4개 = 16)가 1페이지 four-cut 이었고,
+  // 말풍선 슬롯 4개를 초과한 대사 12개는 경고 없이 사라졌다(AI-ACT-04 baseline).
+  // 지금은 수용량을 넘으면 합병을 해제한다 — 같은 컷 구성을 대사만 바꿔 반복하느니
+  // 컷마다 한 페이지를 준다. R2 합병 자체는 page-split.test.ts 와 아래 케이스가 지킨다.
+  it('대사가 수용량 초과 → 합병 해제 (컷마다 1 페이지)', async () => {
     const result = await compose(analyzed, recommended, BASE_OPTS)
-    // R2: closeup×4 → 1페이지 합병
+    expect(result.pages).toHaveLength(4)
+    for (const page of result.pages) {
+      expect(page.sceneIndices).toHaveLength(1)
+    }
+  })
+
+  it('대사가 다 실린다 (유실 0)', async () => {
+    const result = await compose(analyzed, recommended, BASE_OPTS)
+    const placed = new Set(
+      result.pages.flatMap((p) =>
+        p.fabricJson.layers.filter((l) => l.kind === 'bubble').map((l) => String(l.fabric['text'])),
+      ),
+    )
+    const expected = analyzed.scenes.flatMap((s) => s.lines.map((l) => l.text))
+    for (const text of expected) expect(placed.has(text)).toBe(true)
+  })
+})
+
+describe('G5b: 4컷 만화 — 대사가 수용량 안일 때는 합병 유지 (R2)', () => {
+  // 첫 장면만 R2 트리거(closeup + 대사 4개), 나머지 컷은 대사 없이 컷만 이어붙인다.
+  const analyzed = makeAnalyzed([
+    { index: 0, cameraAngle: 'closeup', emotion: 'happy', lineCount: 4 },
+    { index: 1, cameraAngle: 'closeup', emotion: 'happy', lineCount: 0 },
+    { index: 2, cameraAngle: 'closeup', emotion: 'happy', lineCount: 0 },
+    { index: 3, cameraAngle: 'closeup', emotion: 'happy', lineCount: 0 },
+  ])
+  const recommended = makeRecommended([0, 1, 2, 3])
+
+  it('4개 closeup → 1 페이지 four-cut', async () => {
+    const result = await compose(analyzed, recommended, BASE_OPTS)
     expect(result.pages).toHaveLength(1)
     expect(result.pages[0]?.sceneIndices).toHaveLength(4)
     expect(result.pages[0]?.templateId).toBe('preset-four-cut')
+  })
+
+  it('4컷 모두 포즈가 배치된다', async () => {
+    const result = await compose(analyzed, recommended, BASE_OPTS)
+    const poses = result.pages[0]?.fabricJson.layers.filter((l) => l.kind === 'pose') ?? []
+    expect(poses).toHaveLength(4)
   })
 
   it('safe area 침범 0', async () => {

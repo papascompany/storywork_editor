@@ -1,0 +1,191 @@
+{
+  "generatedBy": "scripts/measure-adoption.ts",
+  "metric": "proxy-adoption-rate (blocker-free page ratio)",
+  "format": "preset-b5-novel",
+  "corpusFiles": 21,
+  "totalScenes": 217,
+  "totalPages": 255,
+  "adoptionRate": 1,
+  "dialogueRetention": 1,
+  "blockerCounts": {
+    "empty-slot": 0,
+    "safe-area": 0,
+    "dpi-error": 0,
+    "dialogue-loss": 0,
+    "speaker-missing": 0
+  },
+  "softSignalCounts": {
+    "dpi-warning": 0,
+    "low-dpi-fallback": 0
+  },
+  "perFile": [
+    {
+      "file": "action-fantasy/01-tower-siege.txt",
+      "format": "light-novel",
+      "scenes": 9,
+      "pages": 9,
+      "adoptionRate": 1,
+      "dialogueRetention": 1
+    },
+    {
+      "file": "action-fantasy/02-dragon-chase.txt",
+      "format": "light-novel",
+      "scenes": 10,
+      "pages": 10,
+      "adoptionRate": 1,
+      "dialogueRetention": 1
+    },
+    {
+      "file": "action-fantasy/03-ruin-gate.txt",
+      "format": "novel",
+      "scenes": 9,
+      "pages": 9,
+      "adoptionRate": 1,
+      "dialogueRetention": 1
+    },
+    {
+      "file": "action-fantasy/04-blade-oath.txt",
+      "format": "novel",
+      "scenes": 9,
+      "pages": 9,
+      "adoptionRate": 1,
+      "dialogueRetention": 1
+    },
+    {
+      "file": "action-fantasy/05-frost-wall.txt",
+      "format": "light-novel",
+      "scenes": 10,
+      "pages": 10,
+      "adoptionRate": 1,
+      "dialogueRetention": 1
+    },
+    {
+      "file": "daily-novel/01-school-seat.txt",
+      "format": "novel",
+      "scenes": 10,
+      "pages": 10,
+      "adoptionRate": 1,
+      "dialogueRetention": 1
+    },
+    {
+      "file": "daily-novel/02-office-overtime.txt",
+      "format": "novel",
+      "scenes": 10,
+      "pages": 10,
+      "adoptionRate": 1,
+      "dialogueRetention": 1
+    },
+    {
+      "file": "daily-novel/03-family-boxes.txt",
+      "format": "novel",
+      "scenes": 10,
+      "pages": 10,
+      "adoptionRate": 1,
+      "dialogueRetention": 1
+    },
+    {
+      "file": "daily-novel/04-bookshop-rain.txt",
+      "format": "novel",
+      "scenes": 9,
+      "pages": 10,
+      "adoptionRate": 1,
+      "dialogueRetention": 1
+    },
+    {
+      "file": "daily-novel/05-laundromat-tuesday.txt",
+      "format": "novel",
+      "scenes": 11,
+      "pages": 11,
+      "adoptionRate": 1,
+      "dialogueRetention": 1
+    },
+    {
+      "file": "drama-screenplay/01-golden-hour.txt",
+      "format": "screenplay",
+      "scenes": 10,
+      "pages": 17,
+      "adoptionRate": 1,
+      "dialogueRetention": 1
+    },
+    {
+      "file": "drama-screenplay/02-summer-noodle-house.txt",
+      "format": "screenplay",
+      "scenes": 10,
+      "pages": 20,
+      "adoptionRate": 1,
+      "dialogueRetention": 1
+    },
+    {
+      "file": "drama-screenplay/03-third-floor-meeting-room.txt",
+      "format": "screenplay",
+      "scenes": 10,
+      "pages": 19,
+      "adoptionRate": 1,
+      "dialogueRetention": 1
+    },
+    {
+      "file": "drama-screenplay/04-witness.txt",
+      "format": "screenplay",
+      "scenes": 10,
+      "pages": 12,
+      "adoptionRate": 1,
+      "dialogueRetention": 1
+    },
+    {
+      "file": "drama-screenplay/05-night-study-escape.txt",
+      "format": "screenplay",
+      "scenes": 10,
+      "pages": 19,
+      "adoptionRate": 1,
+      "dialogueRetention": 1
+    },
+    {
+      "file": "mixed-formats/diary-01-night-shift.txt",
+      "format": "diary",
+      "scenes": 15,
+      "pages": 15,
+      "adoptionRate": 1,
+      "dialogueRetention": 1
+    },
+    {
+      "file": "mixed-formats/diary-02-classroom.txt",
+      "format": "diary",
+      "scenes": 15,
+      "pages": 15,
+      "adoptionRate": 1,
+      "dialogueRetention": 1
+    },
+    {
+      "file": "mixed-formats/essay-01-laundry-corner.txt",
+      "format": "essay",
+      "scenes": 6,
+      "pages": 6,
+      "adoptionRate": 1,
+      "dialogueRetention": 1
+    },
+    {
+      "file": "mixed-formats/essay-02-driving-lesson.txt",
+      "format": "essay",
+      "scenes": 6,
+      "pages": 6,
+      "adoptionRate": 1,
+      "dialogueRetention": 1
+    },
+    {
+      "file": "mixed-formats/light-novel-01-crack-in-the-yard.txt",
+      "format": "light-novel",
+      "scenes": 14,
+      "pages": 14,
+      "adoptionRate": 1,
+      "dialogueRetention": 1
+    },
+    {
+      "file": "mixed-formats/light-novel-02-ninth-floor.txt",
+      "format": "light-novel",
+      "scenes": 14,
+      "pages": 14,
+      "adoptionRate": 1,
+      "dialogueRetention": 1
+    }
+  ]
+}

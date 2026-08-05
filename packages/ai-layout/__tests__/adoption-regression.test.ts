@@ -1,11 +1,13 @@
 /**
- * adoption-regression.test.ts — 채택률 회귀 가드 (AI-ACT-04)
+ * adoption-regression.test.ts — 채택률 회귀 가드 (AI-ACT-04 → LAYOUT-03)
  *
  * baseline(2026-08-05, 코퍼스 217장면): 채택률 13.8% · 대사 보존 52.2%
+ * LAYOUT-03(2026-08-05, 255페이지):     채택률 100%  · 대사 보존 100%
  * → docs/eval/adoption-baseline-2026-08-05.md
  *
  * 이 테스트는 **"현재보다 나빠지지 않음"** 만 보장한다.
- * 레이아웃을 개선하면(LAYOUT-03) 아래 하한을 함께 올려야 가드가 의미를 유지한다.
+ * 하한은 baseline 실측치가 아니라 **목표선**(채택 60% · 보존 95%)에 맞춰 둔다 —
+ * 실측이 100% 인 지금 그 아래로 내려가는 변경은 회귀이기 때문이다.
  *
  * CI 에서 전체 코퍼스(21편)를 돌리면 느리므로, 형식별 대표 대본을 인라인 축약본으로
  * 고정해 같은 병목(대사 수용량)을 재현한다. 전체 측정은 scripts/measure-adoption.ts.
@@ -94,14 +96,30 @@ describe('자동배치 채택률 회귀 가드', () => {
     expect(a.blockerCounts).toEqual(b.blockerCounts)
   })
 
-  it('대사 보존율이 baseline 하한 아래로 떨어지지 않는다', async () => {
+  it('대사 보존율이 목표선(95%) 아래로 떨어지지 않는다', async () => {
     const results: AdoptionResult[] = []
     for (const s of SAMPLES) results.push(await measureSample(s.text))
     const overall = aggregateAdoption(results)
-    // 전체 코퍼스 baseline 은 0.522. 이 축약본은 대사 밀도가 더 높아 실측 0.261 —
-    // 가드는 "현재보다 나빠지지 않음"이 목적이므로 실측 바로 아래인 0.25 로 잡는다.
-    // 개선(LAYOUT-03) 시 이 하한을 함께 올릴 것.
-    expect(overall.dialogueRetention).toBeGreaterThanOrEqual(0.25)
+    // LAYOUT-03 이후 실측 1.0. 대사를 버리는 경로가 다시 생기면 여기서 걸린다.
+    expect(overall.dialogueRetention).toBeGreaterThanOrEqual(0.95)
+  })
+
+  it('채택률이 목표선(60%) 아래로 떨어지지 않는다', async () => {
+    const results: AdoptionResult[] = []
+    for (const s of SAMPLES) results.push(await measureSample(s.text))
+    const overall = aggregateAdoption(results)
+    // LAYOUT-03 이후 실측 1.0 (blocker 0). 목표선은 60% 이므로 여유를 두고 가드한다.
+    expect(overall.adoptionRate).toBeGreaterThanOrEqual(0.6)
+  })
+
+  it('대사가 페이지 밖으로 사라지지 않는다 (구간 합 = 장면 전체)', async () => {
+    for (const s of SAMPLES) {
+      const r = await measureSample(s.text)
+      const total = r.pages.reduce((sum, p) => sum + p.dialogueTotal, 0)
+      const placed = r.pages.reduce((sum, p) => sum + p.dialoguePlaced, 0)
+      expect(placed).toBe(total)
+      expect(r.blockerCounts['dialogue-loss']).toBe(0)
+    }
   })
 
   it('인쇄 사고성 blocker(safe-area·dpi-error)는 0을 유지한다', async () => {

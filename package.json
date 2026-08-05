@@ -49,7 +49,8 @@
     "perf:web": "tsx --tsconfig tsconfig.scripts.json scripts/perf-web-measure.ts --env local",
     "perf:web:prod": "tsx --tsconfig tsconfig.scripts.json scripts/perf-web-measure.ts --env prod",
     "adoption:measure": "tsx --tsconfig tsconfig.scripts.json scripts/measure-adoption.ts",
-    "adoption:baseline": "tsx --tsconfig tsconfig.scripts.json scripts/measure-adoption.ts --json data/eval/adoption-baseline.json"
+    "adoption:baseline": "tsx --tsconfig tsconfig.scripts.json scripts/measure-adoption.ts --json data/eval/adoption-baseline.json",
+    "adoption:report": "tsx --tsconfig tsconfig.scripts.json scripts/measure-adoption.ts --json data/eval/adoption-latest.json"
   },
   "devDependencies": {
     "@commitlint/cli": "^19.0.0",

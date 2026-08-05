@@ -289,11 +289,22 @@ describe('E2E-G5: 4컷 만화', () => {
     assertNoSafeAreaWarning(await compose(a, r, BASE))
   })
 
-  it('four-cut 합병 → 1 페이지', async () => {
+  // LAYOUT-03: 장면 4개 × 대사 4개 = 16 은 four-cut 말풍선 슬롯(4)을 크게 넘는다.
+  // 종전에는 1페이지로 합병하고 대사 12개를 조용히 버렸다(AI-ACT-04 baseline).
+  it('대사가 수용량 초과 → 합병 해제 (컷마다 1 페이지)', async () => {
     const result = await compose(a, r, BASE)
-    expect(result.pages).toHaveLength(1)
-    expect(result.pages[0]?.templateId).toBe('preset-four-cut')
-    expect(result.pages[0]?.sceneIndices).toHaveLength(4)
+    expect(result.pages).toHaveLength(4)
+    expect(result.pages.every((p) => p.sceneIndices.length === 1)).toBe(true)
+  })
+
+  it('16개 대사가 모두 페이지에 실린다', async () => {
+    const result = await compose(a, r, BASE)
+    const placed = result.pages.flatMap((p) =>
+      p.fabricJson.layers.filter((l) => l.kind === 'bubble').map((l) => String(l.fabric['text'])),
+    )
+    const expected = a.scenes.flatMap((s) => s.lines.map((l) => l.text))
+    expect(expected).toHaveLength(16)
+    for (const text of expected) expect(placed).toContain(text)
   })
 })
 

@@ -1,33 +1,40 @@
 /**
- * compose.ts — ai-layout 메인 함수 (M4-03 Step 4)
+ * compose.ts — ai-layout 메인 함수 (M4-03 Step 4 · LAYOUT-03 수용량 반영)
  *
  * 처리 흐름:
  *  1. Format 로드 (opts.format 직접 주입 또는 formatId 기반 폴백)
- *  2. splitScenes() → PageGroup[]
- *  3. 각 PageGroup:
- *     a. matchTemplate() → Template 선택
+ *  2. splitScenes() → PageGroup[]                     — 연출 규칙(R1~R5)
+ *  3. planCapacityPages() → PageGroup[]               — 대사 수용량 재계획 (LAYOUT-03)
+ *  4. 각 PageGroup:
+ *     a. 확정된 Template 로드 (+ 부족하면 말풍선 슬롯 동적 보강)
  *     b. assignSlots() → SlotAssignment[] (lowDpi 제약 포함)
  *     c. buildFabricJson() → PageFabricJson (Schema v1 호환)
- *  4. warnings 종합 → ComposeResult 반환
+ *  5. warnings 종합 → ComposeResult 반환
  *
  * 결정론: seed 고정 → 동일 입력 → 동일 출력
  * mm 단위 전용: 픽셀 하드코딩 금지 (CLAUDE.md §8)
  */
 
 import type { RecommendResult } from '@storywork/ai-recommend'
-import type { AnalyzeResult } from '@storywork/ai-script'
+import type { AnalyzeResult, AnalyzedScene } from '@storywork/ai-script'
 
+import { assignBubblesByCost, speakerAnchorFromPoseSlot } from './bubble-cost.js'
+import type { SpeakerAnchor } from './bubble-cost.js'
+import { withGeneratedBubbleSlots } from './bubble-slots.js'
+import { planCapacityPages, resolveTemplateHint, sceneSpeakers } from './capacity.js'
 import { checkLowDpiConstraint, formatLowDpiWarning } from './constraints/low-dpi.js'
 import { splitScenes } from './page-split.js'
 import { assignSlots, BG_TONE_COLOR } from './slot-assign.js'
-import { matchTemplate } from './template-match.js'
+import { matchTemplate, PRESET_TEMPLATES } from './template-match.js'
 import type {
   ComposeOptions,
   ComposeResult,
   FabricLayer,
   LayoutFormat,
+  LayoutTemplate,
   PageDraft,
   PageFabricJson,
+  PageGroup,
   SlotAssignment,
   TemplateHint,
 } from './types.js'
@@ -184,44 +191,70 @@ function assignmentToFabricLayer(
 // ─────────────────────────────────────────────
 
 /**
+ * 페이지가 담당하는 장면 사본 — `lineRanges` 가 있으면 그 구간의 대사만 남긴다.
+ *
+ * `characters` 는 **전체 장면의 화자 집합**으로 고정한다. 대사를 잘라내면 그 페이지의
+ * 화자가 사라져 필수 포즈 슬롯이 비는데(= `[slot-empty]`), 템플릿은 전체 장면 기준으로
+ * 골랐으므로 그건 계획과 배치가 어긋난 것이다.
+ */
+function scenePageView(
+  scene: AnalyzedScene,
+  range?: { start: number; end: number },
+): AnalyzedScene {
+  if (!range) return scene
+  return {
+    ...scene,
+    lines: scene.lines.slice(range.start, range.end),
+    characters: sceneSpeakers(scene),
+  }
+}
+
+/**
  * 멀티 scene 페이지 처리 전략:
  * - 단일 scene: 전체 template에 대해 assignSlots() 1회 호출
- * - 멀티 scene (1on1-talk, four-cut 등): 단일 scene (첫 번째)을 기준으로 배치하되,
- *   각 scene의 첫 번째 포즈 후보를 순서대로 pose 슬롯에 배치.
- *   배경/말풍선은 페이지 단위로 1회만 배치 (중복 slotId 방지).
+ * - 멀티 scene (1on1-talk, four-cut 등): 각 scene의 첫 번째 포즈 후보를 순서대로
+ *   pose 슬롯에 배치하고, 배경은 첫 scene 기준 1회, 말풍선은 **페이지 전체 대사**를
+ *   BUBBLE-02 비용함수로 배치한다(컷별 화자 앵커 → 자기 컷 근처로 모인다).
  */
 async function buildPageFabricJson(
-  pageIndex: number,
-  sceneIndices: number[],
+  group: PageGroup,
   analyzed: AnalyzeResult,
   recommended: RecommendResult,
   format: LayoutFormat,
   opts: ComposeOptions,
-  pageHint?: TemplateHint,
 ): Promise<{ fabricJson: PageFabricJson; templateId?: string; warnings: string[] }> {
+  const { pageIndex, sceneIndices } = group
   const seed = opts.seed ?? 0
   const templates = opts._templates ?? []
   const preferredIds = opts.preferredTemplateIds ?? []
   const tagAdapter = opts._resourceTagAdapter ?? null
 
+  const rangeOf = (sceneIndex: number): { start: number; end: number } | undefined =>
+    group.lineRanges?.find((r) => r.sceneIndex === sceneIndex)
+
   // 첫 번째 장면 기준으로 templateHint 결정
   const firstSceneIdx = sceneIndices[0] ?? 0
   const firstScene = analyzed.scenes.find((s) => s.index === firstSceneIdx)
-  const charCount = firstScene ? firstScene.characters.length : 1
 
   // page-split 의 templateHint 우선 사용 (R3 풀샷 단독 등 명시적 분류 보존).
-  // 없으면 장면 수/cameraAngle 로 fallback 추론.
-  let hint: TemplateHint
-  if (pageHint && pageHint !== 'default') {
-    hint = pageHint
-  } else if (sceneIndices.length === 4) hint = 'four-cut'
-  else if (sceneIndices.length === 2) hint = '1on1-talk'
-  else if (firstScene?.meta.cameraAngle === 'closeup') hint = 'closeup'
-  else if (firstScene?.meta.cameraAngle === 'wide') hint = 'wide'
-  else hint = 'default'
+  // 없으면 장면 수/cameraAngle 로 fallback 추론 — 수용량 패스와 같은 규칙을 쓴다.
+  const hint = resolveTemplateHint(group.templateHint, sceneIndices.length, firstScene)
 
-  // Template 매칭
-  const { template } = matchTemplate(hint, preferredIds, charCount, templates)
+  // Template — 수용량 패스가 확정했으면 그대로 쓴다(재매칭으로 계획과 어긋나지 않게).
+  const pool = templates.length > 0 ? templates : PRESET_TEMPLATES
+  const planned = group.templateId ? pool.find((t) => t.id === group.templateId) : undefined
+  const baseTemplate: LayoutTemplate =
+    planned ??
+    matchTemplate(hint, preferredIds, firstScene ? sceneSpeakers(firstScene).length : 1, templates)
+      .template
+
+  // 이 페이지가 실을 대사 수 → 말풍선 슬롯 보강 (LAYOUT-03)
+  const pageLineCount = sceneIndices.reduce((sum, idx) => {
+    const scene = analyzed.scenes.find((s) => s.index === idx)
+    if (!scene) return sum
+    return sum + scenePageView(scene, rangeOf(idx)).lines.length
+  }, 0)
+  const template = withGeneratedBubbleSlots(baseTemplate, format, pageLineCount)
 
   const allWarnings: string[] = []
   const layers: FabricLayer[] = []
@@ -238,7 +271,7 @@ async function buildPageFabricJson(
         const { assignments, warnings } = await assignSlots(
           template,
           sceneRec,
-          scene,
+          scenePageView(scene, rangeOf(sceneIdx)),
           format,
           tagAdapter,
         )
@@ -266,10 +299,9 @@ async function buildPageFabricJson(
       .filter((s) => s.allowedKinds.includes('pose'))
       .sort((a, b) => a.x - b.x)
 
-    // 배경/말풍선 슬롯은 첫 번째 scene 기준으로 1회 배치
+    // 배경 슬롯은 첫 번째 scene 기준으로 1회 배치
     const firstSceneRec = recommended.scenes.find((r) => r.sceneIndex === firstSceneIdx)
     if (firstScene && firstSceneRec) {
-      // 배경 슬롯 배치 (중복 방지)
       for (const bgSlot of template.slots.filter((s) => s.allowedKinds.includes('bg'))) {
         if (usedSlotIds.has(bgSlot.id)) continue
         usedSlotIds.add(bgSlot.id)
@@ -295,56 +327,10 @@ async function buildPageFabricJson(
         }
         layers.push(layer)
       }
-
-      // 말풍선 슬롯: 첫 번째 scene의 lines 기준
-      const bubbleSlots = template.slots
-        .filter((s) => s.allowedKinds.includes('bubble') || s.allowedKinds.includes('text'))
-        .sort((a, b) => a.y - b.y || a.x - b.x)
-      for (let bi = 0; bi < bubbleSlots.length; bi++) {
-        const bubbleSlot = bubbleSlots[bi]
-        if (!bubbleSlot || usedSlotIds.has(bubbleSlot.id)) continue
-
-        // 어느 scene의 line 인지 결정 (scene 순서 × slot 순서)
-        const sceneIdx2 =
-          sceneIndices[
-            Math.floor(bi / Math.max(1, Math.ceil(bubbleSlots.length / sceneIndices.length)))
-          ]
-        const bScene =
-          sceneIdx2 !== undefined ? analyzed.scenes.find((s) => s.index === sceneIdx2) : firstScene
-        const line = bScene?.lines[bi % Math.max(1, Math.ceil(firstScene?.lines.length ?? 1))]
-        if (!line && bubbleSlot.optional) continue
-
-        usedSlotIds.add(bubbleSlot.id)
-        const layer: FabricLayer = {
-          id: makeId(seed, pageIndex * 100 + bi + 50, bubbleSlot.id),
-          kind: 'bubble',
-          data: {
-            slotId: bubbleSlot.id,
-            locked: false,
-            visible: true,
-            meta: { text: line?.text ?? '' },
-          },
-          fabric: {
-            type: 'textbox',
-            leftMm: bubbleSlot.x * format.widthMm,
-            topMm: bubbleSlot.y * format.heightMm,
-            widthMm: bubbleSlot.w * format.widthMm,
-            heightMm: bubbleSlot.h * format.heightMm,
-            scaleX: 1,
-            scaleY: 1,
-            angle: 0,
-            opacity: 1,
-            text: line?.text ?? '',
-            fontSize: 14,
-            fill: '#000000',
-            zIndex: bubbleSlot.zIndex,
-          },
-        }
-        layers.push(layer)
-      }
     }
 
-    // 각 scene → 순서대로 pose 슬롯에 배치
+    // 각 scene → 순서대로 pose 슬롯에 배치 (말풍선보다 먼저 — 화자 앵커의 근거)
+    const anchors = new Map<string, SpeakerAnchor>()
     for (let si = 0; si < sceneIndices.length; si++) {
       const sceneIdx = sceneIndices[si]
       if (sceneIdx === undefined) continue
@@ -381,6 +367,11 @@ async function buildPageFabricJson(
             lowDpiViolation = true
           }
         }
+      }
+
+      if (charName) {
+        // 같은 인물이 여러 컷에 나와도 컷마다 별도 앵커 — 대사가 자기 컷으로 모인다
+        anchors.set(`${sceneIdx}::${charName}`, speakerAnchorFromPoseSlot(poseSlot, charName))
       }
 
       usedSlotIds.add(poseSlot.id)
@@ -428,6 +419,66 @@ async function buildPageFabricJson(
         },
       }
       layers.push(layer)
+    }
+
+    // ── 말풍선: 페이지 전체 대사를 4항 비용함수로 배치 (LAYOUT-03) ──────────
+    // 종전에는 첫 장면 대사만 슬롯 순서대로 꽂아 나머지 컷의 대사가 통째로 사라졌다.
+    const pageLines: Array<{ sceneIndex: number; text: string; speaker?: string | null }> = []
+    for (const sceneIdx of sceneIndices) {
+      const scene = analyzed.scenes.find((s) => s.index === sceneIdx)
+      if (!scene) continue
+      for (const line of scenePageView(scene, rangeOf(sceneIdx)).lines) {
+        pageLines.push({ sceneIndex: sceneIdx, text: line.text, speaker: line.speaker })
+      }
+    }
+
+    const bubbleSlots = template.slots
+      .filter((s) => s.allowedKinds.includes('bubble') || s.allowedKinds.includes('text'))
+      .sort((a, b) => a.y - b.y || a.x - b.x)
+
+    const { slotIndexByLine } = assignBubblesByCost({
+      lines: pageLines.map((l) => ({
+        speaker: l.speaker ? `${l.sceneIndex}::${l.speaker}` : null,
+      })),
+      slots: bubbleSlots,
+      anchors,
+      format,
+    })
+
+    for (const [lineIdx, slotIdx] of [...slotIndexByLine].sort((a, b) => a[0] - b[0])) {
+      const bubbleSlot = bubbleSlots[slotIdx]
+      const line = pageLines[lineIdx]
+      if (!bubbleSlot || !line || usedSlotIds.has(bubbleSlot.id)) continue
+      usedSlotIds.add(bubbleSlot.id)
+      layers.push({
+        id: makeId(seed, pageIndex * 100 + lineIdx + 50, bubbleSlot.id),
+        kind: 'bubble',
+        data: {
+          slotId: bubbleSlot.id,
+          locked: false,
+          visible: true,
+          meta: {
+            text: line.text,
+            speaker: line.speaker ?? undefined,
+            sceneIndex: line.sceneIndex,
+          },
+        },
+        fabric: {
+          type: 'textbox',
+          leftMm: bubbleSlot.x * format.widthMm,
+          topMm: bubbleSlot.y * format.heightMm,
+          widthMm: bubbleSlot.w * format.widthMm,
+          heightMm: bubbleSlot.h * format.heightMm,
+          scaleX: 1,
+          scaleY: 1,
+          angle: 0,
+          opacity: 1,
+          text: line.text,
+          fontSize: 14,
+          fill: '#000000',
+          zIndex: bubbleSlot.zIndex,
+        },
+      })
     }
   }
 
@@ -480,8 +531,8 @@ export async function compose(
   const format: LayoutFormat = opts.format ?? DEFAULT_FORMAT
   const enableSplitMerge = opts.enableSplitMerge !== false // 기본 true
 
-  // 1. 페이지 분할
-  const pageGroups = enableSplitMerge
+  // 1. 페이지 분할 — 연출 규칙 (R1~R5)
+  const sceneGroups: PageGroup[] = enableSplitMerge
     ? splitScenes(recommended.scenes, analyzed)
     : recommended.scenes.map((r, i) => ({
         pageIndex: i,
@@ -489,19 +540,25 @@ export async function compose(
         templateHint: 'default' as TemplateHint,
       }))
 
-  // 2. 각 PageGroup → PageDraft
+  // 2. 대사 수용량 재계획 — 템플릿 확정 + 합병 해제 + 페이지 분할 (LAYOUT-03)
+  const pageGroups = planCapacityPages(sceneGroups, analyzed, {
+    templates: opts._templates ?? [],
+    preferredIds: opts.preferredTemplateIds ?? [],
+    format,
+    allowSplit: enableSplitMerge,
+  })
+
+  // 3. 각 PageGroup → PageDraft
   const pages: PageDraft[] = []
   const globalWarnings: string[] = []
 
   for (const group of pageGroups) {
     const { fabricJson, templateId, warnings } = await buildPageFabricJson(
-      group.pageIndex,
-      group.sceneIndices,
+      group,
       analyzed,
       recommended,
       format,
       opts,
-      group.templateHint,
     )
 
     pages.push({
@@ -509,6 +566,7 @@ export async function compose(
       templateId,
       fabricJson,
       sceneIndices: group.sceneIndices,
+      ...(group.lineRanges ? { lineRanges: group.lineRanges } : {}),
       warnings,
     })
 

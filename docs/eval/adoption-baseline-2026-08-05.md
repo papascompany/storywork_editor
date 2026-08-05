@@ -1,5 +1,9 @@
 # 자동배치 채택률 baseline — 2026-08-05 (AI-ACT-04)
 
+> **이 문서는 개선 전 상태의 동결 기록이다.** 개선 결과는
+> [adoption-layout03-2026-08-05.md](adoption-layout03-2026-08-05.md) — 채택률 13.8% → 100% ·
+> 대사 보존 52.2% → 100%. 여기 수치와 `data/eval/adoption-baseline.json` 은 비교 기준으로 유지한다.
+
 > 측정: `pnpm adoption:baseline`
 > 코퍼스: `data/eval/scripts/` 21편 / **217장면** · 판형 B5(preset-b5-novel) · seed 0 · LLM/DB 미사용(룰 only, 재현 가능)
 > 지표 정의 정본: [`packages/ai-layout/src/adoption.ts`](../../packages/ai-layout/src/adoption.ts)
@@ -70,16 +74,19 @@ preset-wide            말풍선 슬롯 2
 
 `empty-slot` 61건은 반대 방향의 문제다 — 등장인물이 1명인 장면에 2인용 템플릿이 매칭되어 슬롯이 빈다.
 
-### 후속 개선 방향 (LAYOUT-03 로 등록)
+### 후속 개선 방향 (LAYOUT-03 — ✅ 2026-08-05 완료)
 1. **대사 수 기반 페이지 분할** — 장면의 대사가 슬롯 수용량을 넘으면 같은 장면을 여러 페이지로 분할
 2. **수용량 기반 템플릿 매칭** — `matchTemplate` 에 장면 대사 수를 입력해 슬롯이 충분한 템플릿 선택
 3. **말풍선 슬롯 동적 생성** — 템플릿 슬롯이 부족하면 safe area 안에서 추가 슬롯 생성(BUBBLE-02 비용함수로 위치 결정)
 4. **인원 수 기반 템플릿 매칭 보정** — 1인 장면에 2인 템플릿이 붙는 `empty-slot` 해소
 
+→ 넷 다 반영. 결과·설계·남은 한계는 [adoption-layout03-2026-08-05.md](adoption-layout03-2026-08-05.md).
+
 ## 4. 회귀 가드
 
-`packages/ai-layout/__tests__/adoption-regression.test.ts` 가 코퍼스 축약본으로 baseline 하한을 지킨다.
-**개선 시 하한을 함께 올릴 것** — 가드는 "현재보다 나빠지지 않음"만 보장한다.
+`packages/ai-layout/__tests__/adoption-regression.test.ts` 가 코퍼스 축약본으로 하한을 지킨다.
+LAYOUT-03 이후 하한은 baseline 실측이 아니라 **목표선**(채택 60% · 보존 95%)이다 —
+실측이 100% 인 지금 그 아래로 내려가는 변경은 회귀이기 때문이다.
 
 ## 5. 재현
 

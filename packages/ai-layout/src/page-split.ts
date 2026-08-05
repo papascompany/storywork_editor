@@ -16,7 +16,7 @@
 import type { SceneRecommendation } from '@storywork/ai-recommend'
 import type { AnalyzeResult, AnalyzedScene } from '@storywork/ai-script'
 
-import type { TemplateHint } from './types.js'
+import type { PageGroup, TemplateHint } from './types.js'
 
 // ─────────────────────────────────────────────
 // 상수 (4컷 합병 기준)
@@ -48,14 +48,10 @@ function isEmotionShift(prevEmotion: string | undefined, currEmotion: string | u
 }
 
 // ─────────────────────────────────────────────
-// 페이지 그룹 결과 타입
+// 페이지 그룹 결과 타입 (정의는 types.ts — 소비처가 공유)
 // ─────────────────────────────────────────────
 
-export interface PageGroup {
-  pageIndex: number
-  sceneIndices: number[]
-  templateHint: TemplateHint
-}
+export type { PageGroup }
 
 // ─────────────────────────────────────────────
 // R3: 풀샷 단독 여부
