@@ -1,4 +1,4 @@
-# 새 세션 시작 프롬프트 (2026-08-05 갱신)
+# 새 세션 시작 프롬프트 (2026-08-06 갱신)
 
 > 새 Claude Code 세션을 열 때 **"🚀 프롬프트" 섹션부터 끝까지 그대로 복사 붙여넣기** 하세요.
 > 이 파일은 세션 마무리 때마다 갱신됩니다 — 상단 날짜로 최신 여부 확인.
@@ -21,11 +21,10 @@
    - `docs/handoff/SESSION_HANDOFF_2026-08-05.md` — **최신 핸드오프: 완료 내역·미완 액션·함정 전체**
    - `docs/architecture/roadmap.md` — 작업 큐 (SW-BIZ (A) 섹션이 최신 — AI-ACT / LAYOUT / SCRIPT-KO)
 3. `git log --oneline -10` + `git status -sb` — 내가 만들지 않은 변경은 사용자 작업으로 보존
-4. `gh run view 31013989889` — 직전 HEAD(LAYOUT-03) CI 최종 결과 확인(마감 시점 진행 중이었음)
 
-### ✅ 현재 상태 (main `80bc006` 기준)
+### ✅ 현재 상태 (main `9b03c7e` 기준)
 
-- 워킹트리 clean · web/admin prod 라이브
+- 워킹트리 clean · web/admin prod 라이브 · **최근 3개 커밋 CI 전부 success**(526e49a·80bc006·9b03c7e — 확인 완료, 재확인 불필요)
 - **자동배치 채택률 13.8% → 100% · 대사 보존 52.2% → 100%** (LAYOUT-03). baseline 측정 체계(AI-ACT-04)와 리포트 2건은 `docs/eval/`
 - **포즈 라이브러리 일원화 완료** — prod 1,262행(25점 키포인트 1,260 + 작품 참조 2). 6월 적재분 이중화는 정리됨
 - **한글 PDF 실가동** — fontkit 결함 수정 + Pretendard 번들 커밋(env 불필요). prod 배포 완료, 실 publish 육안 확인만 남음
@@ -42,6 +41,8 @@
 4. **prod 한글 PDF 육안 확인** — 편집기에서 publish 1회
 
 > 어시스턴트는 prod DB 변경 CLI(권한 분류기 차단)·키 발급·비밀번호·결제를 수행할 수 없음. 위 4건은 대표님 실행 후 결과만 공유해 주세요.
+>
+> **재확인 2026-08-06**: `AI_GATEWAY_API_KEY` 는 `.env.local` 3곳 모두에 없음(변수명만 조회) · `tmp/perf/` 최신 산출물은 06-05(web)·05-17(admin)로 PERF-ADMIN-03 미실행 — 2·3번 미실행 확정. 1·4번은 prod 접근이 필요해 로컬에서 재검증하지 않았고 직전 세션의 `migrate status` 실측 기록을 그대로 인용한 것임.
 
 ### 🎯 다음 코드 큐 — 키 없이 바로 착수 가능
 
@@ -75,7 +76,9 @@ bash scripts/ci-watch.sh
 ### ⚠️ 함정 노트 (실측 누적 — 상세는 핸드오프 §5)
 
 - **세션 종료 시 핸드오프+RESUME_PROMPT 갱신은 커밋과 한 세트** — 08-05 커밋 3건이 문서 없이 남아 인계가 끊긴 전례
-- **roadmap 작업 ID 는 전역 유일** — 신규 등록 전 `grep -n "\[XXX-NN\]" docs/architecture/roadmap.md`
+- **roadmap 작업 ID 는 전역 유일** — 신규 등록 전 `grep -n "\[XXX-NN\]" docs/architecture/roadmap.md`. 중복 전수 점검은
+  `grep -o "\[[A-Z][A-Z0-9-]*-[0-9][0-9]*\]" docs/architecture/roadmap.md | sort | uniq -d`
+  (08-06 이 방식으로 FOLLOWUP-15 가 닫힌 항목·열린 항목으로 이중 등재된 것을 발견·정리. 나머지 3건은 본문 참조라 오탐)
 - **pdf-lib `subset:true` + 한글 = 글리프 파괴** — 전체 임베드만 정상. fontkit 2.x 는 pdf-lib 비호환, 정적 OTF(CFF) 파서 거부
 - **ingest upsert 는 slug 안정성 전제** — 체계 변경 후 재적재는 전량 신규 insert 로 이중화. `ingest:dry` 선행, 사고 시 `scripts/cleanup-stale-poses.ts`
 - **prod DB 변경 CLI 는 권한 분류기 차단** — 조사만 하고 실행 명령은 대표님께 전달

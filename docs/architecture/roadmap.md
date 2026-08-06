@@ -274,7 +274,7 @@
 - [ ] [FOLLOWUP-12] PgBouncer prepared statement 비호환 — `prisma db execute --stdin` hang 발생. 실제 앱 코드는 `pgbouncer=true` 로 회피되지만, 마이그레이션/raw SQL 직접 실행은 `DIRECT_URL`(5432) 명시 사용 — `pnpm db:exec` 등 helper script 추가 권고 — @architect
 - [ ] [FOLLOWUP-13] Vercel preview 환경변수 — main 이 production branch 라 같은 이름의 preview env 등록 불가. PR 워크플로우 시작 시 별도 preview branch 명 정해서 추가 — @architect
 - [ ] [FOLLOWUP-14] env.ts 빌드 시점 검증 강제 — 현재 page module import 시점에야 `validateEnv()` 호출되어 정적 page 면 build 통과. 첫 빌드 단계에서 강제 검증되도록 `next.config.ts` 또는 `instrumentation.ts` 에 import — @architect
-- [ ] [FOLLOWUP-15] Vercel web 프로젝트 deploy 'ERROR' (build READY 인데 promotion 실패) — M1 결과물 push 시 재검증. 안되면 Vercel UI 의 deployment log 직접 확인 — @architect
+- [x] [FOLLOWUP-15] Vercel web 프로젝트 deploy 'ERROR' (build READY 인데 promotion 실패) ✅ 2026-05-17 — **위 253행 항목과 동일 건**(원인: GitHub repo private 전환 + Vercel Hobby Plan 충돌). 이 줄이 미완으로 남아 작업 큐에 중복 노출되던 것을 정리 — @architect
 - [x] **[FOLLOWUP-16] Storige 가이드 P0 핫픽스 8건** ✅ 2026-05-05 (커밋 0234fd1..b4e0f93) — bound 핸들러 7건 / dispose 가드 / 모바일 factory 분기 / History capacity 모바일 / useRef+EditorContext / touch-action / user-scalable=no / unhandledrejection. 14 신규 단위 테스트, 회귀 0. **부가**: node_modules 의 macOS Finder 중복(` 2.js`) 220 건 발견 → 클린 재설치로 해결 (clean install 후 0건). — @editor-engineer
   근거: [docs/reference/STORIGE_GUIDE_REVIEW.md](../reference/STORIGE_GUIDE_REVIEW.md) §3, §9
   - StoryCanvas 익명 이벤트 핸들러 7건 → bound member + dispose() off (BUG-002 류)
