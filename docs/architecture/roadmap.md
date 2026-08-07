@@ -233,6 +233,8 @@
 
 ## 후속 이슈 (오토파일럿 진행 중 발견)
 
+- [ ] [FOLLOWUP-71] `중복` 폴더 17장 — 태깅 제외 ↔ 적재 포함 불일치 정합화 ([ADR-0019](decisions.md#adr-0019--포즈-자산-수치-정본-ssot-단일화-2026-08-07) 조사 중 발견). `filename-tagger` 는 `subfolderTags.중복.skip=true` 로 제외하는데 `scripts/ingest-poses.ts` 에는 폴더 제외 로직이 없어 **태그 없이 DB 에 적재**된다(skip 조건은 "이미 적재된 slug" 뿐). `llm-tagger.ts` 주석의 "중복 폴더 = 적재 제외"는 사실과 다름. 영향: 태그 없는 자산 17건이 검색 인덱스에 잔존(추천 노이즈 · 인쇄/법적 위험 없음). 선택지 ①ingest 도 제외 + 기존 17행 정리(🚦 prod 데이터 삭제) ②태깅 정책 변경 ③현행 유지 + 주석 정정 — @pose-curator
+
 - [x] **[FOLLOWUP-51] (P0) 시각 검증 자동화 (visual-check)** ✅ 2026-05-16 (커밋 b9b2f23) — 회고 §6.1-A 대응. 코드 변경 → AI 가 30초 안에 dev 화면 screenshot 으로 직접 검증. 산출물:
   1. `scripts/visual-check.sh` — headless chromium 기반. 인자로 URL/경로 + viewport 받아 `tmp/visual/{slug}.png` 저장. 서버 미기동 시 명확 에러.
   2. `scripts/visual-check.ts` — TS 래퍼 (Playwright chromium-headless). selector 영역만 캡처 지원.
@@ -326,6 +328,21 @@
 - [x] [EDIT-P2] Phase 2 — editor-text 활성화 + 인라인편집 + ControlBar + 한글 splitByGrapheme — `0243653`
 - [ ] [EDIT-P3] Phase 3 — 이미지 필터 + 클리핑 마스크 + 텍스트 특수효과 (Storige 차별화 잔여)
 
+## MODE — 산출물 모드(웹툰 / POD) 선택 (결정 2026-08-07, [ADR-0017](decisions.md#adr-0017--산출물-모드-웹툰--pod-를-프로젝트-생성-시-선택-2026-08-07))
+
+> 웹툰 vs POD 는 **우선순위 문제가 아니라 모드 선택 문제**로 확정됐다. 같은 편집 코어·같은 AI
+> 파이프라인 위에서 판형·지면 단위·출력만 갈라진다.
+> **주의**: 현행 `ai-layout` 은 mm 좌표 전용이고 `capacity` 는 "고정 크기 페이지에 담기는가"로
+> 계획한다. 웹툰은 수용량 초과가 **페이지 분할이 아니라 스트립 연장**이라 분할 전략 자체가 다르다.
+> mm 와 px 를 한 타입에 섞지 않는다 — 섞으면 인쇄 사고로 직결된다.
+
+- [ ] [MODE-01] `Project.mode('webtoon'|'pod')` + `Format.unit('mm'|'px')` 스키마 — 기존 Format 은 전부 `mm` 로 백필, 웹툰 프리셋(폭 690/800 · 세로 가변) 등록 — 🚦 마이그레이션 — @architect
+- [ ] [MODE-02] 프로젝트 생성 UX — 모드 선택 화면 + 모드별 판형 목록 필터. 기존 프로젝트는 `pod` 로 표시 — @ui-designer + @admin-builder
+- [ ] [MODE-03] `ai-layout` 웹툰 분기 — `capacity` 의 페이지 분할을 **스트립 연장**으로 대체(컷 간 여백·스크롤 리듬), safe/bleed 제약은 pod 모드에서만 적용 — @layout-composer
+- [ ] [MODE-04] `editor-core` 세로 무한 캔버스 — 뷰포트 가상화(200객체 60fps 예산 유지), 컷 경계 가이드 — @editor-engineer
+- [ ] [MODE-05] 웹툰 export — 이미지 시퀀스 + 단일 롱 이미지(플랫폼 업로드 규격: 폭 고정·분할 높이 상한) — @editor-engineer + @pdf-publisher
+- [ ] [MODE-06] 웹툰 모드 채택률·품질 측정 — LAYOUT-04 지표를 스트립 기준으로 재정의(페이지당 → 화면 스크롤당) — @qa-tester
+
 ## M10+ (Parking)
 
 - [ ] **SVG 어댑터 입점** — `editor-pose/adapters/svg.ts` + 인입 파이프라인 SVG 분기. 색상 슬롯 풀 지원([ADR-0011](decisions.md#adr-0011--포즈-자산-포맷-png-우선-svg-추후))
@@ -386,7 +403,8 @@ StoryWork 편집기를 '대본만으로 웹툰 만들기' 교육 과정으로 �
 
 ### (C) MARKET — 디자인 마켓플레이스 + 정산 (COMMERCE-01/03 승격·구체화, 후반 일정 — M9 이후 착수)
 외부 캐릭터 디자이너가 자산을 등록·판매하고 수수료를 공유하는 양면시장. **공급측 KPI(디자이너 온보딩) 우선**. 모듈: [`marketplace`](../modules/index.md).
-- [ ] [MARKET-01] 디자이너 자산 등록·검수 파이프라인 — 마이데이터(M7-03) + admin 검수(M3-04) + AI 2차 태깅(AI-ACT-02) 재사용 — @admin-builder + @pose-curator
+- [ ] [MARKET-01] 디자이너 자산 등록·검수 파이프라인 — 마이데이터(M7-03) + admin 검수(M3-04) + AI 2차 태깅(AI-ACT-02) 재사용. **AI 생성 에셋 허용 + 생성 표기 의무**([ADR-0018](decisions.md#adr-0018--디자인-마켓-ai-생성-에셋-허용--생성-표기-의무-2026-08-07)): 등록 폼에 `isAiGenerated`·`generatorModel`·상업 사용 가능 여부 필수, 누락 시 등록 거부, 상세 페이지 표시 — @admin-builder + @pose-curator
+- [ ] [MARKET-05] 신고·사후 내림(takedown) 절차 — 타인 저작물 학습·모사 신고 채널 + 처리 SLA. 마켓 오픈 **전** 필수(ADR-0018) — @architect
 - [ ] [MARKET-02] 거래/결제(Stripe Checkout, M7-01 의존) + 수수료 25% 정책 (COMMERCE-01 구체화) — 🚦 결제·가격 — @architect
 - [ ] [MARKET-03] 정산 시스템(월별 수익정산 + 세금계산서) (COMMERCE-03) — 🚦 정산·세무 — @architect
 - [ ] [MARKET-04] 공급자 KPI 대시보드(디자이너 온보딩/GMV/수수료) — 목표 온보딩 Y1 30 → Y3 300명 — @admin-builder
