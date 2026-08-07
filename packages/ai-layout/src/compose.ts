@@ -176,6 +176,8 @@ function assignmentToFabricLayer(
         meta: {
           speaker: assignment.characterName,
           text: assignment.text ?? '',
+          // 대사 순번 — 배치 품질 측정(LAYOUT-04)이 읽기 순서를 복원하는 근거
+          lineIndex: assignment.lineIndex,
         },
       },
       fabric: {
@@ -567,6 +569,8 @@ async function buildPageFabricJson(
             text: line.text,
             speaker: line.speaker ?? undefined,
             sceneIndex: line.sceneIndex,
+            // 대사 순번 — 배치 품질 측정(LAYOUT-04)이 읽기 순서를 복원하는 근거
+            lineIndex: lineIdx,
           },
         },
         fabric: {

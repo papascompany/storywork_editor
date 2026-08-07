@@ -19,6 +19,7 @@ import { describe, expect, it } from 'vitest'
 
 import { aggregateAdoption, measureAdoption } from '../src/adoption.js'
 import { compose } from '../src/compose.js'
+import { aggregateQuality, measureQuality } from '../src/quality.js'
 import type { AdoptionResult, LayoutFormat } from '../src/types.js'
 
 const FORMAT: LayoutFormat = {
@@ -183,6 +184,29 @@ describe('대사/지문 분리 회귀 가드', () => {
       // 캡션이 말풍선 레이어로 새면 대사와 뒤섞인다
       expect(c.kind).not.toBe('bubble')
     }
+  })
+
+  it('말풍선이 인물 얼굴을 덮지 않는다 (LAYOUT-04 프리셋 수정 회귀 가드)', async () => {
+    // preset-1on1-talk 의 bubble-left 가 pose-right 얼굴 위에 있어 157 페이지 전부에서
+    // 평균 51.8% 를 덮었다(= clearance 0.48). 슬롯 좌표가 되돌아가면 여기서 걸린다.
+    //
+    // 하한을 0.8 로 두는 이유: 수정 후 실측은 코퍼스 0.970 · 이 축약본 0.885/0.924 다.
+    // 남은 가림은 프리셋이 아니라 **생성 슬롯 격자의 상단 중앙 칸**이 두 인물 얼굴의 안쪽
+    // 가장자리를 7~15% 무는 것으로, 슬롯을 5개까지 채우면 피할 자리가 없는 구조적 한계다.
+    for (const s of SAMPLES) {
+      const { composed } = await composeSample(s.text)
+      expect(measureQuality(composed, FORMAT).faceClearance).toBeGreaterThanOrEqual(0.8)
+    }
+  })
+
+  it('배치 품질 종합이 목표선(70%) 아래로 떨어지지 않는다', async () => {
+    // 코퍼스 전체 실측 79.3%(2026-08-07). 축별 값은 docs/eval/layout-quality-2026-08-07.md
+    const results = []
+    for (const s of SAMPLES) {
+      const { composed } = await composeSample(s.text)
+      results.push(measureQuality(composed, FORMAT))
+    }
+    expect(aggregateQuality(results).score).toBeGreaterThanOrEqual(0.7)
   })
 
   it('캡션 레이어 텍스트에 개행이 없다 (PDF drawText 줄간격 함정 회귀 가드)', async () => {

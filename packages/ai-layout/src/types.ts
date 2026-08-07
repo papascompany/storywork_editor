@@ -215,6 +215,12 @@ export interface SlotAssignment {
    * 채택률 측정이 "이 줄이 실제로 실렸는가"를 판정하는 근거 — 병합 문자열만으로는 대조가 깨진다.
    */
   captionLines?: string[]
+  /**
+   * 이 페이지 안에서의 대사 순번 (bubble 종류일 때, 0-based).
+   * 배치 품질 측정(LAYOUT-04)이 읽기 순서 역행을 판정하는 근거 — 레이어 배열 순서는
+   * zIndex 로 정렬되므로 대사 순서를 복원할 수 없다.
+   */
+  lineIndex?: number
   /** lowDpi 위반 여부 */
   lowDpiViolation?: boolean
   /** effectiveDpi 계산값 */

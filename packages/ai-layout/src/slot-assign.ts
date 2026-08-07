@@ -288,6 +288,8 @@ export async function assignSlots(
       kind: 'bubble',
       characterName: line.speaker,
       text: line.text,
+      // 대사 순번 — 배치 품질 측정이 읽기 순서를 복원하는 근거 (LAYOUT-04)
+      lineIndex: lineIdx ?? i,
       // bubbleCandidate 는 shape 정보 — meta 에 저장
     })
 

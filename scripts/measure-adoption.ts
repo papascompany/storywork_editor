@@ -19,8 +19,15 @@
 import fs from 'node:fs'
 import path from 'node:path'
 
-import { aggregateAdoption, compose, measureAdoption } from '@storywork/ai-layout'
-import type { AdoptionResult, LayoutFormat } from '@storywork/ai-layout'
+import {
+  aggregateAdoption,
+  aggregateQuality,
+  compose,
+  measureAdoption,
+  measureQuality,
+  worstPages,
+} from '@storywork/ai-layout'
+import type { AdoptionResult, LayoutFormat, QualityResult } from '@storywork/ai-layout'
 import { recommend } from '@storywork/ai-recommend'
 import { analyze } from '@storywork/ai-script'
 
@@ -49,6 +56,7 @@ interface FileReport {
   adoptionRate: number
   dialogueRetention: number
   adoption: AdoptionResult
+  quality: QualityResult
 }
 
 // ─────────────────────────────────────────────
@@ -100,6 +108,7 @@ async function measureOne(file: string, text: string): Promise<FileReport> {
   })
 
   const adoption = measureAdoption(analyzed, composed)
+  const quality = measureQuality(composed, FORMAT)
   return {
     file,
     format: analyzed.format,
@@ -109,6 +118,7 @@ async function measureOne(file: string, text: string): Promise<FileReport> {
     adoptionRate: adoption.adoptionRate,
     dialogueRetention: adoption.dialogueRetention,
     adoption,
+    quality,
   }
 }
 
@@ -118,6 +128,46 @@ async function measureOne(file: string, text: string): Promise<FileReport> {
 
 function pct(v: number): string {
   return `${(v * 100).toFixed(1)}%`
+}
+
+/**
+ * 배치 품질 섹션 (LAYOUT-04).
+ * 채택률이 100% 로 포화된 뒤 남은 변별력은 여기에 있다 — 독립 축과 의존 축을 나눠 출력한다.
+ */
+function printQuality(quality: QualityResult, verbose: boolean): void {
+  const line = '─'.repeat(72)
+  const bar = (v: number): string => '█'.repeat(Math.round(v * 30)).padEnd(30, '·')
+
+  console.log(`\n${line}`)
+  console.log('  배치 품질 지표 (LAYOUT-04)')
+  console.log(line)
+  console.log(`  ▶ 종합:      ${pct(quality.score)}   (축 평균 — 축별로 읽을 것)`)
+  console.log('')
+  console.log('  독립 축 (배치기가 최적화하지 않는 것 — 품질 판단 근거):')
+  console.log(`    구도 균형       ${pct(quality.balance).padStart(6)}  ${bar(quality.balance)}`)
+  console.log(`    지면 밀도       ${pct(quality.density).padStart(6)}  ${bar(quality.density)}`)
+  console.log(
+    `    대사 밀도       ${pct(quality.dialogueDensity).padStart(6)}  ${bar(quality.dialogueDensity)}`,
+  )
+  console.log('  의존 축 (배치기가 직접 최적화 — 회귀 감시용):')
+  console.log(
+    `    시선 흐름       ${pct(quality.readingFlow).padStart(6)}  ${bar(quality.readingFlow)}`,
+  )
+  console.log(
+    `    얼굴 가림 회피  ${pct(quality.faceClearance).padStart(6)}  ${bar(quality.faceClearance)}`,
+  )
+
+  if (verbose) {
+    console.log('\n  점수 하위 페이지:')
+    for (const p of worstPages(quality, 10)) {
+      console.log(
+        `    p${String(p.pageIndex).padStart(3)} ${pct(p.score).padStart(6)} · ` +
+          `균형 ${pct(p.balance).padStart(6)} · 밀도 ${pct(p.density).padStart(6)} · ` +
+          `대사 ${pct(p.dialogueDensity).padStart(6)} · 시선 ${pct(p.readingFlow).padStart(6)} · ` +
+          `얼굴 ${pct(p.faceClearance).padStart(6)}`,
+      )
+    }
+  }
 }
 
 function printReport(reports: FileReport[], overall: AdoptionResult, verbose: boolean): void {
@@ -190,7 +240,9 @@ async function main(): Promise<void> {
   }
 
   const overall = aggregateAdoption(reports.map((r) => r.adoption))
+  const overallQuality = aggregateQuality(reports.map((r) => r.quality))
   printReport(reports, overall, verbose)
+  printQuality(overallQuality, verbose)
 
   if (jsonOut) {
     const payload = {
@@ -204,6 +256,19 @@ async function main(): Promise<void> {
       dialogueRetention: overall.dialogueRetention,
       blockerCounts: overall.blockerCounts,
       softSignalCounts: overall.softSignalCounts,
+      // LAYOUT-04 — 채택률 포화 이후의 변별 축. independent/dependent 구분은 quality.ts 문서 주석 참조
+      quality: {
+        score: overallQuality.score,
+        independent: {
+          balance: overallQuality.balance,
+          density: overallQuality.density,
+          dialogueDensity: overallQuality.dialogueDensity,
+        },
+        dependent: {
+          readingFlow: overallQuality.readingFlow,
+          faceClearance: overallQuality.faceClearance,
+        },
+      },
       perFile: reports.map((r) => ({
         file: r.file,
         format: r.format,
@@ -211,6 +276,7 @@ async function main(): Promise<void> {
         pages: r.pages,
         adoptionRate: r.adoptionRate,
         dialogueRetention: r.dialogueRetention,
+        qualityScore: r.quality.score,
       })),
     }
     fs.mkdirSync(path.dirname(jsonOut), { recursive: true })

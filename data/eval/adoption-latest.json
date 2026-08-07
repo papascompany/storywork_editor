@@ -4,7 +4,7 @@
   "format": "preset-b5-novel",
   "corpusFiles": 21,
   "totalScenes": 217,
-  "totalPages": 218,
+  "totalPages": 222,
   "adoptionRate": 1,
   "dialogueRetention": 1,
   "blockerCounts": {
@@ -18,6 +18,18 @@
     "dpi-warning": 0,
     "low-dpi-fallback": 0
   },
+  "quality": {
+    "score": 0.7932286536770037,
+    "independent": {
+      "balance": 0.5065462344665523,
+      "density": 0.6249865568693675,
+      "dialogueDensity": 0.8648648648648649
+    },
+    "dependent": {
+      "readingFlow": 1,
+      "faceClearance": 0.9697456121842278
+    }
+  },
   "perFile": [
     {
       "file": "action-fantasy/01-tower-siege.txt",
@@ -25,7 +37,8 @@
       "scenes": 9,
       "pages": 9,
       "adoptionRate": 1,
-      "dialogueRetention": 1
+      "dialogueRetention": 1,
+      "qualityScore": 0.8837130720471229
     },
     {
       "file": "action-fantasy/02-dragon-chase.txt",
@@ -33,7 +46,8 @@
       "scenes": 10,
       "pages": 10,
       "adoptionRate": 1,
-      "dialogueRetention": 1
+      "dialogueRetention": 1,
+      "qualityScore": 0.8805716504080976
     },
     {
       "file": "action-fantasy/03-ruin-gate.txt",
@@ -41,7 +55,8 @@
       "scenes": 9,
       "pages": 9,
       "adoptionRate": 1,
-      "dialogueRetention": 1
+      "dialogueRetention": 1,
+      "qualityScore": 0.8483379176987129
     },
     {
       "file": "action-fantasy/04-blade-oath.txt",
@@ -49,7 +64,8 @@
       "scenes": 9,
       "pages": 9,
       "adoptionRate": 1,
-      "dialogueRetention": 1
+      "dialogueRetention": 1,
+      "qualityScore": 0.8087272100131545
     },
     {
       "file": "action-fantasy/05-frost-wall.txt",
@@ -57,7 +73,8 @@
       "scenes": 10,
       "pages": 10,
       "adoptionRate": 1,
-      "dialogueRetention": 1
+      "dialogueRetention": 1,
+      "qualityScore": 0.8615398602223839
     },
     {
       "file": "daily-novel/01-school-seat.txt",
@@ -65,7 +82,8 @@
       "scenes": 10,
       "pages": 10,
       "adoptionRate": 1,
-      "dialogueRetention": 1
+      "dialogueRetention": 1,
+      "qualityScore": 0.83962702806465
     },
     {
       "file": "daily-novel/02-office-overtime.txt",
@@ -73,7 +91,8 @@
       "scenes": 10,
       "pages": 10,
       "adoptionRate": 1,
-      "dialogueRetention": 1
+      "dialogueRetention": 1,
+      "qualityScore": 0.8370614221812636
     },
     {
       "file": "daily-novel/03-family-boxes.txt",
@@ -81,7 +100,8 @@
       "scenes": 10,
       "pages": 10,
       "adoptionRate": 1,
-      "dialogueRetention": 1
+      "dialogueRetention": 1,
+      "qualityScore": 0.8566269663976259
     },
     {
       "file": "daily-novel/04-bookshop-rain.txt",
@@ -89,7 +109,8 @@
       "scenes": 9,
       "pages": 9,
       "adoptionRate": 1,
-      "dialogueRetention": 1
+      "dialogueRetention": 1,
+      "qualityScore": 0.8405319916504737
     },
     {
       "file": "daily-novel/05-laundromat-tuesday.txt",
@@ -97,7 +118,8 @@
       "scenes": 11,
       "pages": 11,
       "adoptionRate": 1,
-      "dialogueRetention": 1
+      "dialogueRetention": 1,
+      "qualityScore": 0.7503701502002795
     },
     {
       "file": "drama-screenplay/01-golden-hour.txt",
@@ -105,15 +127,17 @@
       "scenes": 10,
       "pages": 10,
       "adoptionRate": 1,
-      "dialogueRetention": 1
+      "dialogueRetention": 1,
+      "qualityScore": 0.8006693752791938
     },
     {
       "file": "drama-screenplay/02-summer-noodle-house.txt",
       "format": "screenplay",
       "scenes": 10,
-      "pages": 11,
+      "pages": 12,
       "adoptionRate": 1,
-      "dialogueRetention": 1
+      "dialogueRetention": 1,
+      "qualityScore": 0.8075244881555421
     },
     {
       "file": "drama-screenplay/03-third-floor-meeting-room.txt",
@@ -121,23 +145,26 @@
       "scenes": 10,
       "pages": 10,
       "adoptionRate": 1,
-      "dialogueRetention": 1
+      "dialogueRetention": 1,
+      "qualityScore": 0.7855879644482451
     },
     {
       "file": "drama-screenplay/04-witness.txt",
       "format": "screenplay",
       "scenes": 10,
-      "pages": 10,
+      "pages": 12,
       "adoptionRate": 1,
-      "dialogueRetention": 1
+      "dialogueRetention": 1,
+      "qualityScore": 0.8135989873233828
     },
     {
       "file": "drama-screenplay/05-night-study-escape.txt",
       "format": "screenplay",
       "scenes": 10,
-      "pages": 10,
+      "pages": 11,
       "adoptionRate": 1,
-      "dialogueRetention": 1
+      "dialogueRetention": 1,
+      "qualityScore": 0.799085491068997
     },
     {
       "file": "mixed-formats/diary-01-night-shift.txt",
@@ -145,7 +172,8 @@
       "scenes": 15,
       "pages": 15,
       "adoptionRate": 1,
-      "dialogueRetention": 1
+      "dialogueRetention": 1,
+      "qualityScore": 0.671786094036712
     },
     {
       "file": "mixed-formats/diary-02-classroom.txt",
@@ -153,7 +181,8 @@
       "scenes": 15,
       "pages": 15,
       "adoptionRate": 1,
-      "dialogueRetention": 1
+      "dialogueRetention": 1,
+      "qualityScore": 0.6586456184021281
     },
     {
       "file": "mixed-formats/essay-01-laundry-corner.txt",
@@ -161,7 +190,8 @@
       "scenes": 6,
       "pages": 6,
       "adoptionRate": 1,
-      "dialogueRetention": 1
+      "dialogueRetention": 1,
+      "qualityScore": 0.6760508905837518
     },
     {
       "file": "mixed-formats/essay-02-driving-lesson.txt",
@@ -169,7 +199,8 @@
       "scenes": 6,
       "pages": 6,
       "adoptionRate": 1,
-      "dialogueRetention": 1
+      "dialogueRetention": 1,
+      "qualityScore": 0.6510194330239062
     },
     {
       "file": "mixed-formats/light-novel-01-crack-in-the-yard.txt",
@@ -177,7 +208,8 @@
       "scenes": 14,
       "pages": 14,
       "adoptionRate": 1,
-      "dialogueRetention": 1
+      "dialogueRetention": 1,
+      "qualityScore": 0.799603750356772
     },
     {
       "file": "mixed-formats/light-novel-02-ninth-floor.txt",
@@ -185,7 +217,8 @@
       "scenes": 14,
       "pages": 14,
       "adoptionRate": 1,
-      "dialogueRetention": 1
+      "dialogueRetention": 1,
+      "qualityScore": 0.8169487736187457
     }
   ]
 }

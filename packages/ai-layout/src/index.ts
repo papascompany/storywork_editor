@@ -97,6 +97,26 @@ export type {
   SoftSignalKind,
 } from './adoption.js'
 
+// ── 배치 품질 지표 (LAYOUT-04) ────────────────────────────────────────────
+export {
+  aggregateQuality,
+  measurePageQuality,
+  measureQuality,
+  worstPages,
+  balanceScore,
+  densityScore,
+  dialogueDensityScore,
+  readingFlowScore,
+  faceClearanceScore,
+  DEPENDENT_AXES,
+  QUALITY_AXES,
+  DENSITY_MIN,
+  DENSITY_MAX,
+  DIALOGUE_MIN,
+  DIALOGUE_MAX,
+} from './quality.js'
+export type { PageQuality, QualityAxis, QualityResult } from './quality.js'
+
 // ── 말풍선 배치 비용함수 + 자동 QA (BUBBLE-02) ─────────────────────────────
 export {
   assignBubblesByCost,

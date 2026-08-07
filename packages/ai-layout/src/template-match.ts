@@ -45,23 +45,28 @@ const PRESET_TEMPLATES: LayoutTemplate[] = [
         zIndex: 1,
         optional: true,
       },
+      // 말풍선은 **인물 아래**에 둔다 (LAYOUT-04 실측 수정).
+      // 종전 `bubble-left` 는 x0.48·y0.05 — 이름과 달리 우상단이었고, 그 자리가 정확히
+      // `pose-right` 의 얼굴(x 0.65~0.87 · y 0.1~0.38)이라 **157 페이지 전부에서 얼굴을
+      // 평균 51.8% 덮었다**. 포즈가 y0.1~0.9 를 차지하므로 상단에는 얼굴을 피할 폭이 없다.
+      // 하단 좌우로 나란히 두면 얼굴 가림 0 이고 좌→우 읽기 순서와도 맞는다.
       {
         id: 'bubble-left',
         allowedKinds: ['bubble', 'text'],
-        x: 0.48,
-        y: 0.05,
-        w: 0.45,
-        h: 0.3,
+        x: 0.04,
+        y: 0.62,
+        w: 0.44,
+        h: 0.28,
         zIndex: 2,
         optional: true,
       },
       {
         id: 'bubble-right',
         allowedKinds: ['bubble', 'text'],
-        x: 0.05,
-        y: 0.6,
-        w: 0.45,
-        h: 0.3,
+        x: 0.52,
+        y: 0.62,
+        w: 0.44,
+        h: 0.28,
         zIndex: 2,
         optional: true,
       },
