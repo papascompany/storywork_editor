@@ -275,11 +275,14 @@ const PRESET_TEMPLATES: LayoutTemplate[] = [
         zIndex: 1,
         optional: true,
       },
+      // 말풍선은 인물(하단 중앙) **위 중앙**에 둔다 (LAYOUT-05 실측 수정).
+      // 종전 좌상단(x0.05·y0.05) 고정은 wide 페이지(요소 1~3개)의 무게중심을 상단으로
+      // 끌어올린 잔여 원인이었다 — 생성 슬롯을 중앙 우선으로 바꾼 뒤에도 dy −0.30 이 남았다.
       {
         id: 'bubble',
         allowedKinds: ['bubble', 'text'],
-        x: 0.05,
-        y: 0.05,
+        x: 0.25,
+        y: 0.26,
         w: 0.5,
         h: 0.2,
         zIndex: 2,

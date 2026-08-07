@@ -102,6 +102,51 @@ function overlapRatio(a: NormRect, b: NormRect): number {
   return area > 0 ? (w * h) / area : 0
 }
 
+/** 페이지 중심 (0.5, 0.5) 까지의 거리 — 생성 슬롯 동률 해소용 (LAYOUT-05) */
+function centerDistance(rect: NormRect): number {
+  const dx = rect.x + rect.w / 2 - 0.5
+  const dy = rect.y + rect.h / 2 - 0.5
+  return Math.sqrt(dx * dx + dy * dy)
+}
+
+/** 얼굴 회피 축소 후에도 유지해야 하는 최소 슬롯 폭 — 이보다 좁으면 텍스트를 못 담는다 */
+const SLOT_W_MIN = 0.22
+
+/**
+ * 후보가 얼굴(headBox)과 겹치면, 세로줄이 겹치는 얼굴들의 x-구간을 뺀 **가장 넓은 빈 구간**으로
+ * 가로 축소를 시도한다 (LAYOUT-05 — 3열 고정 격자의 상단 중앙 칸이 두 인물 얼굴의 안쪽
+ * 가장자리를 7~15% 물던 잔여 가림 제거).
+ *
+ * 빈 구간이 `SLOT_W_MIN` 보다 좁으면 원본을 그대로 돌려준다 — 못 담을 만큼 좁히느니
+ * 얼굴 가림 비용 정렬이 뒤로 미루게 둔다. 동폭 동률이면 왼쪽 구간(결정론).
+ */
+function shrinkAwayFromFaces(rect: NormRect, faces: readonly NormRect[]): NormRect {
+  const blocking = faces.filter(
+    (f) =>
+      rect.y < f.y + f.h && f.y < rect.y + rect.h && rect.x < f.x + f.w && f.x < rect.x + rect.w,
+  )
+  if (blocking.length === 0) return rect
+
+  // [x, x+w] 에서 얼굴 x-구간을 뺀 부분 구간들
+  let intervals: Array<{ s: number; e: number }> = [{ s: rect.x, e: rect.x + rect.w }]
+  for (const f of blocking) {
+    const next: typeof intervals = []
+    for (const iv of intervals) {
+      if (f.x > iv.s) next.push({ s: iv.s, e: Math.min(iv.e, f.x) })
+      if (f.x + f.w < iv.e) next.push({ s: Math.max(iv.s, f.x + f.w), e: iv.e })
+    }
+    intervals = next
+  }
+
+  let best: { s: number; e: number } | null = null
+  for (const iv of intervals) {
+    if (iv.e - iv.s < SLOT_W_MIN) continue
+    if (!best || iv.e - iv.s > best.e - best.s) best = iv
+  }
+  if (!best) return rect
+  return { x: best.s, y: rect.y, w: best.e - best.s, h: rect.h }
+}
+
 // ─────────────────────────────────────────────
 // 생성
 // ─────────────────────────────────────────────
@@ -154,7 +199,8 @@ export function generateGridSlots(
     rows.push(y)
   }
 
-  // 후보 수집 — 기존 말풍선 슬롯과 크게 겹치면 탈락
+  // 후보 수집 — 기존 말풍선 슬롯과 크게 겹치면 탈락.
+  // 얼굴과 겹치는 후보는 얼굴을 비껴가게 가로로 축소해 본다(LAYOUT-05 — 잔여 얼굴 가림 제거).
   const candidates: Array<{ rect: NormRect; cost: number; row: number; col: number }> = []
   for (let r = 0; r < rows.length; r++) {
     const y = rows[r]
@@ -162,34 +208,80 @@ export function generateGridSlots(
     for (let c = 0; c < cols.length; c++) {
       const x = cols[c]
       if (x === undefined) continue
-      const rect: NormRect = { x, y, w, h }
+      const rect = shrinkAwayFromFaces({ x, y, w, h }, heads)
       if (existing.some((s) => overlapRatio(rect, s) > EXISTING_OVERLAP_LIMIT)) continue
       candidates.push({ rect, cost: occlusionCost(rect, heads), row: r, col: c })
     }
   }
 
-  // 얼굴 가림이 적은 순 → 위에서 아래 → 왼쪽에서 오른쪽 (결정론)
-  candidates.sort((a, b) => a.cost - b.cost || a.row - b.row || a.col - b.col)
+  // 두 채택 전략을 모두 시도한다 (LAYOUT-05, 결정론).
+  //
+  //  - 균형 우선: 얼굴 가림 → **페이지 중심 근접** → 행 → 열.
+  //    요소가 1~3개뿐인 페이지(preset-wide 의 캡션 위주 서술 장면)에서 종전 "위에서 아래"
+  //    채움은 그 1~3개를 전부 상단에 몰아 무게중심을 우상단으로 띄웠다 — LAYOUT-04 실측에서
+  //    wide 61페이지 전원이 구도 균형 0점이었던 직접 원인.
+  //  - 수용량 우선: 얼굴 가림 → 행 → 열 (종전 동작).
+  //    3열 격자의 중앙 칸은 좌·우 칸과 상호 배타라, 중앙부터 채우면 행당 2개(좌+우)가
+  //    1개(중앙)로 줄어든다 — 균형 우선만 썼더니 수용량 감소로 코퍼스 페이지가
+  //    222→264(+19%)로 튀었다(실측).
+  //
+  // 판정 순서: ① 요청 수 충족 → ② **미래 자리 보존**(spare) → ③ 균형.
+  // ②가 필요한 이유: 말풍선을 먼저 만들고 캡션을 나중에 만드는데, 균형 우선이 중앙 열을
+  // 세로로 쭉 차지하면 좌·우 열 후보가 전부 겹침 탈락해 **다음 호출(캡션)의 자리가 죽는다**
+  // — 1on1-talk 의 캡션 수용량이 대사 3~5 구간에서 1개씩 줄어 screenplay 지문이 페이지로
+  // 격리됐다(51→94p 실측). 채택 후 살아남는 후보 수를 비교해 자리를 덜 죽이는 쪽을 고른다.
+  // (이로써 구도 균형 축은 생성 슬롯의 동률 해소에 한해 배치기와 결합된다 — quality.ts 참조)
+  const byBalance = [...candidates].sort(
+    (a, b) =>
+      a.cost - b.cost ||
+      centerDistance(a.rect) - centerDistance(b.rect) ||
+      a.row - b.row ||
+      a.col - b.col,
+  )
+  const byCapacity = [...candidates].sort(
+    (a, b) => a.cost - b.cost || a.row - b.row || a.col - b.col,
+  )
 
   const zIndex = existing.length > 0 ? Math.max(...existing.map((s) => s.zIndex)) : 2
-  const picked: NormRect[] = []
-  const out: LayoutSlot[] = []
-  for (const cand of candidates) {
-    if (out.length >= count) break
-    if (picked.some((p) => overlapRatio(cand.rect, p) > GENERATED_OVERLAP_LIMIT)) continue
-    picked.push(cand.rect)
-    out.push({
-      id: `${spec.idPrefix}${out.length + 1}`,
-      allowedKinds: spec.allowedKinds,
-      x: cand.rect.x,
-      y: cand.rect.y,
-      w: cand.rect.w,
-      h: cand.rect.h,
-      zIndex,
-      optional: true,
-    })
+
+  const pick = (
+    ordered: readonly (typeof candidates)[number][],
+  ): { slots: LayoutSlot[]; spare: number } => {
+    const picked: NormRect[] = []
+    const slots: LayoutSlot[] = []
+    for (const cand of ordered) {
+      if (slots.length >= count) break
+      if (picked.some((p) => overlapRatio(cand.rect, p) > GENERATED_OVERLAP_LIMIT)) continue
+      picked.push(cand.rect)
+      slots.push({
+        id: `${spec.idPrefix}${slots.length + 1}`,
+        allowedKinds: spec.allowedKinds,
+        x: cand.rect.x,
+        y: cand.rect.y,
+        w: cand.rect.w,
+        h: cand.rect.h,
+        zIndex,
+        optional: true,
+      })
+    }
+    // 채택 후에도 쓸 수 있는 후보 수 — 다음 호출(캡션)의 여지. 캡션 상한(3) 이상은 동급이다
+    const spare = candidates.filter(
+      (cand) =>
+        !picked.includes(cand.rect) &&
+        picked.every((p) => overlapRatio(cand.rect, p) <= EXISTING_OVERLAP_LIMIT),
+    ).length
+    return { slots, spare: Math.min(spare, 3) }
   }
-  return out
+
+  const balanced = pick(byBalance)
+  const capacious = pick(byCapacity)
+  if (balanced.slots.length !== capacious.slots.length) {
+    return balanced.slots.length > capacious.slots.length ? balanced.slots : capacious.slots
+  }
+  if (balanced.spare !== capacious.spare) {
+    return balanced.spare > capacious.spare ? balanced.slots : capacious.slots
+  }
+  return balanced.slots
 }
 
 /** safe area 안에서 말풍선 슬롯을 `count` 개까지 생성한다 */

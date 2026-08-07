@@ -19,15 +19,15 @@
     "low-dpi-fallback": 0
   },
   "quality": {
-    "score": 0.7932286536770037,
+    "score": 0.8762638115544803,
     "independent": {
-      "balance": 0.5065462344665523,
-      "density": 0.6249865568693675,
+      "balance": 0.6145195434142842,
+      "density": 0.9019346494932444,
       "dialogueDensity": 0.8648648648648649
     },
     "dependent": {
       "readingFlow": 1,
-      "faceClearance": 0.9697456121842278
+      "faceClearance": 1
     }
   },
   "perFile": [
@@ -38,7 +38,7 @@
       "pages": 9,
       "adoptionRate": 1,
       "dialogueRetention": 1,
-      "qualityScore": 0.8837130720471229
+      "qualityScore": 0.937738653348979
     },
     {
       "file": "action-fantasy/02-dragon-chase.txt",
@@ -47,7 +47,7 @@
       "pages": 10,
       "adoptionRate": 1,
       "dialogueRetention": 1,
-      "qualityScore": 0.8805716504080976
+      "qualityScore": 0.9383540843195212
     },
     {
       "file": "action-fantasy/03-ruin-gate.txt",
@@ -56,7 +56,7 @@
       "pages": 9,
       "adoptionRate": 1,
       "dialogueRetention": 1,
-      "qualityScore": 0.8483379176987129
+      "qualityScore": 0.8858716058743115
     },
     {
       "file": "action-fantasy/04-blade-oath.txt",
@@ -65,7 +65,7 @@
       "pages": 9,
       "adoptionRate": 1,
       "dialogueRetention": 1,
-      "qualityScore": 0.8087272100131545
+      "qualityScore": 0.8360891092515494
     },
     {
       "file": "action-fantasy/05-frost-wall.txt",
@@ -74,7 +74,7 @@
       "pages": 10,
       "adoptionRate": 1,
       "dialogueRetention": 1,
-      "qualityScore": 0.8615398602223839
+      "qualityScore": 0.9203243507902601
     },
     {
       "file": "daily-novel/01-school-seat.txt",
@@ -83,7 +83,7 @@
       "pages": 10,
       "adoptionRate": 1,
       "dialogueRetention": 1,
-      "qualityScore": 0.83962702806465
+      "qualityScore": 0.9123981125765189
     },
     {
       "file": "daily-novel/02-office-overtime.txt",
@@ -92,7 +92,7 @@
       "pages": 10,
       "adoptionRate": 1,
       "dialogueRetention": 1,
-      "qualityScore": 0.8370614221812636
+      "qualityScore": 0.8831183969972003
     },
     {
       "file": "daily-novel/03-family-boxes.txt",
@@ -101,7 +101,7 @@
       "pages": 10,
       "adoptionRate": 1,
       "dialogueRetention": 1,
-      "qualityScore": 0.8566269663976259
+      "qualityScore": 0.9206033963377214
     },
     {
       "file": "daily-novel/04-bookshop-rain.txt",
@@ -110,7 +110,7 @@
       "pages": 9,
       "adoptionRate": 1,
       "dialogueRetention": 1,
-      "qualityScore": 0.8405319916504737
+      "qualityScore": 0.945979321634757
     },
     {
       "file": "daily-novel/05-laundromat-tuesday.txt",
@@ -119,7 +119,7 @@
       "pages": 11,
       "adoptionRate": 1,
       "dialogueRetention": 1,
-      "qualityScore": 0.7503701502002795
+      "qualityScore": 0.7856894049341281
     },
     {
       "file": "drama-screenplay/01-golden-hour.txt",
@@ -128,7 +128,7 @@
       "pages": 10,
       "adoptionRate": 1,
       "dialogueRetention": 1,
-      "qualityScore": 0.8006693752791938
+      "qualityScore": 0.9817085240790566
     },
     {
       "file": "drama-screenplay/02-summer-noodle-house.txt",
@@ -137,7 +137,7 @@
       "pages": 12,
       "adoptionRate": 1,
       "dialogueRetention": 1,
-      "qualityScore": 0.8075244881555421
+      "qualityScore": 0.9755638353206045
     },
     {
       "file": "drama-screenplay/03-third-floor-meeting-room.txt",
@@ -146,7 +146,7 @@
       "pages": 10,
       "adoptionRate": 1,
       "dialogueRetention": 1,
-      "qualityScore": 0.7855879644482451
+      "qualityScore": 0.9832603178004724
     },
     {
       "file": "drama-screenplay/04-witness.txt",
@@ -155,7 +155,7 @@
       "pages": 12,
       "adoptionRate": 1,
       "dialogueRetention": 1,
-      "qualityScore": 0.8135989873233828
+      "qualityScore": 0.9781469575792476
     },
     {
       "file": "drama-screenplay/05-night-study-escape.txt",
@@ -164,7 +164,7 @@
       "pages": 11,
       "adoptionRate": 1,
       "dialogueRetention": 1,
-      "qualityScore": 0.799085491068997
+      "qualityScore": 0.9655449429004903
     },
     {
       "file": "mixed-formats/diary-01-night-shift.txt",
@@ -173,7 +173,7 @@
       "pages": 15,
       "adoptionRate": 1,
       "dialogueRetention": 1,
-      "qualityScore": 0.671786094036712
+      "qualityScore": 0.7128756416636572
     },
     {
       "file": "mixed-formats/diary-02-classroom.txt",
@@ -182,7 +182,7 @@
       "pages": 15,
       "adoptionRate": 1,
       "dialogueRetention": 1,
-      "qualityScore": 0.6586456184021281
+      "qualityScore": 0.6757060935207964
     },
     {
       "file": "mixed-formats/essay-01-laundry-corner.txt",
@@ -191,7 +191,7 @@
       "pages": 6,
       "adoptionRate": 1,
       "dialogueRetention": 1,
-      "qualityScore": 0.6760508905837518
+      "qualityScore": 0.751774606696065
     },
     {
       "file": "mixed-formats/essay-02-driving-lesson.txt",
@@ -200,7 +200,7 @@
       "pages": 6,
       "adoptionRate": 1,
       "dialogueRetention": 1,
-      "qualityScore": 0.6510194330239062
+      "qualityScore": 0.7386206093014129
     },
     {
       "file": "mixed-formats/light-novel-01-crack-in-the-yard.txt",
@@ -209,7 +209,7 @@
       "pages": 14,
       "adoptionRate": 1,
       "dialogueRetention": 1,
-      "qualityScore": 0.799603750356772
+      "qualityScore": 0.8530963734199517
     },
     {
       "file": "mixed-formats/light-novel-02-ninth-floor.txt",
@@ -218,7 +218,7 @@
       "pages": 14,
       "adoptionRate": 1,
       "dialogueRetention": 1,
-      "qualityScore": 0.8169487736187457
+      "qualityScore": 0.87565944517788
     }
   ]
 }

@@ -108,6 +108,7 @@ export {
   dialogueDensityScore,
   readingFlowScore,
   faceClearanceScore,
+  unionArea,
   DEPENDENT_AXES,
   QUALITY_AXES,
   DENSITY_MIN,

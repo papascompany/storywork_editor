@@ -16,6 +16,9 @@
  *
  *  - **독립 축** — 배치기가 목적함수로 삼지 않는 것. 품질 판단의 실제 근거
  *    · `balance`         시각 무게중심이 지면 중앙에 있는가
+ *                        (LAYOUT-05 부터 **부분 결합**: 생성 슬롯의 동률 해소에 한해
+ *                        중앙 근접이 들어간다. 주 비용(화자 근접·얼굴 가림)에는 여전히
+ *                        없으므로 독립 축으로 두되, 개선분 해석 시 이 결합을 감안할 것)
  *    · `density`         지면 점유율이 과밀/과소가 아닌가
  *    · `dialogueDensity` 페이지가 감당하는 대사 수가 적정 범위인가
  *  - **의존 축** — `assignBubblesByCost` 가 직접 최적화하는 것. 값이 높은 건 당연하고,
@@ -133,16 +136,63 @@ export function balanceScore(page: PageDraft, format: LayoutFormat): number {
   return clamp01(1 - distance / BALANCE_TOLERANCE)
 }
 
-/** 지면 점유율이 적정 범위에 있는 정도 (0..1) */
+/**
+ * 사각형 합집합 면적 — 좌표 압축 기반 정확값 (LAYOUT-05, 결정론).
+ * 페이지 밖으로 나간 부분(bleed 확장 포즈 등)은 지면 점유가 아니므로 [0,1]² 로 클램프한다.
+ */
+export function unionArea(rects: readonly NormRect[]): number {
+  const clamped = rects
+    .map((r) => {
+      const x0 = Math.max(0, r.x)
+      const y0 = Math.max(0, r.y)
+      const x1 = Math.min(1, r.x + r.w)
+      const y1 = Math.min(1, r.y + r.h)
+      return { x0, y0, x1, y1 }
+    })
+    .filter((r) => r.x1 > r.x0 && r.y1 > r.y0)
+  if (clamped.length === 0) return 0
+
+  const xs = [...new Set(clamped.flatMap((r) => [r.x0, r.x1]))].sort((a, b) => a - b)
+  let total = 0
+  for (let i = 0; i < xs.length - 1; i++) {
+    const x0 = xs[i]
+    const x1 = xs[i + 1]
+    if (x0 === undefined || x1 === undefined || x1 <= x0) continue
+    // 이 세로 스트립을 완전히 덮는 rect 들의 y-구간을 병합해 덮인 높이를 구한다
+    const spans = clamped
+      .filter((r) => r.x0 <= x0 && r.x1 >= x1)
+      .map((r) => ({ s: r.y0, e: r.y1 }))
+      .sort((a, b) => a.s - b.s || a.e - b.e)
+    let covered = 0
+    let curS = 0
+    let curE = -1
+    for (const { s, e } of spans) {
+      if (s > curE) {
+        covered += Math.max(0, curE - curS)
+        curS = s
+        curE = e
+      } else if (e > curE) {
+        curE = e
+      }
+    }
+    covered += Math.max(0, curE - curS)
+    total += (x1 - x0) * covered
+  }
+  return total
+}
+
+/**
+ * 지면 점유율이 적정 범위에 있는 정도 (0..1).
+ * LAYOUT-05 부터 겹침을 제외한 **합집합 면적** 정확값 — 종전에는 면적 단순 합이라
+ * 포즈 위에 얹힌 말풍선이 이중으로 세어져 점유율이 과대 추정됐다.
+ */
 export function densityScore(page: PageDraft, format: LayoutFormat): number {
-  let occupied = 0
+  const rects: NormRect[] = []
   for (const layer of weightedLayers(page)) {
     const r = layerRect(layer, format)
-    if (!r) continue
-    occupied += Math.max(0, r.w) * Math.max(0, r.h)
+    if (r) rects.push(r)
   }
-  // 겹침을 빼지 않은 근사값 — 1 을 넘을 수 있어 상한을 둔다
-  return rangeScore(Math.min(occupied, 1.5), DENSITY_MIN, DENSITY_MAX, 0.4)
+  return rangeScore(unionArea(rects), DENSITY_MIN, DENSITY_MAX, 0.4)
 }
 
 /** 페이지가 감당하는 대사 수가 적정 범위에 있는 정도 (0..1) */
