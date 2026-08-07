@@ -21,11 +21,10 @@
    - `docs/handoff/SESSION_HANDOFF_2026-08-08.md` — **최신 핸드오프: 완료 내역·미완 액션·함정 전체**
    - `docs/architecture/roadmap.md` — 작업 큐 (SW-BIZ (A) · MODE 섹션이 최신)
 3. `git log --oneline -10` + `git status -sb` — 내가 만들지 않은 변경은 사용자 작업으로 보존
-4. `gh run view 31190628907` — 직전 HEAD(LAYOUT-04) CI 최종 결과 확인(마감 시점 진행 중이었음)
 
-### ✅ 현재 상태 (main `a9edced` 기준)
+### ✅ 현재 상태 (main `ebc23c6` 기준)
 
-- 워킹트리 clean · web/admin prod 라이브 · 전체 검증 79 태스크 green
+- 워킹트리 clean · web/admin prod 라이브 · 전체 검증 79 태스크 green · **CI green**(run 31190889786)
 - **자동배치**: 채택률 100% · 대사 보존 100% · 페이지 222(장면 217 = 1.02배). 리포트 3건 `docs/eval/`
 - **배치 품질 지표 도입**(LAYOUT-04) — 종합 **79.3%**. 구도 균형 50.7% · 지면 밀도 62.5% ·
   대사 밀도 86.5% · 시선 흐름 100% · 얼굴 가림 회피 97.0%. 채택률 포화 이후의 변별 축
@@ -86,6 +85,7 @@ pnpm turbo run typecheck lint test --concurrency=1
 # 채택률 + 배치 품질 재측정 (키·DB 불요, 결정론). --verbose 로 하위 페이지 상세
 pnpm adoption:measure
 # push 후 CI 확인 (600초 타임아웃 — CI 는 ~11분이라 자주 놓친다. gh run view <id> 로 재확인)
+# 연속 push 하면 앞선 run 은 concurrency 로 cancelled — 최종 HEAD 의 run 만 보면 된다
 bash scripts/ci-watch.sh
 ```
 

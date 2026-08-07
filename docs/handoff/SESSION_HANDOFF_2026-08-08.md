@@ -48,8 +48,9 @@ main `a9edced` = origin · 워킹트리 clean · 전체 검증 79 태스크 gree
 
 - `pnpm turbo run typecheck lint test --concurrency=1` — **79 태스크 green**(각 커밋마다 실행)
 - ai-script 116 · ai-layout 234 (신규 62: caption-slots 18 · quality 22 · 회귀 가드 5 · 기타)
-- CI: `ae273a1` green(run 31187489500). **`a9edced` 는 push 직후 진행 중 —
-  다음 세션 시작 시 `gh run view 31190628907` 로 확인**
+- CI: **최종 HEAD `ebc23c6` green**(run 31190889786 — 코드·문서 전부 포함) · `ae273a1` green(31187489500).
+  중간 run 31190628907(`a9edced`)은 `cancelled` 인데 실패가 아니라 **워크플로 concurrency
+  (`cancel-in-progress: true`)가 다음 push 로 대체한 것** — 최종 HEAD run 만 보면 된다
 - `pnpm adoption:measure` — 채택률 100% · 대사 보존 100% · 페이지 222 · 품질 종합 79.3%
 
 ## 3. 🔴 대표님 액션 — 4건 전부 미실행 (이번 세션 실측 재확인)
@@ -93,6 +94,8 @@ SCRIPT-KO-02 착수 가능** — 파급이 가장 크다. 3번은 저장 후 알
 - macOS NFD 파일명 · 하이드레이션 전 클릭 유실 · editor-* React 의존 금지 · 직접 hex 금지
 - 커밋 subject 소문자/한글 시작(commitlint), body ≤100자/줄, `Co-Authored-By` 유지
 - `ci-watch.sh` 는 600초 타임아웃 — CI 가 ~11분이라 자주 놓친다. `gh run view <id>` 로 재확인할 것
+- ★ **연속 push 하면 앞선 CI run 이 `cancelled` 로 남는다** — 워크플로 `concurrency` 가
+  `cancel-in-progress: true`. 실패가 아니므로 **최종 HEAD 의 run 만** 확인하면 된다
 
 _갱신: 2026-08-08 · SCRIPT-KO-04 · 제품 결정 3건(ADR-0017/0018/0019) · LAYOUT-04 완료.
 다음 착수 후보 = LAYOUT-05(키 불요) 또는 키 등록 시 CONTI-01._
