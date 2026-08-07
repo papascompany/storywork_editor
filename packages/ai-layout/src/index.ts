@@ -41,19 +41,48 @@ export {
 } from './template-match.js'
 export type { TemplateMatchOptions, TemplateMatchResult } from './template-match.js'
 
-// ── 대사 수용량 기반 페이지 계획 (LAYOUT-03) ──────────────────────────────
-export { planCapacityPages, sceneHint, sceneSpeakers } from './capacity.js'
-export type { CapacityPlanContext } from './capacity.js'
+// ── 대사 수용량 기반 페이지 계획 (LAYOUT-03 · SCRIPT-KO-04) ───────────────
+export {
+  planCapacityPages,
+  planLineRanges,
+  pageBudgetOf,
+  fitsInPage,
+  captionTextsOf,
+  dialogueLinesOf,
+  sceneHint,
+  sceneSpeakers,
+} from './capacity.js'
+export type { CapacityPlanContext, PageBudget } from './capacity.js'
 export {
   generateBubbleSlots,
+  generateGridSlots,
   pageBubbleCapacity,
   withGeneratedBubbleSlots,
   bubbleSlotsOf,
+  textLikeSlotsOf,
   poseSlotsOf,
   requiredPoseSlotsOf,
   MAX_BUBBLES_PER_PAGE,
   GENERATED_SLOT_PREFIX,
+  CAPTION_SLOT_KIND,
 } from './bubble-slots.js'
+export type { GridSlotSpec } from './bubble-slots.js'
+
+// ── 캡션(내레이션·지문) 박스 (SCRIPT-KO-04) ───────────────────────────────
+export {
+  captionBoxesNeeded,
+  captionSlotsOf,
+  generateCaptionSlots,
+  groupCaptionLines,
+  joinCaptionBox,
+  pageCaptionSlotCapacity,
+  withGeneratedCaptionSlots,
+  CAPTION_CHARS_PER_BOX,
+  CAPTION_LINES_PER_BOX,
+  CAPTION_LINE_SEPARATOR,
+  GENERATED_CAPTION_PREFIX,
+  MAX_CAPTION_SLOTS_PER_PAGE,
+} from './caption-slots.js'
 
 export { assignSlots } from './slot-assign.js'
 export type { SlotAssignResult } from './slot-assign.js'

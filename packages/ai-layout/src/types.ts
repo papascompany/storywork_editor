@@ -203,13 +203,18 @@ export interface PoseAlternativeMeta {
 export interface SlotAssignment {
   slotId: string
   slot: LayoutSlot
-  /** 배치된 자원 종류 */
-  kind: 'pose' | 'background' | 'bubble' | 'text' | 'empty'
+  /** 배치된 자원 종류 ('caption' = 내레이션/지문 박스, SCRIPT-KO-04) */
+  kind: 'pose' | 'background' | 'bubble' | 'text' | 'caption' | 'empty'
   resourceId?: string
   /** 캐릭터 이름 (pose 종류일 때) */
   characterName?: string
-  /** 텍스트 내용 (bubble/text 종류일 때) */
+  /** 텍스트 내용 (bubble/text/caption 종류일 때 — 캡션은 묶인 줄을 이어붙인 표시 문자열) */
   text?: string
+  /**
+   * 캡션 박스가 묶은 원본 라인들 (caption 종류일 때).
+   * 채택률 측정이 "이 줄이 실제로 실렸는가"를 판정하는 근거 — 병합 문자열만으로는 대조가 깨진다.
+   */
+  captionLines?: string[]
   /** lowDpi 위반 여부 */
   lowDpiViolation?: boolean
   /** effectiveDpi 계산값 */

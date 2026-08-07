@@ -9,9 +9,11 @@
 
 import type { SceneRecommendation } from '@storywork/ai-recommend'
 import type { AnalyzedScene } from '@storywork/ai-script'
+import { isCaptionLine, isDialogueLine } from '@storywork/ai-script'
 
 import { assignBubblesByCost, speakerAnchorFromPoseSlot } from './bubble-cost.js'
 import type { SpeakerAnchor } from './bubble-cost.js'
+import { captionSlotsOf, groupCaptionLines, joinCaptionBox } from './caption-slots.js'
 import { checkLowDpiConstraint, formatLowDpiWarning } from './constraints/low-dpi.js'
 import type {
   LayoutFormat,
@@ -113,9 +115,13 @@ export async function assignSlots(
   // 배경 슬롯
   const bgSlots = template.slots.filter((s) => s.allowedKinds.includes('bg'))
 
-  // 말풍선/텍스트 슬롯
+  // 말풍선 슬롯 (캡션 전용 슬롯은 제외 — 대사가 캡션 자리에 들어가면 안 된다)
   const bubbleSlots = template.slots
-    .filter((s) => s.allowedKinds.includes('bubble') || s.allowedKinds.includes('text'))
+    .filter(
+      (s) =>
+        (s.allowedKinds.includes('bubble') || s.allowedKinds.includes('text')) &&
+        !s.allowedKinds.includes('caption'),
+    )
     .sort((a, b) => a.y - b.y || a.x - b.x)
 
   // ── 배경 슬롯 배치 ─────────────────────────────────────────────────────────
@@ -233,7 +239,9 @@ export async function assignSlots(
 
   // ── 말풍선/텍스트 슬롯 배치 (BUBBLE-02: 4항 비용함수 기반 line→slot 매핑) ──
   // cost = w1·(화자 mouth 근접+꼬리 각도) + w2·얼굴 가림 + w3·읽기순서 + w4·경계 침범
-  const lines = analyzedScene.lines
+  //
+  // 말풍선에는 **대사만** 넣는다 (SCRIPT-KO-04). 서술·지문은 아래 캡션 박스로 간다.
+  const lines = analyzedScene.lines.filter((l) => isDialogueLine(l))
 
   // 포즈 배치 결과에서 화자 앵커 구성 (키포인트 어댑터 부재 시 슬롯 휴리스틱)
   const anchors = new Map<string, SpeakerAnchor>()
@@ -285,6 +293,31 @@ export async function assignSlots(
 
     // 사용되지 않은 bubbleCandidate 억제 경고 방지
     void bubbleCandidate
+  }
+
+  // ── 캡션(내레이션·지문) 박스 배치 (SCRIPT-KO-04) ────────────────────────────
+  // 연속된 서술 여러 줄을 한 박스로 묶는다. 묶음 규칙은 수용량 계산과 같은 함수를 쓴다.
+  const captionSlots = captionSlotsOf(template).sort((a, b) => a.y - b.y || a.x - b.x)
+  const captionBoxes = groupCaptionLines(
+    analyzedScene.lines.filter((l) => isCaptionLine(l)).map((l) => l.text),
+  )
+
+  for (let i = 0; i < captionSlots.length && i < captionBoxes.length; i++) {
+    const captionSlot = captionSlots[i]
+    const box = captionBoxes[i]
+    if (!captionSlot || !box) continue
+
+    if (isTextSafeAreaViolation(captionSlot, format)) {
+      warnings.push(`[safe-area] 캡션 슬롯 ${captionSlot.id} 가 safe area 를 침범합니다.`)
+    }
+
+    assignments.push({
+      slotId: captionSlot.id,
+      slot: captionSlot,
+      kind: 'caption',
+      text: joinCaptionBox(box),
+      captionLines: box,
+    })
   }
 
   return { assignments, warnings }

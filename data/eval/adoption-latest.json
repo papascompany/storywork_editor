@@ -4,7 +4,7 @@
   "format": "preset-b5-novel",
   "corpusFiles": 21,
   "totalScenes": 217,
-  "totalPages": 255,
+  "totalPages": 218,
   "adoptionRate": 1,
   "dialogueRetention": 1,
   "blockerCounts": {
@@ -87,7 +87,7 @@
       "file": "daily-novel/04-bookshop-rain.txt",
       "format": "novel",
       "scenes": 9,
-      "pages": 10,
+      "pages": 9,
       "adoptionRate": 1,
       "dialogueRetention": 1
     },
@@ -103,7 +103,7 @@
       "file": "drama-screenplay/01-golden-hour.txt",
       "format": "screenplay",
       "scenes": 10,
-      "pages": 17,
+      "pages": 10,
       "adoptionRate": 1,
       "dialogueRetention": 1
     },
@@ -111,7 +111,7 @@
       "file": "drama-screenplay/02-summer-noodle-house.txt",
       "format": "screenplay",
       "scenes": 10,
-      "pages": 20,
+      "pages": 11,
       "adoptionRate": 1,
       "dialogueRetention": 1
     },
@@ -119,7 +119,7 @@
       "file": "drama-screenplay/03-third-floor-meeting-room.txt",
       "format": "screenplay",
       "scenes": 10,
-      "pages": 19,
+      "pages": 10,
       "adoptionRate": 1,
       "dialogueRetention": 1
     },
@@ -127,7 +127,7 @@
       "file": "drama-screenplay/04-witness.txt",
       "format": "screenplay",
       "scenes": 10,
-      "pages": 12,
+      "pages": 10,
       "adoptionRate": 1,
       "dialogueRetention": 1
     },
@@ -135,7 +135,7 @@
       "file": "drama-screenplay/05-night-study-escape.txt",
       "format": "screenplay",
       "scenes": 10,
-      "pages": 19,
+      "pages": 10,
       "adoptionRate": 1,
       "dialogueRetention": 1
     },

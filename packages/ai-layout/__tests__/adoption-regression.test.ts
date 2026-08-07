@@ -138,3 +138,62 @@ describe('자동배치 채택률 회귀 가드', () => {
     }
   })
 })
+
+// ─────────────────────────────────────────────
+// 대사/지문 분리 (SCRIPT-KO-04)
+// ─────────────────────────────────────────────
+
+describe('대사/지문 분리 회귀 가드', () => {
+  async function composeSample(text: string) {
+    const analyzed = await analyze(text, { format: 'auto', llmEnabled: false, maxAlternatives: 0 })
+    const recommended = await recommend(analyzed, {
+      seed: 0,
+      characterMapping: {},
+      candidatesPerCharacter: 5,
+      llmEnabled: false,
+    })
+    const composed = await compose(analyzed, recommended, {
+      formatId: FORMAT.id,
+      format: FORMAT,
+      seed: 0,
+    })
+    return { analyzed, composed }
+  }
+
+  it('씬 헤딩은 페이지에 텍스트로 남지 않는다 (장면 속성으로 흡수)', async () => {
+    const { analyzed, composed } = await composeSample(SAMPLES[0]?.text ?? '')
+    const texts = composed.pages.flatMap((p) =>
+      p.fabricJson.layers.map((l) => String((l.data.meta as { text?: string })?.text ?? '')),
+    )
+    expect(texts.some((t) => t.startsWith('S#'))).toBe(false)
+    // 헤딩의 장소/시간대는 장면 메타로 살아 있어야 한다
+    expect(analyzed.scenes[0]?.meta.location).toBe('카페 안')
+    expect(analyzed.scenes[0]?.meta.timeOfDay).toBe('noon')
+  })
+
+  it('서술은 말풍선이 아니라 캡션 레이어로 나간다', async () => {
+    const { composed } = await composeSample(SAMPLES[1]?.text ?? '')
+    const captions = composed.pages
+      .flatMap((p) => p.fabricJson.layers)
+      .filter((l) => (l.data.meta as { kind?: string })?.kind === 'caption')
+
+    expect(captions.length).toBeGreaterThan(0)
+    for (const c of captions) {
+      expect(c.kind).toBe('text')
+      // 캡션이 말풍선 레이어로 새면 대사와 뒤섞인다
+      expect(c.kind).not.toBe('bubble')
+    }
+  })
+
+  it('캡션 레이어 텍스트에 개행이 없다 (PDF drawText 줄간격 함정 회귀 가드)', async () => {
+    for (const s of SAMPLES) {
+      const { composed } = await composeSample(s.text)
+      const captions = composed.pages
+        .flatMap((p) => p.fabricJson.layers)
+        .filter((l) => (l.data.meta as { kind?: string })?.kind === 'caption')
+      for (const c of captions) {
+        expect(String(c.fabric['text'] ?? '')).not.toContain('\n')
+      }
+    }
+  })
+})

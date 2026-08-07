@@ -65,6 +65,7 @@ function extractLinesFromParagraph(para: string, ctx: AttributionContext): Analy
       index: lineIdx++,
       speaker,
       text: directMatch[2]?.trim() ?? '',
+      kind: 'dialogue',
     })
     return result
   }
@@ -72,12 +73,17 @@ function extractLinesFromParagraph(para: string, ctx: AttributionContext): Analy
   // ko-speech 1층 룰 엔진으로 인용 추출 + 화자 귀속
   const attributed = attributeParagraph(para, ctx)
   for (const q of attributed) {
-    result.push({ index: lineIdx++, speaker: q.speaker, text: q.text })
+    result.push({ index: lineIdx++, speaker: q.speaker, text: q.text, kind: 'dialogue' })
   }
 
-  // 대화가 없으면 단락 전체를 서술 행으로
+  // 대화가 없으면 단락 전체를 서술 행으로 — 말풍선이 아니라 캡션 박스로 간다 (SCRIPT-KO-04)
   if (result.length === 0 && para.length > 0) {
-    result.push({ index: lineIdx++, speaker: undefined, text: para.slice(0, 200) })
+    result.push({
+      index: lineIdx++,
+      speaker: undefined,
+      text: para.slice(0, 200),
+      kind: 'narration',
+    })
   }
 
   return result

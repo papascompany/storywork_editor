@@ -34,6 +34,12 @@ export const MAX_BUBBLES_PER_PAGE = 6
 /** 생성 슬롯 ID 접두 — 템플릿 원본 슬롯과 구분 */
 export const GENERATED_SLOT_PREFIX = 'gen-bubble-'
 
+/**
+ * 캡션(내레이션/지문) 슬롯을 표시하는 allowedKinds 값 (SCRIPT-KO-04).
+ * 캡션 슬롯도 텍스트를 담지만 **대사가 들어가서는 안 되므로** 말풍선 목록에서 제외한다.
+ */
+export const CAPTION_SLOT_KIND = 'caption'
+
 /** 후보 격자 비율 (판형 정규화) */
 const SLOT_W_RATIO = 0.46
 const SLOT_W_MAX = 0.44
@@ -50,13 +56,27 @@ const GENERATED_OVERLAP_LIMIT = 0.05
 // 헬퍼
 // ─────────────────────────────────────────────
 
-function isBubbleKind(slot: LayoutSlot): boolean {
-  return slot.allowedKinds.includes('bubble') || slot.allowedKinds.includes('text')
+function isTextLikeKind(slot: LayoutSlot): boolean {
+  return (
+    slot.allowedKinds.includes('bubble') ||
+    slot.allowedKinds.includes('text') ||
+    slot.allowedKinds.includes(CAPTION_SLOT_KIND)
+  )
 }
 
-/** 템플릿의 말풍선/텍스트 슬롯 */
+/**
+ * 텍스트가 들어가는 모든 슬롯 (말풍선 + 캡션).
+ * 새 슬롯을 생성할 때 **겹침을 피해야 할 대상**은 종류와 무관하게 이 전체다.
+ */
+export function textLikeSlotsOf(template: LayoutTemplate): LayoutSlot[] {
+  return template.slots.filter(isTextLikeKind)
+}
+
+/** 템플릿의 말풍선/텍스트 슬롯 — 캡션 전용 슬롯은 제외한다 (대사가 들어갈 자리만) */
 export function bubbleSlotsOf(template: LayoutTemplate): LayoutSlot[] {
-  return template.slots.filter(isBubbleKind)
+  return template.slots.filter(
+    (s) => isTextLikeKind(s) && !s.allowedKinds.includes(CAPTION_SLOT_KIND),
+  )
 }
 
 /** 템플릿의 포즈 슬롯 */
@@ -86,18 +106,35 @@ function overlapRatio(a: NormRect, b: NormRect): number {
 // 생성
 // ─────────────────────────────────────────────
 
+/** 생성할 슬롯의 종류 명세 — 격자 로직은 말풍선·캡션이 공유한다 */
+export interface GridSlotSpec {
+  /** 생성 슬롯 ID 접두 */
+  idPrefix: string
+  /** 생성 슬롯의 allowedKinds */
+  allowedKinds: string[]
+}
+
+const BUBBLE_SLOT_SPEC: GridSlotSpec = {
+  idPrefix: GENERATED_SLOT_PREFIX,
+  allowedKinds: ['bubble', 'text'],
+}
+
 /**
- * safe area 안에서 말풍선 슬롯을 `count` 개까지 생성한다.
+ * safe area 안에서 텍스트 슬롯을 `count` 개까지 생성한다.
  * 자리가 모자라면 만들 수 있는 만큼만 반환한다(요청보다 적을 수 있음).
+ *
+ * 이미 자리를 차지한 **모든** 텍스트류 슬롯(말풍선 + 캡션)을 피하므로,
+ * 말풍선을 먼저 만들고 캡션을 나중에 만들면 서로 겹치지 않는다.
  */
-export function generateBubbleSlots(
+export function generateGridSlots(
   template: LayoutTemplate,
   format: LayoutFormat,
   count: number,
+  spec: GridSlotSpec = BUBBLE_SLOT_SPEC,
 ): LayoutSlot[] {
   if (count <= 0) return []
 
-  const existing = bubbleSlotsOf(template)
+  const existing = textLikeSlotsOf(template)
   const heads = poseSlotsOf(template).map(headBox)
 
   const safeX = format.safeMm / format.widthMm
@@ -142,8 +179,8 @@ export function generateBubbleSlots(
     if (picked.some((p) => overlapRatio(cand.rect, p) > GENERATED_OVERLAP_LIMIT)) continue
     picked.push(cand.rect)
     out.push({
-      id: `${GENERATED_SLOT_PREFIX}${out.length + 1}`,
-      allowedKinds: ['bubble', 'text'],
+      id: `${spec.idPrefix}${out.length + 1}`,
+      allowedKinds: spec.allowedKinds,
       x: cand.rect.x,
       y: cand.rect.y,
       w: cand.rect.w,
@@ -153,6 +190,15 @@ export function generateBubbleSlots(
     })
   }
   return out
+}
+
+/** safe area 안에서 말풍선 슬롯을 `count` 개까지 생성한다 */
+export function generateBubbleSlots(
+  template: LayoutTemplate,
+  format: LayoutFormat,
+  count: number,
+): LayoutSlot[] {
+  return generateGridSlots(template, format, count, BUBBLE_SLOT_SPEC)
 }
 
 /**

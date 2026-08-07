@@ -20,9 +20,11 @@
  * 결정론: 입력 순서와 정수 연산만 사용. 랜덤·시각 의존 없음.
  */
 
-import type { AnalyzeResult, AnalyzedScene } from '@storywork/ai-script'
+import type { AnalyzeResult, AnalyzedLine, AnalyzedScene } from '@storywork/ai-script'
+import { isCaptionLine, isDialogueLine } from '@storywork/ai-script'
 
-import { pageBubbleCapacity, poseSlotsOf } from './bubble-slots.js'
+import { pageBubbleCapacity, poseSlotsOf, withGeneratedBubbleSlots } from './bubble-slots.js'
+import { captionBoxesNeeded, pageCaptionSlotCapacity } from './caption-slots.js'
 import { matchTemplate } from './template-match.js'
 import type { LayoutFormat, LayoutTemplate, PageGroup, TemplateHint } from './types.js'
 
@@ -69,6 +71,117 @@ export function resolveTemplateHint(
   return 'default'
 }
 
+/** 대사(말풍선 대상) 라인 */
+export function dialogueLinesOf(lines: readonly AnalyzedLine[]): AnalyzedLine[] {
+  return lines.filter((l) => isDialogueLine(l))
+}
+
+/** 캡션(내레이션·지문) 라인의 텍스트 */
+export function captionTextsOf(lines: readonly AnalyzedLine[]): string[] {
+  return lines.filter((l) => isCaptionLine(l)).map((l) => l.text)
+}
+
+// ─────────────────────────────────────────────
+// 페이지 예산 (SCRIPT-KO-04)
+// ─────────────────────────────────────────────
+
+/**
+ * 한 페이지가 담을 수 있는 양 — 대사는 말풍선 개수로, 서술·지문은 캡션 박스 개수로 센다.
+ * 종전에는 둘을 합쳐 말풍선 하나씩 세었기 때문에 서술이 많은 대본에서 페이지가 부풀었다.
+ */
+export interface PageBudget {
+  /** 말풍선 수용량 (대사 줄 수) */
+  bubbles: number
+  /** 캡션 박스 수용량 (박스 하나가 여러 줄을 묶는다) */
+  captionBoxes: number
+}
+
+/**
+ * 템플릿·판형의 페이지 예산.
+ *
+ * 캡션 자리는 **말풍선을 먼저 배치한 뒤 남는 자리**에서 계산한다 — compose 가 실제로
+ * 그 순서로 슬롯을 보강하므로, 계획과 배치가 같은 결론을 내야 글이 유실되지 않는다.
+ */
+export function pageBudgetOf(
+  template: LayoutTemplate,
+  format: LayoutFormat,
+  dialogueCount: number,
+): PageBudget {
+  const bubbles = pageBubbleCapacity(template, format)
+  const withBubbles = withGeneratedBubbleSlots(template, format, Math.min(dialogueCount, bubbles))
+  return { bubbles, captionBoxes: pageCaptionSlotCapacity(withBubbles, format) }
+}
+
+/** 이 라인들이 한 페이지 예산 안에 들어가는가 */
+export function fitsInPage(lines: readonly AnalyzedLine[], budget: PageBudget): boolean {
+  return (
+    dialogueLinesOf(lines).length <= budget.bubbles &&
+    captionBoxesNeeded(captionTextsOf(lines)) <= budget.captionBoxes
+  )
+}
+
+/** 예산을 넘지 않게 라인을 순서대로 잘라 담는다 (그리디 · 결정론) */
+function sliceRanges(
+  lines: readonly AnalyzedLine[],
+  limits: PageBudget,
+): Array<{ start: number; end: number }> {
+  const out: Array<{ start: number; end: number }> = []
+  let start = 0
+  let dialogue = 0
+  let captions: string[] = []
+
+  for (let i = 0; i < lines.length; i++) {
+    const line = lines[i]
+    if (!line) continue
+
+    const dialogueLine = isDialogueLine(line)
+    const nextDialogue = dialogue + (dialogueLine ? 1 : 0)
+    const nextCaptions = dialogueLine ? captions : [...captions, line.text]
+    const overflow =
+      nextDialogue > limits.bubbles || captionBoxesNeeded(nextCaptions) > limits.captionBoxes
+
+    // 페이지가 비어 있는데도 넘치면(한 줄이 상한을 넘는 경우) 그 줄은 그대로 담는다 — 버리지 않는다
+    if (overflow && i > start) {
+      out.push({ start, end: i })
+      start = i
+      dialogue = dialogueLine ? 1 : 0
+      captions = dialogueLine ? [] : [line.text]
+      continue
+    }
+
+    dialogue = nextDialogue
+    captions = nextCaptions
+  }
+
+  if (start < lines.length) out.push({ start, end: lines.length })
+  return out
+}
+
+/**
+ * 장면 라인을 페이지 구간으로 나눈다. 구간의 합집합은 항상 라인 전체다(유실 0).
+ *
+ * 2패스: 먼저 예산 한도로 잘라 페이지 수 N 을 얻고, 그 N 으로 페이지당 목표치를 낮춰
+ * 다시 자른다 — 마지막 페이지에 한 줄만 남는 배치를 피하려는 것. 재분배가 페이지 수를
+ * 늘리면 1패스 결과를 쓴다.
+ */
+export function planLineRanges(
+  lines: readonly AnalyzedLine[],
+  budget: PageBudget,
+): Array<{ start: number; end: number }> {
+  const first = sliceRanges(lines, budget)
+  if (first.length <= 1) return first
+
+  const pageCount = first.length
+  const dialogueTotal = dialogueLinesOf(lines).length
+  const captionTotal = captionBoxesNeeded(captionTextsOf(lines))
+  const balanced = sliceRanges(lines, {
+    bubbles: Math.max(1, Math.min(budget.bubbles, Math.ceil(dialogueTotal / pageCount))),
+    captionBoxes: Math.max(1, Math.min(budget.captionBoxes, Math.ceil(captionTotal / pageCount))),
+  })
+
+  return balanced.length === pageCount ? balanced : first
+}
+
 // ─────────────────────────────────────────────
 // 계획
 // ─────────────────────────────────────────────
@@ -113,29 +226,26 @@ export function planCapacityPages(
 
     const hint = resolveTemplateHint(rawHint, 1, scene)
     const speakerCount = sceneSpeakers(scene).length
-    const lineCount = scene.lines.length
+    const dialogueCount = dialogueLinesOf(scene.lines).length
     const { template } = matchTemplate(hint, ctx.preferredIds, speakerCount, ctx.templates, {
-      dialogueCount: lineCount,
+      // 말풍선 수용량 점수는 **대사만** 본다 — 서술·지문은 캡션 박스로 가기 때문
+      dialogueCount,
       // 단독 장면은 인물 1명만 세워도 성립한다 — 화자가 없으면 포즈 슬롯도 요구하지 않는다
       requiredPoseCount: Math.min(1, speakerCount),
     })
 
-    const capacity = pageBubbleCapacity(template, ctx.format)
-    if (!allowSplit || lineCount <= capacity || capacity <= 0) {
+    const budget = pageBudgetOf(template, ctx.format, dialogueCount)
+    if (!allowSplit || fitsInPage(scene.lines, budget)) {
       emit({ sceneIndices: [sceneIndex], templateHint: hint, templateId: template.id })
       return
     }
 
-    // 균등 분할 — 마지막 페이지에 대사 1개만 남는 배치를 피한다
-    const pageCount = Math.ceil(lineCount / capacity)
-    const perPage = Math.ceil(lineCount / pageCount)
-    for (let start = 0; start < lineCount; start += perPage) {
-      const end = Math.min(lineCount, start + perPage)
+    for (const range of planLineRanges(scene.lines, budget)) {
       emit({
         sceneIndices: [sceneIndex],
         templateHint: hint,
         templateId: template.id,
-        lineRanges: [{ sceneIndex, start, end }],
+        lineRanges: [{ sceneIndex, start: range.start, end: range.end }],
       })
     }
   }
@@ -153,17 +263,17 @@ export function planCapacityPages(
     const scenes = group.sceneIndices
       .map((i) => sceneMap.get(i))
       .filter((s): s is AnalyzedScene => s !== undefined)
-    const totalLines = scenes.reduce((sum, s) => sum + s.lines.length, 0)
+    const pageLines = scenes.flatMap((s) => s.lines)
     const cutCount = group.sceneIndices.length
     const hint = resolveTemplateHint(group.templateHint, cutCount, scenes[0])
 
     // 멀티 장면 페이지는 장면당 포즈 1개를 세운다 → 채울 수 있는 포즈 수 = 컷 수
+    const dialogueCount = dialogueLinesOf(pageLines).length
     const { template } = matchTemplate(hint, ctx.preferredIds, cutCount, ctx.templates, {
-      dialogueCount: totalLines,
+      dialogueCount,
       requiredPoseCount: cutCount,
     })
-    const capacity = pageBubbleCapacity(template, ctx.format)
-    const fitsDialogue = totalLines <= capacity
+    const fitsDialogue = fitsInPage(pageLines, pageBudgetOf(template, ctx.format, dialogueCount))
     const showsAllCuts = poseSlotsOf(template).length >= cutCount
 
     if (fitsDialogue && showsAllCuts) {

@@ -39,6 +39,8 @@ const AnalyzedLineSchema = z.object({
   speaker: z.string().optional(),
   text: z.string(),
   offset: z.number().optional(),
+  // SCRIPT-KO-04 — 없으면 소비 측(lineKindOf)이 화자 유무로 추론한다
+  kind: z.enum(['dialogue', 'narration', 'direction']).optional(),
 })
 
 const SceneMetaSchema = z.object({

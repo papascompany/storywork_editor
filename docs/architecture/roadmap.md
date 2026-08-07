@@ -366,7 +366,15 @@
   · **골든 G5 기대값 정정**: 장면4×대사4=16 을 1페이지 four-cut(슬롯 4)으로 고정한 테스트가 **대사 12개 유실을 정답으로 박아두고 있었음**. 합병 해제 4페이지 + 16개 전량 배치로 교체, R2 커버리지는 page-split 30케이스 + 신규 G5b(수용량 안이면 합병 유지)가 유지
   · 실물 검증(지표 아닌 좌표): screenplay 20페이지·말풍선 72개 — safe area 밖 0 · 상호 겹침 0 · 빈 텍스트 0. 신규 테스트 31 (`capacity.test.ts` 25 + 회귀 가드 3 + 골든 3), ai-layout 191 green
   · 리포트 [docs/eval/adoption-layout03-2026-08-05.md](../eval/adoption-layout03-2026-08-05.md) · 회귀 가드 하한을 목표선(60%/95%)으로 상향
-- [ ] [SCRIPT-KO-04] 대사/지문 구분 (`AnalyzedLine.kind`) — LAYOUT-03 실측 후속. (등록 시 ID 가 기존 SCRIPT-KO-03(CSN 스코어러)과 충돌해 04 로 정정) 현재 `AnalyzedLine` 에 대사/지문 구분이 없어 **장면 헤딩(`S#1. …`)과 지문이 말풍선 슬롯을 차지**한다(화자 없음 비율: essay 96.2% · diary 90.7% · novel 56.5% · screenplay 27.2%). 페이지 수 증가(217→255)의 상당 부분이 여기서 옴 — 지문은 캡션/내레이션 박스로 분리 배치 — @scene-analyzer
+- [x] [SCRIPT-KO-04] 대사/지문 구분 (`AnalyzedLine.kind`) — LAYOUT-03 실측 후속 — @scene-analyzer ✅ 2026-08-07.
+  · **페이지 255 → 218(−14.5%) · 장면당 1.175 → 1.005**, 채택률 100% · 대사 보존 100% 유지. screenplay 87 → 51(−41.4%): 17→10 · 20→11 · 19→10 · 12→10 · 19→10. LAYOUT-03 이 대사 유실을 페이지 증가(+17.5%)로 갚았던 부분이 되돌아옴
+  · `AnalyzedLine.kind: 'dialogue'|'narration'|'direction'` + `line-kind.ts` — 파서는 항상 채우고, 기존 SceneDoc 은 `lineKindOf()` 폴백(화자 유무 = 종전 동작)으로 읽는다
+  · `parse-screenplay.ts` — 헤딩 정규식을 `S#1.`·`S 1:`·`#3.`·`씬 2:`·`INT./EXT.` 로 확장(구분자 필수 → "장면이 바뀌었다" 오탐 차단). **헤딩은 라인이 아니라 `SceneMeta.location/timeOfDay` 로 흡수** — 배경 톤 추천이 실제로 쓰는 두 값. 종전에 통째로 버려지던 지문(`[...]`·`(...)`)은 `direction` 으로 보존
+  · `caption-slots.ts` 신설 — 서술·지문은 캡션 박스로. **박스 하나가 연속 3줄·180자를 묶는다**(수용량이 늘어나는 실제 근거). 기하는 말풍선과 같은 격자(`generateGridSlots`)를 공유하고 말풍선을 먼저 배치해 침범 없음. 수용량 계산과 실제 묶음이 같은 함수(`groupCaptionLines`)
+  · `capacity.ts` — 페이지 예산이 `{ bubbles, captionBoxes }` 둘로 분리. 분할은 두 예산을 동시에 지키는 그리디 2패스(균등 재분배가 페이지 수를 늘리면 1패스 유지)
+  · **PDF 함정 회피**: 캡션을 개행 한 덩어리로 내보내면 pdf-lib `drawText` 가 페이지 기본 lineHeight(24pt)로 박스를 넘김 → 캡션은 **줄당 `text` 레이어**로 나가고 줄 위치를 ai-layout 이 계산. 신규 LayerKind 없음(Schema v1 `'text'` 재사용 — 편집기·PDF 어댑터 기존 경로)
+  · 기존 기대값 1건 의도적 정정: "지문은 lines 에 포함되지 않는다" → "지문은 direction 으로 분리된다"(정보를 버리는 것을 정답으로 박아둔 테스트). 신규 테스트 21(`caption-slots.test.ts` 18 + 회귀 가드 3), ai-script 116 · ai-layout 209 green
+  · 리포트 [docs/eval/adoption-script-ko-04-2026-08-07.md](../eval/adoption-script-ko-04-2026-08-07.md)
 - [ ] [LAYOUT-04] 배치 **품질** 지표 (LAYOUT-03 후속) — 채택률 프록시가 100% 로 포화돼 변별력 상실. 구도 균형·시선 흐름·컷당 대사 밀도 등 품질 축 측정 도입(실사용 로그 FOLLOWUP-60 도입 시 실측 채택률로 교체하고 프록시는 선행지표로 강등) — @layout-composer + @qa-tester
 
 ### (B) EDU — 교육 커리큘럼 (신규, 후반 일정 — M9 이후 착수)

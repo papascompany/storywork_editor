@@ -103,7 +103,12 @@ function layerText(layer: FabricLayer): string {
   return (meta.text ?? (typeof fabricText === 'string' ? fabricText : '') ?? '').trim()
 }
 
-/** 페이지에 실제로 실린 대사 텍스트 집합 */
+/**
+ * 페이지에 실제로 실린 대본 텍스트 집합.
+ *
+ * 말풍선(대사)과 캡션 박스(서술·지문, SCRIPT-KO-04) 둘 다 센다. 캡션은 줄마다 별도
+ * 'text' 레이어로 나가므로 여기서는 종류를 구분할 필요가 없다.
+ */
 function placedDialogues(page: PageDraft): Set<string> {
   const out = new Set<string>()
   for (const layer of page.fabricJson.layers) {

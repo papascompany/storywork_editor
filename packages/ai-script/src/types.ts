@@ -38,12 +38,34 @@ export interface SceneMeta {
 // 분석 결과 단위
 // ─────────────────────────────────────────────
 
+/**
+ * 라인 종류 (SCRIPT-KO-04).
+ *
+ * 종전에는 모든 라인이 구분 없이 말풍선 슬롯을 차지해, 지문·서술이 대사와 같은 자리를
+ * 두고 경쟁하며 페이지를 부풀렸다(LAYOUT-03 실측: 화자 없는 라인 비율 essay 96.2% ·
+ * diary 90.7% · novel 56.5% · screenplay 27.2%).
+ *
+ *  - `dialogue`  인물의 발화 → 말풍선
+ *  - `narration` 서술·내레이션 → 캡션 박스
+ *  - `direction` 지문(무대 지시·행동 묘사) → 캡션 박스
+ *
+ * 장면 헤딩(`S#1. 병원 응급실 / 밤`)은 라인이 아니라 `SceneMeta.location/timeOfDay` 로
+ * 흡수한다 — 배치 대상이 아니라 장면의 속성이기 때문이다.
+ */
+export type LineKind = 'dialogue' | 'narration' | 'direction'
+
 export interface AnalyzedLine {
   index: number
   speaker?: string
   text: string
   /** 장면 내 텍스트 바이트 오프셋 (경계 계산용) */
   offset?: number
+  /**
+   * 라인 종류 (SCRIPT-KO-04).
+   * 파서는 항상 채우지만, 이 필드 도입 이전에 저장된 SceneDoc 에는 없다 —
+   * 소비 측은 `lineKindOf()` 로 읽어 화자 유무 기반 폴백을 거친다.
+   */
+  kind?: LineKind
 }
 
 export interface AnalyzedScene {

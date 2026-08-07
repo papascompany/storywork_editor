@@ -17,11 +17,24 @@
 
 import type { RecommendResult } from '@storywork/ai-recommend'
 import type { AnalyzeResult, AnalyzedScene } from '@storywork/ai-script'
+import { isCaptionLine } from '@storywork/ai-script'
 
 import { assignBubblesByCost, speakerAnchorFromPoseSlot } from './bubble-cost.js'
 import type { SpeakerAnchor } from './bubble-cost.js'
 import { withGeneratedBubbleSlots } from './bubble-slots.js'
-import { planCapacityPages, resolveTemplateHint, sceneSpeakers } from './capacity.js'
+import {
+  captionTextsOf,
+  dialogueLinesOf,
+  planCapacityPages,
+  resolveTemplateHint,
+  sceneSpeakers,
+} from './capacity.js'
+import {
+  captionBoxesNeeded,
+  captionSlotsOf,
+  groupCaptionLines,
+  withGeneratedCaptionSlots,
+} from './caption-slots.js'
 import { checkLowDpiConstraint, formatLowDpiWarning } from './constraints/low-dpi.js'
 import { splitScenes } from './page-split.js'
 import { assignSlots, BG_TONE_COLOR } from './slot-assign.js'
@@ -31,6 +44,7 @@ import type {
   ComposeResult,
   FabricLayer,
   LayoutFormat,
+  LayoutSlot,
   LayoutTemplate,
   PageDraft,
   PageFabricJson,
@@ -187,6 +201,68 @@ function assignmentToFabricLayer(
 }
 
 // ─────────────────────────────────────────────
+// 캡션(내레이션·지문) 레이어 (SCRIPT-KO-04)
+// ─────────────────────────────────────────────
+
+/** 캡션 본문 글자 크기 (pt) — 대사(14)보다 작게 둬 말풍선과 시각적으로 구분한다 */
+const CAPTION_FONT_SIZE = 12
+
+/**
+ * 캡션 박스 하나 → **줄당 하나씩**의 텍스트 레이어.
+ *
+ * 한 레이어에 개행을 넣지 않는 이유: PDF 렌더(pdf-lib `drawText`)는 `\n` 을 만나면
+ * 페이지 기본 lineHeight(24pt)로 줄을 내려 12pt 캡션이 박스를 넘긴다.
+ * 줄 위치를 여기서 직접 계산해 그 경로를 아예 쓰지 않는다.
+ */
+function captionLayersOf(
+  slot: LayoutSlot,
+  lines: readonly string[],
+  format: LayoutFormat,
+  makeLayerId: (lineIndex: number) => string,
+  sceneIndex?: number,
+): FabricLayer[] {
+  if (lines.length === 0) return []
+
+  const widthMm = slot.w * format.widthMm
+  const boxHeightMm = slot.h * format.heightMm
+  const lineHeightMm = boxHeightMm / lines.length
+
+  return lines.map((text, i) => ({
+    id: makeLayerId(i),
+    kind: 'text',
+    data: {
+      slotId: slot.id,
+      locked: false,
+      visible: true,
+      meta: {
+        kind: 'caption',
+        lineKind: 'caption',
+        text,
+        // 같은 박스에 묶인 줄들 — 편집기가 한 덩어리로 다룰 수 있게 슬롯 ID 와 순서를 남긴다
+        captionBoxSlotId: slot.id,
+        captionLineIndex: i,
+        sceneIndex,
+      },
+    },
+    fabric: {
+      type: 'textbox',
+      leftMm: slot.x * format.widthMm,
+      topMm: slot.y * format.heightMm + i * lineHeightMm,
+      widthMm,
+      heightMm: lineHeightMm,
+      scaleX: 1,
+      scaleY: 1,
+      angle: 0,
+      opacity: 1,
+      text,
+      fontSize: CAPTION_FONT_SIZE,
+      fill: '#000000',
+      zIndex: slot.zIndex,
+    },
+  }))
+}
+
+// ─────────────────────────────────────────────
 // PageGroup → PageFabricJson (Schema v1 호환)
 // ─────────────────────────────────────────────
 
@@ -248,13 +324,18 @@ async function buildPageFabricJson(
     matchTemplate(hint, preferredIds, firstScene ? sceneSpeakers(firstScene).length : 1, templates)
       .template
 
-  // 이 페이지가 실을 대사 수 → 말풍선 슬롯 보강 (LAYOUT-03)
-  const pageLineCount = sceneIndices.reduce((sum, idx) => {
+  // 이 페이지가 실을 라인 — 대사는 말풍선, 서술·지문은 캡션 박스로 (LAYOUT-03 · SCRIPT-KO-04)
+  const pageViewLines = sceneIndices.flatMap((idx) => {
     const scene = analyzed.scenes.find((s) => s.index === idx)
-    if (!scene) return sum
-    return sum + scenePageView(scene, rangeOf(idx)).lines.length
-  }, 0)
-  const template = withGeneratedBubbleSlots(baseTemplate, format, pageLineCount)
+    return scene ? scenePageView(scene, rangeOf(idx)).lines : []
+  })
+  // 보강 순서는 capacity.pageBudgetOf() 와 같아야 한다 — 말풍선이 먼저 자리를 잡고,
+  // 캡션은 남은 자리에 만들어진다. 순서가 어긋나면 계획한 수용량과 실제가 달라진다.
+  const template = withGeneratedCaptionSlots(
+    withGeneratedBubbleSlots(baseTemplate, format, dialogueLinesOf(pageViewLines).length),
+    format,
+    captionBoxesNeeded(captionTextsOf(pageViewLines)),
+  )
 
   const allWarnings: string[] = []
   const layers: FabricLayer[] = []
@@ -281,6 +362,21 @@ async function buildPageFabricJson(
           const assignment = assignments[ai]
           if (!assignment || usedSlotIds.has(assignment.slotId)) continue
           usedSlotIds.add(assignment.slotId)
+
+          // 캡션은 줄당 레이어 — 개행 한 덩어리로 내보내면 PDF 에서 박스를 넘친다
+          if (assignment.kind === 'caption') {
+            layers.push(
+              ...captionLayersOf(
+                assignment.slot,
+                assignment.captionLines ?? [],
+                format,
+                (li) => makeId(seed, pageIndex * 100 + ai, `${assignment.slot.id}-${li}`),
+                sceneIdx,
+              ),
+            )
+            continue
+          }
+
           const layer = assignmentToFabricLayer(
             assignment,
             format,
@@ -424,16 +520,26 @@ async function buildPageFabricJson(
     // ── 말풍선: 페이지 전체 대사를 4항 비용함수로 배치 (LAYOUT-03) ──────────
     // 종전에는 첫 장면 대사만 슬롯 순서대로 꽂아 나머지 컷의 대사가 통째로 사라졌다.
     const pageLines: Array<{ sceneIndex: number; text: string; speaker?: string | null }> = []
+    const captionEntries: Array<{ sceneIndex: number; text: string }> = []
     for (const sceneIdx of sceneIndices) {
       const scene = analyzed.scenes.find((s) => s.index === sceneIdx)
       if (!scene) continue
       for (const line of scenePageView(scene, rangeOf(sceneIdx)).lines) {
+        // 서술·지문은 말풍선이 아니라 캡션 박스로 (SCRIPT-KO-04)
+        if (isCaptionLine(line)) {
+          captionEntries.push({ sceneIndex: sceneIdx, text: line.text })
+          continue
+        }
         pageLines.push({ sceneIndex: sceneIdx, text: line.text, speaker: line.speaker })
       }
     }
 
     const bubbleSlots = template.slots
-      .filter((s) => s.allowedKinds.includes('bubble') || s.allowedKinds.includes('text'))
+      .filter(
+        (s) =>
+          (s.allowedKinds.includes('bubble') || s.allowedKinds.includes('text')) &&
+          !s.allowedKinds.includes('caption'),
+      )
       .sort((a, b) => a.y - b.y || a.x - b.x)
 
     const { slotIndexByLine } = assignBubblesByCost({
@@ -479,6 +585,30 @@ async function buildPageFabricJson(
           zIndex: bubbleSlot.zIndex,
         },
       })
+    }
+
+    // ── 캡션(내레이션·지문) 박스 — 페이지 전체 서술을 순서대로 묶어 배치 ─────────
+    const captionSlots = captionSlotsOf(template).sort((a, b) => a.y - b.y || a.x - b.x)
+    const captionBoxes = groupCaptionLines(captionEntries.map((e) => e.text))
+    let captionCursor = 0
+
+    for (let bi = 0; bi < captionSlots.length && bi < captionBoxes.length; bi++) {
+      const captionSlot = captionSlots[bi]
+      const box = captionBoxes[bi]
+      if (!captionSlot || !box || usedSlotIds.has(captionSlot.id)) continue
+      const firstEntry = captionEntries[captionCursor]
+      captionCursor += box.length
+      usedSlotIds.add(captionSlot.id)
+
+      layers.push(
+        ...captionLayersOf(
+          captionSlot,
+          box,
+          format,
+          (li) => makeId(seed, pageIndex * 100 + bi + 80, `${captionSlot.id}-${li}`),
+          firstEntry?.sceneIndex,
+        ),
+      )
     }
   }
 
