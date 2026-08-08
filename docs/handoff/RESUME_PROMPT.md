@@ -1,4 +1,4 @@
-# 새 세션 시작 프롬프트 (2026-08-08 v2 갱신 — LAYOUT-05 반영)
+# 새 세션 시작 프롬프트 (2026-08-08 v3 갱신 — MODE-01 반영)
 
 > 새 Claude Code 세션을 열 때 **"🚀 프롬프트" 섹션부터 끝까지 그대로 복사 붙여넣기** 하세요.
 > 이 파일은 세션 마무리 때마다 갱신됩니다 — 상단 날짜로 최신 여부 확인.
@@ -22,10 +22,13 @@
    - `docs/architecture/roadmap.md` — 작업 큐 (SW-BIZ (A) · MODE 섹션이 최신)
 3. `git log --oneline -10` + `git status -sb` — 내가 만들지 않은 변경은 사용자 작업으로 보존
 
-### ✅ 현재 상태 (main `dedd945` 기준)
+### ✅ 현재 상태 (main `8cdbdeb`+ 기준)
 
 - 워킹트리 clean · web/admin prod 라이브 · 전체 검증 79 태스크 green.
-  **`dedd945`(LAYOUT-05) CI 는 마감 시점 진행 중 — 시작 시 `gh run list --branch main --limit 1` 로 확인**
+  시작 시 `gh run list --branch main --limit 1` 로 최종 HEAD CI 확인
+- **MODE-01 스키마 완료(코드) — 🚦 prod 반영 대기**: `Project.mode`/`Format.unit` +
+  마이그레이션 `20260808100000` + 웹툰 px 프리셋 2종(isActive:false). 로컬 fresh DB 실측 green.
+  prod 적용은 아래 대표님 액션 2번(deploy 겸용)+5번(시드)
 - **자동배치**: 채택률 100% · 대사 보존 100% · 페이지 222(장면 217 = 1.02배). 리포트 4건 `docs/eval/`
 - **배치 품질**(LAYOUT-04 지표 + LAYOUT-05 개선) — 종합 **87.6%**. 구도 균형 61.5% ·
   지면 밀도 90.2% · 대사 밀도 86.5% · 시선 흐름 100% · 얼굴 가림 회피 **100%**.
@@ -42,13 +45,18 @@
 1. **AI_GATEWAY_API_KEY 등록** ← **파급 최대**. `.env.local` 3곳(루트·apps/web·apps/admin) +
    `cd apps/web && vercel env add AI_GATEWAY_API_KEY production`.
    등록 즉시 CONTI-01 · AI-ACT-03 · SCRIPT-KO-02 착수 가능
-2. **FOLLOWUP-68 이력 정리** — FK 는 이미 prod 존재라 deploy 단독 실행은 실패한다. 순서 고정:
+2. **FOLLOWUP-68 이력 정리 + MODE-01 deploy 겸용** — FK 는 이미 prod 존재라 deploy 단독 실행은
+   실패한다. 순서 고정 (이 명령의 `migrate deploy` 가 MODE-01 마이그레이션도 함께 적용):
    ```bash
    set -a; source .env.local; set +a; pnpm prisma migrate resolve --applied 20260629020000_reaction_user_fk && pnpm prisma migrate deploy && pnpm prisma migrate status
    ```
 3. **PERF-ADMIN-03 인증 저장** — `pnpm perf:admin:save-auth --env prod` (비번은 어시 취급 불가).
    저장 후 알리면 측정·P75 분석은 어시가
 4. **prod 한글 PDF 육안 확인** — 편집기에서 publish 1회
+5. **MODE-01 웹툰 프리셋 시드** — 2번 성공 후 1회 (isActive:false 라 사용자 노출 없음):
+   ```bash
+   set -a; source .env.local; set +a; pnpm tsx scripts/seed-formats.ts
+   ```
 
 > 어시스턴트는 prod DB 변경 CLI(권한 분류기 차단)·키 발급·비밀번호·결제를 수행할 수 없음.
 > **재확인 2026-08-07**: `.env.local` 3곳 모두 `AI_GATEWAY_API_KEY` 0건 · `tmp/perf/admin-auth.json`
@@ -56,9 +64,11 @@
 
 ### 🎯 다음 코드 큐 — 키 없이 바로 착수 가능
 
-- 🟢 **MODE-01~06** 웹툰/POD 모드 — [ADR-0017](../architecture/decisions.md) 결정 완료, 구현 대기.
-  MODE-01(스키마)은 🚦 마이그레이션이라 승인 필요. **웹툰은 수용량 초과가 페이지 분할이 아니라
-  스트립 연장** — 분할 전략 자체가 다르다. mm 와 px 를 한 타입에 섞지 말 것
+- 🟢 **MODE-02** 프로젝트 생성 모드 선택 UX + admin 판형 폼 px 지원 — MODE-01 스키마 완료.
+  웹툰 프리셋 isActive 활성화는 MODE-02 완성과 한 세트(반쪽 노출 금지)
+- 🟢 **MODE-03** ai-layout 웹툰 분기 — **웹툰은 수용량 초과가 페이지 분할이 아니라 스트립 연장**,
+  분할 전략 자체가 다르다. px 판형의 인쇄 경로(pdf-engine·preflight) 가드 포함.
+  mm 와 px 를 한 타입에 섞지 말 것(`Format.unit` 이 판별자)
 - 🟢 산문 서술 문장 단위 분할 — `parse-novel` 이 단락을 200자에서 자른다. 캡션이 여러 줄을 담게 된
   지금은 문장 단위가 더 맞다
 - ⏸ LAYOUT-06 배치 품질 잔여 축(균형 61.5 · 대사 밀도 86.5) — 수확 체감 구간.
@@ -118,6 +128,6 @@ breaking change push 는 보고 후
 
 ### 🎬 시작
 
-위 내용 검토 후: ① 대표님 액션 4건 진행 결과 ② 다음 작업 선택을 확인하고 진행해 주세요.
-**키 등록 전이면 MODE 트랙(웹툰/POD 모드)부터** — 단 MODE-01 스키마는 🚦 마이그레이션 승인 후.
+위 내용 검토 후: ① 대표님 액션 5건 진행 결과 ② 다음 작업 선택을 확인하고 진행해 주세요.
+**키 등록 전이면 MODE-02 부터** (MODE-01 스키마는 코드 완료, prod 반영만 대기).
 세션 종료 시 `docs/handoff/SESSION_HANDOFF_<날짜>.md` 신규 작성 + 이 파일 갱신을 잊지 말 것.

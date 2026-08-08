@@ -336,7 +336,13 @@
 > 계획한다. 웹툰은 수용량 초과가 **페이지 분할이 아니라 스트립 연장**이라 분할 전략 자체가 다르다.
 > mm 와 px 를 한 타입에 섞지 않는다 — 섞으면 인쇄 사고로 직결된다.
 
-- [ ] [MODE-01] `Project.mode('webtoon'|'pod')` + `Format.unit('mm'|'px')` 스키마 — 기존 Format 은 전부 `mm` 로 백필, 웹툰 프리셋(폭 690/800 · 세로 가변) 등록 — 🚦 마이그레이션 — @architect
+- [x] [MODE-01] `Project.mode('webtoon'|'pod')` + `Format.unit('mm'|'px')` 스키마 — @architect ✅ 2026-08-08 (`8cdbdeb`) · **🚦 prod deploy·seed 대기**.
+  · enum `ProjectMode`/`FormatUnit` + 컬럼 2개(NOT NULL DEFAULT — 기존 행 자동 백필: Project=pod, Format=mm). additive only
+  · 마이그레이션 `20260808100000_project_mode_format_unit` — 로컬 fresh DB(docker pg16) deploy 성공 + drift 0 실측
+  · 웹툰 px 프리셋 2종 시드(`preset-webtoon-690`/`-800`, 세그먼트 높이 1280·dpi 72·bleed/safe 0) — **isActive:false** 로 MODE-02 배선 전 편집기 노출 차단. `unit='px'` 면 widthMm/heightMm 는 픽셀값(컬럼명 레거시, 스키마 주석 명시)
+  · zod(`ProjectModeSchema`/`FormatUnitSchema`, default 로 기존 API 호환) + web `/api/formats` 에 unit 판별자
+  · **prod 반영은 대표님 액션**: FOLLOWUP-68 명령의 `migrate deploy` 가 이 마이그레이션도 함께 적용한다 + 시드 `pnpm tsx scripts/seed-formats.ts` 별도 1회
+  · admin 판형 폼 px 지원·모드 선택 UX 는 MODE-02, px 판형 인쇄 경로 가드는 MODE-03
 - [ ] [MODE-02] 프로젝트 생성 UX — 모드 선택 화면 + 모드별 판형 목록 필터. 기존 프로젝트는 `pod` 로 표시 — @ui-designer + @admin-builder
 - [ ] [MODE-03] `ai-layout` 웹툰 분기 — `capacity` 의 페이지 분할을 **스트립 연장**으로 대체(컷 간 여백·스크롤 리듬), safe/bleed 제약은 pod 모드에서만 적용 — @layout-composer
 - [ ] [MODE-04] `editor-core` 세로 무한 캔버스 — 뷰포트 가상화(200객체 60fps 예산 유지), 컷 경계 가이드 — @editor-engineer

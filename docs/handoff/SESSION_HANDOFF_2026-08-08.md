@@ -58,6 +58,16 @@ main `dedd945` = origin · 워킹트리 clean · 전체 검증 79 태스크 gree
   `unionArea`(밀도 합집합 정확화)
 - 리포트 [layout-quality-2026-08-08.md](../eval/layout-quality-2026-08-08.md)
 
+### ⑤ MODE-01 산출물 모드 스키마 (`8cdbdeb`) — 🚦 prod 반영 대기
+- `ProjectMode(pod|webtoon)` + `FormatUnit(mm|px)` enum, `Project.mode`/`Format.unit` 컬럼
+  (NOT NULL DEFAULT → 기존 행 자동 백필). additive only
+- 마이그레이션 `20260808100000_project_mode_format_unit` — **로컬 fresh DB(docker pg16)에서
+  deploy 성공 + drift 0 + 시드 6종 실측 완료**. prod 적용은 대표님 액션(§3)
+- 웹툰 px 프리셋 2종(`preset-webtoon-690`/`-800`) — **isActive:false** 라 MODE-02 배선 전
+  편집기에 노출되지 않는다. `unit='px'` 면 widthMm/heightMm 는 픽셀값(컬럼명 레거시)
+- 프로젝트 생성 2개소는 mode 미지정 → DB DEFAULT pod. admin px 폼은 MODE-02,
+  px 인쇄 경로 가드는 MODE-03
+
 ## 2. 검증
 
 - `pnpm turbo run typecheck lint test --concurrency=1` — **79 태스크 green**(각 커밋마다 실행)
@@ -72,18 +82,23 @@ main `dedd945` = origin · 워킹트리 clean · 전체 검증 79 태스크 gree
 | # | 항목 | 실측 근거 | 실행 |
 |---|---|---|---|
 | 1 | AI_GATEWAY_API_KEY 등록 | `.env.local` 3곳 0건 | `cd apps/web && vercel env add AI_GATEWAY_API_KEY production` + `.env.local` 3곳 |
-| 2 | FOLLOWUP-68 이력 정리 | migrate 3건 미기록 | `set -a; source .env.local; set +a; pnpm prisma migrate resolve --applied 20260629020000_reaction_user_fk && pnpm prisma migrate deploy && pnpm prisma migrate status` |
+| 2 | FOLLOWUP-68 이력 정리 **+ MODE-01 deploy 겸용** | migrate 3건 미기록 | `set -a; source .env.local; set +a; pnpm prisma migrate resolve --applied 20260629020000_reaction_user_fk && pnpm prisma migrate deploy && pnpm prisma migrate status` |
 | 3 | PERF-ADMIN-03 인증 저장 | `tmp/perf/admin-auth.json` 부재 | `pnpm perf:admin:save-auth --env prod` |
 | 4 | prod 한글 PDF 육안 확인 | 배선은 배포 완료, 실 publish 미수행 | 편집기에서 publish 1회 |
+| 5 | **MODE-01 웹툰 프리셋 시드** (2번 deploy 후) | 신규 — prod 미반영 | `set -a; source .env.local; set +a; pnpm tsx scripts/seed-formats.ts` |
+
+> **2번 명령의 `migrate deploy` 가 MODE-01 마이그레이션(`20260808100000`)도 함께 적용한다** —
+> 별도 실행 불요. 5번(시드)은 2번 성공 후 1회. 웹툰 프리셋은 isActive:false 라 사용자 노출 없음.
 
 대표님이 4건 모두 진행 의사를 밝혔다(2026-08-07). **1번(키) 등록 즉시 CONTI-01 → AI-ACT-03 →
 SCRIPT-KO-02 착수 가능** — 파급이 가장 크다. 3번은 저장 후 알려주시면 측정·P75 분석은 어시가.
 
 ## 4. 다음 코드 큐
 
-- 🟢 **MODE-01~06** 웹툰/POD 모드 — ADR-0017 결정 완료, 구현 대기. MODE-01(스키마)은 🚦 마이그레이션.
-  **LAYOUT-06(품질 잔여 축)은 수확 체감 구간이라 실사용 로그(FOLLOWUP-60) 이후 재개** — 다음
-  세션은 MODE 트랙이 우선
+- 🟢 **MODE-02** 프로젝트 생성 모드 선택 UX + admin 판형 폼 px 지원 — MODE-01 스키마 완료로
+  착수 가능(키 불요). 웹툰 프리셋 isActive 활성화는 MODE-02 완성과 한 세트
+- 🟢 **MODE-03** ai-layout 웹툰 분기(스트립 연장) + px 판형 인쇄 경로 가드
+- ⏸ LAYOUT-06 — 실사용 로그(FOLLOWUP-60) 이후 재개
 - 🟢 산문 서술 문장 단위 분할 — `parse-novel` 이 단락을 200자에서 자른다. 캡션이 여러 줄을 담게 된
   지금은 문장 단위가 더 맞다(SCRIPT-KO-04 리포트 §5)
 - 🚦 키 등록 시: **CONTI-01** → **AI-ACT-03** → **SCRIPT-KO-02**
@@ -113,5 +128,6 @@ SCRIPT-KO-02 착수 가능** — 파급이 가장 크다. 3번은 저장 후 알
 - ★ **연속 push 하면 앞선 CI run 이 `cancelled` 로 남는다** — 워크플로 `concurrency` 가
   `cancel-in-progress: true`. 실패가 아니므로 **최종 HEAD 의 run 만** 확인하면 된다
 
-_갱신: 2026-08-08 · SCRIPT-KO-04 · 제품 결정 3건(ADR-0017/0018/0019) · LAYOUT-04 · LAYOUT-05 완료.
-다음 착수 후보 = MODE-01~06(ADR-0017, MODE-01 은 🚦 마이그레이션) 또는 키 등록 시 CONTI-01._
+_갱신: 2026-08-08 · SCRIPT-KO-04 · 제품 결정 3건(ADR-0017/0018/0019) · LAYOUT-04 · LAYOUT-05 ·
+MODE-01(코드 완료, prod 반영은 대표님 액션 2+5번) 완료.
+다음 착수 후보 = MODE-02(키 불요) 또는 키 등록 시 CONTI-01._
