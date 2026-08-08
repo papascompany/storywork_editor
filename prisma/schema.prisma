@@ -64,6 +64,20 @@ enum ProjectStatus {
   archived
 }
 
+/// 산출물 모드 (ADR-0017) — 프로젝트 생성 시 선택. 편집 코어·AI 파이프라인은 공유하고
+/// 판형·지면 단위·출력만 갈라진다 (pod=POD PDF, webtoon=세로 스트립)
+enum ProjectMode {
+  pod
+  webtoon
+}
+
+/// 판형 단위계 (ADR-0017) — mm=인쇄(POD), px=화면(웹툰).
+/// 한 판형은 정확히 하나의 단위계만 갖는다 — 섞으면 인쇄 사고로 직결된다.
+enum FormatUnit {
+  mm
+  px
+}
+
 enum JobStatus {
   queued
   running
@@ -171,6 +185,11 @@ model Subscription {
 model Format {
   id            String     @id @default(cuid())
   name          String     @unique
+  /// 단위계 (ADR-0017 / MODE-01). 기존 판형은 전부 mm 로 백필.
+  /// unit='px' 이면 widthMm/heightMm 는 **픽셀값**이다(컬럼명은 mm 시절 레거시) —
+  /// heightMm 는 스트립 세그먼트 기본 높이이며 실제 세로 길이는 가변(MODE-03 소비).
+  /// px 판형은 인쇄 경로(pdf-engine·preflight)에 들어가면 안 된다 — MODE-03 에서 가드.
+  unit          FormatUnit @default(mm)
   widthMm       Float
   heightMm      Float
   dpi           Int        @default(300)
@@ -319,6 +338,9 @@ model Project {
   formatId  String
   format    Format        @relation(fields: [formatId], references: [id])
   title     String
+  /// 산출물 모드 (ADR-0017 / MODE-01). 기존 프로젝트는 전부 pod 로 백필.
+  /// 모드는 생성 시 확정 — 판형 단위계(Format.unit)와 정합해야 한다(pod=mm, webtoon=px)
+  mode      ProjectMode   @default(pod)
   status    ProjectStatus @default(drafting)
   settings  Json          @default("{}")
   createdAt DateTime      @default(now())

@@ -33,6 +33,36 @@ const FORMAT_SEEDS = [
     safeMm: 5,
     gridDef: null,
   },
+  // ── 웹툰 px 판형 (ADR-0017 / MODE-01) ──────────────────────────────────────
+  // unit='px' 이므로 widthMm/heightMm 는 픽셀값이다(컬럼명은 레거시).
+  // heightMm = 스트립 세그먼트 기본 높이(실제 세로 길이는 가변, MODE-03 소비).
+  // dpi 는 화면 기준 72, bleed/safe 는 인쇄 개념이라 0.
+  // **isActive: false** — 모드 선택 UX(MODE-02)와 배치 분기(MODE-03)가 배선되기 전에
+  // 편집기 판형 목록(/api/formats 는 isActive=true 만 노출)에 나타나면 안 된다.
+  {
+    id: 'preset-webtoon-690',
+    name: '웹툰 표준 690px',
+    unit: 'px' as const,
+    widthMm: 690,
+    heightMm: 1280,
+    dpi: 72,
+    bleedMm: 0,
+    safeMm: 0,
+    gridDef: null,
+    isActive: false,
+  },
+  {
+    id: 'preset-webtoon-800',
+    name: '웹툰 와이드 800px',
+    unit: 'px' as const,
+    widthMm: 800,
+    heightMm: 1280,
+    dpi: 72,
+    bleedMm: 0,
+    safeMm: 0,
+    gridDef: null,
+    isActive: false,
+  },
   {
     id: 'preset-a5-artbook',
     name: 'A5 작품집',
@@ -81,11 +111,15 @@ async function main(): Promise<void> {
       create: {
         id: seed.id,
         name: seed.name,
+        // unit 미지정 시 DB DEFAULT 'mm' (MODE-01)
+        ...('unit' in seed ? { unit: seed.unit } : {}),
         widthMm: seed.widthMm,
         heightMm: seed.heightMm,
         dpi: seed.dpi,
         bleedMm: seed.bleedMm,
         safeMm: seed.safeMm,
+        // 웹툰 px 판형은 MODE-02 배선 전까지 비활성(편집기 목록 숨김)
+        ...('isActive' in seed ? { isActive: seed.isActive } : {}),
         // gridDef 는 모든 시드가 null → 생략(=DB NULL). Prisma Json? 는 JS null 직접 대입 불가.
       },
     })

@@ -1,7 +1,9 @@
 import { z } from 'zod'
 
+import { FormatUnitSchema } from './enums.js'
+
 // ─────────────────────────────────────────────
-// Format — 인쇄 판형
+// Format — 판형 (mm=인쇄 / px=웹툰, ADR-0017)
 // ─────────────────────────────────────────────
 
 export const GridDefSchema = z.record(z.string(), z.unknown()).nullable().optional()
@@ -10,6 +12,9 @@ export type GridDef = z.infer<typeof GridDefSchema>
 export const FormatSchema = z.object({
   id: z.string().cuid(),
   name: z.string().min(1).max(100),
+  /// 단위계 (MODE-01). unit='px' 이면 widthMm/heightMm 는 픽셀값(필드명은 레거시) —
+  /// heightMm 는 스트립 세그먼트 기본 높이. px 판형은 인쇄 경로에 들어가면 안 된다
+  unit: FormatUnitSchema.default('mm'),
   widthMm: z.number().positive(),
   heightMm: z.number().positive(),
   dpi: z.number().int().min(72).max(1200).default(300),

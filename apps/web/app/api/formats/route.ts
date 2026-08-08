@@ -21,6 +21,9 @@ export async function GET(): Promise<NextResponse> {
       select: {
         id: true,
         name: true,
+        // 단위계 판별자 (MODE-01) — px 판형은 isActive=false 라 아직 안 나오지만,
+        // MODE-02 활성화 시 클라이언트가 mm/px 를 구분할 수 있어야 한다
+        unit: true,
         widthMm: true,
         heightMm: true,
         dpi: true,

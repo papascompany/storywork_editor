@@ -37,6 +37,14 @@ export const ProjectStatusSchema = z.enum([
 ])
 export type ProjectStatus = z.infer<typeof ProjectStatusSchema>
 
+/// 산출물 모드 (ADR-0017 / MODE-01) — pod=인쇄 PDF, webtoon=세로 스트립
+export const ProjectModeSchema = z.enum(['pod', 'webtoon'])
+export type ProjectMode = z.infer<typeof ProjectModeSchema>
+
+/// 판형 단위계 (ADR-0017 / MODE-01) — mm=인쇄, px=화면. 한 판형은 하나의 단위계만
+export const FormatUnitSchema = z.enum(['mm', 'px'])
+export type FormatUnit = z.infer<typeof FormatUnitSchema>
+
 export const JobStatusSchema = z.enum(['queued', 'running', 'succeeded', 'failed'])
 export type JobStatus = z.infer<typeof JobStatusSchema>
 
