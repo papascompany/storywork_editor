@@ -1,0 +1,68 @@
+{
+  "v": 1,
+  "format": {
+    "id": "preset-webtoon-690",
+    "unit": "px",
+    "widthMm": 690,
+    "heightMm": 1280,
+    "dpi": 72
+  },
+  "layers": [
+    {
+      "id": "seg-bg",
+      "kind": "bg",
+      "data": { "slotId": "bg", "locked": false, "visible": true },
+      "fabric": {
+        "type": "rect",
+        "leftMm": 0,
+        "topMm": 0,
+        "widthMm": 690,
+        "heightMm": 1280,
+        "scaleX": 1,
+        "scaleY": 1,
+        "fill": "#FFF8F0"
+      }
+    },
+    {
+      "id": "seg-pose",
+      "kind": "pose",
+      "data": {
+        "resourceId": "pose-001",
+        "slotId": "pose-center",
+        "locked": false,
+        "visible": true,
+        "meta": { "kind": "pose", "characterName": "주인공" }
+      },
+      "fabric": {
+        "type": "rect",
+        "leftMm": 103.5,
+        "topMm": 153.6,
+        "widthMm": 483,
+        "heightMm": 819.2,
+        "scaleX": 1,
+        "scaleY": 1,
+        "fill": "transparent"
+      }
+    },
+    {
+      "id": "seg-bubble",
+      "kind": "bubble",
+      "data": {
+        "slotId": "gen-bubble-1",
+        "locked": false,
+        "visible": true,
+        "meta": { "text": "여기서부터 스크롤이야.", "lineIndex": 0 }
+      },
+      "fabric": {
+        "type": "rect",
+        "leftMm": 27.6,
+        "topMm": 998.4,
+        "widthMm": 303.6,
+        "heightMm": 192,
+        "scaleX": 1,
+        "scaleY": 1,
+        "fill": "#FFFFFF"
+      }
+    }
+  ]
+}

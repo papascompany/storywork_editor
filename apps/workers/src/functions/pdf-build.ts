@@ -116,6 +116,15 @@ export const pdfBuildJob = inngest.createFunction(
             `[pdf-build] 소유권 불일치: project.ownerId=${result.ownerId}, ownerId=${ownerId}`,
           )
         }
+        // px(웹툰) 판형 최후 방어선 (MODE-04) — pdf-engine 은 mm 좌표 전용이다.
+        // 라우트 가드를 우회해 큐에 들어온 잡(직접 이벤트 전송·과거 큐 잔여)을 여기서 끊는다.
+        // 재시도해도 결과가 같으므로 즉시 실패시킨다.
+        const formatUnit = (result.format as { unit?: string } | null)?.unit
+        if (formatUnit !== undefined && formatUnit !== 'mm') {
+          throw new Error(
+            `[pdf-build] 웹툰(px) 판형은 PDF 대상이 아닙니다 (formatId=${result.formatId}, unit=${formatUnit}).`,
+          )
+        }
         return result
       } finally {
         await prisma.$disconnect()

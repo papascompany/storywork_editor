@@ -55,6 +55,15 @@ export const LayerJsonSchema: z.ZodType<LayerJson> = LayerJsonSchemaBase.extend(
 
 export const PageFormatSchema = z.object({
   id: z.string().min(1),
+  /**
+   * 단위계 (MODE-04 / ADR-0017) — 생략은 'mm'(v1 기존 저장본 하위호환).
+   * 'px'(웹툰)이면 아래 `widthMm/heightMm` 와 레이어의 `leftMm/topMm/…` 는 **픽셀값**이다
+   * (필드명은 v1 레거시, 판별자는 이 `unit`).
+   *
+   * `.default('mm')` 를 쓰면 출력 타입이 required 가 되어 unit 없는 Format 을 넘기는
+   * 기존 호출부가 컴파일 에러를 낸다 — 반드시 `.optional()`.
+   */
+  unit: z.enum(['mm', 'px']).optional(),
   widthMm: z.number().positive(),
   heightMm: z.number().positive(),
   dpi: z.number().int().min(72).max(1200),

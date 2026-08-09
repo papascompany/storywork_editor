@@ -10,7 +10,7 @@ React/DOM 에 의존하지 않는 **헤드리스** 캔버스 코어로, 브라�
 import { StoryCanvas } from '@storywork/editor-core'
 import { Rect } from 'fabric'
 
-// 판형 정의 (mm 단위)
+// 판형 정의 — 단위계는 unit 이 결정한다 (생략 = 'mm')
 const format = { id: 'b5', widthMm: 182, heightMm: 257, dpi: 150 }
 
 // 인스턴스 생성 (container 없으면 헤드리스)
@@ -79,12 +79,25 @@ canvas.on('render:after', () => {})
 
 ## 좌표 계약
 
-모든 외부 API 는 **mm 단위** 를 사용한다. 픽셀 변환은 내부 어댑터에서만 처리한다.
+외부 API 는 **판형의 단위** 로 좌표를 주고받는다. 픽셀 변환은 내부 어댑터에서만 처리한다.
+단위계는 `Format.unit` 이 결정하며 **생략하면 `'mm'`**(기존 동작).
 
 ```ts
+// mm 판형 (POD 인쇄) — dpi 로 환산
 canvas.mmToPx(25.4) // → 150 (at 150dpi)
 canvas.pxToMm(150) // → 25.4
+
+// px 판형 (웹툰, ADR-0017) — 좌표가 이미 픽셀이라 1:1
+const webtoon = { id: 'w690', unit: 'px' as const, widthMm: 690, heightMm: 1280, dpi: 72 }
+new StoryCanvas({ format: webtoon }).mmToPx(690) // → 690
 ```
+
+> `unit='px'` 이면 `widthMm/heightMm` 와 저장본의 `leftMm/topMm/…` 는 **픽셀값**이다
+> (필드명은 v1 스키마 레거시, 판별자는 `unit`). `heightMm` 는 스트립 세그먼트 하나의
+> 높이이며 세로 길이는 세그먼트 수로 늘어난다.
+>
+> **판형의 `dpi` 를 좌표 변환에 직접 쓰지 말 것** — 항상 `coordDpi(format)` 을 거친다.
+> 직접 쓰면 690px 웹툰 판형이 690mm(=1956px @72dpi)로 해석돼 캔버스가 2.8배로 튄다.
 
 ## ObjectData 계약
 

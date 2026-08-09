@@ -1,13 +1,13 @@
 # 세션 핸드오프 — 2026-08-08~09 (작업 08-07 밤 ~ 08-09 새벽)
 
 > 이전: [SESSION_HANDOFF_2026-08-05.md](SESSION_HANDOFF_2026-08-05.md)
-> 이 세션 = **SCRIPT-KO-04 + 제품 결정 3건 + LAYOUT-04/05 + MODE-01/02/03** 완료.
+> 이 세션 = **SCRIPT-KO-04 + 제품 결정 3건 + LAYOUT-04/05 + MODE-01/02/03 + MODE-04a** 완료.
 > 도중 모델 전환(Opus 5 → Fable 5, LAYOUT-05 착수 직전) — 체크포인트 대조 후 이어감.
 > **08-09 새벽 prod 장애 발생·복구**(§1-⑥ · §5 함정 노트 필독).
 
 ## 0. 한 줄 상태
 
-MODE-03 까지 완료 · **prod 마이그레이션 적용 완료**(대표님 실행, FOLLOWUP-68 이력 정리 겸용 —
+MODE-04a 까지 완료 · **prod 마이그레이션 적용 완료**(대표님 실행, FOLLOWUP-68 이력 정리 겸용 —
 액션 2번 해소) · 잔여 대표님 액션 = 키 등록(1) · PERF 인증(3) · PDF 육안(4) ·
 **웹툰 시드 재실행(5 — git pull 후, 1차 실행이 구버전 워킹카피로 추정돼 미반영)**.
 
@@ -94,16 +94,29 @@ MODE-03 까지 완료 · **prod 마이그레이션 적용 완료**(대표님 실
 - **시드 미반영 발견**: 대표님이 시드 실행했다고 했으나 prod 에 px 프리셋 0행·판형 4종
   그대로 — **구버전 워킹카피(git pull 전)에서 실행된 것으로 추정. git pull 후 재실행 필요**
 
+### ⑧ MODE-04a editor-core 단위계(px) + 인쇄 가드 봉쇄 (08-09)
+- **다각도 정찰 워크플로**(8 에이전트·4축 정찰 + 설계 3안 판정)로 착수. 판정: 단일 롱 캔버스
+  **기각**(fabric `calcViewportBoundaries()` 가 엘리먼트 크기 기준 → 오프스크린 컬링 무효,
+  dpr=2·7세그먼트에서 Safari 16384px 상한, BUG-013 iOS 방어 계약 위반) → 세그먼트 스택은 04b
+- `Format.unit` 정본화: editor-core → **shared-schema PageFormatSchema** → 직렬화 → ai-layout
+  산출물. schema 누락 시 zod 가 조용히 strip 하는 함정을 골든 라운드트립으로 고정
+- **좌표용 dpi 치환**(`coordDpi`): px 판형에 25.4 를 돌려줘 항등 변환. `mmToPx/pxToMm` 시그니처와
+  60여 호출처 무수정, mm 산식 동결 → editor-export 골든 PNG 43 통과(무회귀 증거)
+- 가드 구멍 3개 봉쇄: publish async 우회 · PDF 워커 무검사 · compose 라우트 unit 미select
+- 캔버스 상한 클램프(16384px, dpr 반영) · loadJson 단위계 불일치 경고
+
 ## 2. 검증
 
 - `pnpm turbo run typecheck lint test --concurrency=1` — **79 태스크 green**(각 커밋마다 실행)
+- MODE-04a: 신규 23 tests(coords-unit 11 · 웹툰 라운드트립 3 · 기타) · editor-core 91 ·
+  editor-export 골든 PNG 43(mm 무회귀 증거) · ai-layout 257
 - ai-script 116 · ai-layout **248**(신규 74: caption-slots 18 · quality 22 · layout05 12 · 회귀 가드 5 · 기타)
 - CI: `ebc23c6` green(31190889786) · `ae273a1` green(31187489500). **`dedd945`(LAYOUT-05)는
   push 직후 진행 중 — 다음 세션 시작 시 최종 HEAD run 확인.** 중간 run 이 `cancelled` 면
   실패가 아니라 워크플로 concurrency(`cancel-in-progress`)가 다음 push 로 대체한 것
 - `pnpm adoption:measure` — 채택률 100% · 대사 보존 100% · 페이지 222 · **품질 종합 87.6%**
 
-## 3. 🔴 대표님 액션 — 4건 전부 미실행 (이번 세션 실측 재확인)
+## 3. 🔴 대표님 액션 — 잔여 4건(1·3·4·5)
 
 | # | 항목 | 상태 | 실행 |
 |---|---|---|---|
@@ -120,9 +133,9 @@ SCRIPT-KO-02 착수 가능** — 파급이 가장 크다. 3번은 저장 후 알
 
 ## 4. 다음 코드 큐
 
-- 🟢 **MODE-04** editor-core 세로 무한 캔버스 + px 단위 지원 — 웹툰 모드 개방의 마지막 관문.
-  편집기 mm→px 변환(unit=px 면 1:1)부터. MODE-05(이미지 export)와 함께 완성되면
-  모달 "준비 중" 해제 + 프리셋 isActive + full-pipeline 가드 해제가 한 세트
+- 🟢 **MODE-04b** 웹툰 세로 스트립 편집 UI — 세그먼트별 캔버스 세로 스택 + 가상화.
+  단일 롱 캔버스는 기각(근거 roadmap). 선행: `usePageStore.updatePageJson(index, json)` 신설
+- 🟢 **MODE-04c** 웹툰 개방 정합 — `save` px 허용 전에 `Project.mode` 저장 배선 필수
 - ⏸ LAYOUT-06 — 실사용 로그(FOLLOWUP-60) 이후 재개
 - 🟢 산문 서술 문장 단위 분할 — `parse-novel` 이 단락을 200자에서 자른다. 캡션이 여러 줄을 담게 된
   지금은 문장 단위가 더 맞다(SCRIPT-KO-04 리포트 §5)
@@ -130,6 +143,17 @@ SCRIPT-KO-02 착수 가능** — 파급이 가장 크다. 3번은 저장 후 알
 - 🚦 기타 게이트(불변): onnxruntime-node(BUBBLE-02) · Upstash(SEC-RATE-01) · POSE3D-01 결제
 
 ## 5. 환경/함정 노트 (누적 — 신규 ★)
+
+- ★★ **판형의 `dpi` 를 좌표 변환에 직접 쓰지 말 것 — 항상 `coordDpi(format)`.** 직접 쓰면
+  690px 웹툰 판형이 690mm(=1956px @72dpi)로 해석돼 캔버스가 2.8배로 튄다. 같은 이유로
+  `Format.unit` 은 타입·**zod 스키마**·직렬화·ai-layout 산출물 **전 구간**에 흘려야 한다 —
+  한 곳만 빠져도(특히 `PageFormatSchema`) zod 가 strip 해 저장본에서 조용히 사라진다
+- ★ **서버 가드는 "가장 먼저 return 하는 분기"보다 앞에 둘 것** — publish 라우트의 px 가드가
+  동기 경로에만 있어 `{async:true}` 요청이 워커로 새고 있었다(MODE-04a 에서 봉쇄).
+  가드 추가 시 그 라우트의 **모든 조기 return 경로**를 확인할 것
+- ★ **fabric 캔버스를 크게 만들면 오프스크린 컬링이 죽는다** — `calcViewportBoundaries()` 가
+  캔버스 **엘리먼트** 크기를 vpt 역변환해 쓰므로, 엘리먼트가 콘텐츠 전체면 컬링이 한 번도
+  발동하지 않는다. 현재 "fabric 내부 크기 = 뷰포트" 구조가 공짜로 주는 이득이다(BUG-013 방어와 한 세트)
 
 - ★★ **스키마 컬럼 추가는 "DB 먼저, 코드 나중" — push = prod 자동배포인 이 레포에서
   마이그레이션 미적용 상태로 스키마 커밋을 push 하면 prod 가 죽는다.** Prisma 는 select

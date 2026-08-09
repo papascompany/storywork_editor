@@ -226,6 +226,8 @@ export function FormatPickerModal({
     if (!selectedPreset) return
     const format: PageFormat = {
       name: selectedPreset.name,
+      // 단위계를 편집기까지 전달 — px 판형이면 캔버스가 1:1 로 잡힌다 (MODE-04)
+      unit: selectedPreset.unit,
       widthMm: selectedPreset.widthMm,
       heightMm: selectedPreset.heightMm,
       dpi: selectedPreset.dpi,

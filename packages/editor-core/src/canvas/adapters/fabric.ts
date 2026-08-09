@@ -12,7 +12,7 @@ import { Canvas, Object as FabricObjectClass } from 'fabric'
 
 import type { Format } from '../../types.js'
 import { isCoarsePointer } from '../../utils/coarse.js'
-import { formatToPxSize } from '../coords.js'
+import { clampCanvasPx, formatPxSize } from '../coords.js'
 
 import { createHeadlessCanvas } from './headless.js'
 
@@ -47,13 +47,20 @@ function applyFabricGlobalDefaults(coarse: boolean): void {
  * - container 가 없으면 헤드리스 모드 (Node/jsdom)
  */
 export function createFabricCanvas(opts: FabricAdapterOptions): Canvas {
-  const { width, height } = formatToPxSize(
-    opts.format.widthMm,
-    opts.format.heightMm,
-    opts.format.dpi,
-  )
-
   const coarse = isCoarsePointer()
+
+  // 단위계 자동 처리 — px(웹툰) 판형은 1:1 (MODE-04)
+  const raw = formatPxSize(opts.format)
+  // 브라우저 canvas 상한 방어 — 넘으면 예외 없이 빈 캔버스가 된다.
+  // enableRetinaScaling 이 켜진 데스크톱은 백스토어가 dpr 배라 한계가 절반이다.
+  const dpr = coarse || typeof window === 'undefined' ? 1 : (window.devicePixelRatio ?? 1)
+  const { width, height, clamped } = clampCanvasPx(raw.width, raw.height, dpr)
+  if (clamped) {
+    console.warn(
+      `[editor-core] 캔버스 크기 ${raw.width}×${raw.height}px 가 브라우저 상한을 넘어 ` +
+        `${width}×${height}px 로 축소했습니다 (dpr=${dpr}).`,
+    )
+  }
   applyFabricGlobalDefaults(coarse)
 
   let canvas: Canvas
@@ -105,7 +112,13 @@ export function createFabricCanvas(opts: FabricAdapterOptions): Canvas {
  * format 변경 시 캔버스 크기를 재계산한다.
  */
 export function resizeCanvas(canvas: Canvas, format: Format): void {
-  const { width, height } = formatToPxSize(format.widthMm, format.heightMm, format.dpi)
+  const raw = formatPxSize(format)
+  const { width, height, clamped } = clampCanvasPx(raw.width, raw.height)
+  if (clamped) {
+    console.warn(
+      `[editor-core] resizeCanvas: ${raw.width}×${raw.height}px → ${width}×${height}px 로 축소(상한 방어).`,
+    )
+  }
   canvas.setWidth(width)
   canvas.setHeight(height)
 }

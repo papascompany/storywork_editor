@@ -9,7 +9,7 @@ import { serializeToJson } from '../serialize/toJson.js'
 import type { EditorEvent, EventMap, Format, ObjectData, Unsubscribe } from '../types.js'
 
 import { createFabricCanvas, resizeCanvas } from './adapters/fabric.js'
-import { mmToPx, pxToMm } from './coords.js'
+import { coordDpi, mmToPx, pxToMm } from './coords.js'
 
 export type StoryCanvasOptions = {
   format: Format
@@ -161,7 +161,20 @@ export class StoryCanvas {
     this._fabric.clear()
     this._objectMap.clear()
 
-    const { objects } = await deserializeFromJson(json, this._format.dpi)
+    // 좌표 역변환 기준은 **캔버스 판형**이다(기존 계약 유지 — 저장본 dpi 를 따르지 않는다).
+    // 그래서 저장본과 캔버스의 단위계가 다르면 좌표가 조용히 스케일된다:
+    // px 저장본(690)을 mm 캔버스(300dpi)에 얹으면 8149px 로 튄다. 호출자 오류이므로
+    // 삼키지 말고 드러낸다 — 웹툰(px)/POD(mm) 혼선의 유일한 조기 신호다 (MODE-04).
+    const jsonUnit = json.format?.unit ?? 'mm'
+    const canvasUnit = this._format.unit ?? 'mm'
+    if (jsonUnit !== canvasUnit) {
+      console.warn(
+        `[editor-core] loadJson: 판형 단위계 불일치 (저장본=${jsonUnit}, 캔버스=${canvasUnit}). ` +
+          `좌표는 캔버스 기준으로 역변환되어 위치가 어긋납니다. setFormat 을 먼저 맞추세요.`,
+      )
+    }
+
+    const { objects } = await deserializeFromJson(json, coordDpi(this._format))
     // H2: 이미지 로드 등 비동기 완료 후 dispose 됐을 경우 silent return
     if (this._disposed) return
 
@@ -175,7 +188,7 @@ export class StoryCanvas {
    * 현재 캔버스 상태를 PageJsonV1 으로 직렬화한다.
    */
   toJson(): PageJsonV1 {
-    return serializeToJson(this._fabric, this._format, this._format.dpi)
+    return serializeToJson(this._fabric, this._format, coordDpi(this._format))
   }
 
   // ─────────────────────────────────────────────
@@ -231,11 +244,11 @@ export class StoryCanvas {
   // ─────────────────────────────────────────────
 
   mmToPx(mm: number): number {
-    return mmToPx(mm, this._format.dpi)
+    return mmToPx(mm, coordDpi(this._format))
   }
 
   pxToMm(px: number): number {
-    return pxToMm(px, this._format.dpi)
+    return pxToMm(px, coordDpi(this._format))
   }
 
   // ─────────────────────────────────────────────

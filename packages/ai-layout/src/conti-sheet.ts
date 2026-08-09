@@ -402,6 +402,8 @@ export function composeContiSheets(cuts: ContiCut[], opts: ContiSheetOptions): P
       v: 1,
       format: {
         id: format.id,
+        // 판별자는 산출물까지 흘린다 (MODE-04) — 콘티 시트는 인쇄(mm)가 기본이다
+        ...(format.unit ? { unit: format.unit } : {}),
         widthMm: format.widthMm,
         heightMm: format.heightMm,
         dpi: format.dpi,

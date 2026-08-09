@@ -4,10 +4,18 @@
 // ─────────────────────────────────────────────
 
 /**
- * 판형(인쇄 포맷) — mm 단위
+ * 판형 — 단위계는 `unit` 이 결정한다 (ADR-0017 / MODE-04).
+ *
+ * - `unit='mm'`(기본, 생략 시): 인쇄(POD). `widthMm/heightMm` 는 밀리미터이고
+ *   화면 픽셀은 `dpi` 로 환산한다.
+ * - `unit='px'`: 웹툰. `widthMm/heightMm` 는 **픽셀값**이다(필드명은 레거시).
+ *   좌표 변환은 1:1 이며 `dpi` 는 환산에 쓰이지 않는다(`coordDpi()` 참조).
+ *   `heightMm` 는 스트립 세그먼트 하나의 높이다 — 세로 길이는 세그먼트 수로 늘어난다.
  */
 export type Format = {
   id: string
+  /** 단위계 — 생략은 'mm'(기존 호출 하위호환) */
+  unit?: 'mm' | 'px'
   widthMm: number
   heightMm: number
   dpi: number

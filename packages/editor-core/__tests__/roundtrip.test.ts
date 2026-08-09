@@ -112,3 +112,41 @@ describe('골든 라운드트립', () => {
     expect(result.format.dpi).toBe(300)
   })
 })
+
+// ─────────────────────────────────────────────
+// 웹툰(px) 세그먼트 — 단위계 라운드트립 (MODE-04)
+// ─────────────────────────────────────────────
+
+describe('웹툰 px 세그먼트 라운드트립', () => {
+  it('parsePageJson 을 통과해도 format.unit 이 살아남는다 (zod strip 회귀 가드)', () => {
+    // PageFormatSchema 에 unit 이 없으면 zod 가 조용히 제거한다 —
+    // 그러면 편집기가 저장본을 mm 로 오독해 690px 이 8149px 로 튄다.
+    const golden = loadGolden('webtoon-segment.json')
+    expect(golden.format.unit).toBe('px')
+  })
+
+  it('px 좌표가 1:1 로 보존된다 (mm 환산이 끼면 2.8배로 어긋난다)', async () => {
+    const golden = loadGolden('webtoon-segment.json')
+    const result = await roundtrip(golden)
+
+    const bg = result.layers.find((l) => l.id === 'seg-bg')
+    expect(bg?.fabric['widthMm']).toBeCloseTo(690, 6)
+    expect(bg?.fabric['heightMm']).toBeCloseTo(1280, 6)
+
+    const bubble = result.layers.find((l) => l.id === 'seg-bubble')
+    expect(bubble?.fabric['leftMm']).toBeCloseTo(27.6, 6)
+    expect(bubble?.fabric['topMm']).toBeCloseTo(998.4, 6)
+  })
+
+  it('레이어 메타(대사 순번·캐릭터)가 보존된다', async () => {
+    const golden = loadGolden('webtoon-segment.json')
+    const result = await roundtrip(golden)
+
+    const pose = result.layers.find((l) => l.id === 'seg-pose')
+    expect(pose?.data.resourceId).toBe('pose-001')
+    expect((pose?.data.meta as { characterName?: string })?.characterName).toBe('주인공')
+
+    const bubble = result.layers.find((l) => l.id === 'seg-bubble')
+    expect((bubble?.data.meta as { lineIndex?: number })?.lineIndex).toBe(0)
+  })
+})

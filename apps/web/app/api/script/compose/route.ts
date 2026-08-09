@@ -44,6 +44,8 @@ import { prisma } from '@/lib/prisma'
 
 const LayoutFormatSchema = z.object({
   id: z.string(),
+  // 단위계 (MODE-04) — 없으면 mm. body 로 px 를 주입해도 아래 가드가 400 으로 막는다
+  unit: z.enum(['mm', 'px']).optional(),
   widthMm: z.number().positive(),
   heightMm: z.number().positive(),
   dpi: z.number().positive(),
@@ -102,11 +104,21 @@ export async function POST(req: Request): Promise<NextResponse> {
   if (formatId) {
     const dbFormat = await prisma.format.findUnique({
       where: { id: formatId },
-      select: { id: true, widthMm: true, heightMm: true, dpi: true, bleedMm: true, safeMm: true },
+      select: {
+        id: true,
+        // 단위계를 함께 읽는다 — 없으면 px 판형이 mm 로 오독돼 690mm 지면이 나온다 (MODE-04)
+        unit: true,
+        widthMm: true,
+        heightMm: true,
+        dpi: true,
+        bleedMm: true,
+        safeMm: true,
+      },
     })
     if (!dbFormat) return jsonError(`Format 을 찾을 수 없습니다: ${formatId}`, 404)
     resolvedFormat = {
       id: dbFormat.id,
+      unit: dbFormat.unit,
       widthMm: dbFormat.widthMm,
       heightMm: dbFormat.heightMm,
       dpi: dbFormat.dpi,
@@ -117,6 +129,13 @@ export async function POST(req: Request): Promise<NextResponse> {
     resolvedFormat = format
   } else {
     return jsonError('formatId 또는 format 둘 중 하나 필수', 400)
+  }
+
+  // px(웹툰) 판형 가드 (MODE-04) — 웹툰 배치는 MODE-03 스트립 분기가 담당하지만,
+  // 편집기 px 캔버스(MODE-04b)·이미지 export(MODE-05)가 배선되기 전까지는 열지 않는다.
+  // 여기를 막지 않으면 body.format 으로 px 를 직접 주입해 게이트를 우회할 수 있다.
+  if (resolvedFormat.unit !== undefined && resolvedFormat.unit !== 'mm') {
+    return jsonError('웹툰(px) 판형 자동 배치는 준비 중입니다.', 400)
   }
 
   // 4. compose 실행

@@ -14,6 +14,8 @@ import type { CoverConfig } from '../../../lib/cover-config'
 
 export interface PageFormat {
   name: string
+  /** 단위계 (MODE-04 / ADR-0017) — 생략은 'mm'. 'px' 면 아래 치수는 픽셀값이다 */
+  unit?: 'mm' | 'px'
   widthMm: number
   heightMm: number
   dpi: number

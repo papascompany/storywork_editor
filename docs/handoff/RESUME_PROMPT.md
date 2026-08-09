@@ -1,4 +1,4 @@
-# 새 세션 시작 프롬프트 (2026-08-09 v2 갱신 — MODE-03 반영)
+# 새 세션 시작 프롬프트 (2026-08-09 v3 갱신 — MODE-04a 반영)
 
 > 새 Claude Code 세션을 열 때 **"🚀 프롬프트" 섹션부터 끝까지 그대로 복사 붙여넣기** 하세요.
 > 이 파일은 세션 마무리 때마다 갱신됩니다 — 상단 날짜로 최신 여부 확인.
@@ -22,14 +22,16 @@
    - `docs/architecture/roadmap.md` — 작업 큐 (SW-BIZ (A) · MODE 섹션이 최신)
 3. `git log --oneline -10` + `git status -sb` — 내가 만들지 않은 변경은 사용자 작업으로 보존
 
-### ✅ 현재 상태 (MODE-02 push 시점 기준)
+### ✅ 현재 상태 (MODE-04a push 시점 기준)
 
 - 워킹트리 clean · web/admin prod 라이브 · 전체 검증 79 태스크 green.
   시작 시 `gh run list --branch main --limit 1` 로 최종 HEAD CI 확인
 - **MODE-01+02+03 완료 · prod 마이그레이션 적용 완료**(2026-08-09 01:13, 대표님 실행).
   모드 선택 UX(웹툰 "준비 중") + 단위계 필터 + px 가드(생성·자동배치·publish·preflight) +
   ai-layout 웹툰 스트립 분기(`strip.ts` — 장면당 세그먼트·스트립 연장·리듬 6%).
-  **웹툰 모드 개방은 MODE-04(편집기 px 캔버스)+05(export) 완성과 한 세트**
+  **웹툰 모드 개방은 MODE-04b(스트립 UI)+04c(mode 정합)+05(export) 완성과 한 세트**
+- **MODE-04a 완료**: `Format.unit` 정본화(타입→zod→직렬화→ai-layout) · 좌표용 dpi 치환으로
+  60여 호출처 무수정 · 인쇄 가드 구멍 3개 봉쇄(publish async 우회·워커·compose select)
 - **08-09 prod 장애 사후 기록**: 스키마 push 가 마이그레이션보다 먼저 배포돼 P2022 로
   판형 API 503·저장 실패 ~2.5h → 마이그레이션 적용으로 복구. 함정 노트 ★★ 참조
 - **자동배치**: 채택률 100% · 대사 보존 100% · 페이지 222(장면 217 = 1.02배). 리포트 4건 `docs/eval/`
@@ -64,9 +66,12 @@
 
 ### 🎯 다음 코드 큐 — 키 없이 바로 착수 가능
 
-- 🟢 **MODE-04** editor-core 세로 무한 캔버스 + px 단위(mm→px 변환에 unit=px 면 1:1) —
-  웹툰 개방의 마지막 관문. MODE-05(이미지 export)까지 완성되면 모달 "준비 중" 해제 +
-  프리셋 isActive + full-pipeline 가드 해제가 한 세트
+- 🟢 **MODE-04b** 웹툰 세로 스트립 편집 UI — 세그먼트별 캔버스 DOM 세로 스택 + 가상화.
+  **단일 롱 캔버스는 기각됨**(fabric 컬링 무효화·Safari 16384px·iOS 방어 계약 — roadmap 참조).
+  선행: `usePageStore.updatePageJson(index, json)` 신설(현행 `updateCurrentPageJson` 은
+  캔버스 N개에서 다른 세그먼트를 덮어쓴다)
+- 🟢 **MODE-04c** 웹툰 개방 정합 — `save` px 허용 전에 `Project.mode` 저장 배선 필수
+  (현재 mode 미사용 → `mode=pod + unit=px` 모순 레코드 위험)
 - 🟢 산문 서술 문장 단위 분할 — `parse-novel` 이 단락을 200자에서 자른다. 캡션이 여러 줄을 담게 된
   지금은 문장 단위가 더 맞다
 - ⏸ LAYOUT-06 배치 품질 잔여 축(균형 61.5 · 대사 밀도 86.5) — 수확 체감 구간.
@@ -132,5 +137,5 @@ breaking change push 는 보고 후
 ### 🎬 시작
 
 위 내용 검토 후: ① 대표님 액션 5건 진행 결과 ② 다음 작업 선택을 확인하고 진행해 주세요.
-**키 등록 전이면 MODE-04 부터** (MODE-01/02/03 완료, 웹툰 시드는 액션 5번 재실행).
+**키 등록 전이면 MODE-04b 부터** (MODE-04a 완료, 웹툰 시드는 액션 5번 재실행).
 세션 종료 시 `docs/handoff/SESSION_HANDOFF_<날짜>.md` 신규 작성 + 이 파일 갱신을 잊지 말 것.

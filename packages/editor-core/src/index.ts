@@ -11,7 +11,17 @@ export { StoryCanvas } from './canvas/StoryCanvas.js'
 export type { StoryCanvasOptions } from './canvas/StoryCanvas.js'
 
 // 좌표 변환 유틸 (어댑터에서 직접 사용)
-export { mmToPx, pxToMm, formatToPxSize } from './canvas/coords.js'
+// coordDpi/formatPxSize: 단위계(mm/px)를 자동 처리하는 진입점 — MODE-04
+export {
+  mmToPx,
+  pxToMm,
+  formatToPxSize,
+  formatPxSize,
+  coordDpi,
+  clampCanvasPx,
+  MAX_CANVAS_SIDE_PX,
+} from './canvas/coords.js'
+export type { CoordFormatLike } from './canvas/coords.js'
 
 // 객체 메타 유틸
 export {

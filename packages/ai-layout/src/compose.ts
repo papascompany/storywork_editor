@@ -630,6 +630,8 @@ async function buildPageFabricJson(
     v: 1,
     format: {
       id: format.id,
+      // 단위계를 산출물에 실어 보낸다 — 없으면 편집기가 웹툰 세그먼트를 mm 로 오독한다 (MODE-04)
+      ...(format.unit ? { unit: format.unit } : {}),
       widthMm: format.widthMm,
       heightMm: format.heightMm,
       dpi: format.dpi,

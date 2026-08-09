@@ -177,6 +177,8 @@ export interface PageFabricJson {
   v: 1
   format: {
     id: string
+    /** 단위계 (MODE-04) — 생략은 'mm'. 편집기가 세그먼트를 mm 로 오독하지 않게 하는 판별자 */
+    unit?: 'mm' | 'px'
     widthMm: number
     heightMm: number
     dpi: number

@@ -405,6 +405,8 @@ export function EditorShell() {
     if (prevEff.widthMm !== nextEff.widthMm || prevEff.heightMm !== nextEff.heightMm) {
       canvas.setFormat({
         id: project.formatId,
+        // 단위계 전달 필수 — 빠지면 px 판형이 mm 로 되돌아가 캔버스가 2.8배로 튄다 (MODE-04)
+        unit: project.format.unit,
         widthMm: nextEff.widthMm,
         heightMm: nextEff.heightMm,
         dpi: project.format.dpi,
@@ -509,6 +511,7 @@ export function EditorShell() {
         const eff = effectivePageFormat(format, cover, 0)
         canvas.setFormat({
           id: formatId,
+          unit: format.unit,
           widthMm: eff.widthMm,
           heightMm: eff.heightMm,
           dpi: format.dpi,
@@ -540,6 +543,7 @@ export function EditorShell() {
     const eff = effectivePageFormat(format, project?.cover, project?.currentPageIndex ?? 0)
     canvas.setFormat({
       id: formatId,
+      unit: format.unit,
       widthMm: eff.widthMm,
       heightMm: eff.heightMm,
       dpi: format.dpi,

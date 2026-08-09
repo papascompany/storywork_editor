@@ -1,12 +1,22 @@
 /**
- * format-conversion.ts — 판형 mm → px 변환 + fit-to-screen 줌 헬퍼
+ * format-conversion.ts — 판형 → px 변환 + fit-to-screen 줌 헬퍼
  *
  * Hard Contracts:
- * - 내부 좌표는 항상 mm 기준 정규화. 픽셀 변환은 이 모듈에서.
+ * - 내부 좌표는 판형 단위 기준 정규화. 픽셀 변환은 이 모듈에서.
  * - dpi 를 외부에서 주입받아 변환 (300 dpi 하드코드 금지).
+ *
+ * ## px(웹툰) 판형 (MODE-04 / ADR-0017)
+ * `unit='px'` 판형은 좌표가 이미 픽셀이라 변환이 1:1 이어야 한다.
+ * editor-core `coordDpi()` 와 **같은 규칙**으로 좌표용 dpi 를 25.4 로 치환한다 —
+ * 두 곳이 어긋나면 캔버스 크기와 객체 좌표가 따로 논다.
  */
 
 const MM_PER_INCH = 25.4
+
+/** 좌표 변환에 쓸 dpi — px 판형은 항등 변환(editor-core coordDpi 와 동일 규칙) */
+export function coordDpiOf(format: { unit?: 'mm' | 'px'; dpi: number }): number {
+  return format.unit === 'px' ? MM_PER_INCH : format.dpi
+}
 
 // ─── 타입 ──────────────────────────────────────────────────────────────────────
 
@@ -19,6 +29,8 @@ export interface CanvasSize {
 }
 
 export interface FormatInput {
+  /** 단위계 — 생략은 'mm'(하위호환) */
+  unit?: 'mm' | 'px'
   widthMm: number
   heightMm: number
   dpi: number
@@ -49,12 +61,14 @@ export function mmToPx(mm: number, dpi: number): number {
  * // → { widthPx:1772, heightPx:1772, bleedPx:35, safePx:59, dpi:300 }
  */
 export function formatToPx(format: FormatInput): CanvasSize {
+  // px 판형이면 dpi 대신 25.4 — 값이 그대로 픽셀이 된다 (MODE-04)
+  const dpi = coordDpiOf(format)
   return {
-    widthPx: mmToPx(format.widthMm, format.dpi),
-    heightPx: mmToPx(format.heightMm, format.dpi),
-    bleedPx: mmToPx(format.bleedMm, format.dpi),
-    safePx: mmToPx(format.safeMm, format.dpi),
-    dpi: format.dpi,
+    widthPx: mmToPx(format.widthMm, dpi),
+    heightPx: mmToPx(format.heightMm, dpi),
+    bleedPx: mmToPx(format.bleedMm, dpi),
+    safePx: mmToPx(format.safeMm, dpi),
+    dpi,
   }
 }
 

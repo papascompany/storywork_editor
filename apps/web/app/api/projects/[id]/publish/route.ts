@@ -139,6 +139,15 @@ export async function POST(
     return jsonError('이 프로젝트에 접근할 권한이 없습니다.', 403)
   }
 
+  // 4-b. px(웹툰) 판형 가드 (MODE-03 도입 · MODE-04 위치 교정)
+  // pdf-engine 은 mm 좌표 전용이다 — px 값을 mm 로 읽으면 690mm 지면이 만들어진다.
+  // **async 분기보다 먼저** 둬야 한다: 종전에는 동기 경로에만 있어 `{async:true}` 요청이
+  // 가드를 건너뛰고 Inngest 워커로 넘어갔다. 웹툰 출력은 이미지 시퀀스(MODE-05)로 간다.
+  const projectFormatUnit = (project as unknown as { format?: { unit?: string } }).format?.unit
+  if (projectFormatUnit !== undefined && projectFormatUnit !== 'mm') {
+    return jsonError('웹툰(px) 판형은 PDF 출판 대상이 아닙니다.', 400)
+  }
+
   // ── 비동기 모드 분기 (async=true) ──────────────────────────────────────────
   if (isAsync) {
     // PublishJob 생성 (status: 'queued')
@@ -208,12 +217,6 @@ export async function POST(
     dpi: number
     bleedMm: number
     safeMm: number
-  }
-
-  // px(웹툰) 판형 가드 (MODE-03) — pdf-engine 은 mm 좌표 전용이다. px 값을 mm 로 읽으면
-  // 690mm 지면이 만들어진다. 웹툰 출력은 이미지 시퀀스(MODE-05)로 간다.
-  if (format.unit !== undefined && format.unit !== 'mm') {
-    return jsonError('웹툰(px) 판형은 PDF 출판 대상이 아닙니다.', 400)
   }
 
   const pages = (project as unknown as { pages: Array<Record<string, unknown>> }).pages
