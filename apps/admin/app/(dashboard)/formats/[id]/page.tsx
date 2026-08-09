@@ -33,6 +33,7 @@ export default async function FormatEditPage({ params }: PageProps) {
       format={{
         id: format.id,
         name: format.name,
+        unit: format.unit,
         widthMm: format.widthMm,
         heightMm: format.heightMm,
         dpi: format.dpi as 72 | 150 | 300 | 600,

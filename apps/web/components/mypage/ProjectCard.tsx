@@ -53,10 +53,18 @@ function formatRelativeDate(date: Date): string {
   return `${Math.floor(months / 12)}년 전`
 }
 
+/** 산출물 모드 라벨 (MODE-02) — 기존 프로젝트는 백필로 전부 pod */
+const MODE_LABEL: Record<string, string> = {
+  pod: '인쇄·출판',
+  webtoon: '웹툰',
+}
+
 export interface ProjectCardProps {
   id: string
   title: string
   status: string
+  /** 산출물 모드 — 목록 조회가 안 내려주면 표시 생략 */
+  mode?: string
   thumbnail: string | null
   updatedAt: Date
   pageCount: number
@@ -66,6 +74,7 @@ export function ProjectCard({
   id,
   title,
   status,
+  mode,
   thumbnail,
   updatedAt,
   pageCount,
@@ -73,6 +82,7 @@ export function ProjectCard({
   const placeholderColor = getPlaceholderColor(title)
   const statusLabel = STATUS_LABEL[status] ?? status
   const statusBg = STATUS_BG[status] ?? 'var(--mkt-hairline-soft)'
+  const modeLabel = mode ? (MODE_LABEL[mode] ?? mode) : null
   const relDate = formatRelativeDate(updatedAt)
 
   return (
@@ -191,6 +201,26 @@ export function ProjectCard({
           >
             {statusLabel}
           </span>
+          {modeLabel && (
+            <span
+              style={{
+                display: 'inline-block',
+                marginLeft: '6px',
+                padding: '2px 8px',
+                borderRadius: 'var(--mkt-rounded-pill)',
+                border: '1px solid var(--mkt-hairline)',
+                fontFamily: 'var(--mkt-font-sans)',
+                fontSize: '11px',
+                fontWeight: 480,
+                color: 'var(--mkt-ink)',
+                opacity: 0.6,
+                letterSpacing: '0.2px',
+              }}
+              data-testid="project-mode-badge"
+            >
+              {modeLabel}
+            </span>
+          )}
         </div>
       </article>
     </Link>

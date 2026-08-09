@@ -22,8 +22,17 @@ import type { FormatOutput, FormatPreset } from '../../../../src/lib/schemas/for
 
 const FIELD_META: Record<string, FieldMeta> = {
   name: { label: '판형 이름', placeholder: '예: B5 단행본', autoFocus: true },
-  widthMm: { label: '가로 (mm)', helpText: '50~500' },
-  heightMm: { label: '세로 (mm)', helpText: '50~500' },
+  unit: {
+    label: '단위계',
+    widget: 'select',
+    options: [
+      { value: 'mm', label: 'mm — 인쇄·출판 (POD)' },
+      { value: 'px', label: 'px — 웹툰 화면' },
+    ],
+    helpText: 'px 판형은 폭=픽셀·세로=세그먼트 기본 높이, 재단/안전 여백 0. 생성 후 변경 불가',
+  },
+  widthMm: { label: '가로', helpText: 'mm 50~500 · px 200~8192' },
+  heightMm: { label: '세로', helpText: 'mm 50~500 · px 200~8192 (px 는 세그먼트 높이)' },
   dpi: {
     label: '해상도 (DPI)',
     widget: 'select',

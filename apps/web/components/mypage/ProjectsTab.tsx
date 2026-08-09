@@ -21,6 +21,8 @@ export interface ProjectData {
   id: string
   title: string
   status: string
+  /** 산출물 모드 (MODE-02) — 기존 프로젝트는 백필로 전부 pod */
+  mode?: string
   thumbnail: string | null
   updatedAt: Date
   pageCount: number
@@ -181,6 +183,7 @@ export function ProjectsTab({ projects, contestSubmission = null }: ProjectsTabP
               id={project.id}
               title={project.title}
               status={project.status}
+              mode={project.mode}
               thumbnail={project.thumbnail}
               updatedAt={project.updatedAt}
               pageCount={project.pageCount}

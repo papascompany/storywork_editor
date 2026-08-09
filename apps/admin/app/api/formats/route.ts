@@ -8,7 +8,7 @@ import { apiError, apiOk } from '../../../src/lib/api-response'
 import { recordAudit } from '../../../src/lib/audit'
 import { getAdminUser, getSession, hasRole } from '../../../src/lib/auth'
 import { prisma } from '../../../src/lib/prisma'
-import { formatInputSchema } from '../../../src/lib/schemas/format'
+import { formatInputSchemaWithUnitCheck } from '../../../src/lib/schemas/format'
 
 // ─── GET /api/formats ────────────────────────────────────────────────────────
 
@@ -76,13 +76,14 @@ export async function POST(req: NextRequest) {
     return apiError('BAD_REQUEST', '요청 본문이 올바른 JSON 형식이 아닙니다.', 400)
   }
 
-  const parsed = formatInputSchema.safeParse(body)
+  const parsed = formatInputSchemaWithUnitCheck.safeParse(body)
   if (!parsed.success) {
     return apiError('VALIDATION_ERROR', 'Zod 검증 실패', 400, parsed.error.flatten())
   }
 
   const {
     name,
+    unit,
     widthMm,
     heightMm,
     dpi,
@@ -104,6 +105,7 @@ export async function POST(req: NextRequest) {
   const format = await prisma.format.create({
     data: {
       name,
+      unit,
       widthMm,
       heightMm,
       dpi,

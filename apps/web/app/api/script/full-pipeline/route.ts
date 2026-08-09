@@ -161,10 +161,24 @@ export async function POST(req: Request): Promise<NextResponse> {
   // 4. Format 로드
   const dbFormat = await prisma.format.findUnique({
     where: { id: resolvedFormatId },
-    select: { id: true, widthMm: true, heightMm: true, dpi: true, bleedMm: true, safeMm: true },
+    select: {
+      id: true,
+      unit: true,
+      widthMm: true,
+      heightMm: true,
+      dpi: true,
+      bleedMm: true,
+      safeMm: true,
+    },
   })
   if (!dbFormat) {
     return jsonError('지정한 판형을 찾을 수 없습니다.', 404)
+  }
+
+  // px(웹툰) 판형 가드 (MODE-02) — ai-layout 은 mm 좌표 전용이다. px 값을 mm 로 읽으면
+  // 690mm 페이지가 만들어진다. 웹툰 배치 분기(MODE-03) 배선 전까지 차단한다.
+  if (dbFormat.unit !== 'mm') {
+    return jsonError('웹툰(px) 판형 자동 배치는 준비 중입니다.', 400)
   }
 
   const format: LayoutFormat = {

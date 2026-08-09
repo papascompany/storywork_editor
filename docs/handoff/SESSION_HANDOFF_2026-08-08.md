@@ -1,13 +1,14 @@
-# 세션 핸드오프 — 2026-08-08 (작업 08-07 밤 ~ 08-08)
+# 세션 핸드오프 — 2026-08-08~09 (작업 08-07 밤 ~ 08-09 새벽)
 
 > 이전: [SESSION_HANDOFF_2026-08-05.md](SESSION_HANDOFF_2026-08-05.md)
-> 이 세션 = **SCRIPT-KO-04 + 제품 결정 3건 + LAYOUT-04 + LAYOUT-05** 완료. 전부 push 완료.
+> 이 세션 = **SCRIPT-KO-04 + 제품 결정 3건 + LAYOUT-04 + LAYOUT-05 + MODE-01 + MODE-02** 완료.
 > 도중 모델 전환(Opus 5 → Fable 5, LAYOUT-05 착수 직전) — 체크포인트 대조 후 이어감.
+> **08-09 새벽 prod 장애 발생·복구**(§1-⑥ · §5 함정 노트 필독).
 
 ## 0. 한 줄 상태
 
-main `dedd945` = origin · 워킹트리 clean · 전체 검증 79 태스크 green ·
-**대표님 액션 4건은 여전히 전부 미실행**(이번 세션 착수 시 실측 재확인).
+MODE-02 까지 완료 · **prod 마이그레이션 적용 완료**(대표님 실행, FOLLOWUP-68 이력 정리 겸용 —
+액션 2번 해소) · 잔여 대표님 액션 = 키 등록(1) · PERF 인증(3) · PDF 육안(4) · 웹툰 시드(5).
 
 ## 1. 완료
 
@@ -68,6 +69,18 @@ main `dedd945` = origin · 워킹트리 clean · 전체 검증 79 태스크 gree
 - 프로젝트 생성 2개소는 mode 미지정 → DB DEFAULT pod. admin px 폼은 MODE-02,
   px 인쇄 경로 가드는 MODE-03
 
+### ⑥ MODE-02 프로젝트 생성 모드 UX + prod 장애 복구 (08-09 새벽)
+- **prod 장애 발견**: MODE-02 시각 검증 중 로컬 503 추적 → **실서비스 `/api/formats` 503 확인**.
+  원인 = MODE-01 스키마 push(=Vercel 자동배포)가 **마이그레이션 미적용 prod DB** 와 불일치.
+  Prisma 는 select 명시 없는 조회에도 스키마 전체 컬럼을 SELECT 에 나열하므로, 새 컬럼
+  (`Format.unit`/`Project.mode`)이 DB 에 없으면 P2022 로 죽는다 — 판형 API 503 ·
+  프로젝트 저장/admin 판형 관리 실패. 지속 약 2.5시간(push 후 ~10h 미발견 + 발견 후 대기)
+- **복구**: 대표님이 마이그레이션 적용(01:13 KST, FOLLOWUP-68 resolve + deploy 겸용) →
+  즉시 200 + `unit:"mm"` 백필 확인. additive 라 데이터 영향 없음
+- **MODE-02 구현**: FormatPickerModal 모드 세그먼트(POD 활성·웹툰 "준비 중" 비활성) +
+  단위계 필터 · 서버 px 가드 2곳(save/full-pipeline) · admin unit 지원(생성 시 확정,
+  PATCH 불변, px 는 bleed/safe 0 강제) · mypage 모드 뱃지. 신규 테스트 9 · 시각 검증 2회
+
 ## 2. 검증
 
 - `pnpm turbo run typecheck lint test --concurrency=1` — **79 태스크 green**(각 커밋마다 실행)
@@ -79,16 +92,15 @@ main `dedd945` = origin · 워킹트리 clean · 전체 검증 79 태스크 gree
 
 ## 3. 🔴 대표님 액션 — 4건 전부 미실행 (이번 세션 실측 재확인)
 
-| # | 항목 | 실측 근거 | 실행 |
+| # | 항목 | 상태 | 실행 |
 |---|---|---|---|
-| 1 | AI_GATEWAY_API_KEY 등록 | `.env.local` 3곳 0건 | `cd apps/web && vercel env add AI_GATEWAY_API_KEY production` + `.env.local` 3곳 |
-| 2 | FOLLOWUP-68 이력 정리 **+ MODE-01 deploy 겸용** | migrate 3건 미기록 | `set -a; source .env.local; set +a; pnpm prisma migrate resolve --applied 20260629020000_reaction_user_fk && pnpm prisma migrate deploy && pnpm prisma migrate status` |
-| 3 | PERF-ADMIN-03 인증 저장 | `tmp/perf/admin-auth.json` 부재 | `pnpm perf:admin:save-auth --env prod` |
-| 4 | prod 한글 PDF 육안 확인 | 배선은 배포 완료, 실 publish 미수행 | 편집기에서 publish 1회 |
-| 5 | **MODE-01 웹툰 프리셋 시드** (2번 deploy 후) | 신규 — prod 미반영 | `set -a; source .env.local; set +a; pnpm tsx scripts/seed-formats.ts` |
+| 1 | AI_GATEWAY_API_KEY 등록 | ⏳ 미실행 | `cd apps/web && vercel env add AI_GATEWAY_API_KEY production` + `.env.local` 3곳 |
+| 2 | FOLLOWUP-68 이력 정리 + MODE-01 deploy | **✅ 2026-08-09 01:13 완료**(prod 200 + unit 백필 실측) | — |
+| 3 | PERF-ADMIN-03 인증 저장 | ⏳ 미실행 | `pnpm perf:admin:save-auth --env prod` |
+| 4 | prod 한글 PDF 육안 확인 | ⏳ 미실행 | 편집기에서 publish 1회 |
+| 5 | MODE-01 웹툰 프리셋 시드 | ⏳ 미실행 (2번 완료로 실행 가능) | `set -a; source .env.local; set +a; pnpm tsx scripts/seed-formats.ts` |
 
-> **2번 명령의 `migrate deploy` 가 MODE-01 마이그레이션(`20260808100000`)도 함께 적용한다** —
-> 별도 실행 불요. 5번(시드)은 2번 성공 후 1회. 웹툰 프리셋은 isActive:false 라 사용자 노출 없음.
+> 5번(시드)은 idempotent upsert 라 언제든 1회. 웹툰 프리셋은 isActive:false 라 사용자 노출 없음.
 
 대표님이 4건 모두 진행 의사를 밝혔다(2026-08-07). **1번(키) 등록 즉시 CONTI-01 → AI-ACT-03 →
 SCRIPT-KO-02 착수 가능** — 파급이 가장 크다. 3번은 저장 후 알려주시면 측정·P75 분석은 어시가.
@@ -105,6 +117,13 @@ SCRIPT-KO-02 착수 가능** — 파급이 가장 크다. 3번은 저장 후 알
 - 🚦 기타 게이트(불변): onnxruntime-node(BUBBLE-02) · Upstash(SEC-RATE-01) · POSE3D-01 결제
 
 ## 5. 환경/함정 노트 (누적 — 신규 ★)
+
+- ★★ **스키마 컬럼 추가는 "DB 먼저, 코드 나중" — push = prod 자동배포인 이 레포에서
+  마이그레이션 미적용 상태로 스키마 커밋을 push 하면 prod 가 죽는다.** Prisma 는 select
+  명시 없는 조회에도 스키마 전체 컬럼을 SELECT 에 나열하므로, 새 컬럼이 DB 에 없으면
+  관련 모델의 **모든 조회**가 P2022 로 실패한다(08-09 실측: 판형 API 503 · 저장 실패
+  ~2.5h). 순서 고정: ①마이그레이션 파일 커밋 ②**prod deploy 실행·확인** ③스키마 소비
+  코드 push. additive 라도 예외 없다
 
 - ★ **품질 지표는 배치기의 목적함수와 독립이어야 변별력이 있다** — 배치기가 최소화하는 항을 그대로
   지표로 쓰면 순환 논증이다. 의존 축은 "높은 게 당연, **떨어지면 회귀**"로만 읽는다

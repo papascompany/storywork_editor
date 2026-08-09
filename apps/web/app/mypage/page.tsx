@@ -61,6 +61,7 @@ export default async function MyPage({ searchParams }: MyPageProps) {
     id: string
     title: string
     status: string
+    mode: string
     updatedAt: Date
     _count: { pages: number }
     pages: { thumbnail: string | null }[]
@@ -75,6 +76,8 @@ export default async function MyPage({ searchParams }: MyPageProps) {
           id: true,
           title: true,
           status: true,
+          // 산출물 모드 (MODE-02) — 기존 프로젝트는 백필로 전부 pod
+          mode: true,
           updatedAt: true,
           _count: { select: { pages: true } },
           // 첫 번째 페이지 썸네일만 가져옴
@@ -95,6 +98,7 @@ export default async function MyPage({ searchParams }: MyPageProps) {
     id: p.id,
     title: p.title,
     status: String(p.status),
+    mode: String(p.mode),
     thumbnail: p.pages[0]?.thumbnail ?? null,
     updatedAt: p.updatedAt,
     pageCount: p._count.pages,

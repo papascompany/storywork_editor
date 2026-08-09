@@ -20,6 +20,8 @@ import type { AdminRole } from '../../../src/lib/auth'
 export interface FormatRow {
   id: string
   name: string
+  /** 단위계 (MODE-02) — MODE-01 이전 조회 폴백용 optional */
+  unit?: 'mm' | 'px'
   widthMm: number
   heightMm: number
   dpi: number
@@ -45,8 +47,14 @@ const columns: ColumnDef<FormatRow>[] = [
     id: 'dimensions',
     header: '크기',
     enableSorting: false,
-    meta: { mobileLabel: '크기 (mm)' },
-    cell: ({ row }) => `${row.original.widthMm} × ${row.original.heightMm} mm`,
+    meta: { mobileLabel: '크기' },
+    cell: ({ row }) => {
+      const unit = row.original.unit ?? 'mm'
+      // px(웹툰) 판형의 세로는 스트립 세그먼트 기본 높이 — 실제 길이는 가변
+      return unit === 'px'
+        ? `폭 ${row.original.widthMm}px · 세로 가변`
+        : `${row.original.widthMm} × ${row.original.heightMm} mm`
+    },
   },
   {
     accessorKey: 'dpi',

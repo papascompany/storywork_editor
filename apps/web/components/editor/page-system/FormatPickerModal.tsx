@@ -1,12 +1,16 @@
 'use client'
 
 /**
- * FormatPickerModal — 판형 선택 모달
+ * FormatPickerModal — 산출물 모드 + 판형 선택 모달
  *
- * - 4종 인라인 프리셋 카드 (B5 / A5 / 정사각 / 세로형)
+ * - 모드 선택 세그먼트 (MODE-02 / ADR-0017): 인쇄·출판(POD) ↔ 웹툰.
+ *   웹툰은 배치 분기(MODE-03)가 배선되기 전까지 **비활성("준비 중")** — 편집기·배치가
+ *   아직 mm 전제라 px 프로젝트를 만들면 잘못된 결과가 나온다(반쪽 노출 금지).
+ * - 판형 목록은 모드의 단위계로 필터한다 (pod=mm, webtoon=px) — px 판형이 활성화돼도
+ *   POD 목록에 섞이지 않는 것이 이 필터의 실질 가치다.
+ * - 4종 인라인 프리셋 카드 (B5 / A5 / 정사각 / 세로형) — 전부 mm
  * - 프로젝트 이름 입력 (선택, 기본 "새 콘티 YYYY-MM-DD")
  * - ESC 닫기 비활성 (project === null 일 때는 반드시 선택해야 함)
- * - FOLLOWUP: admin /api/formats 불러와 추가 그리드 표시
  */
 
 import { Button, Dialog, DialogContent, DialogHeader, DialogTitle, cn } from '@storywork/ui'
@@ -18,10 +22,20 @@ import type { PageFormat } from '../store/usePageStore'
 
 // ─── 프리셋 정의 ──────────────────────────────────────────────────────────────
 
+/** 산출물 모드 (ADR-0017) — 모드의 단위계로 판형 목록을 필터한다 */
+export type ProjectMode = 'pod' | 'webtoon'
+
+const MODE_UNIT: Record<ProjectMode, 'mm' | 'px'> = {
+  pod: 'mm',
+  webtoon: 'px',
+}
+
 interface FormatPresetCard {
   id: string
   name: string
   description: string
+  /** 단위계 (MODE-02) — 하드코드 프리셋은 전부 mm */
+  unit: 'mm' | 'px'
   widthMm: number
   heightMm: number
   dpi: number
@@ -38,6 +52,8 @@ interface FormatPresetCard {
 interface DbFormat {
   id: string
   name: string
+  /** 단위계 판별자 — MODE-01 이전 응답에는 없을 수 있어 mm 폴백 */
+  unit?: 'mm' | 'px'
   widthMm: number
   heightMm: number
   dpi: number
@@ -49,10 +65,15 @@ interface DbFormat {
 }
 
 function dbFormatToCard(f: DbFormat): FormatPresetCard {
+  const unit = f.unit ?? 'mm'
   return {
     id: f.id,
     name: f.name,
-    description: `${f.widthMm}×${f.heightMm}mm · ${f.dpi}dpi`,
+    description:
+      unit === 'px'
+        ? `폭 ${f.widthMm}px · 세로 가변`
+        : `${f.widthMm}×${f.heightMm}mm · ${f.dpi}dpi`,
+    unit,
     widthMm: f.widthMm,
     heightMm: f.heightMm,
     dpi: f.dpi,
@@ -70,6 +91,7 @@ const FORMAT_PRESETS: FormatPresetCard[] = [
     id: 'preset:b5-novel',
     name: 'B5 단행본',
     description: '130×200mm · 일반 만화/콘티',
+    unit: 'mm',
     widthMm: 130,
     heightMm: 200,
     dpi: 300,
@@ -81,6 +103,7 @@ const FORMAT_PRESETS: FormatPresetCard[] = [
     id: 'preset:a5-artbook',
     name: 'A5 작품집',
     description: '148×210mm · 작품집/매거진',
+    unit: 'mm',
     widthMm: 148,
     heightMm: 210,
     dpi: 300,
@@ -92,6 +115,7 @@ const FORMAT_PRESETS: FormatPresetCard[] = [
     id: 'preset:square',
     name: '정사각 1:1',
     description: '150×150mm · 인스타 카드뉴스',
+    unit: 'mm',
     widthMm: 150,
     heightMm: 150,
     dpi: 300,
@@ -103,6 +127,7 @@ const FORMAT_PRESETS: FormatPresetCard[] = [
     id: 'preset:mobile-story',
     name: '세로형 모바일',
     description: '90×150mm · 모바일 스토리',
+    unit: 'mm',
     widthMm: 90,
     heightMm: 150,
     dpi: 300,
@@ -169,6 +194,8 @@ export function FormatPickerModal({
   const [title, setTitle] = useState('')
   // DB 판형 목록 (isActive=true 만) — 실패 시 하드코드 프리셋 폴백
   const [dbCards, setDbCards] = useState<FormatPresetCard[] | null>(null)
+  // 산출물 모드 (MODE-02) — 웹툰은 MODE-03 배선 전까지 세그먼트에서 비활성
+  const [mode, setMode] = useState<ProjectMode>('pod')
 
   useEffect(() => {
     if (!open) return
@@ -190,7 +217,8 @@ export function FormatPickerModal({
     }
   }, [open])
 
-  const cards = dbCards ?? FORMAT_PRESETS
+  // 모드의 단위계로 필터 — px 판형이 활성화돼도 POD 목록에 섞이지 않는다 (MODE-02)
+  const cards = (dbCards ?? FORMAT_PRESETS).filter((c) => c.unit === MODE_UNIT[mode])
 
   const defaultTitle = `새 콘티 ${new Date().toLocaleDateString('ko-KR', { year: 'numeric', month: '2-digit', day: '2-digit' })}`
 
@@ -235,6 +263,56 @@ export function FormatPickerModal({
         <DialogHeader>
           <DialogTitle className="text-lg font-semibold">어떤 판형으로 시작할까요?</DialogTitle>
         </DialogHeader>
+
+        {/* 산출물 모드 세그먼트 (MODE-02) — 웹툰은 MODE-03 배선 전까지 비활성 */}
+        <div
+          className={cn(
+            'mt-4 grid grid-cols-2 gap-1 p-1',
+            'rounded-[var(--radius-md)] bg-[var(--color-surface-muted,var(--color-border))]',
+          )}
+          role="radiogroup"
+          aria-label="산출물 모드 선택"
+        >
+          <button
+            type="button"
+            role="radio"
+            aria-checked={mode === 'pod'}
+            onClick={() => setMode('pod')}
+            className={cn(
+              'rounded-[var(--radius-sm)] px-3 py-2 text-sm font-medium transition-colors',
+              'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--editor-focus)]',
+              mode === 'pod'
+                ? 'bg-[var(--color-surface)] text-[var(--color-text)] shadow-sm'
+                : 'text-[var(--color-text-muted)] hover:text-[var(--color-text)]',
+            )}
+            data-testid="mode-segment-pod"
+          >
+            📄 인쇄·출판 (POD)
+          </button>
+          <button
+            type="button"
+            role="radio"
+            aria-checked={false}
+            disabled
+            title="웹툰 모드는 준비 중입니다"
+            className={cn(
+              'rounded-[var(--radius-sm)] px-3 py-2 text-sm font-medium',
+              'text-[var(--color-text-muted)] opacity-60 cursor-not-allowed',
+              'inline-flex items-center justify-center gap-1.5',
+            )}
+            data-testid="mode-segment-webtoon"
+          >
+            📱 웹툰
+            <span
+              className={cn(
+                'rounded-full px-1.5 py-0.5 text-[10px] font-medium',
+                'bg-[var(--color-border)] text-[var(--color-text-muted)]',
+              )}
+            >
+              준비 중
+            </span>
+          </button>
+        </div>
 
         {/* 프리셋 카드 그리드 — gap-4 mt-4 호흡감 */}
         <div className="grid grid-cols-2 gap-4 mt-4" role="radiogroup" aria-label="판형 선택">

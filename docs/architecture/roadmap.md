@@ -343,7 +343,13 @@
   · zod(`ProjectModeSchema`/`FormatUnitSchema`, default 로 기존 API 호환) + web `/api/formats` 에 unit 판별자
   · **prod 반영은 대표님 액션**: FOLLOWUP-68 명령의 `migrate deploy` 가 이 마이그레이션도 함께 적용한다 + 시드 `pnpm tsx scripts/seed-formats.ts` 별도 1회
   · admin 판형 폼 px 지원·모드 선택 UX 는 MODE-02, px 판형 인쇄 경로 가드는 MODE-03
-- [ ] [MODE-02] 프로젝트 생성 UX — 모드 선택 화면 + 모드별 판형 목록 필터. 기존 프로젝트는 `pod` 로 표시 — @ui-designer + @admin-builder
+- [x] [MODE-02] 프로젝트 생성 UX — 모드 선택 + 판형 필터 + admin px 지원 — @ui-designer + @admin-builder ✅ 2026-08-09.
+  · FormatPickerModal 에 모드 세그먼트: POD 활성 · **웹툰은 "준비 중" 비활성**(MODE-03 배치 분기 배선 전 반쪽 노출 금지). 판형 목록은 모드의 단위계로 필터(pod=mm) — px 판형이 활성화돼도 POD 목록에 섞이지 않는 것이 실질 가치
+  · 서버 px 가드 2곳: `projects/save`(생성) · `script/full-pipeline`(자동배치) — unit≠mm 이면 400. UI disabled + 프리셋 isActive:false 와 삼중 방어
+  · admin: `formatInputSchemaWithUnitCheck`(단위별 치수 범위 mm 50~500 · px 200~8192, px 는 bleed/safe 0 강제) · 생성 폼 unit select · **PATCH 는 unit 불변**(기존 프로젝트 치수 해석 보호) · 목록/편집 단위 표시
+  · mypage 프로젝트 카드 모드 뱃지(기존 프로젝트 = 백필 pod)
+  · 신규 테스트 9(web 모달 4 + admin 스키마 5) · 시각 검증(모달 스크린샷 2회) 완료
+  · **작업 중 prod 장애 발견·복구**: MODE-01 스키마 push(=Vercel 자동배포)가 마이그레이션 미적용 prod 와 불일치 → Prisma 가 select 없는 조회에도 전체 컬럼을 나열해 P2022 → 판형 API 503 · 저장 실패 (~2.5h). 대표님 마이그레이션 적용으로 정상화. 재발 방지 함정 노트는 핸드오프 §5
 - [ ] [MODE-03] `ai-layout` 웹툰 분기 — `capacity` 의 페이지 분할을 **스트립 연장**으로 대체(컷 간 여백·스크롤 리듬), safe/bleed 제약은 pod 모드에서만 적용 — @layout-composer
 - [ ] [MODE-04] `editor-core` 세로 무한 캔버스 — 뷰포트 가상화(200객체 60fps 예산 유지), 컷 경계 가이드 — @editor-engineer
 - [ ] [MODE-05] 웹툰 export — 이미지 시퀀스 + 단일 롱 이미지(플랫폼 업로드 규격: 폭 고정·분할 높이 상한) — @editor-engineer + @pdf-publisher

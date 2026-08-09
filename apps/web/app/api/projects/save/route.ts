@@ -139,6 +139,12 @@ export async function POST(req: Request): Promise<NextResponse> {
     )
   }
 
+  // 4-b. px(웹툰) 판형 가드 (MODE-02) — 편집기·배치가 아직 mm 전제라 px 프로젝트를
+  // 만들면 잘못된 결과가 나온다. 배치 분기(MODE-03) 배선 전까지 서버에서 차단한다.
+  if (format.unit !== 'mm') {
+    return jsonError('웹툰(px) 판형 프로젝트 생성은 준비 중입니다.', 400)
+  }
+
   try {
     let savedProjectId: string
 

@@ -26,6 +26,9 @@ import type { AdminRole } from '../../../../src/lib/auth'
 import { formatInputSchema } from '../../../../src/lib/schemas/format'
 import type { FormatOutput } from '../../../../src/lib/schemas/format'
 
+/** 편집 폼 스키마 — unit 제외(생성 시 확정, PATCH 도 strip 한다) */
+const formatEditSchema = formatInputSchema.omit({ unit: true })
+
 // ─── 필드 메타 ───────────────────────────────────────────────────────────────
 
 const FIELD_META: Record<string, FieldMeta> = {
@@ -72,6 +75,8 @@ const FIELD_META: Record<string, FieldMeta> = {
 export interface FormatData {
   id: string
   name: string
+  /** 단위계 — 생성 시 확정, 편집 불가 (MODE-02). 표시 전용 */
+  unit: 'mm' | 'px'
   widthMm: number
   heightMm: number
   dpi: 72 | 150 | 300 | 600
@@ -101,7 +106,7 @@ export function FormatEditClient({ format, userRole }: FormatEditClientProps) {
   const isSuperadmin = userRole === 'superadmin'
   const usageCount = format.templateCount + format.projectCount
 
-  const handleSubmit = async (values: FormatOutput) => {
+  const handleSubmit = async (values: Omit<FormatOutput, 'unit'>) => {
     setServerErrors({})
 
     const res = await fetch(`/api/formats/${format.id}`, {
@@ -209,8 +214,17 @@ export function FormatEditClient({ format, userRole }: FormatEditClientProps) {
       </div>
 
       {/* EntityForm */}
+      {/* 단위계 — 생성 시 확정. 바꾸면 기존 프로젝트의 치수 해석이 통째로 바뀌므로 편집 불가 (MODE-02) */}
+      <p
+        style={{ fontSize: 13, color: 'var(--nike-text-muted, #666)', margin: '0 0 12px' }}
+        data-testid="format-unit-readonly"
+      >
+        단위계: <strong>{format.unit === 'px' ? 'px — 웹툰 화면' : 'mm — 인쇄·출판 (POD)'}</strong>{' '}
+        (생성 시 확정, 변경 불가)
+      </p>
+
       <EntityForm
-        schema={formatInputSchema}
+        schema={formatEditSchema}
         defaultValues={{
           name: format.name,
           widthMm: format.widthMm,

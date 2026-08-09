@@ -20,8 +20,14 @@ const coverDimensionMm = z
 
 export const formatInputSchema = z.object({
   name: z.string().min(2).max(50),
-  widthMm: z.number().int().min(50).max(500),
-  heightMm: z.number().int().min(50).max(500),
+  /**
+   * 단위계 (MODE-02 / ADR-0017). mm=인쇄(POD), px=웹툰 화면.
+   * unit='px' 이면 widthMm/heightMm 는 픽셀값(필드명은 레거시)이고 heightMm 는
+   * 스트립 세그먼트 기본 높이다. 단위별 치수 범위는 아래 superRefine 에서 검증.
+   */
+  unit: z.enum(['mm', 'px']).default('mm'),
+  widthMm: z.number().int().positive(),
+  heightMm: z.number().int().positive(),
   dpi: z.union([z.literal(72), z.literal(150), z.literal(300), z.literal(600)]),
   bleedMm: z.number().min(0).max(10).default(3),
   safeMm: z.number().min(0).max(20).default(5),
@@ -44,11 +50,43 @@ export const formatInputSchema = z.object({
   isActive: z.boolean().default(true),
 })
 
+/** 단위별 치수 허용 범위 — mm 는 인쇄 실물, px 는 웹툰 화면 규격 */
+const DIMENSION_RANGE = {
+  mm: { min: 50, max: 500, label: 'mm 판형은 50~500' },
+  px: { min: 200, max: 8192, label: 'px 판형은 200~8192' },
+} as const
+
+/** 단위별 치수·인쇄 필드 검증을 붙인 최종 입력 스키마 (POST/PATCH 공용 규칙) */
+function validateByUnit(
+  data: { unit: 'mm' | 'px'; widthMm: number; heightMm: number; bleedMm: number; safeMm: number },
+  ctx: z.RefinementCtx,
+): void {
+  const range = DIMENSION_RANGE[data.unit]
+  for (const field of ['widthMm', 'heightMm'] as const) {
+    const v = data[field]
+    if (v < range.min || v > range.max) {
+      ctx.addIssue({ code: 'custom', path: [field], message: range.label })
+    }
+  }
+  // bleed/safe 는 인쇄 개념 — px(웹툰) 판형에 값이 있으면 인쇄 경로 오용의 씨앗이 된다
+  if (data.unit === 'px' && (data.bleedMm !== 0 || data.safeMm !== 0)) {
+    ctx.addIssue({
+      code: 'custom',
+      path: ['bleedMm'],
+      message: 'px(웹툰) 판형은 재단/안전 여백이 없습니다 — 0 으로 두세요',
+    })
+  }
+}
+
+export const formatInputSchemaWithUnitCheck = formatInputSchema.superRefine(validateByUnit)
+
 export type FormatInput = z.input<typeof formatInputSchema>
 export type FormatOutput = z.output<typeof formatInputSchema>
 
-// PATCH 용 — 모든 필드 optional
-export const formatPatchSchema = formatInputSchema.partial()
+// PATCH 용 — 모든 필드 optional.
+// unit 은 제외한다: 단위계를 바꾸면 이 판형을 이미 참조하는 프로젝트의 치수 해석이
+// 통째로 바뀐다(130mm ↔ 130px). 단위계는 생성 시에만 확정.
+export const formatPatchSchema = formatInputSchema.omit({ unit: true }).partial()
 export type FormatPatch = z.input<typeof formatPatchSchema>
 
 // ─── 4종 프리셋 ──────────────────────────────────────────────────────────────
@@ -67,6 +105,7 @@ export const FORMAT_PRESETS: FormatPreset[] = [
     description: '일반 만화/소설',
     values: {
       name: 'B5 단행본',
+      unit: 'mm',
       widthMm: 130,
       heightMm: 200,
       dpi: 300,
@@ -83,6 +122,7 @@ export const FORMAT_PRESETS: FormatPreset[] = [
     description: '작품집/매거진',
     values: {
       name: 'A5 작품집',
+      unit: 'mm',
       widthMm: 148,
       heightMm: 210,
       dpi: 300,
@@ -99,6 +139,7 @@ export const FORMAT_PRESETS: FormatPreset[] = [
     description: '인스타 카드뉴스',
     values: {
       name: '정사각 1:1',
+      unit: 'mm',
       widthMm: 150,
       heightMm: 150,
       dpi: 300,
@@ -115,6 +156,7 @@ export const FORMAT_PRESETS: FormatPreset[] = [
     description: '모바일 스토리',
     values: {
       name: '세로형 모바일',
+      unit: 'mm',
       widthMm: 90,
       heightMm: 150,
       dpi: 300,

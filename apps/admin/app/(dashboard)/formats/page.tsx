@@ -19,6 +19,7 @@ export default async function FormatsPage() {
     select: {
       id: true,
       name: true,
+      unit: true,
       widthMm: true,
       heightMm: true,
       dpi: true,
@@ -32,6 +33,7 @@ export default async function FormatsPage() {
   const data = formats.map((f) => ({
     id: f.id,
     name: f.name,
+    unit: f.unit,
     widthMm: f.widthMm,
     heightMm: f.heightMm,
     dpi: f.dpi,
