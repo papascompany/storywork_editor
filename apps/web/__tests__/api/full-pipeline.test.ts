@@ -64,6 +64,8 @@ const MOCK_USER_EMAIL = 'test@example.com'
 const MOCK_DB_USER = { id: 'user-cuid-001', email: MOCK_USER_EMAIL, role: 'user' }
 const MOCK_FORMAT = {
   id: 'preset-b5-novel',
+  // DB 는 unit NOT NULL DEFAULT 'mm' (MODE-01) — px 가드가 mm 아닌 판형을 400 으로 거부한다
+  unit: 'mm',
   widthMm: 128,
   heightMm: 182,
   dpi: 350,
@@ -422,6 +424,24 @@ describe('POST /api/script/full-pipeline', () => {
     expect(status).toBe(404)
     const d = data as { error: string }
     expect(d.error).toContain('판형')
+  })
+
+  it('px(웹툰) 판형 → 400 (MODE-02 가드 — ai-layout 은 mm 좌표 전용)', async () => {
+    mockGetPrismaClient.mockReturnValue(
+      makeMockPrisma({
+        format: { ...MOCK_FORMAT, id: 'preset-webtoon-690', unit: 'px', widthMm: 690 },
+      }) as any,
+    )
+
+    const { status, data } = await callRoute({
+      scriptRaw: '철수: 안녕!',
+      formatId: 'preset-webtoon-690',
+      title: '웹툰 가드',
+    })
+
+    expect(status).toBe(400)
+    const d = data as { error: string }
+    expect(d.error).toContain('웹툰')
   })
 
   // ── 5. 기존 프로젝트 (projectId) ──────────────────────────────────
