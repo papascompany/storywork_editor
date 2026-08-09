@@ -19,6 +19,13 @@ export type { AnalyzeResult, RecommendResult }
 
 export interface LayoutFormat {
   id: string
+  /**
+   * 단위계 (MODE-03 / ADR-0017). 생략하면 mm — 기존 호출 전부 하위호환.
+   * unit='px' 이면 widthMm/heightMm 는 **픽셀값**(필드명은 레거시)이고 heightMm 는
+   * 스트립 세그먼트 기본 높이다. px 판형은 compose 가 웹툰 스트립 분기로 처리하며
+   * 인쇄 경로(pdf-engine·preflight)에 들어가면 안 된다.
+   */
+  unit?: 'mm' | 'px'
   widthMm: number
   heightMm: number
   dpi: number
@@ -182,6 +189,8 @@ export interface PageFabricJson {
     schemaVersion: 1
     templateId?: string
     sceneIndices: number[]
+    /** 웹툰 세그먼트 표시 (MODE-03) — 없으면 pod 페이지 */
+    mode?: 'webtoon'
   }
 }
 

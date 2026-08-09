@@ -202,11 +202,18 @@ export async function POST(
 
   // 5. buildPdf() 입력 구성 (동기 모드)
   const format = (project as unknown as { format: Record<string, unknown> }).format as {
+    unit?: string
     widthMm: number
     heightMm: number
     dpi: number
     bleedMm: number
     safeMm: number
+  }
+
+  // px(웹툰) 판형 가드 (MODE-03) — pdf-engine 은 mm 좌표 전용이다. px 값을 mm 로 읽으면
+  // 690mm 지면이 만들어진다. 웹툰 출력은 이미지 시퀀스(MODE-05)로 간다.
+  if (format.unit !== undefined && format.unit !== 'mm') {
+    return jsonError('웹툰(px) 판형은 PDF 출판 대상이 아닙니다.', 400)
   }
 
   const pages = (project as unknown as { pages: Array<Record<string, unknown>> }).pages

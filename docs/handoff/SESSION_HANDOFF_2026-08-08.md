@@ -1,14 +1,15 @@
 # 세션 핸드오프 — 2026-08-08~09 (작업 08-07 밤 ~ 08-09 새벽)
 
 > 이전: [SESSION_HANDOFF_2026-08-05.md](SESSION_HANDOFF_2026-08-05.md)
-> 이 세션 = **SCRIPT-KO-04 + 제품 결정 3건 + LAYOUT-04 + LAYOUT-05 + MODE-01 + MODE-02** 완료.
+> 이 세션 = **SCRIPT-KO-04 + 제품 결정 3건 + LAYOUT-04/05 + MODE-01/02/03** 완료.
 > 도중 모델 전환(Opus 5 → Fable 5, LAYOUT-05 착수 직전) — 체크포인트 대조 후 이어감.
 > **08-09 새벽 prod 장애 발생·복구**(§1-⑥ · §5 함정 노트 필독).
 
 ## 0. 한 줄 상태
 
-MODE-02 까지 완료 · **prod 마이그레이션 적용 완료**(대표님 실행, FOLLOWUP-68 이력 정리 겸용 —
-액션 2번 해소) · 잔여 대표님 액션 = 키 등록(1) · PERF 인증(3) · PDF 육안(4) · 웹툰 시드(5).
+MODE-03 까지 완료 · **prod 마이그레이션 적용 완료**(대표님 실행, FOLLOWUP-68 이력 정리 겸용 —
+액션 2번 해소) · 잔여 대표님 액션 = 키 등록(1) · PERF 인증(3) · PDF 육안(4) ·
+**웹툰 시드 재실행(5 — git pull 후, 1차 실행이 구버전 워킹카피로 추정돼 미반영)**.
 
 ## 1. 완료
 
@@ -81,6 +82,18 @@ MODE-02 까지 완료 · **prod 마이그레이션 적용 완료**(대표님 실
   단위계 필터 · 서버 px 가드 2곳(save/full-pipeline) · admin unit 지원(생성 시 확정,
   PATCH 불변, px 는 bleed/safe 0 강제) · mypage 모드 뱃지. 신규 테스트 9 · 시각 검증 2회
 
+### ⑦ MODE-03 웹툰 스트립 분기 + CI hotfix (08-09)
+- `strip.ts` — `LayoutFormat.unit` 분기: 합병 없음(장면당 1세그먼트) · 수용량 초과 =
+  **스트립 연장** · 스크롤 리듬 6% 인셋(bg 제외). 수용량 계산과 실제 보강이
+  `planningTemplate` 단일점 공유(LAYOUT-03 계약). `publish`/`preflight` px 가드
+- **웹툰 모드 개방 안 함** — MODE-04(편집기 px 캔버스)·05(export) 전까지 모달 "준비 중"·
+  full-pipeline 가드 유지
+- CI hotfix(`bd22de2`): MODE-02 px 가드가 unit 없는 테스트 mock 판형을 400 으로 거부해
+  full-pipeline 테스트 9건이 깨짐 — mock 에 unit:'mm' 추가 + px 가드 케이스 신규.
+  **교훈: 서버 가드 추가 시 해당 API 의 기존 테스트 mock 도 같이 봐야 한다**
+- **시드 미반영 발견**: 대표님이 시드 실행했다고 했으나 prod 에 px 프리셋 0행·판형 4종
+  그대로 — **구버전 워킹카피(git pull 전)에서 실행된 것으로 추정. git pull 후 재실행 필요**
+
 ## 2. 검증
 
 - `pnpm turbo run typecheck lint test --concurrency=1` — **79 태스크 green**(각 커밋마다 실행)
@@ -98,7 +111,7 @@ MODE-02 까지 완료 · **prod 마이그레이션 적용 완료**(대표님 실
 | 2 | FOLLOWUP-68 이력 정리 + MODE-01 deploy | **✅ 2026-08-09 01:13 완료**(prod 200 + unit 백필 실측) | — |
 | 3 | PERF-ADMIN-03 인증 저장 | ⏳ 미실행 | `pnpm perf:admin:save-auth --env prod` |
 | 4 | prod 한글 PDF 육안 확인 | ⏳ 미실행 | 편집기에서 publish 1회 |
-| 5 | MODE-01 웹툰 프리셋 시드 | ⏳ 미실행 (2번 완료로 실행 가능) | `set -a; source .env.local; set +a; pnpm tsx scripts/seed-formats.ts` |
+| 5 | MODE-01 웹툰 프리셋 시드 | ⏳ **재실행 필요** — 1차 실행이 prod 미반영(px 0행·판형 4종, 구버전 워킹카피 추정) | **`git pull` 후** `set -a; source .env.local; set +a; pnpm tsx scripts/seed-formats.ts` |
 
 > 5번(시드)은 idempotent upsert 라 언제든 1회. 웹툰 프리셋은 isActive:false 라 사용자 노출 없음.
 
@@ -107,9 +120,9 @@ SCRIPT-KO-02 착수 가능** — 파급이 가장 크다. 3번은 저장 후 알
 
 ## 4. 다음 코드 큐
 
-- 🟢 **MODE-02** 프로젝트 생성 모드 선택 UX + admin 판형 폼 px 지원 — MODE-01 스키마 완료로
-  착수 가능(키 불요). 웹툰 프리셋 isActive 활성화는 MODE-02 완성과 한 세트
-- 🟢 **MODE-03** ai-layout 웹툰 분기(스트립 연장) + px 판형 인쇄 경로 가드
+- 🟢 **MODE-04** editor-core 세로 무한 캔버스 + px 단위 지원 — 웹툰 모드 개방의 마지막 관문.
+  편집기 mm→px 변환(unit=px 면 1:1)부터. MODE-05(이미지 export)와 함께 완성되면
+  모달 "준비 중" 해제 + 프리셋 isActive + full-pipeline 가드 해제가 한 세트
 - ⏸ LAYOUT-06 — 실사용 로그(FOLLOWUP-60) 이후 재개
 - 🟢 산문 서술 문장 단위 분할 — `parse-novel` 이 단락을 200자에서 자른다. 캡션이 여러 줄을 담게 된
   지금은 문장 단위가 더 맞다(SCRIPT-KO-04 리포트 §5)

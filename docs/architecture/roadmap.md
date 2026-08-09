@@ -350,7 +350,12 @@
   · mypage 프로젝트 카드 모드 뱃지(기존 프로젝트 = 백필 pod)
   · 신규 테스트 9(web 모달 4 + admin 스키마 5) · 시각 검증(모달 스크린샷 2회) 완료
   · **작업 중 prod 장애 발견·복구**: MODE-01 스키마 push(=Vercel 자동배포)가 마이그레이션 미적용 prod 와 불일치 → Prisma 가 select 없는 조회에도 전체 컬럼을 나열해 P2022 → 판형 API 503 · 저장 실패 (~2.5h). 대표님 마이그레이션 적용으로 정상화. 재발 방지 함정 노트는 핸드오프 §5
-- [ ] [MODE-03] `ai-layout` 웹툰 분기 — `capacity` 의 페이지 분할을 **스트립 연장**으로 대체(컷 간 여백·스크롤 리듬), safe/bleed 제약은 pod 모드에서만 적용 — @layout-composer
+- [x] [MODE-03] `ai-layout` 웹툰 분기 + 인쇄 경로 가드 — @layout-composer ✅ 2026-08-09.
+  · `strip.ts` 신설 — `LayoutFormat.unit('mm'|'px', 생략=mm 하위호환)` 기반 분기. **합병 없음**(장면당 1세그먼트 — 한 지면 여러 컷은 인쇄 문법) · **수용량 초과 = 스트립 연장**(기존 `planCapacityPages` 단일 장면 분할 경로 재사용 — 페이지 분할이 웹툰에선 곧 세그먼트 추가) · **스크롤 리듬**(세그먼트 상·하 6% 인셋, bg 는 전체 유지)
+  · 리듬은 두 경로가 같은 값을 공유: 기존 슬롯은 `withStripRhythm` 사본, 생성 격자·safe 검사는 `normalizeWebtoonFormat` 의 **safeMm 재해석**(웹툰에서 safeMm = 리듬 인셋 px — 인쇄 safe 아님, 주석 명시). 수용량 계산(capacity)과 실제 보강(compose)이 `planningTemplate` 단일점을 공유 — 어긋나면 대사 유실(LAYOUT-03 계약)
+  · 인쇄 경로 가드: `publish`·`preflight` route 에 unit≠mm → 400 (pdf-engine 은 mm 전용 — px 를 mm 로 읽으면 690mm 지면). `_aiMeta.mode='webtoon'` 세그먼트 표시
+  · **웹툰 모드 개방은 안 함** — 편집기 px 캔버스(MODE-04)·이미지 export(MODE-05) 배선 전까지 모달 "준비 중"·프리셋 isActive:false·full-pipeline px 가드 유지. 개방은 MODE-04/05 완료와 한 세트
+  · 신규 테스트 9(`strip.test.ts` — 세그먼트 문법·보존 100%·리듬 준수·결정론·mm 무회귀), ai-layout 257 green
 - [ ] [MODE-04] `editor-core` 세로 무한 캔버스 — 뷰포트 가상화(200객체 60fps 예산 유지), 컷 경계 가이드 — @editor-engineer
 - [ ] [MODE-05] 웹툰 export — 이미지 시퀀스 + 단일 롱 이미지(플랫폼 업로드 규격: 폭 고정·분할 높이 상한) — @editor-engineer + @pdf-publisher
 - [ ] [MODE-06] 웹툰 모드 채택률·품질 측정 — LAYOUT-04 지표를 스트립 기준으로 재정의(페이지당 → 화면 스크롤당) — @qa-tester

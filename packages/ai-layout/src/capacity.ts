@@ -25,6 +25,7 @@ import { isCaptionLine, isDialogueLine } from '@storywork/ai-script'
 
 import { pageBubbleCapacity, poseSlotsOf, withGeneratedBubbleSlots } from './bubble-slots.js'
 import { captionBoxesNeeded, pageCaptionSlotCapacity } from './caption-slots.js'
+import { planningTemplate } from './strip.js'
 import { matchTemplate } from './template-match.js'
 import type { LayoutFormat, LayoutTemplate, PageGroup, TemplateHint } from './types.js'
 
@@ -234,7 +235,8 @@ export function planCapacityPages(
       requiredPoseCount: Math.min(1, speakerCount),
     })
 
-    const budget = pageBudgetOf(template, ctx.format, dialogueCount)
+    // 웹툰이면 리듬 템플릿으로 수용량을 계산한다 — compose 의 실제 보강과 같은 변환(MODE-03)
+    const budget = pageBudgetOf(planningTemplate(template, ctx.format), ctx.format, dialogueCount)
     if (!allowSplit || fitsInPage(scene.lines, budget)) {
       emit({ sceneIndices: [sceneIndex], templateHint: hint, templateId: template.id })
       return

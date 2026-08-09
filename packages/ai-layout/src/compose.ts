@@ -38,6 +38,7 @@ import {
 import { checkLowDpiConstraint, formatLowDpiWarning } from './constraints/low-dpi.js'
 import { splitScenes } from './page-split.js'
 import { assignSlots, BG_TONE_COLOR } from './slot-assign.js'
+import { isWebtoonFormat, normalizeWebtoonFormat, planningTemplate } from './strip.js'
 import { matchTemplate, PRESET_TEMPLATES } from './template-match.js'
 import type {
   ComposeOptions,
@@ -331,10 +332,12 @@ async function buildPageFabricJson(
     const scene = analyzed.scenes.find((s) => s.index === idx)
     return scene ? scenePageView(scene, rangeOf(idx)).lines : []
   })
+  // 웹툰이면 리듬 인셋 사본 — capacity 의 수용량 계산과 같은 변환이어야 한다 (MODE-03)
+  const rhythmTemplate = planningTemplate(baseTemplate, format)
   // 보강 순서는 capacity.pageBudgetOf() 와 같아야 한다 — 말풍선이 먼저 자리를 잡고,
   // 캡션은 남은 자리에 만들어진다. 순서가 어긋나면 계획한 수용량과 실제가 달라진다.
   const template = withGeneratedCaptionSlots(
-    withGeneratedBubbleSlots(baseTemplate, format, dialogueLinesOf(pageViewLines).length),
+    withGeneratedBubbleSlots(rhythmTemplate, format, dialogueLinesOf(pageViewLines).length),
     format,
     captionBoxesNeeded(captionTextsOf(pageViewLines)),
   )
@@ -638,6 +641,8 @@ async function buildPageFabricJson(
       schemaVersion: 1,
       templateId: template.id,
       sceneIndices,
+      // 웹툰 세그먼트 표시 (MODE-03) — editor-core 는 _aiMeta 를 무시해도 무방
+      ...(isWebtoonFormat(format) ? { mode: 'webtoon' as const } : {}),
     },
   }
 
@@ -662,24 +667,30 @@ export async function compose(
   opts: ComposeOptions,
 ): Promise<ComposeResult> {
   const seed = opts.seed ?? 0
-  const format: LayoutFormat = opts.format ?? DEFAULT_FORMAT
+  // 웹툰(px) 판형은 스트립 계획용으로 정규화된다 — safeMm 가 리듬 인셋(px)으로 재해석 (MODE-03)
+  const format: LayoutFormat = normalizeWebtoonFormat(opts.format ?? DEFAULT_FORMAT)
+  const webtoon = isWebtoonFormat(format)
   const enableSplitMerge = opts.enableSplitMerge !== false // 기본 true
 
-  // 1. 페이지 분할 — 연출 규칙 (R1~R5)
-  const sceneGroups: PageGroup[] = enableSplitMerge
-    ? splitScenes(recommended.scenes, analyzed)
-    : recommended.scenes.map((r, i) => ({
-        pageIndex: i,
-        sceneIndices: [r.sceneIndex],
-        templateHint: 'default' as TemplateHint,
-      }))
+  // 1. 페이지 분할 — 연출 규칙 (R1~R5).
+  //    웹툰은 합병(한 지면에 여러 컷)이 인쇄 문법이라 쓰지 않는다 — 장면당 1세그먼트.
+  //    enableSplitMerge 옵션은 웹툰에서 무시된다(합병 없음이 모드의 정의).
+  const sceneGroups: PageGroup[] =
+    !webtoon && enableSplitMerge
+      ? splitScenes(recommended.scenes, analyzed)
+      : recommended.scenes.map((r, i) => ({
+          pageIndex: i,
+          sceneIndices: [r.sceneIndex],
+          templateHint: 'default' as TemplateHint,
+        }))
 
-  // 2. 대사 수용량 재계획 — 템플릿 확정 + 합병 해제 + 페이지 분할 (LAYOUT-03)
+  // 2. 대사 수용량 재계획 — 템플릿 확정 + 합병 해제 + 분할 (LAYOUT-03).
+  //    웹툰에서 "분할"은 페이지가 아니라 **스트립 연장**(세그먼트 추가)이다 — 항상 허용.
   const pageGroups = planCapacityPages(sceneGroups, analyzed, {
     templates: opts._templates ?? [],
     preferredIds: opts.preferredTemplateIds ?? [],
     format,
-    allowSplit: enableSplitMerge,
+    allowSplit: webtoon ? true : enableSplitMerge,
   })
 
   // 3. 각 PageGroup → PageDraft

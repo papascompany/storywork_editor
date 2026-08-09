@@ -68,6 +68,15 @@ export {
 } from './bubble-slots.js'
 export type { GridSlotSpec } from './bubble-slots.js'
 
+// ── 웹툰 세로 스트립 분기 (MODE-03) ───────────────────────────────────────
+export {
+  isWebtoonFormat,
+  normalizeWebtoonFormat,
+  planningTemplate,
+  withStripRhythm,
+  STRIP_RHYTHM_INSET,
+} from './strip.js'
+
 // ── 캡션(내레이션·지문) 박스 (SCRIPT-KO-04) ───────────────────────────────
 export {
   captionBoxesNeeded,
