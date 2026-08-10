@@ -1,13 +1,13 @@
-# 세션 핸드오프 — 2026-08-08~09 (작업 08-07 밤 ~ 08-09 새벽)
+# 세션 핸드오프 — 2026-08-08~10 (작업 08-07 밤 ~ 08-10)
 
 > 이전: [SESSION_HANDOFF_2026-08-05.md](SESSION_HANDOFF_2026-08-05.md)
-> 이 세션 = **SCRIPT-KO-04 + 제품 결정 3건 + LAYOUT-04/05 + MODE-01/02/03 + MODE-04a** 완료.
+> 이 세션 = **SCRIPT-KO-04 + 제품 결정 3건 + LAYOUT-04/05 + MODE-01/02/03 + MODE-04a/04b** 완료.
 > 도중 모델 전환(Opus 5 → Fable 5, LAYOUT-05 착수 직전) — 체크포인트 대조 후 이어감.
 > **08-09 새벽 prod 장애 발생·복구**(§1-⑥ · §5 함정 노트 필독).
 
 ## 0. 한 줄 상태
 
-MODE-04a 까지 완료 · **prod 마이그레이션 적용 완료**(대표님 실행, FOLLOWUP-68 이력 정리 겸용 —
+MODE-04b 까지 완료 · **prod 마이그레이션 적용 완료**(대표님 실행, FOLLOWUP-68 이력 정리 겸용 —
 액션 2번 해소) · 잔여 대표님 액션 = 키 등록(1) · PERF 인증(3) · PDF 육안(4) ·
 **웹툰 시드 재실행(5 — git pull 후, 1차 실행이 구버전 워킹카피로 추정돼 미반영)**.
 
@@ -105,10 +105,22 @@ MODE-04a 까지 완료 · **prod 마이그레이션 적용 완료**(대표님 �
 - 가드 구멍 3개 봉쇄: publish async 우회 · PDF 워커 무검사 · compose 라우트 unit 미select
 - 캔버스 상한 클램프(16384px, dpr 반영) · loadJson 단위계 불일치 경고
 
+### ⑨ MODE-04b 웹툰 세로 스트립 편집 UI (08-10)
+- `editor-core/src/strip/geometry.ts`(React 무의존) + `StoryCanvas.setViewportScale()` —
+  뷰포트 API 를 코어로 회수(종전 web 이 `_fabricCanvas` 직접 조작)
+- web `webtoon/` 3종: 가상화 훅(라이브 창 3/2 · 히스테리시스 · **활성 pin**) ·
+  세그먼트 캔버스(**flush → dispose 순서 고정**) · 스트립 컨테이너
+- 선행 조건 해소: `updatePageJson(index, json)` — `updateCurrentPageJson` 은 캔버스 N개에서
+  다른 세그먼트를 덮어쓴다
+- **실측 함정**: 가상화 훅이 `RefObject` 를 받으면 effect 의존성이 불변이라 마운트 시 current 가
+  null 이면 영영 재시도하지 않는다(컨테이너 623px 인데 훅은 0). callback ref + state 로 교정
+- 검증: 실기 8세그먼트 스트립 렌더 · 휠 스크롤 라이브 이동([0]→[0,1]) · 활성 승격 ·
+  mm 경로 무회귀 육안. 신규 28 tests
+
 ## 2. 검증
 
 - `pnpm turbo run typecheck lint test --concurrency=1` — **79 태스크 green**(각 커밋마다 실행)
-- MODE-04a: 신규 23 tests(coords-unit 11 · 웹툰 라운드트립 3 · 기타) · editor-core 91 ·
+- MODE-04a/b: 신규 51 tests(coords-unit 11 · 라운드트립 3 · strip-geometry 22 · virtualizer 6 · 기타) · editor-core 113 ·
   editor-export 골든 PNG 43(mm 무회귀 증거) · ai-layout 257
 - ai-script 116 · ai-layout **248**(신규 74: caption-slots 18 · quality 22 · layout05 12 · 회귀 가드 5 · 기타)
 - CI: `ebc23c6` green(31190889786) · `ae273a1` green(31187489500). **`dedd945`(LAYOUT-05)는
@@ -133,9 +145,9 @@ SCRIPT-KO-02 착수 가능** — 파급이 가장 크다. 3번은 저장 후 알
 
 ## 4. 다음 코드 큐
 
-- 🟢 **MODE-04b** 웹툰 세로 스트립 편집 UI — 세그먼트별 캔버스 세로 스택 + 가상화.
-  단일 롱 캔버스는 기각(근거 roadmap). 선행: `usePageStore.updatePageJson(index, json)` 신설
 - 🟢 **MODE-04c** 웹툰 개방 정합 — `save` px 허용 전에 `Project.mode` 저장 배선 필수
+  (현재 save 가 mode 를 안 써서 `mode=pod + unit=px` 모순 레코드 위험). 이후 MODE-05(export)까지
+  끝나야 웹툰 게이트 4종을 연다
 - ⏸ LAYOUT-06 — 실사용 로그(FOLLOWUP-60) 이후 재개
 - 🟢 산문 서술 문장 단위 분할 — `parse-novel` 이 단락을 200자에서 자른다. 캡션이 여러 줄을 담게 된
   지금은 문장 단위가 더 맞다(SCRIPT-KO-04 리포트 §5)
@@ -170,6 +182,10 @@ SCRIPT-KO-02 착수 가능** — 파급이 가장 크다. 3번은 저장 후 알
   죽일 수 있다** — LAYOUT-05 에서 균형 우선 채택이 캡션 수용량을 전멸시켜 screenplay 51→94p.
   수용량 계산과 실제 생성이 같은 함수인 구조 덕에 페이지 수로 즉시 드러남. 생성 슬롯 채택을
   바꾸면 **반드시 `pnpm adoption:measure` 로 페이지 수부터 확인**
+- ★ **가상화 훅에 `RefObject` 를 넘기지 말 것 — 엘리먼트를 넘겨라.** effect 의존성이 ref
+  객체(불변)라 마운트 시 `current` 가 null 이었으면 **영영 재시도하지 않는다**. MODE-04b 에서
+  컨테이너가 623px 인데 훅은 0 으로 알고 스크롤을 못 따라갔다. callback ref + state 로 넘기면
+  DOM 부착이 리렌더를 일으켜 effect 가 다시 돈다
 - ★ **캡션은 줄당 개별 `text` 레이어로** — 개행 한 덩어리는 pdf-lib `drawText` 가 페이지 기본
   lineHeight(24pt)로 내려 12pt 캡션이 박스를 넘친다(기존 함정의 재확인). 회귀 가드 있음
 - ★ **`중복` 폴더 17장: 태깅 제외 ↔ 적재 포함** — `filename-tagger` 는 skip 하는데 `ingest-poses.ts`

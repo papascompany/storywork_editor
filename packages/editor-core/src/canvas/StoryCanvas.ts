@@ -298,6 +298,26 @@ export class StoryCanvas {
   }
 
   /**
+   * 뷰포트 배율을 설정한다 (MODE-04b).
+   *
+   * 웹툰 스트립은 세그먼트마다 캔버스를 두고 **같은 줌**을 걸어야 하므로, web 이
+   * `_fabricCanvas` 로 viewportTransform 을 직접 만지던 것을 여기로 회수한다.
+   * pan 은 0 — 스트립에서 가로 위치는 CSS 가 잡고, 세로 위치는 스크롤 컨테이너가 잡는다.
+   *
+   * @param scale 1 = 100%. 0 이하는 무시한다.
+   */
+  setViewportScale(scale: number): void {
+    if (this._disposed || scale <= 0) return
+    this._fabric.setViewportTransform([scale, 0, 0, scale, 0, 0])
+    this._fabric.requestRenderAll()
+  }
+
+  /** 현재 뷰포트 배율 (viewportTransform 의 x 스케일) */
+  get viewportScale(): number {
+    return this._fabric.viewportTransform?.[0] ?? 1
+  }
+
+  /**
    * 판형(Format)을 런타임에 변경한다.
    * - fabric 캔버스 dimensions 를 새 판형의 px 크기로 갱신
    * - mm↔px 변환 기준(dpi)도 함께 갱신

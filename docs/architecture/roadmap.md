@@ -363,10 +363,15 @@
   · **가드 구멍 3개 봉쇄**(정찰이 실측으로 발견): ①`publish` px 가드가 동기 경로에만 있어 `{async:true}` 가 우회 → 소유권 확인 직후로 이동 ②PDF 워커 무검사 → 최후 방어선 추가 ③`compose` 라우트가 `unit` 을 select 하지 않아 px 판형이 mm 로 오독 → select + 400 가드 + zod 필드
   · web 배선: `PageFormat.unit` · 모달→편집기 전달 · `setFormat` 3곳 · `format-conversion` 단위 분기
   · 신규 테스트 23(coords-unit 11 · 웹툰 라운드트립 3 · 기존 확장), turbo 79 태스크 green. README 좌표 계약 갱신
-- [ ] [MODE-04b] 웹툰 세로 스트립 편집 UI — 세그먼트별 캔버스를 DOM 세로 스택 + 뷰포트 가상화(라이브 창 K개, 나머지는 썸네일), 컷 경계 리듬 가이드, 활성 세그먼트 전환 — @editor-engineer.
+- [x] [MODE-04b] 웹툰 세로 스트립 편집 UI — @editor-engineer ✅ 2026-08-10.
+  · `editor-core/src/strip/geometry.ts` 신설(React 무의존 순수 산술): `stripLayout`(간격 누적·마지막 간격 제외) · `visibleRange`(overscan·간격 폴백) · `segmentAtScroll` · `scrollToSegment` · `fitStripWidth`. `StoryCanvas.setViewportScale()` 로 뷰포트 API 를 코어에 회수(종전 web 이 `_fabricCanvas` 로 직접 조작)
+  · web `webtoon/` 3종: `useStripVirtualizer`(라이브 창 = 데스크톱 3·모바일 2, **히스테리시스** 진입 좁게/이탈 넓게로 경계 플리커 차단, **활성 세그먼트 pin** 으로 편집 중 선택·히스토리 보호) · `StripSegmentCanvas`(언마운트 전 flush → dispose 순서 고정) · `StripCanvas`(스크롤 컨테이너 + 절대 배치 슬롯, 비라이브는 썸네일)
+  · **선행 조건 해소**: `usePageStore.updatePageJson(index, json)` 신설 — 현행 `updateCurrentPageJson` 은 캔버스 N개 환경에서 다른 세그먼트를 덮어쓴다
+  · EditorShell 분기는 **판형 단위계가 곧 조건**(`format.unit === 'px'`) — 별도 플래그를 두면 판형과 어긋나 mm 프로젝트가 스트립으로 열린다
+  · **실측 함정**: 가상화 훅이 `RefObject` 를 받으면 effect 의존성이 불변이라 마운트 시 `current` 가 null 이었을 때 **영영 재시도하지 않는다**(컨테이너 623px 인데 훅은 0 으로 알고 스크롤 미추종). callback ref + state 로 엘리먼트를 직접 받게 교정
+  · 검증: 실기 브라우저에서 8세그먼트 스트립 렌더·휠 스크롤 시 라이브 창 이동([0]→[0,1])·활성 승격·컷 경계 간격 육안 확인. mm(POD) 경로 무회귀 육안 확인. 신규 테스트 28(strip-geometry 22 · strip-virtualizer 6), turbo 79 green
+  · **제약(영구)**: 세그먼트 간 드래그 이동 불가 — fabric 캔버스 경계. 잘라내기/붙여넣기로만
   · **단일 롱 캔버스는 기각**(정찰 실측): fabric `calcViewportBoundaries()` 가 캔버스 엘리먼트 크기 기준이라 스트립 전체를 한 캔버스로 만들면 **오프스크린 컬링이 무효화**된다. dpr=2 에서 세그먼트 7개면 Safari 16384px 상한을 넘어 빈 캔버스가 되고(웹툰 1화는 30~60세그먼트), BUG-013 의 "fabric 내부 크기 = 뷰포트" iOS 크래시 방어 계약도 깨진다
-  · 선행 조건: `usePageStore` 에 **인덱스 지정 `updatePageJson(index, json)`** 신설(현행 `updateCurrentPageJson` 은 캔버스 N개 환경에서 다른 세그먼트를 덮어쓴다)
-  · 제약(영구): 세그먼트 간 드래그 이동 불가 — fabric 캔버스 경계. 잘라내기/붙여넣기로만
 - [ ] [MODE-04c] 웹툰 개방 정합 — `save` 라우트 px 허용 **전에** `Project.mode` 저장 배선 필수(현재 save 가 mode 를 쓰지 않아 `mode=pod + unit=px` 모순 레코드가 생긴다). `/api/projects/[id]` 응답에 format 치수·unit·mode 포함 → `useProjectImport` FALLBACK_FORMAT 제거 — @architect
 - [ ] [MODE-05] 웹툰 export — 이미지 시퀀스 + 단일 롱 이미지(플랫폼 업로드 규격: 폭 고정·분할 높이 상한) — @editor-engineer + @pdf-publisher
 - [ ] [MODE-06] 웹툰 모드 채택률·품질 측정 — LAYOUT-04 지표를 스트립 기준으로 재정의(페이지당 → 화면 스크롤당) — @qa-tester

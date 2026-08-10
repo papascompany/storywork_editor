@@ -69,6 +69,7 @@ import { type ToolId, useToolStore } from './store/useToolStore'
 import { ToolBar } from './ToolBar'
 import { TopBar } from './TopBar'
 import type { HistoryRef as History } from './types'
+import { StripCanvas } from './webtoon/StripCanvas'
 
 // 도구 단축키 맵
 const TOOL_SHORTCUTS: Record<string, ToolId> = {
@@ -102,8 +103,20 @@ export function EditorShell() {
 
   // ── 페이지 시스템 상태 ─────────────────────────────────────────
   const project = usePageStore((s) => s.project)
-  const { createProject, loadProject, setCurrentPage, updateCurrentPageJson, addPage } =
-    usePageStore()
+  const {
+    createProject,
+    loadProject,
+    setCurrentPage,
+    updateCurrentPageJson,
+    updatePageJson,
+    addPage,
+  } = usePageStore()
+
+  /**
+   * 웹툰(px) 프로젝트인가 — 판형 단위계가 곧 분기 조건 (MODE-04b).
+   * 별도 플래그를 두면 판형과 어긋나 mm 프로젝트가 스트립으로 열리는 사고가 난다.
+   */
+  const isWebtoonProject = project?.format.unit === 'px'
   const [formatPickerOpen, setFormatPickerOpen] = useState(false)
   const [recoveryToastShown, setRecoveryToastShown] = useState(false)
 
@@ -1189,17 +1202,29 @@ export function EditorShell() {
             onAddPoseToCanvas={addPoseFromResource}
           />
 
-          {/* Canvas — 모바일/데스크톱 공통 */}
+          {/* Canvas — 모바일/데스크톱 공통.
+              웹툰(px) 판형은 페이지 전환이 아니라 세로 스트립으로 훑는다 (MODE-04b).
+              판형 단위계가 곧 분기 조건 — 별도 플래그를 두면 둘이 어긋난다. */}
           <div className="relative flex flex-1 flex-col overflow-hidden">
-            <EditorCanvas
-              containerRef={containerRef}
-              canvas={canvasRef.current}
-              history={historyRef.current as any}
-              layerTree={layerTreeRef.current}
-              selectedIds={selectedIds}
-              onClearSelection={clearSelection}
-              onAddPoseToCanvas={addPoseFromResource}
-            />
+            {isWebtoonProject && project ? (
+              <StripCanvas
+                pages={project.pages}
+                format={project.format}
+                activeIndex={project.currentPageIndex}
+                onActiveIndexChange={setCurrentPage}
+                onSegmentFlush={updatePageJson}
+              />
+            ) : (
+              <EditorCanvas
+                containerRef={containerRef}
+                canvas={canvasRef.current}
+                history={historyRef.current as any}
+                layerTree={layerTreeRef.current}
+                selectedIds={selectedIds}
+                onClearSelection={clearSelection}
+                onAddPoseToCanvas={addPoseFromResource}
+              />
+            )}
             {/* Footer — 데스크톱(md+) 전용 */}
             <Footer
               canvas={canvasRef.current}

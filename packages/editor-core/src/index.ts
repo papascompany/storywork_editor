@@ -23,6 +23,18 @@ export {
 } from './canvas/coords.js'
 export type { CoordFormatLike } from './canvas/coords.js'
 
+// 웹툰 세로 스트립 기하 (MODE-04b) — 순수 산술, React/DOM 무의존
+export {
+  stripLayout,
+  visibleRange,
+  segmentAtScroll,
+  scrollToSegment,
+  fitStripWidth,
+  STRIP_GAP_PX,
+  STRIP_OVERSCAN,
+} from './strip/geometry.js'
+export type { StripSegment, StripSlot, StripLayout } from './strip/geometry.js'
+
 // 객체 메타 유틸
 export {
   createObjectData,

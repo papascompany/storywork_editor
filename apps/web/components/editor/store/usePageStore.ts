@@ -80,6 +80,14 @@ interface PageStore {
   setCurrentPage: (pageIndex: number) => void
   updateCurrentPageJson: (fabricJson: Record<string, unknown>) => void
   updateCurrentPageThumbnail: (thumbnail: string) => void
+  /**
+   * 인덱스를 명시해 페이지 JSON 을 쓴다 (MODE-04b).
+   *
+   * 웹툰 스트립은 캔버스를 여러 개 동시에 띄우므로, 활성 세그먼트가 아닌 캔버스가
+   * flush 할 때 `updateCurrentPageJson` 을 쓰면 **다른 세그먼트를 덮어쓴다**.
+   * 캔버스 풀에서 내리는 경로는 반드시 이 액션을 쓸 것.
+   */
+  updatePageJson: (pageIndex: number, fabricJson: Record<string, unknown>) => void
   updatePageThumbnail: (pageIndex: number, thumbnail: string) => void
 }
 
@@ -290,6 +298,17 @@ export const usePageStore = create<PageStore>()(
         const page = s.project.pages[s.project.currentPageIndex]
         if (!page) return
         page.thumbnail = thumbnail
+      })
+    },
+
+    updatePageJson(pageIndex, fabricJson) {
+      set((s) => {
+        if (!s.project) return
+        const page = s.project.pages[pageIndex]
+        if (!page) return
+        page.fabricJson = fabricJson
+        page.updatedAt = Date.now()
+        s.project.updatedAt = Date.now()
       })
     },
 
