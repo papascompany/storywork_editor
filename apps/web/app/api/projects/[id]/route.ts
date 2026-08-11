@@ -6,7 +6,7 @@
  *   - 소유권 확인 → 불일치 403
  *
  * 응답:
- *   { project: { id, title, formatId, status }, pages: Page[] }
+ *   { project: { id, title, formatId, status, mode, format, cover }, pages: Page[] }
  */
 
 /* eslint-disable import/order */
@@ -69,6 +69,20 @@ export async function GET(
     const project = await prisma.project.findUnique({
       where: { id: projectId },
       include: {
+        // 판형 실치수를 함께 내려 클라이언트가 하드코딩 폴백을 쓰지 않게 한다 (MODE-04c).
+        // 폴백(128×182@350)은 실제 판형과 다르면 좌표가 통째로 어긋난다.
+        format: {
+          select: {
+            id: true,
+            name: true,
+            unit: true,
+            widthMm: true,
+            heightMm: true,
+            dpi: true,
+            bleedMm: true,
+            safeMm: true,
+          },
+        },
         pages: {
           orderBy: { index: 'asc' },
           select: {
@@ -104,6 +118,18 @@ export async function GET(
         title: project.title,
         formatId: project.formatId,
         status: project.status,
+        // 산출물 모드 (MODE-04c) — 편집기가 스트립/페이지 뷰를 고르는 근거
+        mode: project.mode,
+        // 판형 실치수 — 단위계 포함 (px 웹툰이면 값이 곧 픽셀)
+        format: {
+          name: project.format.name,
+          unit: project.format.unit,
+          widthMm: project.format.widthMm,
+          heightMm: project.format.heightMm,
+          dpi: project.format.dpi,
+          bleedMm: project.format.bleedMm,
+          safeMm: project.format.safeMm,
+        },
         cover,
         createdAt: project.createdAt.toISOString(),
         updatedAt: project.updatedAt.toISOString(),

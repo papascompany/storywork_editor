@@ -175,6 +175,9 @@ export async function POST(req: Request): Promise<NextResponse> {
     return jsonError('지정한 판형을 찾을 수 없습니다.', 404)
   }
 
+  // 산출물 모드는 판형 단위계에서 도출한다 — 클라이언트 입력을 믿지 않는다 (MODE-04c)
+  const projectMode: 'pod' | 'webtoon' = dbFormat.unit === 'px' ? 'webtoon' : 'pod'
+
   // px(웹툰) 판형 가드 (MODE-02) — ai-layout 은 mm 좌표 전용이다. px 값을 mm 로 읽으면
   // 690mm 페이지가 만들어진다. 웹툰 배치 분기(MODE-03) 배선 전까지 차단한다.
   if (dbFormat.unit !== 'mm') {
@@ -372,6 +375,8 @@ export async function POST(req: Request): Promise<NextResponse> {
           data: {
             title: title ?? undefined,
             formatId: resolvedFormatId,
+            // 판형 파생값 — 판형이 바뀌면 mode 도 따라간다 (MODE-04c)
+            mode: projectMode,
             status: 'composing',
           },
         })
@@ -387,6 +392,7 @@ export async function POST(req: Request): Promise<NextResponse> {
             ownerId: dbUser.id,
             formatId: resolvedFormatId,
             title: title ?? `새 콘티 — ${new Date().toLocaleDateString('ko-KR')}`,
+            mode: projectMode,
             status: 'composing',
           },
         })

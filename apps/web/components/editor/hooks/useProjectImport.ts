@@ -38,6 +38,18 @@ interface ApiProjectResponse {
     title: string
     formatId: string
     status: string
+    /** 산출물 모드 (MODE-04c) — 구버전 응답에는 없을 수 있어 optional */
+    mode?: string
+    /** 판형 실치수 (MODE-04c) — 구버전 응답에는 없을 수 있어 optional */
+    format?: {
+      name: string
+      unit?: 'mm' | 'px'
+      widthMm: number
+      heightMm: number
+      dpi: number
+      bleedMm: number
+      safeMm: number
+    }
     /** FOLLOWUP-COVER-02: Project.settings.cover (표지 독립 치수) */
     cover?: { widthMm: number; heightMm: number } | null
   }
@@ -46,6 +58,13 @@ interface ApiProjectResponse {
 
 // ─── 기본 포맷 폴백 ───────────────────────────────────────────────────────────
 
+/**
+ * 서버가 판형을 안 내려줄 때만 쓰는 최후 폴백 (MODE-04c 이전 응답 호환).
+ *
+ * **실제 판형과 다르면 좌표가 통째로 어긋난다** — 예전에는 이 값이 무조건 쓰여서
+ * 130×200mm 작품도 128×182 로 열렸다. 지금은 서버 응답의 `project.format` 이 우선이고
+ * 이 상수는 배포 시차(구버전 응답) 대비용으로만 남긴다.
+ */
 const FALLBACK_FORMAT = {
   name: 'B5 소설',
   widthMm: 128,
@@ -103,7 +122,9 @@ export function useProjectImport(
           id: data.project.id,
           title: data.project.title,
           formatId: data.project.formatId,
-          format: FALLBACK_FORMAT,
+          // 서버가 내려준 실제 판형 우선 — 폴백은 구버전 응답 대비 (MODE-04c)
+          format: data.project.format ?? FALLBACK_FORMAT,
+          mode: data.project.mode,
           cover: data.project.cover ?? null,
           pages: data.pages.map((p) => ({
             id: p.id,

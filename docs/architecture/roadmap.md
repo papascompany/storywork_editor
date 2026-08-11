@@ -372,7 +372,13 @@
   · 검증: 실기 브라우저에서 8세그먼트 스트립 렌더·휠 스크롤 시 라이브 창 이동([0]→[0,1])·활성 승격·컷 경계 간격 육안 확인. mm(POD) 경로 무회귀 육안 확인. 신규 테스트 28(strip-geometry 22 · strip-virtualizer 6), turbo 79 green
   · **제약(영구)**: 세그먼트 간 드래그 이동 불가 — fabric 캔버스 경계. 잘라내기/붙여넣기로만
   · **단일 롱 캔버스는 기각**(정찰 실측): fabric `calcViewportBoundaries()` 가 캔버스 엘리먼트 크기 기준이라 스트립 전체를 한 캔버스로 만들면 **오프스크린 컬링이 무효화**된다. dpr=2 에서 세그먼트 7개면 Safari 16384px 상한을 넘어 빈 캔버스가 되고(웹툰 1화는 30~60세그먼트), BUG-013 의 "fabric 내부 크기 = 뷰포트" iOS 크래시 방어 계약도 깨진다
-- [ ] [MODE-04c] 웹툰 개방 정합 — `save` 라우트 px 허용 **전에** `Project.mode` 저장 배선 필수(현재 save 가 mode 를 쓰지 않아 `mode=pod + unit=px` 모순 레코드가 생긴다). `/api/projects/[id]` 응답에 format 치수·unit·mode 포함 → `useProjectImport` FALLBACK_FORMAT 제거 — @architect
+- [x] [MODE-04c] 웹툰 개방 정합 — `Project.mode` 저장 배선 + 판형 실치수 응답 — @architect ✅ 2026-08-10.
+  · **mode 는 판형 단위계에서 도출한 파생값**(`format.unit === 'px' ? 'webtoon' : 'pod'`) — 클라이언트가 보낸 mode 는 무시한다(신뢰 경계). 판형이 유일한 진실이 아니면 `mode=pod + unit=px` 모순 레코드가 남아 편집기 뷰와 출력 경로가 갈라진다
+  · **업데이트 경로가 진짜 구멍이었다** — `save` 가 `formatId` 는 바꾸면서 `mode` 는 그대로 뒀다(판형만 px 로 바뀌고 mode 는 pod 로 잔존). `save` 신규/업데이트 + `full-pipeline` 신규/업데이트 **4개소 전부** 배선
+  · `/api/projects/[id]` 응답에 `mode` + 판형 실치수(`unit` 포함) 추가 → `useProjectImport` 의 `FALLBACK_FORMAT` 을 **구버전 응답 대비 최후 폴백**으로 강등(종전에는 무조건 128×182@350 을 써서 130×200mm 작품도 그 값으로 열렸다)
+  · `ProjectData.mode` 추가 — 편집기 뷰 분기는 여전히 `format.unit` 이 근거이고 mode 는 표시·대조용
+  · 신규 테스트 4(`project-mode.test.ts` — 도출 저장 · 클라이언트 mode 무시 · **업데이트 동반 갱신** · px 400 유지), turbo 79 green
+  · **웹툰 게이트는 그대로** — px 생성은 여전히 400. 개방은 MODE-05(이미지 export) 완성과 한 세트
 - [ ] [MODE-05] 웹툰 export — 이미지 시퀀스 + 단일 롱 이미지(플랫폼 업로드 규격: 폭 고정·분할 높이 상한) — @editor-engineer + @pdf-publisher
 - [ ] [MODE-06] 웹툰 모드 채택률·품질 측정 — LAYOUT-04 지표를 스트립 기준으로 재정의(페이지당 → 화면 스크롤당) — @qa-tester
 

@@ -44,6 +44,12 @@ export interface ProjectData {
   formatId: string
   format: PageFormat
   /**
+   * 산출물 모드 (MODE-04c) — 서버 `Project.mode` 의 사본.
+   * **판형 단위계에서 도출된 파생값**이라 `format.unit` 과 항상 정합한다.
+   * 편집기 뷰 분기는 `format.unit` 을 보고, 이 필드는 표시·저장 대조용이다.
+   */
+  mode?: string
+  /**
    * 표지 설정 (FOLLOWUP-COVER-02) — 설정 시 pages[0] = 표지 페이지(독립 치수).
    * null/undefined = 표지 없음. 서버 영속화는 Project.settings.cover.
    */

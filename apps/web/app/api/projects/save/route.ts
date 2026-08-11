@@ -139,8 +139,13 @@ export async function POST(req: Request): Promise<NextResponse> {
     )
   }
 
-  // 4-b. px(웹툰) 판형 가드 (MODE-02) — 편집기·배치가 아직 mm 전제라 px 프로젝트를
-  // 만들면 잘못된 결과가 나온다. 배치 분기(MODE-03) 배선 전까지 서버에서 차단한다.
+  // 4-b. 산출물 모드는 **판형 단위계에서 도출한다** (MODE-04c).
+  // 클라이언트가 보낸 mode 를 믿으면 `mode=pod + unit=px` 같은 모순 레코드가 남는다 —
+  // 판형이 유일한 진실이고 mode 는 그 파생값이다.
+  const projectMode: 'pod' | 'webtoon' = format.unit === 'px' ? 'webtoon' : 'pod'
+
+  // 4-c. px(웹툰) 판형 가드 (MODE-02) — 편집기 스트립(MODE-04b)은 준비됐지만
+  // 이미지 export(MODE-05)가 없어 만들어도 내보낼 수 없다. 게이트는 MODE-05 와 한 세트로 연다.
   if (format.unit !== 'mm') {
     return jsonError('웹툰(px) 판형 프로젝트 생성은 준비 중입니다.', 400)
   }
@@ -167,7 +172,9 @@ export async function POST(req: Request): Promise<NextResponse> {
       await prisma.$transaction([
         prisma.project.update({
           where: { id: projectId },
-          data: { title, formatId, settings, updatedAt: now },
+          // 판형을 바꾸면 mode 도 함께 따라가야 한다 (MODE-04c) — 안 그러면 판형만 px 로
+          // 바뀌고 mode 는 pod 로 남아 모순 레코드가 된다
+          data: { title, formatId, mode: projectMode, settings, updatedAt: now },
         }),
         prisma.page.deleteMany({ where: { projectId } }),
         prisma.page.createMany({
@@ -196,6 +203,8 @@ export async function POST(req: Request): Promise<NextResponse> {
           ownerId: dbUser.id,
           formatId,
           title: defaultTitle,
+          // 판형 단위계에서 도출한 모드 — 판형과 항상 정합한다 (MODE-04c)
+          mode: projectMode,
           status: 'drafting',
           settings,
           pages: {
