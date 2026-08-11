@@ -147,3 +147,85 @@ describe('POST /api/projects/save — mode 정합 (MODE-04c)', () => {
     expect(prisma._spies.projectCreate).not.toHaveBeenCalled()
   })
 })
+
+// ─── 조회 경로 ────────────────────────────────────────────────────────────────
+
+describe('GET /api/projects/[id] — 판형 실치수 응답 (MODE-04c)', () => {
+  const PROJECT_ROW = {
+    id: 'project-1',
+    ownerId: 'user-1',
+    title: '기존 작품',
+    formatId: 'fmt-b6',
+    status: 'draft',
+    mode: 'pod',
+    settings: null,
+    createdAt: new Date('2026-01-01T00:00:00Z'),
+    updatedAt: new Date('2026-01-02T00:00:00Z'),
+    // 폴백(128×182@350)과 **다른** 판형이어야 폴백을 안 쓴다는 게 증명된다
+    format: {
+      id: 'fmt-b6',
+      name: 'B6 만화',
+      unit: 'mm',
+      widthMm: 130,
+      heightMm: 200,
+      dpi: 300,
+      bleedMm: 3,
+      safeMm: 5,
+    },
+    pages: [],
+  }
+
+  async function callGet(row: unknown) {
+    mockGetPrismaClient.mockReturnValue({
+      user: { findUnique: vi.fn().mockResolvedValue(MOCK_USER) },
+      project: { findUnique: vi.fn().mockResolvedValue(row) },
+    })
+    const { GET } = await import('../../app/api/projects/[id]/route')
+    const res = (await GET(new Request('http://localhost/api/projects/project-1'), {
+      params: Promise.resolve({ id: 'project-1' }),
+    })) as NextResponse
+    return { status: res.status, data: (await res.json()) as Record<string, never> }
+  }
+
+  it('응답에 mode 와 판형 실치수(unit 포함)가 담긴다', async () => {
+    const { status, data } = await callGet(PROJECT_ROW)
+    expect(status).toBe(200)
+
+    const project = (data as unknown as { project: Record<string, unknown> }).project
+    expect(project['mode']).toBe('pod')
+    expect(project['format']).toEqual({
+      name: 'B6 만화',
+      unit: 'mm',
+      widthMm: 130,
+      heightMm: 200,
+      dpi: 300,
+      bleedMm: 3,
+      safeMm: 5,
+    })
+  })
+
+  it('px 작품은 unit=px 와 mode=webtoon 을 그대로 내려준다 (편집기 뷰 분기 근거)', async () => {
+    const { status, data } = await callGet({
+      ...PROJECT_ROW,
+      mode: 'webtoon',
+      formatId: 'preset-webtoon-690',
+      format: {
+        id: 'preset-webtoon-690',
+        name: '웹툰 690',
+        unit: 'px',
+        widthMm: 690,
+        heightMm: 1280,
+        dpi: 72,
+        bleedMm: 0,
+        safeMm: 0,
+      },
+    })
+
+    expect(status).toBe(200)
+    const project = (data as unknown as { project: { mode: string; format: { unit: string } } })
+      .project
+    // 폴백은 unit 이 없어서 웹툰 작품도 POD 페이지 뷰로 열렸다 — 이제 서버가 알려준다
+    expect(project.format.unit).toBe('px')
+    expect(project.mode).toBe('webtoon')
+  })
+})
