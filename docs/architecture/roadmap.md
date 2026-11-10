@@ -271,7 +271,7 @@
 - [ ] [FOLLOWUP-07] Storybook visual regression (Chromatic 또는 Playwright snapshot) — M9 안정화에서 — @qa-tester
 - [ ] [FOLLOWUP-08] `packages/shared-schema/package.json` 에 `"type": "module"` 추가 — node 의 ESM/CJS 추론 경고 제거 — @architect
 - [x] [FOLLOWUP-09] pgvector `search_path` — 마이그레이션 SQL 에 `SET search_path = public, extensions;` 추가 ✅ 2026-05-05 (커밋 f008321) — Cloud 전환 시 실제 발생, 즉시 해결
-- [ ] [FOLLOWUP-10] GitHub Actions Node 20 → Node 24 업그레이드 (`actions/checkout@v5`, `actions/setup-node@v5`, `pnpm/action-setup@v5`) — 2026-09-16 까지 — @architect
+- [x] [FOLLOWUP-10] GitHub Actions Node 20 → Node 24 업그레이드 — @architect ✅ 2026-11-10. 액션 런타임 전부 node24: `checkout@v7` · `setup-node@v7` · `pnpm/action-setup@v6` · `upload-artifact@v7`(v5 는 아직 node20 이라 v7). 입력 변경 없음(setup-node v7 breaking 은 `registry-url` 한정 — 미사용). 프로젝트 Node(`.nvmrc`)는 별개로 유지
 - [x] [FOLLOWUP-11] DB 비밀번호 입력 ✅ 2026-05-05 — username `yohan` + 11자 password 로 prisma db pull 16 모델 인식 + prisma generate 성공
 - [ ] [FOLLOWUP-12] PgBouncer prepared statement 비호환 — `prisma db execute --stdin` hang 발생. 실제 앱 코드는 `pgbouncer=true` 로 회피되지만, 마이그레이션/raw SQL 직접 실행은 `DIRECT_URL`(5432) 명시 사용 — `pnpm db:exec` 등 helper script 추가 권고 — @architect
 - [ ] [FOLLOWUP-13] Vercel preview 환경변수 — main 이 production branch 라 같은 이름의 preview env 등록 불가. PR 워크플로우 시작 시 별도 preview branch 명 정해서 추가 — @architect
