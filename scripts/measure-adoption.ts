@@ -9,6 +9,7 @@
  *   pnpm adoption:measure                # 요약 출력
  *   pnpm adoption:measure -- --verbose   # 페이지별 blocker 상세
  *   pnpm adoption:baseline               # data/eval/adoption-baseline.json 갱신
+ *   pnpm adoption:measure -- --format webtoon   # 웹툰(px) 판형 — 화면 스크롤 품질 추가 (MODE-06)
  *
  * 지표 정의는 packages/ai-layout/src/adoption.ts 의 문서 주석이 정본이다.
  * (요약: blocker 0 페이지 비율 = 프록시 채택률. 실사용 로그 도입 시 교체 예정)
@@ -22,12 +23,20 @@ import path from 'node:path'
 import {
   aggregateAdoption,
   aggregateQuality,
+  aggregateStripQuality,
   compose,
   measureAdoption,
   measureQuality,
+  measureStripQuality,
   worstPages,
+  worstWindows,
 } from '@storywork/ai-layout'
-import type { AdoptionResult, LayoutFormat, QualityResult } from '@storywork/ai-layout'
+import type {
+  AdoptionResult,
+  LayoutFormat,
+  QualityResult,
+  StripQualityResult,
+} from '@storywork/ai-layout'
 import { recommend } from '@storywork/ai-recommend'
 import { analyze } from '@storywork/ai-script'
 
@@ -37,15 +46,40 @@ import { analyze } from '@storywork/ai-script'
 
 const CORPUS_DIR = path.join(process.cwd(), 'data/eval/scripts')
 
-/** 평가 판형 — B5 단행본 (기본 출판 판형) */
-const FORMAT: LayoutFormat = {
-  id: 'preset-b5-novel',
-  widthMm: 128,
-  heightMm: 182,
-  dpi: 350,
-  bleedMm: 3,
-  safeMm: 5,
+/** 평가 판형 — `--format pod`(기본, B5 단행본) | `--format webtoon`(690px 세로 스트립) */
+const FORMATS = {
+  pod: {
+    id: 'preset-b5-novel',
+    widthMm: 128,
+    heightMm: 182,
+    dpi: 350,
+    bleedMm: 3,
+    safeMm: 5,
+  },
+  // scripts/seed-formats.ts 의 preset-webtoon-690 과 같은 값 (px 판형: widthMm/heightMm = 픽셀)
+  webtoon: {
+    id: 'preset-webtoon-690',
+    unit: 'px',
+    widthMm: 690,
+    heightMm: 1280,
+    dpi: 72,
+    bleedMm: 0,
+    safeMm: 0,
+  },
+} satisfies Record<string, LayoutFormat>
+
+type FormatKey = keyof typeof FORMATS
+
+function parseFormatKey(args: readonly string[]): FormatKey {
+  const idx = args.indexOf('--format')
+  const value = idx >= 0 ? args[idx + 1] : 'pod'
+  if (value === 'pod' || value === 'webtoon') return value
+  console.error(`[adoption] 알 수 없는 --format: ${value} (pod | webtoon)`)
+  process.exit(2)
 }
+
+const FORMAT_KEY = parseFormatKey(process.argv.slice(2))
+const FORMAT: LayoutFormat = FORMATS[FORMAT_KEY]
 
 interface FileReport {
   file: string
@@ -57,6 +91,8 @@ interface FileReport {
   dialogueRetention: number
   adoption: AdoptionResult
   quality: QualityResult
+  /** 웹툰 판형일 때만 — 화면 스크롤 단위 품질 (MODE-06) */
+  strip?: StripQualityResult
 }
 
 // ─────────────────────────────────────────────
@@ -109,6 +145,7 @@ async function measureOne(file: string, text: string): Promise<FileReport> {
 
   const adoption = measureAdoption(analyzed, composed)
   const quality = measureQuality(composed, FORMAT)
+  const strip = FORMAT_KEY === 'webtoon' ? measureStripQuality(composed, FORMAT) : undefined
   return {
     file,
     format: analyzed.format,
@@ -119,6 +156,7 @@ async function measureOne(file: string, text: string): Promise<FileReport> {
     dialogueRetention: adoption.dialogueRetention,
     adoption,
     quality,
+    strip,
   }
 }
 
@@ -170,12 +208,58 @@ function printQuality(quality: QualityResult, verbose: boolean): void {
   }
 }
 
+/**
+ * 웹툰 화면 스크롤 품질 (MODE-06).
+ * 위의 페이지 지표는 세그먼트를 인쇄 지면처럼 따로 채점한 값이고, 이 섹션이 독자가 실제로
+ * 보는 단위(폰 화면 창)의 값이다. 둘이 갈리는 지점이 웹툰 배치 개선의 실마리다.
+ */
+function printStripQuality(strip: StripQualityResult, verbose: boolean): void {
+  const line = '─'.repeat(72)
+  const bar = (v: number): string => '█'.repeat(Math.round(v * 30)).padEnd(30, '·')
+
+  console.log(`\n${line}`)
+  console.log('  웹툰 화면 스크롤 품질 (MODE-06)')
+  console.log(line)
+  console.log(
+    `  화면 창:     ${strip.totalWindows} 개 (세그먼트 ${strip.totalSegments} · 창 높이 ${Math.round(strip.viewportHeight)}px · 반 화면 겹침)`,
+  )
+  console.log(`  ▶ 종합:      ${pct(strip.score)}`)
+  console.log(
+    `  ▶ 배경만:    ${pct(strip.backgroundOnlyRatio)}   (인물 없이 배경·캡션만 지나가는 화면 비율)`,
+  )
+  console.log('')
+  console.log('  독립 축:')
+  console.log(`    가로 균형       ${pct(strip.balance).padStart(6)}  ${bar(strip.balance)}`)
+  console.log(`    화면 밀도       ${pct(strip.density).padStart(6)}  ${bar(strip.density)}`)
+  console.log(
+    `    화면당 대사     ${pct(strip.dialogueDensity).padStart(6)}  ${bar(strip.dialogueDensity)}`,
+  )
+  console.log('  의존 축 (회귀 감시용):')
+  console.log(
+    `    시선 흐름       ${pct(strip.readingFlow).padStart(6)}  ${bar(strip.readingFlow)}`,
+  )
+  console.log(
+    `    얼굴 가림 회피  ${pct(strip.faceClearance).padStart(6)}  ${bar(strip.faceClearance)}`,
+  )
+
+  if (verbose) {
+    console.log('\n  점수 하위 화면:')
+    for (const w of worstWindows(strip, 10)) {
+      console.log(
+        `    창 y=${String(Math.round(w.top)).padStart(6)} seg[${w.segments.join(',')}] ${pct(w.score).padStart(6)} · ` +
+          `균형 ${pct(w.balance).padStart(6)} · 밀도 ${pct(w.density).padStart(6)}(${pct(w.raw.coverage)}) · ` +
+          `대사 ${pct(w.dialogueDensity).padStart(6)}(${w.raw.texts}) · 시선 ${pct(w.readingFlow).padStart(6)}`,
+      )
+    }
+  }
+}
+
 function printReport(reports: FileReport[], overall: AdoptionResult, verbose: boolean): void {
   const totalScenes = reports.reduce((a, r) => a + r.scenes, 0)
   const line = '─'.repeat(72)
 
   console.log(`\n${line}`)
-  console.log('  자동배치 채택률 baseline (AI-ACT-04)')
+  console.log(`  자동배치 채택률 baseline (AI-ACT-04) — 판형 ${FORMAT.id}`)
   console.log(line)
   console.log(`  대본:        ${reports.length} 편`)
   console.log(`  장면:        ${totalScenes} 개`)
@@ -243,6 +327,9 @@ async function main(): Promise<void> {
   const overallQuality = aggregateQuality(reports.map((r) => r.quality))
   printReport(reports, overall, verbose)
   printQuality(overallQuality, verbose)
+  const stripResults = reports.flatMap((r) => (r.strip ? [r.strip] : []))
+  const overallStrip = stripResults.length > 0 ? aggregateStripQuality(stripResults) : undefined
+  if (overallStrip) printStripQuality(overallStrip, verbose)
 
   if (jsonOut) {
     const payload = {
@@ -269,6 +356,26 @@ async function main(): Promise<void> {
           faceClearance: overallQuality.faceClearance,
         },
       },
+      // MODE-06 — 웹툰 판형에서만. 창 단위(폰 화면) 품질
+      ...(overallStrip
+        ? {
+            stripQuality: {
+              score: overallStrip.score,
+              totalWindows: overallStrip.totalWindows,
+              viewportHeight: overallStrip.viewportHeight,
+              backgroundOnlyRatio: overallStrip.backgroundOnlyRatio,
+              independent: {
+                balance: overallStrip.balance,
+                density: overallStrip.density,
+                dialogueDensity: overallStrip.dialogueDensity,
+              },
+              dependent: {
+                readingFlow: overallStrip.readingFlow,
+                faceClearance: overallStrip.faceClearance,
+              },
+            },
+          }
+        : {}),
       perFile: reports.map((r) => ({
         file: r.file,
         format: r.format,
@@ -277,6 +384,7 @@ async function main(): Promise<void> {
         adoptionRate: r.adoptionRate,
         dialogueRetention: r.dialogueRetention,
         qualityScore: r.quality.score,
+        ...(r.strip ? { stripQualityScore: r.strip.score } : {}),
       })),
     }
     fs.mkdirSync(path.dirname(jsonOut), { recursive: true })

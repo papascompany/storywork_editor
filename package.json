@@ -50,7 +50,8 @@
     "perf:web:prod": "tsx --tsconfig tsconfig.scripts.json scripts/perf-web-measure.ts --env prod",
     "adoption:measure": "tsx --tsconfig tsconfig.scripts.json scripts/measure-adoption.ts",
     "adoption:baseline": "tsx --tsconfig tsconfig.scripts.json scripts/measure-adoption.ts --json data/eval/adoption-baseline.json",
-    "adoption:report": "tsx --tsconfig tsconfig.scripts.json scripts/measure-adoption.ts --json data/eval/adoption-latest.json"
+    "adoption:report": "tsx --tsconfig tsconfig.scripts.json scripts/measure-adoption.ts --json data/eval/adoption-latest.json",
+    "adoption:webtoon": "tsx --tsconfig tsconfig.scripts.json scripts/measure-adoption.ts --format webtoon --json data/eval/adoption-webtoon-baseline.json"
   },
   "devDependencies": {
     "@commitlint/cli": "^19.0.0",
