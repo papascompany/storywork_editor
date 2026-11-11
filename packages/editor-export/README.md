@@ -71,6 +71,35 @@ const { jobId, statusUrl } = await requestPdf(projectId, {
 })
 ```
 
+### exportWebtoon — 웹툰(px 판형) 이미지 (MODE-05)
+
+웹툰 세그먼트 저장본들을 이미지로 내보냅니다. **px 판형 전용**(mm 판형은 거부 — 인쇄물은 PDF).
+
+```ts
+import { createStoreZip, exportWebtoon } from '@storywork/editor-export'
+
+const { files } = await exportWebtoon(pages, format, {
+  layout: 'long', // 'sequence' = 세그먼트별 1장 · 'long' = 세로로 이은 롱 이미지
+  gapPx: 0, // long 전용 — 세그먼트 사이 여백(배경색)
+  maxSliceHeightPx: 4000, // long 전용 — 파일당 높이 상한(생략 시 캔버스 상한 16384/scale)
+})
+// 여러 장이면 무압축 ZIP 으로 묶어 내려준다
+const zip = createStoreZip(
+  await Promise.all(
+    files.map(async (f) => ({
+      name: f.name,
+      data: new Uint8Array(await f.blob.arrayBuffer()),
+    })),
+  ),
+)
+```
+
+- 편집 중 캔버스가 아니라 세그먼트마다 **헤드리스 캔버스를 판형 실물 크기로** 새로 만들어
+  그린다. 편집 캔버스는 화면 맞춤 배율이 걸려 있어 `toCanvasElement` 결과가 1:1 이 아니다.
+- 롱 이미지는 **세그먼트 경계에서 우선 자르고**, 세그먼트 하나가 상한보다 클 때만 강제 분할한다
+  (`planWebtoonSlices` — 순수 함수).
+- 동시에 살아 있는 세그먼트 캔버스는 최대 1개(모바일 메모리).
+
 ### DirtyTracker — autosave 연동 예제
 
 ```ts

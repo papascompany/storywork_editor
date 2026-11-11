@@ -24,3 +24,17 @@ export { requestPdf } from './pdf/requestPdf.js'
 
 // Dirty Tracker (autosave)
 export { DirtyTracker } from './dirty/tracker.js'
+
+// 웹툰(px 판형) 이미지 내보내기 — 시퀀스 / 롱 이미지 (MODE-05)
+export { exportWebtoon } from './webtoon/exportWebtoon.js'
+export type {
+  ExportWebtoonOptions,
+  ExportWebtoonResult,
+  WebtoonImageFile,
+  WebtoonImageMime,
+  WebtoonPageInput,
+} from './webtoon/exportWebtoon.js'
+export { planWebtoonSlices } from './webtoon/slices.js'
+export type { PlanWebtoonSlicesOptions, WebtoonSlice, WebtoonSlicePart } from './webtoon/slices.js'
+export { createStoreZip, crc32 } from './webtoon/zip.js'
+export type { ZipEntry } from './webtoon/zip.js'
