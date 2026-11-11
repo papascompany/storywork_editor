@@ -258,3 +258,18 @@ describe('measureStripQuality — 계약', () => {
     expect(all.score).toBeCloseTo(expected)
   })
 })
+
+describe('measureStripQuality — 캡션 박스 단위 계수', () => {
+  it('같은 캡션 박스의 줄들은 텍스트 하나로 센다', () => {
+    const lines = [0, 1, 2].map((i) =>
+      layer(
+        'text',
+        { x: 0.3, y: 0.1 + i * 0.05, w: 0.4, h: 0.05 },
+        { kind: 'caption', captionBoxSlotId: 'gen-caption-1', captionLineIndex: i },
+      ),
+    )
+    const pose = layer('pose', { x: 0.3, y: 0.4, w: 0.4, h: 0.5 })
+    const r = measureStripQuality(strip([[pose, ...lines]]), WEBTOON)
+    expect(r.windows[0]?.raw.texts).toBe(1)
+  })
+})

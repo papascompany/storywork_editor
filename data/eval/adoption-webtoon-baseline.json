@@ -4,7 +4,7 @@
   "format": "preset-webtoon-690",
   "corpusFiles": 21,
   "totalScenes": 217,
-  "totalPages": 263,
+  "totalPages": 264,
   "adoptionRate": 1,
   "dialogueRetention": 1,
   "blockerCounts": {
@@ -19,11 +19,11 @@
     "low-dpi-fallback": 0
   },
   "quality": {
-    "score": 0.9125400975966128,
+    "score": 0.914654932534484,
     "independent": {
-      "balance": 0.7699456194097416,
-      "density": 0.905872739295752,
-      "dialogueDensity": 0.8868821292775665
+      "balance": 0.7785461568259072,
+      "density": 0.9074178997859031,
+      "dialogueDensity": 0.8873106060606061
     },
     "dependent": {
       "readingFlow": 1,
@@ -31,14 +31,14 @@
     }
   },
   "stripQuality": {
-    "score": 0.9537677644123403,
-    "totalWindows": 535,
+    "score": 0.9542180461954297,
+    "totalWindows": 537,
     "viewportHeight": 1226.6666666666665,
-    "backgroundOnlyRatio": 0.08971962616822429,
+    "backgroundOnlyRatio": 0.0893854748603352,
     "independent": {
-      "balance": 0.8645279325328746,
-      "density": 0.9192641605568611,
-      "dialogueDensity": 0.9850467289719627
+      "balance": 0.8679723234909247,
+      "density": 0.9198776840225343,
+      "dialogueDensity": 0.9832402234636871
     },
     "dependent": {
       "readingFlow": 1,
@@ -53,8 +53,8 @@
       "pages": 9,
       "adoptionRate": 1,
       "dialogueRetention": 1,
-      "qualityScore": 0.9408028726848738,
-      "stripQualityScore": 0.9679725969087776
+      "qualityScore": 0.9504817145440501,
+      "stripQualityScore": 0.94464336514468
     },
     {
       "file": "action-fantasy/02-dragon-chase.txt",
@@ -63,8 +63,8 @@
       "pages": 11,
       "adoptionRate": 1,
       "dialogueRetention": 1,
-      "qualityScore": 0.9428909306851575,
-      "stripQualityScore": 0.9677426445580172
+      "qualityScore": 0.9496749894123017,
+      "stripQualityScore": 0.9643498553912384
     },
     {
       "file": "action-fantasy/03-ruin-gate.txt",
@@ -73,18 +73,18 @@
       "pages": 9,
       "adoptionRate": 1,
       "dialogueRetention": 1,
-      "qualityScore": 0.8873246290093709,
-      "stripQualityScore": 0.9260783209596729
+      "qualityScore": 0.8891894362087976,
+      "stripQualityScore": 0.9271700669176438
     },
     {
       "file": "action-fantasy/04-blade-oath.txt",
       "format": "novel",
       "scenes": 9,
-      "pages": 9,
+      "pages": 10,
       "adoptionRate": 1,
       "dialogueRetention": 1,
-      "qualityScore": 0.8751955051482433,
-      "stripQualityScore": 0.9270038272240737
+      "qualityScore": 0.8809727741706723,
+      "stripQualityScore": 0.922274645341904
     },
     {
       "file": "action-fantasy/05-frost-wall.txt",
@@ -93,8 +93,8 @@
       "pages": 11,
       "adoptionRate": 1,
       "dialogueRetention": 1,
-      "qualityScore": 0.9256878294026457,
-      "stripQualityScore": 0.9561713039442442
+      "qualityScore": 0.9341552186542205,
+      "stripQualityScore": 0.9573035699808723
     },
     {
       "file": "daily-novel/01-school-seat.txt",
@@ -104,7 +104,7 @@
       "adoptionRate": 1,
       "dialogueRetention": 1,
       "qualityScore": 0.9101274889064339,
-      "stripQualityScore": 0.9542266774626578
+      "stripQualityScore": 0.9575600107959911
     },
     {
       "file": "daily-novel/02-office-overtime.txt",
@@ -113,8 +113,8 @@
       "pages": 10,
       "adoptionRate": 1,
       "dialogueRetention": 1,
-      "qualityScore": 0.901828362234731,
-      "stripQualityScore": 0.9350591721837016
+      "qualityScore": 0.9029044124902535,
+      "stripQualityScore": 0.9419447497394575
     },
     {
       "file": "daily-novel/03-family-boxes.txt",
@@ -123,8 +123,8 @@
       "pages": 10,
       "adoptionRate": 1,
       "dialogueRetention": 1,
-      "qualityScore": 0.9228523428206691,
-      "stripQualityScore": 0.9677775525921636
+      "qualityScore": 0.9282961820793079,
+      "stripQualityScore": 0.9698812949304966
     },
     {
       "file": "daily-novel/04-bookshop-rain.txt",
@@ -133,8 +133,8 @@
       "pages": 9,
       "adoptionRate": 1,
       "dialogueRetention": 1,
-      "qualityScore": 0.9393414022345312,
-      "stripQualityScore": 0.9595955586587359
+      "qualityScore": 0.9403648475691438,
+      "stripQualityScore": 0.9714324643719952
     },
     {
       "file": "daily-novel/05-laundromat-tuesday.txt",
@@ -144,7 +144,7 @@
       "adoptionRate": 1,
       "dialogueRetention": 1,
       "qualityScore": 0.8479673282792028,
-      "stripQualityScore": 0.9002879922741559
+      "stripQualityScore": 0.912409204395368
     },
     {
       "file": "drama-screenplay/01-golden-hour.txt",
@@ -154,7 +154,7 @@
       "adoptionRate": 1,
       "dialogueRetention": 1,
       "qualityScore": 0.973202425695959,
-      "stripQualityScore": 0.9898989898989898
+      "stripQualityScore": 0.9919191919191918
     },
     {
       "file": "drama-screenplay/02-summer-noodle-house.txt",
@@ -203,8 +203,8 @@
       "pages": 15,
       "adoptionRate": 1,
       "dialogueRetention": 1,
-      "qualityScore": 0.8143126351816342,
-      "stripQualityScore": 0.8869834372770528
+      "qualityScore": 0.8150027682429513,
+      "stripQualityScore": 0.8900044750763508
     },
     {
       "file": "mixed-formats/diary-02-classroom.txt",
@@ -214,7 +214,7 @@
       "adoptionRate": 1,
       "dialogueRetention": 1,
       "qualityScore": 0.7993550587773502,
-      "stripQualityScore": 0.8669270354286978
+      "stripQualityScore": 0.8647764977942892
     },
     {
       "file": "mixed-formats/essay-01-laundry-corner.txt",
@@ -223,8 +223,8 @@
       "pages": 6,
       "adoptionRate": 1,
       "dialogueRetention": 1,
-      "qualityScore": 0.8165077230712477,
-      "stripQualityScore": 0.9191651532031142
+      "qualityScore": 0.818721747999594,
+      "stripQualityScore": 0.9216226176839132
     },
     {
       "file": "mixed-formats/essay-02-driving-lesson.txt",
@@ -243,8 +243,8 @@
       "pages": 14,
       "adoptionRate": 1,
       "dialogueRetention": 1,
-      "qualityScore": 0.8787881809630148,
-      "stripQualityScore": 0.9305143506942872
+      "qualityScore": 0.889481160073373,
+      "stripQualityScore": 0.9296265134130419
     },
     {
       "file": "mixed-formats/light-novel-02-ninth-floor.txt",
@@ -253,8 +253,8 @@
       "pages": 15,
       "adoptionRate": 1,
       "dialogueRetention": 1,
-      "qualityScore": 0.9006824051893132,
-      "stripQualityScore": 0.9416646179890525
+      "qualityScore": 0.9019145252120331,
+      "stripQualityScore": 0.9421917336170251
     }
   ]
 }

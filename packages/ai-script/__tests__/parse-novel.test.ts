@@ -1,6 +1,12 @@
 import { describe, expect, it } from 'vitest'
 
-import { NARRATION_LINE_MAX_CHARS, parseNovel, splitNarration } from '../src/parsers/parse-novel.js'
+import {
+  NARRATION_LINE_MAX_CHARS,
+  isSpeechTagSentence,
+  narrationOfGap,
+  parseNovel,
+  splitNarration,
+} from '../src/parsers/parse-novel.js'
 
 describe('parseNovel()', () => {
   it('빈 문자열은 빈 배열 반환', () => {
@@ -142,5 +148,45 @@ describe('splitNarration — 긴 서술 단락 보존', () => {
     // 행 index 는 장면 안에서 연속이다
     const all = scenes[0]?.lines ?? []
     expect(all.map((l) => l.index)).toEqual(all.map((_, i) => i))
+  })
+})
+
+// ─────────────────────────────────────────────
+// 대사가 섞인 단락 — 인용 밖 서술(행동 묘사) 보존
+// ─────────────────────────────────────────────
+
+describe('대사 섞인 단락의 서술 보존', () => {
+  it('화자 표시 문장은 마지막 어절이 발화동사인 짧은 문장뿐이다', () => {
+    expect(isSpeechTagSentence('민수가 낮게 말했다.')).toBe(true)
+    expect(isSpeechTagSentence('그녀가 물었다.')).toBe(true)
+    // 행동으로 끝나면 장면 정보 — 서술로 남긴다
+    expect(isSpeechTagSentence('리안이 외치며 검을 뽑았다.')).toBe(false)
+    expect(isSpeechTagSentence('탑의 정문이 안쪽으로 무너졌다.')).toBe(false)
+  })
+
+  it('인용 사이 조각에서 화자 표시와 문장부호 찌꺼기는 버리고 서술만 남긴다', () => {
+    expect(narrationOfGap(' 민수가 말했다. ')).toEqual([])
+    expect(narrationOfGap(' … ')).toEqual([])
+    expect(narrationOfGap('리안은 난간을\n붙잡았다. 리안이 말했다.')).toEqual([
+      '리안은 난간을 붙잡았다.',
+    ])
+  })
+
+  it('parseNovel — 행동 묘사와 대사가 원래 순서대로 남는다', () => {
+    const text =
+      '탑의 정문이 안쪽으로 무너졌다. "물러서!" 리안이 외쳤다. 세라가 손끝을 튕겼다. "막을게." 세라가 말했다.'
+    const lines = parseNovel(text, 99).flatMap((s) => s.lines)
+    expect(lines.map((l) => [l.kind, l.text])).toEqual([
+      ['narration', '탑의 정문이 안쪽으로 무너졌다.'],
+      ['dialogue', '물러서!'],
+      ['narration', '세라가 손끝을 튕겼다.'],
+      ['dialogue', '막을게.'],
+    ])
+    expect(lines.map((l) => l.index)).toEqual([0, 1, 2, 3])
+  })
+
+  it('인용만 있는 단락은 종전과 같다 (서술 행 없음)', () => {
+    const lines = parseNovel('"안녕." 민수가 말했다.', 99).flatMap((s) => s.lines)
+    expect(lines.map((l) => l.kind)).toEqual(['dialogue'])
   })
 })

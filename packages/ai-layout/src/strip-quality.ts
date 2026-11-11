@@ -127,19 +127,44 @@ function toSegments(pages: readonly PageDraft[], format: LayoutFormat): Segment[
     const top = index * segH
     const rects: StripRect[] = []
     const texts: StripText[] = []
+    // 캡션 박스는 줄마다 text 레이어가 하나씩이다(PDF 줄높이 함정 회피 — SCRIPT-KO-04).
+    // 독자가 읽는 단위는 박스 하나이므로 같은 박스의 줄들을 하나로 합쳐 센다 — 줄 단위로 세면
+    // 3줄 캡션 하나가 텍스트 3개로 잡혀 "화면당 대사"가 과대 계상된다
+    const captionBoxes = new Map<string, StripRect>()
     for (const layer of page.fabricJson.layers) {
       if (layer.kind === 'bg') continue
       const r = stripRect(layer, top)
       if (!r) continue
       rects.push(r)
-      if (isTextLayer(layer)) {
-        texts.push({
-          segment: index,
-          lineIndex: num((layer.data.meta as { lineIndex?: unknown } | undefined)?.lineIndex, -1),
-          cx: r.x + r.w / 2,
-          cy: r.y + r.h / 2,
-        })
+      if (!isTextLayer(layer)) continue
+      const meta = layer.data.meta as
+        | { lineIndex?: unknown; captionBoxSlotId?: unknown }
+        | undefined
+      const boxId = typeof meta?.captionBoxSlotId === 'string' ? meta.captionBoxSlotId : null
+      if (boxId) {
+        const prev = captionBoxes.get(boxId)
+        captionBoxes.set(
+          boxId,
+          prev
+            ? {
+                x: Math.min(prev.x, r.x),
+                y: Math.min(prev.y, r.y),
+                w: Math.max(prev.x + prev.w, r.x + r.w) - Math.min(prev.x, r.x),
+                h: Math.max(prev.y + prev.h, r.y + r.h) - Math.min(prev.y, r.y),
+              }
+            : r,
+        )
+        continue
       }
+      texts.push({
+        segment: index,
+        lineIndex: num(meta?.lineIndex, -1),
+        cx: r.x + r.w / 2,
+        cy: r.y + r.h / 2,
+      })
+    }
+    for (const box of captionBoxes.values()) {
+      texts.push({ segment: index, lineIndex: -1, cx: box.x + box.w / 2, cy: box.y + box.h / 2 })
     }
     return { index, top, rects, texts, faceClearance: faceClearanceScore(page, format) }
   })
