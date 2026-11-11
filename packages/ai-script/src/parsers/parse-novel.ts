@@ -16,7 +16,12 @@
 
 import type { AnalyzedLine, AnalyzedScene, SceneMeta } from '../types.js'
 
-import { attributeParagraph, createAttributionContext, recordMentions } from './ko-speech.js'
+import {
+  SPEECH_VERB_RE,
+  attributeParagraph,
+  createAttributionContext,
+  recordMentions,
+} from './ko-speech.js'
 import type { AttributionContext } from './ko-speech.js'
 import { buildSlug, buildSummary, extractEmotion, isLikelyName } from './utils.js'
 
@@ -78,6 +83,47 @@ function splitLongSentence(sentence: string, max: number): string[] {
   return out
 }
 
+/** 문장 끝(마침표·물음표·느낌표 + 뒤따르는 공백)까지를 한 문장으로 나눈다 */
+function sentencesOf(text: string): string[] {
+  const sentences: string[] = []
+  let start = 0
+  for (const m of text.matchAll(SENTENCE_END_RE)) {
+    const end = (m.index ?? 0) + m[0].length
+    const sentence = text.slice(start, end).trim()
+    if (sentence) sentences.push(sentence)
+    start = end
+  }
+  const tail = text.slice(start).trim()
+  if (tail) sentences.push(tail)
+  return sentences
+}
+
+/** 화자 표시 문장으로 볼 최대 길이 — 이보다 길면 행동 묘사가 섞였다고 보고 남긴다 */
+const SPEECH_TAG_MAX_CHARS = 25
+
+/**
+ * 인용을 받쳐 주기만 하는 **화자 표시 문장**인가 ("민수가 낮게 말했다.").
+ * 마지막 어절이 발화동사로 끝나는 짧은 문장만 해당한다. "리안이 외치며 검을 뽑았다."처럼
+ * 행동으로 끝나는 문장은 장면 정보라 서술로 남긴다. 화자 정보는 이미 대사 행에 귀속돼 있다.
+ */
+export function isSpeechTagSentence(sentence: string): boolean {
+  const s = sentence.trim()
+  if (s.length === 0 || s.length > SPEECH_TAG_MAX_CHARS) return false
+  const lastWord = s.split(/\s+/).at(-1) ?? ''
+  return SPEECH_VERB_RE.test(lastWord)
+}
+
+/**
+ * 인용 사이 글 조각에서 서술만 남긴다 — 화자 표시 문장과 문장부호 찌꺼기는 버린다.
+ * 줄바꿈은 공백으로 펴서 한 흐름으로 만든 뒤 `splitNarration` 으로 길이를 맞춘다.
+ */
+export function narrationOfGap(gap: string): string[] {
+  const flat = gap.replace(/\s+/g, ' ').trim()
+  if (flat.replace(/[\s.!?…,~\-—―]/g, '').length === 0) return []
+  const kept = sentencesOf(flat).filter((sentence) => !isSpeechTagSentence(sentence))
+  return kept.length === 0 ? [] : splitNarration(kept.join(' '))
+}
+
 /**
  * 서술 단락을 `max` 자 이하 덩어리로 나눈다 — **글을 버리지 않는다.**
  *
@@ -89,18 +135,7 @@ export function splitNarration(para: string, max = NARRATION_LINE_MAX_CHARS): st
   const text = para.trim()
   if (text.length <= max) return text ? [text] : []
 
-  // 문장 끝(마침표·물음표·느낌표 + 뒤따르는 공백)까지를 한 문장으로
-  const sentences: string[] = []
-  let start = 0
-  for (const m of text.matchAll(SENTENCE_END_RE)) {
-    const end = (m.index ?? 0) + m[0].length
-    const sentence = text.slice(start, end).trim()
-    if (sentence) sentences.push(sentence)
-    start = end
-  }
-  const tail = text.slice(start).trim()
-  if (tail) sentences.push(tail)
-
+  const sentences = sentencesOf(text)
   const out: string[] = []
   let current = ''
   for (const sentence of sentences) {
@@ -148,10 +183,22 @@ function extractLinesFromParagraph(para: string, ctx: AttributionContext): Analy
     return result
   }
 
-  // ko-speech 1층 룰 엔진으로 인용 추출 + 화자 귀속
+  // ko-speech 1층 룰 엔진으로 인용 추출 + 화자 귀속.
+  // 인용 사이의 서술(행동 묘사)도 원래 순서대로 남긴다 — 종전에는 인용만 뽑고 나머지를
+  // 버려, 대사가 섞인 단락의 행동 묘사가 통째로 사라졌다(코퍼스 실측: 서술 5,770자, 전체의 18.5%)
   const attributed = attributeParagraph(para, ctx)
+  let cursor = 0
   for (const q of attributed) {
+    for (const text of narrationOfGap(para.slice(cursor, q.start))) {
+      result.push({ index: lineIdx++, speaker: undefined, text, kind: 'narration' })
+    }
     result.push({ index: lineIdx++, speaker: q.speaker, text: q.text, kind: 'dialogue' })
+    cursor = q.end
+  }
+  if (attributed.length > 0) {
+    for (const text of narrationOfGap(para.slice(cursor))) {
+      result.push({ index: lineIdx++, speaker: undefined, text, kind: 'narration' })
+    }
   }
 
   // 대화가 없으면 단락 전체를 서술 행으로 — 말풍선이 아니라 캡션 박스로 간다 (SCRIPT-KO-04).
