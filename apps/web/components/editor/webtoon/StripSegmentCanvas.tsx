@@ -27,6 +27,11 @@ export interface StripSegmentCanvasProps {
   format: PageFormat
   zoom: number
   onFlush: (index: number, fabricJson: Record<string, unknown>) => void
+  /**
+   * 즉시 flush 함수 등록 (MODE-05) — 내보내기가 언마운트를 기다리지 않고 현재 편집을
+   * 스토어로 끌어올 수 있게 한다. 반환값은 해제 함수
+   */
+  registerFlush?: (index: number, flush: () => void) => () => void
 }
 
 export function StripSegmentCanvas({
@@ -35,12 +40,15 @@ export function StripSegmentCanvas({
   format,
   zoom,
   onFlush,
+  registerFlush,
 }: StripSegmentCanvasProps) {
   const containerRef = useRef<HTMLDivElement | null>(null)
   const canvasRef = useRef<StoryCanvas | null>(null)
   /** 최신 flush 콜백 — effect 를 재실행하지 않고 참조만 갱신한다 */
   const flushRef = useRef(onFlush)
   flushRef.current = onFlush
+  const registerRef = useRef(registerFlush)
+  registerRef.current = registerFlush
 
   // 캔버스 수명 — 세그먼트 하나당 하나. 언마운트 시 flush 후 dispose
   useEffect(() => {
@@ -60,15 +68,33 @@ export function StripSegmentCanvas({
     })
     canvasRef.current = canvas
 
-    // 저장본 복원 — 비어 있으면(신규 세그먼트) 건너뛴다
+    // 저장본 복원 — 비어 있으면(신규 세그먼트) 건너뛴다.
+    // 복원이 끝나기 전에는 flush 하지 않는다: loadJson 은 비동기라 그 사이 toJson 은 빈
+    // 캔버스이고, 그걸 스토어에 쓰면 저장본을 지운다(빠른 스크롤·로드 직후 내보내기).
+    let restored = true
     if (page.fabricJson && Object.keys(page.fabricJson).length > 0) {
-      void canvas.loadJson(page.fabricJson as Parameters<typeof canvas.loadJson>[0])
+      restored = false
+      void canvas
+        .loadJson(page.fabricJson as Parameters<typeof canvas.loadJson>[0])
+        .then(() => {
+          restored = true
+        })
+        .catch((err: unknown) => {
+          console.warn(`[strip] 세그먼트 ${index} 복원 실패:`, err)
+        })
     }
 
+    const flush = () => {
+      if (!restored) return
+      flushRef.current(index, canvas.toJson() as unknown as Record<string, unknown>)
+    }
+    const unregister = registerRef.current?.(index, flush)
+
     return () => {
+      unregister?.()
       // dispose 전에 편집 내용을 스토어로 되돌린다 — 순서가 뒤바뀌면 유실된다
       try {
-        flushRef.current(index, canvas.toJson() as unknown as Record<string, unknown>)
+        flush()
       } catch (err) {
         console.warn(`[strip] 세그먼트 ${index} flush 실패:`, err)
       }
