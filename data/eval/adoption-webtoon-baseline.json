@@ -19,9 +19,9 @@
     "low-dpi-fallback": 0
   },
   "quality": {
-    "score": 0.8857984184011972,
+    "score": 0.904588424243515,
     "independent": {
-      "balance": 0.6756383513087658,
+      "balance": 0.7695883805203506,
       "density": 0.8884888758323548,
       "dialogueDensity": 0.8648648648648649
     },
@@ -31,12 +31,12 @@
     }
   },
   "stripQuality": {
-    "score": 0.9065258070377559,
+    "score": 0.9235764527351797,
     "totalWindows": 450,
     "viewportHeight": 1226.6666666666665,
     "backgroundOnlyRatio": 0.10666666666666667,
     "independent": {
-      "balance": 0.7530478278793726,
+      "balance": 0.8383010563665002,
       "density": 0.9040256517538335,
       "dialogueDensity": 0.8755555555555565
     },
@@ -83,8 +83,8 @@
       "pages": 9,
       "adoptionRate": 1,
       "dialogueRetention": 1,
-      "qualityScore": 0.8469969801226157,
-      "stripQualityScore": 0.9088415447283464
+      "qualityScore": 0.8751955051482433,
+      "stripQualityScore": 0.9270038272240737
     },
     {
       "file": "action-fantasy/05-frost-wall.txt",
@@ -103,8 +103,8 @@
       "pages": 10,
       "adoptionRate": 1,
       "dialogueRetention": 1,
-      "qualityScore": 0.9081467634404394,
-      "stripQualityScore": 0.9512429463347806
+      "qualityScore": 0.9101274889064339,
+      "stripQualityScore": 0.9542266774626578
     },
     {
       "file": "daily-novel/02-office-overtime.txt",
@@ -113,8 +113,8 @@
       "pages": 10,
       "adoptionRate": 1,
       "dialogueRetention": 1,
-      "qualityScore": 0.8891390259731985,
-      "stripQualityScore": 0.929738539879844
+      "qualityScore": 0.901828362234731,
+      "stripQualityScore": 0.9350591721837016
     },
     {
       "file": "daily-novel/03-family-boxes.txt",
@@ -123,8 +123,8 @@
       "pages": 10,
       "adoptionRate": 1,
       "dialogueRetention": 1,
-      "qualityScore": 0.9208716173546746,
-      "stripQualityScore": 0.9646896830317104
+      "qualityScore": 0.9228523428206691,
+      "stripQualityScore": 0.9677775525921636
     },
     {
       "file": "daily-novel/04-bookshop-rain.txt",
@@ -143,8 +143,8 @@
       "pages": 11,
       "adoptionRate": 1,
       "dialogueRetention": 1,
-      "qualityScore": 0.798222968299095,
-      "stripQualityScore": 0.853056486885142
+      "qualityScore": 0.8479673282792028,
+      "stripQualityScore": 0.9002879922741559
     },
     {
       "file": "drama-screenplay/01-golden-hour.txt",
@@ -203,8 +203,8 @@
       "pages": 15,
       "adoptionRate": 1,
       "dialogueRetention": 1,
-      "qualityScore": 0.7342151666804507,
-      "stripQualityScore": 0.8130811268269152
+      "qualityScore": 0.8143126351816342,
+      "stripQualityScore": 0.8869834372770528
     },
     {
       "file": "mixed-formats/diary-02-classroom.txt",
@@ -213,8 +213,8 @@
       "pages": 15,
       "adoptionRate": 1,
       "dialogueRetention": 1,
-      "qualityScore": 0.7062999261927794,
-      "stripQualityScore": 0.7847723272778278
+      "qualityScore": 0.7993550587773502,
+      "stripQualityScore": 0.8669270354286978
     },
     {
       "file": "mixed-formats/essay-01-laundry-corner.txt",
@@ -243,8 +243,8 @@
       "pages": 14,
       "adoptionRate": 1,
       "dialogueRetention": 1,
-      "qualityScore": 0.855001342115127,
-      "stripQualityScore": 0.9054612915225025
+      "qualityScore": 0.8787881809630148,
+      "stripQualityScore": 0.9305143506942872
     },
     {
       "file": "mixed-formats/light-novel-02-ninth-floor.txt",
@@ -253,8 +253,8 @@
       "pages": 14,
       "adoptionRate": 1,
       "dialogueRetention": 1,
-      "qualityScore": 0.8775969250668396,
-      "stripQualityScore": 0.9166697592487646
+      "qualityScore": 0.8971393522018822,
+      "stripQualityScore": 0.9344154629695665
     }
   ]
 }

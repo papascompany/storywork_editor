@@ -31,7 +31,7 @@
  * 결정론: 입력 순서와 산술만 사용. 랜덤·시각 의존 없음.
  */
 
-import type { LayoutFormat, LayoutSlot, LayoutTemplate } from './types.js'
+import type { FabricLayer, LayoutFormat, LayoutSlot, LayoutTemplate } from './types.js'
 
 // ─────────────────────────────────────────────
 // 상수
@@ -84,4 +84,71 @@ export function withStripRhythm(template: LayoutTemplate): LayoutTemplate {
 /** 계획·배치가 공유하는 템플릿 변환 — 웹툰이면 리듬 사본, 아니면 원본 (수용량 계약의 단일점) */
 export function planningTemplate(template: LayoutTemplate, format: LayoutFormat): LayoutTemplate {
   return isWebtoonFormat(format) ? withStripRhythm(template) : template
+}
+
+// ─────────────────────────────────────────────
+// 인물 없는 세그먼트 — 텍스트 묶음 가로 중앙 정렬 (LAYOUT-07)
+// ─────────────────────────────────────────────
+
+function num(v: unknown): number {
+  return typeof v === 'number' && Number.isFinite(v) ? v : 0
+}
+
+/**
+ * 인물(pose)이 없는 웹툰 세그먼트의 전경(캡션·말풍선 등)을 **묶음째 가로로 평행이동**해
+ * 면적 가중 무게중심을 화면 가운데로 맞춘다.
+ *
+ * ## 왜 필요한가 (MODE-06 실측)
+ * 서술 장면(등장인물 0명)은 세그먼트의 27% 인데, 캡션이 생성 격자의 좌/우 열(폭 ~31%)에
+ * 붙어 스크롤 화면의 가로 균형이 35%(나머지 80%)였다. 인쇄에서는 펼침면·여백이 받쳐 주지만
+ * 웹툰은 화면 폭이 곧 지면이라 한쪽으로 쏠린 글 상자가 그대로 드러난다.
+ *
+ * ## 왜 "묶음째"인가
+ * 캡션만 옮기면 같은 세그먼트의 말풍선과 겹칠 수 있다. 모든 전경을 같은 dx 로 옮기면
+ * 상대 배치가 보존돼 **새 겹침이 생기지 않고 좌→우 읽기 순서도 그대로**다. 세로 위치는
+ * 건드리지 않는다(스크롤 리듬 인셋 계약 유지).
+ *
+ * ## 가장자리 보호
+ * 이동 후에도 묶음의 좌우 여백은 **원래 더 좁았던 쪽 여백 이상**을 유지한다 — 원래 safe-area
+ * 를 통과한 배치가 이동 때문에 가장자리로 붙는 일이 없다. 그래서 완전히 중앙에 못 가는
+ * 경우도 있다(가능한 만큼만 이동).
+ *
+ * 인물이 있는 세그먼트·인쇄(mm) 판형은 그대로 돌려준다 — 인물 중심 구도는 배치기가
+ * 화자 근접·얼굴 가림으로 이미 정한 것이라 건드리지 않는다. 순수 함수(입력 불변).
+ */
+export function centerPoseLessSegment(
+  layers: readonly FabricLayer[],
+  format: LayoutFormat,
+): FabricLayer[] {
+  if (!isWebtoonFormat(format) || layers.some((l) => l.kind === 'pose')) return [...layers]
+
+  const W = format.widthMm
+  let x0 = Infinity
+  let x1 = -Infinity
+  let areaSum = 0
+  let cxSum = 0
+  for (const l of layers) {
+    if (l.kind === 'bg') continue
+    const w = num(l.fabric['widthMm'])
+    const h = num(l.fabric['heightMm'])
+    if (w <= 0 || h <= 0) continue
+    const left = num(l.fabric['leftMm'])
+    x0 = Math.min(x0, left)
+    x1 = Math.max(x1, left + w)
+    areaSum += w * h
+    cxSum += (left + w / 2) * w * h
+  }
+  if (areaSum <= 0 || W <= 0) return [...layers]
+
+  const margin = Math.max(0, Math.min(x0, W - x1))
+  const wanted = W / 2 - cxSum / areaSum
+  const dx = Math.min(Math.max(wanted, margin - x0), W - margin - x1)
+  // 반 픽셀 미만은 의미 없는 이동 — 결정론적으로 원본 유지
+  if (Math.abs(dx) < 0.5) return [...layers]
+
+  return layers.map((l) =>
+    l.kind === 'bg' || num(l.fabric['widthMm']) <= 0
+      ? l
+      : { ...l, fabric: { ...l.fabric, leftMm: num(l.fabric['leftMm']) + dx } },
+  )
 }

@@ -16,13 +16,14 @@ import { describe, expect, it } from 'vitest'
 import { measureAdoption } from '../src/adoption.js'
 import { compose } from '../src/compose.js'
 import {
+  centerPoseLessSegment,
   isWebtoonFormat,
   normalizeWebtoonFormat,
   withStripRhythm,
   STRIP_RHYTHM_INSET,
 } from '../src/strip.js'
 import { PRESET_TEMPLATES } from '../src/template-match.js'
-import type { ComposeResult, LayoutFormat } from '../src/types.js'
+import type { ComposeResult, FabricLayer, LayoutFormat } from '../src/types.js'
 
 /** 웹툰 표준 690px — 시드 preset-webtoon-690 과 동일 기하 (DB 는 safe/bleed 0) */
 const WEBTOON: LayoutFormat = {
@@ -204,5 +205,89 @@ describe('compose() — 웹툰 스트립 (MODE-03)', () => {
       result,
     )
     expect(adoption.dialogueRetention).toBe(1)
+  })
+})
+
+// ─────────────────────────────────────────────
+// LAYOUT-07 — 인물 없는 세그먼트 텍스트 묶음 가로 중앙 정렬
+// ─────────────────────────────────────────────
+
+describe('centerPoseLessSegment (LAYOUT-07)', () => {
+  const PX: LayoutFormat = {
+    id: 'w',
+    unit: 'px',
+    widthMm: 690,
+    heightMm: 1280,
+    dpi: 72,
+    bleedMm: 0,
+    safeMm: 0,
+  }
+
+  function box(kind: string, x: number, y: number, w: number, h: number, meta = {}): FabricLayer {
+    return {
+      id: `${kind}-${x}-${y}`,
+      kind,
+      data: { meta },
+      fabric: { leftMm: x, topMm: y, widthMm: w, heightMm: h },
+    }
+  }
+
+  const bg = box('bg', 0, 0, 690, 1280)
+  const centroidX = (layers: FabricLayer[]): number => {
+    let a = 0
+    let c = 0
+    for (const l of layers.filter((x) => x.kind !== 'bg')) {
+      const w = l.fabric['widthMm'] as number
+      const h = l.fabric['heightMm'] as number
+      a += w * h
+      c += ((l.fabric['leftMm'] as number) + w / 2) * w * h
+    }
+    return c / a
+  }
+
+  it('왼쪽 열에 붙은 캡션을 가로 가운데로 옮긴다 (세로 위치·배경은 그대로)', () => {
+    const input = [
+      bg,
+      box('text', 77, 557, 216, 96, { kind: 'caption' }),
+      box('text', 77, 653, 216, 96, { kind: 'caption' }),
+    ]
+    const out = centerPoseLessSegment(input, PX)
+    expect(centroidX(out)).toBeCloseTo(345)
+    expect(out.map((l) => l.fabric['topMm'])).toEqual(input.map((l) => l.fabric['topMm']))
+    expect(out[0]).toBe(bg)
+    // 입력 불변
+    expect(input[1]?.fabric['leftMm']).toBe(77)
+  })
+
+  it('말풍선과 캡션을 묶음째 옮겨 상대 배치(겹침·좌우 순서)를 보존한다', () => {
+    const bubble = box('bubble', 173, 370, 345, 225)
+    const caption = box('text', 77, 557, 216, 96, { kind: 'caption' })
+    const out = centerPoseLessSegment([bg, bubble, caption], PX)
+    const dx = (out[1]?.fabric['leftMm'] as number) - 173
+    expect(dx).not.toBe(0)
+    expect((out[2]?.fabric['leftMm'] as number) - 77).toBeCloseTo(dx)
+  })
+
+  it('가장자리 쪽으로는 원래 더 좁았던 여백 이상을 유지한다', () => {
+    // 폭 넓은 묶음(왼쪽 여백 20, 오른쪽 여백 100) — 중앙까지 가려면 오른쪽으로 40 이동이 필요하지만
+    // 여백 20 을 지키는 한도에서 이동한다
+    const out = centerPoseLessSegment(
+      [bg, box('text', 20, 100, 570, 100), box('text', 20, 300, 100, 100)],
+      PX,
+    )
+    const xs = out.slice(1).map((l) => l.fabric['leftMm'] as number)
+    const right = Math.max(
+      ...out.slice(1).map((l) => (l.fabric['leftMm'] as number) + (l.fabric['widthMm'] as number)),
+    )
+    expect(Math.min(...xs)).toBeGreaterThanOrEqual(20)
+    expect(690 - right).toBeGreaterThanOrEqual(20)
+  })
+
+  it('인물이 있는 세그먼트와 인쇄 판형은 건드리지 않는다', () => {
+    const withPose = [bg, box('pose', 50, 300, 200, 700), box('text', 77, 557, 216, 96)]
+    expect(centerPoseLessSegment(withPose, PX)).toEqual(withPose)
+    const mm: LayoutFormat = { ...PX, unit: 'mm', widthMm: 128, heightMm: 182 }
+    const caption = [box('text', 5, 50, 30, 20)]
+    expect(centerPoseLessSegment(caption, mm)).toEqual(caption)
   })
 })
