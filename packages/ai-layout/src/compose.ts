@@ -38,7 +38,12 @@ import {
 import { checkLowDpiConstraint, formatLowDpiWarning } from './constraints/low-dpi.js'
 import { splitScenes } from './page-split.js'
 import { assignSlots, BG_TONE_COLOR } from './slot-assign.js'
-import { isWebtoonFormat, normalizeWebtoonFormat, planningTemplate } from './strip.js'
+import {
+  centerPoseLessSegment,
+  isWebtoonFormat,
+  normalizeWebtoonFormat,
+  planningTemplate,
+} from './strip.js'
 import { matchTemplate, PRESET_TEMPLATES } from './template-match.js'
 import type {
   ComposeOptions,
@@ -619,8 +624,11 @@ async function buildPageFabricJson(
     }
   }
 
+  // 웹툰 인물 없는 세그먼트 — 텍스트 묶음 가로 중앙 정렬 (LAYOUT-07). 인쇄·인물 세그먼트는 무변경
+  const placed = centerPoseLessSegment(layers, format)
+
   // zIndex 오름차순 정렬 (결정론)
-  layers.sort((a, b) => {
+  placed.sort((a, b) => {
     const za = typeof a.fabric['zIndex'] === 'number' ? a.fabric['zIndex'] : 0
     const zb = typeof b.fabric['zIndex'] === 'number' ? b.fabric['zIndex'] : 0
     return za - zb || a.id.localeCompare(b.id)
@@ -636,7 +644,7 @@ async function buildPageFabricJson(
       heightMm: format.heightMm,
       dpi: format.dpi,
     },
-    layers,
+    layers: placed,
     _aiMeta: {
       generatedBy: 'ai-layout',
       seed,

@@ -70,6 +70,7 @@ export type { GridSlotSpec } from './bubble-slots.js'
 
 // ── 웹툰 세로 스트립 분기 (MODE-03) ───────────────────────────────────────
 export {
+  centerPoseLessSegment,
   isWebtoonFormat,
   normalizeWebtoonFormat,
   planningTemplate,
