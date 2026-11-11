@@ -127,6 +127,20 @@ export {
 } from './quality.js'
 export type { PageQuality, QualityAxis, QualityResult } from './quality.js'
 
+// ── 웹툰 스트립 품질 — 화면 스크롤 단위 (MODE-06) ──────────────────────────
+export {
+  measureStripQuality,
+  aggregateStripQuality,
+  worstWindows,
+  STRIP_VIEWPORT_ASPECT,
+  STRIP_WINDOW_STRIDE,
+  STRIP_DENSITY_MIN,
+  STRIP_DENSITY_MAX,
+  STRIP_TEXT_MIN,
+  STRIP_TEXT_MAX,
+} from './strip-quality.js'
+export type { StripQualityResult, StripWindowQuality } from './strip-quality.js'
+
 // ── 말풍선 배치 비용함수 + 자동 QA (BUBBLE-02) ─────────────────────────────
 export {
   assignBubblesByCost,
