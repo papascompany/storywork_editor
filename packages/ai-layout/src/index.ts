@@ -63,6 +63,8 @@ export {
   poseSlotsOf,
   requiredPoseSlotsOf,
   MAX_BUBBLES_PER_PAGE,
+  STRIP_MAX_BUBBLES_PER_SEGMENT,
+  maxBubblesFor,
   GENERATED_SLOT_PREFIX,
   CAPTION_SLOT_KIND,
 } from './bubble-slots.js'

@@ -4,7 +4,7 @@
   "format": "preset-webtoon-690",
   "corpusFiles": 21,
   "totalScenes": 217,
-  "totalPages": 222,
+  "totalPages": 263,
   "adoptionRate": 1,
   "dialogueRetention": 1,
   "blockerCounts": {
@@ -19,11 +19,11 @@
     "low-dpi-fallback": 0
   },
   "quality": {
-    "score": 0.904588424243515,
+    "score": 0.9125400975966128,
     "independent": {
-      "balance": 0.7695883805203506,
-      "density": 0.8884888758323548,
-      "dialogueDensity": 0.8648648648648649
+      "balance": 0.7699456194097416,
+      "density": 0.905872739295752,
+      "dialogueDensity": 0.8868821292775665
     },
     "dependent": {
       "readingFlow": 1,
@@ -31,14 +31,14 @@
     }
   },
   "stripQuality": {
-    "score": 0.9235764527351797,
-    "totalWindows": 450,
+    "score": 0.9537677644123403,
+    "totalWindows": 535,
     "viewportHeight": 1226.6666666666665,
-    "backgroundOnlyRatio": 0.10666666666666667,
+    "backgroundOnlyRatio": 0.08971962616822429,
     "independent": {
-      "balance": 0.8383010563665002,
-      "density": 0.9040256517538335,
-      "dialogueDensity": 0.8755555555555565
+      "balance": 0.8645279325328746,
+      "density": 0.9192641605568611,
+      "dialogueDensity": 0.9850467289719627
     },
     "dependent": {
       "readingFlow": 1,
@@ -60,11 +60,11 @@
       "file": "action-fantasy/02-dragon-chase.txt",
       "format": "light-novel",
       "scenes": 10,
-      "pages": 10,
+      "pages": 11,
       "adoptionRate": 1,
       "dialogueRetention": 1,
-      "qualityScore": 0.9421515090523386,
-      "stripQualityScore": 0.9607435703443578
+      "qualityScore": 0.9428909306851575,
+      "stripQualityScore": 0.9677426445580172
     },
     {
       "file": "action-fantasy/03-ruin-gate.txt",
@@ -90,11 +90,11 @@
       "file": "action-fantasy/05-frost-wall.txt",
       "format": "light-novel",
       "scenes": 10,
-      "pages": 10,
+      "pages": 11,
       "adoptionRate": 1,
       "dialogueRetention": 1,
-      "qualityScore": 0.9232280976415757,
-      "stripQualityScore": 0.9517317894160809
+      "qualityScore": 0.9256878294026457,
+      "stripQualityScore": 0.9561713039442442
     },
     {
       "file": "daily-novel/01-school-seat.txt",
@@ -150,51 +150,51 @@
       "file": "drama-screenplay/01-golden-hour.txt",
       "format": "screenplay",
       "scenes": 10,
-      "pages": 10,
+      "pages": 16,
       "adoptionRate": 1,
       "dialogueRetention": 1,
-      "qualityScore": 0.9842072744054849,
-      "stripQualityScore": 0.9033333333333333
+      "qualityScore": 0.973202425695959,
+      "stripQualityScore": 0.9898989898989898
     },
     {
       "file": "drama-screenplay/02-summer-noodle-house.txt",
       "format": "screenplay",
       "scenes": 10,
-      "pages": 12,
+      "pages": 20,
       "adoptionRate": 1,
       "dialogueRetention": 1,
-      "qualityScore": 0.977758453914943,
-      "stripQualityScore": 0.9130916629393194
+      "qualityScore": 0.9707915578192836,
+      "stripQualityScore": 1
     },
     {
       "file": "drama-screenplay/03-third-floor-meeting-room.txt",
       "format": "screenplay",
       "scenes": 10,
-      "pages": 10,
+      "pages": 19,
       "adoptionRate": 1,
       "dialogueRetention": 1,
-      "qualityScore": 0.9854279816515262,
-      "stripQualityScore": 0.8866666666666667
+      "qualityScore": 0.9709488903755793,
+      "stripQualityScore": 0.9982905982905981
     },
     {
       "file": "drama-screenplay/04-witness.txt",
       "format": "screenplay",
       "scenes": 10,
-      "pages": 12,
+      "pages": 19,
       "adoptionRate": 1,
       "dialogueRetention": 1,
-      "qualityScore": 0.9806165758306121,
-      "stripQualityScore": 0.9280000000000002
+      "qualityScore": 0.9711276835909434,
+      "stripQualityScore": 0.9982905982905982
     },
     {
       "file": "drama-screenplay/05-night-study-escape.txt",
       "format": "screenplay",
       "scenes": 10,
-      "pages": 11,
+      "pages": 19,
       "adoptionRate": 1,
       "dialogueRetention": 1,
-      "qualityScore": 0.9675628527663466,
-      "stripQualityScore": 0.9052941465053529
+      "qualityScore": 0.9622147089405513,
+      "stripQualityScore": 0.9922211612732037
     },
     {
       "file": "mixed-formats/diary-01-night-shift.txt",
@@ -250,11 +250,11 @@
       "file": "mixed-formats/light-novel-02-ninth-floor.txt",
       "format": "light-novel",
       "scenes": 14,
-      "pages": 14,
+      "pages": 15,
       "adoptionRate": 1,
       "dialogueRetention": 1,
-      "qualityScore": 0.8971393522018822,
-      "stripQualityScore": 0.9344154629695665
+      "qualityScore": 0.9006824051893132,
+      "stripQualityScore": 0.9416646179890525
     }
   ]
 }

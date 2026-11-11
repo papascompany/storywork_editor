@@ -14,6 +14,14 @@ import { analyze } from '@storywork/ai-script'
 import { describe, expect, it } from 'vitest'
 
 import { measureAdoption } from '../src/adoption.js'
+import {
+  MAX_BUBBLES_PER_PAGE,
+  STRIP_MAX_BUBBLES_PER_SEGMENT,
+  bubbleSlotsOf,
+  maxBubblesFor,
+  pageBubbleCapacity,
+  withGeneratedBubbleSlots,
+} from '../src/bubble-slots.js'
 import { compose } from '../src/compose.js'
 import {
   centerPoseLessSegment,
@@ -289,5 +297,46 @@ describe('centerPoseLessSegment (LAYOUT-07)', () => {
     const mm: LayoutFormat = { ...PX, unit: 'mm', widthMm: 128, heightMm: 182 }
     const caption = [box('text', 5, 50, 30, 20)]
     expect(centerPoseLessSegment(caption, mm)).toEqual(caption)
+  })
+})
+
+// ─────────────────────────────────────────────
+// LAYOUT-08 — 웹툰 세그먼트당 말풍선 상한
+// ─────────────────────────────────────────────
+
+describe('웹툰 세그먼트당 말풍선 상한 (LAYOUT-08)', () => {
+  it('상한은 판형이 정한다 — 웹툰 4 · 인쇄 6(종전)', () => {
+    expect(maxBubblesFor(WEBTOON)).toBe(STRIP_MAX_BUBBLES_PER_SEGMENT)
+    expect(STRIP_MAX_BUBBLES_PER_SEGMENT).toBe(4)
+    expect(maxBubblesFor(B5)).toBe(MAX_BUBBLES_PER_PAGE)
+  })
+
+  it('수용량 계산과 실제 보강이 같은 상한을 본다 (대사 유실 방지 계약)', () => {
+    for (const t of PRESET_TEMPLATES) {
+      const rhythm = withStripRhythm(t)
+      const capacity = pageBubbleCapacity(rhythm, WEBTOON)
+      expect(capacity).toBeLessThanOrEqual(STRIP_MAX_BUBBLES_PER_SEGMENT)
+      const boosted = withGeneratedBubbleSlots(rhythm, WEBTOON, 99)
+      expect(Math.min(bubbleSlotsOf(boosted).length, STRIP_MAX_BUBBLES_PER_SEGMENT)).toBe(capacity)
+    }
+  })
+
+  it('대사 8줄 장면은 세그먼트를 늘려 담고, 어떤 세그먼트도 4개를 넘지 않는다', async () => {
+    const webtoon = await composeWith(WEBTOON)
+    for (const p of webtoon.pages) {
+      expect(p.fabricJson.layers.filter((l) => l.kind === 'bubble').length).toBeLessThanOrEqual(4)
+    }
+    const analyzed = await analyze(SCRIPT, {
+      format: 'auto',
+      llmEnabled: false,
+      maxAlternatives: 0,
+    })
+    expect(measureAdoption(analyzed, webtoon).dialogueRetention).toBe(1)
+  })
+
+  it('인쇄 판형의 수용량은 종전 상한(6)을 그대로 쓴다 (무회귀)', () => {
+    const capacities = PRESET_TEMPLATES.map((t) => pageBubbleCapacity(t, B5))
+    expect(Math.max(...capacities)).toBe(MAX_BUBBLES_PER_PAGE)
+    for (const c of capacities) expect(c).toBeLessThanOrEqual(MAX_BUBBLES_PER_PAGE)
   })
 })

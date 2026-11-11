@@ -22,6 +22,7 @@
 
 import { occlusionCost } from './bubble-cost.js'
 import type { NormRect } from './bubble-cost.js'
+import { isWebtoonFormat } from './strip.js'
 import type { LayoutFormat, LayoutSlot, LayoutTemplate } from './types.js'
 
 // ─────────────────────────────────────────────
@@ -30,6 +31,24 @@ import type { LayoutFormat, LayoutSlot, LayoutTemplate } from './types.js'
 
 /** 한 페이지가 담는 말풍선 상한 — 가독성 한계. 초과분은 페이지 분할로 처리 */
 export const MAX_BUBBLES_PER_PAGE = 6
+
+/**
+ * 웹툰 세그먼트 하나의 말풍선 상한 (LAYOUT-08).
+ *
+ * 세그먼트(1280px)가 폰 화면(16:9 → 1227px)과 거의 같아, 세그먼트의 대사가 한 화면에
+ * 고스란히 들어온다. 인쇄 상한 6 을 그대로 쓰면 화면 21.8% 가 대사 5~6개였다(MODE-06 실측).
+ * 웹툰은 한 화면에 읽히는 대사가 적어야 스크롤 리듬이 산다 — 넘치는 대사는 세그먼트를
+ * 늘려(스트립 연장) 담는다. 값의 근거·트레이드오프는 docs/eval/webtoon-quality-2026-11-11.md §5
+ */
+export const STRIP_MAX_BUBBLES_PER_SEGMENT = 4
+
+/**
+ * 판형의 페이지(세그먼트)당 말풍선 상한. 수용량 계산과 실제 보강이 **반드시 이 함수 하나**를
+ * 거쳐야 한다 — 둘이 다른 상한을 보면 계획한 수용량과 실제 슬롯 수가 어긋나 대사가 유실된다.
+ */
+export function maxBubblesFor(format: Pick<LayoutFormat, 'unit'>): number {
+  return isWebtoonFormat(format) ? STRIP_MAX_BUBBLES_PER_SEGMENT : MAX_BUBBLES_PER_PAGE
+}
 
 /** 생성 슬롯 ID 접두 — 템플릿 원본 슬롯과 구분 */
 export const GENERATED_SLOT_PREFIX = 'gen-bubble-'
@@ -299,9 +318,12 @@ export function generateBubbleSlots(
  * 페이지 분할(capacity.ts)이 이 값을 기준으로 계산하므로 어긋나면 대사가 유실된다.
  */
 export function pageBubbleCapacity(template: LayoutTemplate, format: LayoutFormat): number {
+  const max = maxBubblesFor(format)
   const existing = bubbleSlotsOf(template).length
-  if (existing >= MAX_BUBBLES_PER_PAGE) return existing
-  const generatable = generateBubbleSlots(template, format, MAX_BUBBLES_PER_PAGE - existing).length
+  // 웹툰은 상한이 계약이다 — 템플릿 슬롯이 더 많아도 상한까지만 계획한다(배치는 대사 수만큼만
+  // 슬롯을 쓰므로 남는 슬롯은 비어 있을 뿐). 인쇄는 종전대로 템플릿 슬롯 수를 존중한다
+  if (existing >= max) return isWebtoonFormat(format) ? max : existing
+  const generatable = generateBubbleSlots(template, format, max - existing).length
   return existing + generatable
 }
 
@@ -315,7 +337,7 @@ export function withGeneratedBubbleSlots(
   neededBubbles: number,
 ): LayoutTemplate {
   const existing = bubbleSlotsOf(template).length
-  const target = Math.min(neededBubbles, MAX_BUBBLES_PER_PAGE)
+  const target = Math.min(neededBubbles, maxBubblesFor(format))
   const need = target - existing
   if (need <= 0) return template
 
