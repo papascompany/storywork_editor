@@ -30,6 +30,13 @@ const SCENE_BREAK_KEYWORDS = /^(그날|다음\s*날|한편|그\s*후|얼마\s*�
 /** 문장 구분 (한국어 마침표 + 물음표 + 느낌표) */
 const SENTENCE_END_RE = /[.。?？!！]+\s*/g
 
+/**
+ * 서술 한 줄의 최대 길이 — 넘는 단락은 문장 경계에서 나눈다 (종전에는 여기서 잘라 버렸다).
+ * 캡션 박스 하나가 담는 양(ai-layout CAPTION_CHARS_PER_BOX 180자)과 비슷한 크기로 둬서,
+ * 나뉜 줄들이 박스에 자연스럽게 묶이게 한다.
+ */
+export const NARRATION_LINE_MAX_CHARS = 200
+
 /** 화자 직접 패턴 "이름: 대사" */
 const DIRECT_SPEAKER_RE = /^([가-힣]{2,8})\s*:\s*(.+)/
 
@@ -42,6 +49,77 @@ function splitParagraphs(text: string): string[] {
     .split(/\n{2,}/)
     .map((p) => p.trim())
     .filter((p) => p.length > 0)
+}
+
+// ─────────────────────────────────────────────
+// 서술 단락 분할
+// ─────────────────────────────────────────────
+
+/** 문장 하나가 상한을 넘으면 공백에서, 공백도 없으면 글자 수로 나눈다 */
+function splitLongSentence(sentence: string, max: number): string[] {
+  const out: string[] = []
+  let current = ''
+  for (const word of sentence.split(/\s+/).filter((w) => w.length > 0)) {
+    if (word.length > max) {
+      if (current) out.push(current)
+      current = ''
+      for (let i = 0; i < word.length; i += max) out.push(word.slice(i, i + max))
+      continue
+    }
+    const next = current ? `${current} ${word}` : word
+    if (next.length > max) {
+      out.push(current)
+      current = word
+    } else {
+      current = next
+    }
+  }
+  if (current) out.push(current)
+  return out
+}
+
+/**
+ * 서술 단락을 `max` 자 이하 덩어리로 나눈다 — **글을 버리지 않는다.**
+ *
+ * 종전 동작은 `para.slice(0, 200)` 이라 긴 서술 단락의 뒷부분이 조용히 사라졌다. 대사 보존
+ * 지표는 대사만 세므로 이 손실은 어떤 지표에도 잡히지 않았다. 이제 문장 경계에서 이어 담고,
+ * 문장 하나가 상한보다 길 때만 공백에서 나눈다. 상한 이하 단락은 그대로 한 줄이다(종전과 동일).
+ */
+export function splitNarration(para: string, max = NARRATION_LINE_MAX_CHARS): string[] {
+  const text = para.trim()
+  if (text.length <= max) return text ? [text] : []
+
+  // 문장 끝(마침표·물음표·느낌표 + 뒤따르는 공백)까지를 한 문장으로
+  const sentences: string[] = []
+  let start = 0
+  for (const m of text.matchAll(SENTENCE_END_RE)) {
+    const end = (m.index ?? 0) + m[0].length
+    const sentence = text.slice(start, end).trim()
+    if (sentence) sentences.push(sentence)
+    start = end
+  }
+  const tail = text.slice(start).trim()
+  if (tail) sentences.push(tail)
+
+  const out: string[] = []
+  let current = ''
+  for (const sentence of sentences) {
+    if (sentence.length > max) {
+      if (current) out.push(current)
+      current = ''
+      out.push(...splitLongSentence(sentence, max))
+      continue
+    }
+    const next = current ? `${current} ${sentence}` : sentence
+    if (next.length > max) {
+      out.push(current)
+      current = sentence
+    } else {
+      current = next
+    }
+  }
+  if (current) out.push(current)
+  return out
 }
 
 // ─────────────────────────────────────────────
@@ -76,14 +154,12 @@ function extractLinesFromParagraph(para: string, ctx: AttributionContext): Analy
     result.push({ index: lineIdx++, speaker: q.speaker, text: q.text, kind: 'dialogue' })
   }
 
-  // 대화가 없으면 단락 전체를 서술 행으로 — 말풍선이 아니라 캡션 박스로 간다 (SCRIPT-KO-04)
+  // 대화가 없으면 단락 전체를 서술 행으로 — 말풍선이 아니라 캡션 박스로 간다 (SCRIPT-KO-04).
+  // 긴 단락은 문장 경계에서 여러 서술 행으로 나눈다(잘라 버리지 않는다)
   if (result.length === 0 && para.length > 0) {
-    result.push({
-      index: lineIdx++,
-      speaker: undefined,
-      text: para.slice(0, 200),
-      kind: 'narration',
-    })
+    for (const text of splitNarration(para)) {
+      result.push({ index: lineIdx++, speaker: undefined, text, kind: 'narration' })
+    }
   }
 
   return result
