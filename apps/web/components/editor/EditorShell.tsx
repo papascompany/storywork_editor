@@ -32,7 +32,7 @@ import type { LayerNodeJson, LayerTree } from '@storywork/editor-layers'
 import type { PageJsonV1 } from '@storywork/schema/editor'
 import { useTheme, useToast } from '@storywork/ui'
 import { FabricImage, Rect } from 'fabric'
-import React, { useCallback, useEffect, useRef, useState } from 'react'
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 
 import type { ResourceSummary } from '../../app/api/_lib/search-types'
 import type { CoverConfig } from '../../lib/cover-config'
@@ -70,6 +70,7 @@ import { ToolBar } from './ToolBar'
 import { TopBar } from './TopBar'
 import type { HistoryRef as History } from './types'
 import { StripCanvas } from './webtoon/StripCanvas'
+import type { WebtoonExportSource } from './webtoon/webtoonExport'
 
 // 도구 단축키 맵
 const TOOL_SHORTCUTS: Record<string, ToolId> = {
@@ -117,6 +118,24 @@ export function EditorShell() {
    * 별도 플래그를 두면 판형과 어긋나 mm 프로젝트가 스트립으로 열리는 사고가 난다.
    */
   const isWebtoonProject = project?.format.unit === 'px'
+
+  /**
+   * 웹툰 이미지 출력 공급자 (MODE-05). 스트립 세그먼트는 언마운트 때만 스토어로 flush 하므로,
+   * 내보내기 직전에 라이브 세그먼트를 먼저 flush 하고 스토어를 **그 자리에서** 다시 읽는다
+   * (렌더 시점의 `project` 를 캡처하면 방금 flush 한 편집이 빠진다).
+   */
+  const stripFlushAllRef = useRef<(() => void) | null>(null)
+  const webtoonFormat = isWebtoonProject ? project?.format : undefined
+  const webtoonExport = useMemo<WebtoonExportSource | null>(() => {
+    if (!webtoonFormat) return null
+    return {
+      format: webtoonFormat,
+      getPages: () => {
+        stripFlushAllRef.current?.()
+        return (usePageStore.getState().project?.pages ?? []).map((p) => p.fabricJson)
+      },
+    }
+  }, [webtoonFormat])
   const [formatPickerOpen, setFormatPickerOpen] = useState(false)
   const [recoveryToastShown, setRecoveryToastShown] = useState(false)
 
@@ -1187,6 +1206,7 @@ export function EditorShell() {
           isAuthenticated={isAuthenticated}
           serverSaveStatus={serverSaveStatus}
           onSave={() => void triggerSave()}
+          webtoonExport={webtoonExport}
         />
 
         {/* 중앙 영역: ToolBar | FeatureSidebar | Canvas | RightPanel */}
@@ -1213,6 +1233,7 @@ export function EditorShell() {
                 activeIndex={project.currentPageIndex}
                 onActiveIndexChange={setCurrentPage}
                 onSegmentFlush={updatePageJson}
+                flushAllRef={stripFlushAllRef}
               />
             ) : (
               <EditorCanvas

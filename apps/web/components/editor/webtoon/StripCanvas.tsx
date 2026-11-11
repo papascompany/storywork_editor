@@ -24,7 +24,8 @@
 import { fitStripWidth } from '@storywork/editor-core'
 import type { StripSegment } from '@storywork/editor-core'
 import { cn } from '@storywork/ui'
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import type { MutableRefObject } from 'react'
 
 import type { PageData, PageFormat } from '../store/usePageStore'
 
@@ -38,6 +39,12 @@ export interface StripCanvasProps {
   onActiveIndexChange: (index: number) => void
   /** 세그먼트 캔버스가 내려갈 때 flush — 인덱스 지정 필수(다른 세그먼트를 덮어쓰지 않게) */
   onSegmentFlush: (index: number, fabricJson: Record<string, unknown>) => void
+  /**
+   * 라이브 세그먼트 전체 flush 함수를 받을 ref (MODE-05).
+   * 세그먼트는 언마운트 때만 스토어로 flush 하므로, 내보내기처럼 **지금** 저장본이 필요한
+   * 호출자는 이 함수를 먼저 불러 화면에 떠 있는 편집까지 스토어에 반영해야 한다.
+   */
+  flushAllRef?: MutableRefObject<(() => void) | null>
 }
 
 export function StripCanvas({
@@ -46,6 +53,7 @@ export function StripCanvas({
   activeIndex,
   onActiveIndexChange,
   onSegmentFlush,
+  flushAllRef,
 }: StripCanvasProps) {
   // callback ref + state — DOM 이 붙는 순간 리렌더가 일어나야 가상화 effect 가 컨테이너를
   // 실제로 잡는다. 평범한 useRef 로 넘기면 마운트 타이밍에 따라 영영 0×0 으로 남는다(실측).
@@ -81,6 +89,26 @@ export function StripCanvas({
     // activeIndex 를 의존성에 넣으면 사용자가 직접 고른 활성을 스크롤이 되돌린다
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [scrolledIndex])
+
+  // 라이브 세그먼트별 flush — 세그먼트가 마운트 때 등록하고 언마운트 때 해제한다
+  const flushersRef = useRef(new Map<number, () => void>())
+  const registerFlush = useCallback((index: number, flush: () => void) => {
+    flushersRef.current.set(index, flush)
+    return () => {
+      // StrictMode 이중 마운트에서 새 등록을 지우지 않도록 자기 것일 때만 해제
+      if (flushersRef.current.get(index) === flush) flushersRef.current.delete(index)
+    }
+  }, [])
+
+  useEffect(() => {
+    if (!flushAllRef) return
+    flushAllRef.current = () => {
+      for (const flush of flushersRef.current.values()) flush()
+    }
+    return () => {
+      flushAllRef.current = null
+    }
+  }, [flushAllRef])
 
   const liveSet = useMemo(() => new Set(liveIndices), [liveIndices])
 
@@ -122,6 +150,7 @@ export function StripCanvas({
                   format={format}
                   zoom={zoom}
                   onFlush={onSegmentFlush}
+                  registerFlush={registerFlush}
                 />
               ) : page.thumbnail ? (
                 // 썸네일은 캔버스가 만든 dataURL — next/image 최적화 대상이 아니다

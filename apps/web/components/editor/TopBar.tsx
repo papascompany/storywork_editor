@@ -34,12 +34,14 @@ import {
   Check,
   Eye,
   HelpCircle,
+  Images,
   Lock,
   Loader2,
   Moon,
   MoreVertical,
   Redo2,
   Save,
+  ScrollText,
   Share2,
   Sparkles,
   Sun,
@@ -52,6 +54,8 @@ import { AutoSaveIndicator } from './AutoSaveIndicator'
 import { DownloadMenu } from './DownloadMenu'
 import { FilenameInline } from './FilenameInline'
 import type { AutosaveFailReason, SaveStatus } from './hooks/useAutosave'
+import { runWebtoonExport } from './webtoon/webtoonExport'
+import type { WebtoonExportLayout, WebtoonExportSource } from './webtoon/webtoonExport'
 
 // ─── Props ───────────────────────────────────────────────────────────────────
 
@@ -92,6 +96,9 @@ export type TopBarProps = {
 
   // M6-02: PDF 비동기 출판용 projectId
   projectId?: string | null
+
+  // MODE-05: 웹툰(px 판형) 프로젝트면 이미지 출력 공급자 — 다운로드 메뉴가 웹툰 출력으로 바뀐다
+  webtoonExport?: WebtoonExportSource | null
 }
 
 // ─── TopBar ──────────────────────────────────────────────────────────────────
@@ -116,6 +123,7 @@ export function TopBar({
   serverSaveStatus = 'idle',
   onSave,
   projectId = null,
+  webtoonExport = null,
 }: TopBarProps) {
   const { resolvedTheme, toggleTheme } = useTheme()
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
@@ -123,6 +131,25 @@ export function TopBar({
   // ── 공유 / 미리보기 핸들러 ──────────────────────────────
   const handleShare = () => {
     showToast('공유 기능은 M8에서 활성화됩니다.', 'info')
+  }
+
+  // MODE-05: 모바일 메뉴의 웹툰 이미지 다운로드 — 데스크톱 DownloadMenu 와 같은 경로
+  const handleMobileWebtoonExport = (layout: WebtoonExportLayout) => {
+    if (!webtoonExport) return
+    setMobileMenuOpen(false)
+    void runWebtoonExport(webtoonExport, layout, fileName)
+      .then(({ imageCount }) => {
+        showToast(
+          imageCount > 1
+            ? `이미지 ${imageCount}장을 ZIP 으로 내려받았습니다.`
+            : '이미지를 내려받았습니다.',
+          'success',
+        )
+      })
+      .catch((err: unknown) => {
+        console.error('[TopBar] 웹툰 이미지 내보내기 실패:', err)
+        showToast('웹툰 이미지 내보내기에 실패했습니다.', 'error')
+      })
   }
 
   const handlePreview = () => {
@@ -270,6 +297,7 @@ export function TopBar({
         layerTree={layerTree}
         fileName={fileName}
         projectId={projectId}
+        webtoon={webtoonExport}
       />
 
       {/* 저장 */}
@@ -589,57 +617,94 @@ export function TopBar({
                 미리보기
               </button>
 
-              {/* PNG 다운로드 */}
-              <button
-                type="button"
-                onClick={() => {
-                  // DownloadMenu 로직과 동일하게 처리 — canvas 없을 시 무시
-                  if (!canvas) {
-                    showToast('캔버스가 초기화되지 않았습니다.', 'error')
-                    return
-                  }
-                  void (async () => {
-                    try {
-                      const { exportPng: ep } = await import('@storywork/editor-export')
-                      const result = await ep(canvas, { scale: 2, background: '#ffffff' })
-                      const url = URL.createObjectURL(result.blob)
-                      const a = document.createElement('a')
-                      a.href = url
-                      a.download = `${fileName}.png`
-                      a.click()
-                      setTimeout(() => URL.revokeObjectURL(url), 1000)
-                    } catch {
-                      showToast('PNG 내보내기에 실패했습니다.', 'error')
-                    }
-                  })()
-                  setMobileMenuOpen(false)
-                }}
-                disabled={!canvas}
-                aria-label="PNG 이미지로 다운로드"
-                className={cn(
-                  'flex items-center gap-3 px-4 py-3 text-sm rounded-[var(--radius-md)]',
-                  'text-[var(--color-text)] hover:bg-[var(--color-surface-muted)]',
-                  'disabled:opacity-50 disabled:pointer-events-none',
-                  'min-h-[2.75rem]',
-                )}
-              >
-                {/* FileImage icon inline */}
-                <svg
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  className="size-5"
-                  aria-hidden="true"
-                >
-                  <rect width="18" height="18" x="3" y="3" rx="2" ry="2" />
-                  <circle cx="9" cy="9" r="2" />
-                  <path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21" />
-                </svg>
-                PNG 다운로드
-              </button>
+              {webtoonExport ? (
+                <>
+                  {/* 웹툰 — 이미지 시퀀스 (MODE-05) */}
+                  <button
+                    type="button"
+                    onClick={() => handleMobileWebtoonExport('sequence')}
+                    aria-label="세그먼트별 이미지로 다운로드 (ZIP)"
+                    data-testid="mobile-download-webtoon-sequence"
+                    className={cn(
+                      'flex items-center gap-3 px-4 py-3 text-sm rounded-[var(--radius-md)]',
+                      'text-[var(--color-text)] hover:bg-[var(--color-surface-muted)]',
+                      'min-h-[2.75rem]',
+                    )}
+                  >
+                    <Images className="size-5" aria-hidden="true" />
+                    이미지 시퀀스 (ZIP)
+                  </button>
+
+                  {/* 웹툰 — 롱 이미지 (MODE-05) */}
+                  <button
+                    type="button"
+                    onClick={() => handleMobileWebtoonExport('long')}
+                    aria-label="세로로 이은 롱 이미지로 다운로드"
+                    data-testid="mobile-download-webtoon-long"
+                    className={cn(
+                      'flex items-center gap-3 px-4 py-3 text-sm rounded-[var(--radius-md)]',
+                      'text-[var(--color-text)] hover:bg-[var(--color-surface-muted)]',
+                      'min-h-[2.75rem]',
+                    )}
+                  >
+                    <ScrollText className="size-5" aria-hidden="true" />롱 이미지
+                  </button>
+                </>
+              ) : (
+                <>
+                  {/* PNG 다운로드 */}
+                  <button
+                    type="button"
+                    onClick={() => {
+                      // DownloadMenu 로직과 동일하게 처리 — canvas 없을 시 무시
+                      if (!canvas) {
+                        showToast('캔버스가 초기화되지 않았습니다.', 'error')
+                        return
+                      }
+                      void (async () => {
+                        try {
+                          const { exportPng: ep } = await import('@storywork/editor-export')
+                          const result = await ep(canvas, { scale: 2, background: '#ffffff' })
+                          const url = URL.createObjectURL(result.blob)
+                          const a = document.createElement('a')
+                          a.href = url
+                          a.download = `${fileName}.png`
+                          a.click()
+                          setTimeout(() => URL.revokeObjectURL(url), 1000)
+                        } catch {
+                          showToast('PNG 내보내기에 실패했습니다.', 'error')
+                        }
+                      })()
+                      setMobileMenuOpen(false)
+                    }}
+                    disabled={!canvas}
+                    aria-label="PNG 이미지로 다운로드"
+                    className={cn(
+                      'flex items-center gap-3 px-4 py-3 text-sm rounded-[var(--radius-md)]',
+                      'text-[var(--color-text)] hover:bg-[var(--color-surface-muted)]',
+                      'disabled:opacity-50 disabled:pointer-events-none',
+                      'min-h-[2.75rem]',
+                    )}
+                  >
+                    {/* FileImage icon inline */}
+                    <svg
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      className="size-5"
+                      aria-hidden="true"
+                    >
+                      <rect width="18" height="18" x="3" y="3" rx="2" ry="2" />
+                      <circle cx="9" cy="9" r="2" />
+                      <path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21" />
+                    </svg>
+                    PNG 다운로드
+                  </button>
+                </>
+              )}
 
               {/* 공유 */}
               <button

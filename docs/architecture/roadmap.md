@@ -379,7 +379,15 @@
   · `ProjectData.mode` 추가 — 편집기 뷰 분기는 여전히 `format.unit` 이 근거이고 mode 는 표시·대조용
   · 신규 테스트 4(`project-mode.test.ts` — 도출 저장 · 클라이언트 mode 무시 · **업데이트 동반 갱신** · px 400 유지), turbo 79 green
   · **웹툰 게이트는 그대로** — px 생성은 여전히 400. 개방은 MODE-05(이미지 export) 완성과 한 세트
-- [ ] [MODE-05] 웹툰 export — 이미지 시퀀스 + 단일 롱 이미지(플랫폼 업로드 규격: 폭 고정·분할 높이 상한) — @editor-engineer + @pdf-publisher
+- [x] [MODE-05] 웹툰 export — 이미지 시퀀스 + 단일 롱 이미지(플랫폼 업로드 규격: 폭 고정·분할 높이 상한) — @editor-engineer + @pdf-publisher ✅ 2026-11-11.
+  · `editor-export` `exportWebtoon(pages, format, { layout: 'sequence'|'long' })` — **px 판형 전용**(mm 은 throw). 편집 캔버스가 아니라 세그먼트마다 **헤드리스 StoryCanvas 를 판형 실물 크기로** 새로 만들어 그린다: 편집 캔버스는 뷰포트 배율이 걸려 fabric `toCanvasElement` 가 그 배율까지 곱하고(handoff §4 의 "1:1 아님"), 라이브 창 밖 세그먼트는 캔버스가 없다
+  · `planWebtoonSlices` 순수 함수 — 롱 이미지는 **세그먼트 경계 우선**으로 자르고, 세그먼트 하나가 상한보다 클 때만 강제 분할. 조각 끝에 간격을 붙이지 않는다(이어 붙이면 간격 2배). 상한 기본 = 캔버스 상한 16384/scale
+  · `createStoreZip` — 무압축 ZIP(CRC-32 · UTF-8 파일명 플래그) 자체 구현. PNG 는 이미 압축돼 DEFLATE 이득이 없어 외부 의존성 없이 해결. `unzip -t` 교차 검증
+  · web: DownloadMenu/TopBar 모바일 메뉴가 px 판형이면 **이미지 시퀀스(ZIP) · 롱 이미지**로 바뀐다(PDF·프리플라이트·PNG·JSON 숨김 — 인쇄 경로는 서버가 px 거부). 렌더 엔진은 클릭 시 동적 import
+  · **라이브 세그먼트 flush**: 세그먼트는 언마운트 때만 스토어로 flush 하므로 `StripCanvas.flushAllRef` 로 내보내기 직전 강제 flush 후 스토어를 그 자리에서 다시 읽는다. 겸사 **복원 전 flush 차단** — `loadJson` 이 끝나기 전 flush 하면 빈 캔버스가 저장본을 덮는 기존 경쟁 조건도 막았다
+  · 검증: editor-export 신규 16(픽셀 색상으로 1:1 좌표·간격·분할·scale 확인) · web 신규 6 · **실 Chromium dpr=2 에서 폭 690 정확**(레티나 배율 미적용 확인)
+  · **웹툰 게이트는 아직 닫혀 있다** — 모달 "준비 중" · 프리셋 isActive:false · 서버 px 가드(save/full-pipeline/compose) 유지. 개방은 출시 결정 + prod 시드(대표님) 가 필요해 별도 단계
+  · 플랫폼별 분할 높이 프리셋은 미정 — 규격 확인 후 `maxSliceHeightPx` 로 노출
 - [ ] [MODE-06] 웹툰 모드 채택률·품질 측정 — LAYOUT-04 지표를 스트립 기준으로 재정의(페이지당 → 화면 스크롤당) — @qa-tester
 
 ## M10+ (Parking)
