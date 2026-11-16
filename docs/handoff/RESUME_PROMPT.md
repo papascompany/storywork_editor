@@ -1,4 +1,4 @@
-# 새 세션 시작 프롬프트 (2026-08-10 v2 갱신 — MODE-04c 반영)
+# 새 세션 시작 프롬프트 (2026-11-16 갱신 — MODE-05/06 · LAYOUT-07/08 · SCRIPT-KO-05/06 반영)
 
 > 새 Claude Code 세션을 열 때 **"🚀 프롬프트" 섹션부터 끝까지 그대로 복사 붙여넣기** 하세요.
 > 이 파일은 세션 마무리 때마다 갱신됩니다 — 상단 날짜로 최신 여부 확인.
@@ -18,65 +18,50 @@
 1. `git pull` → `pnpm install` → 디스크 확인(`df -h /System/Volumes/Data`, 98%+ 면 **병렬 pnpm 절대 금지**·`turbo --concurrency=1`)
 2. 문서 읽기 (이 순서, 핵심만):
    - `CLAUDE.md` — 프로젝트 SSOT (도메인·스택·모듈 규칙·마일스톤)
-   - `docs/handoff/SESSION_HANDOFF_2026-08-08.md` — **최신 핸드오프: 완료 내역·미완 액션·함정 전체**
+   - `docs/handoff/SESSION_HANDOFF_2026-11-16.md` — **최신 핸드오프: 완료 내역·미완 액션·함정**
+     (이전 누적 함정은 `SESSION_HANDOFF_2026-08-08.md` §5)
    - `docs/architecture/roadmap.md` — 작업 큐 (SW-BIZ (A) · MODE 섹션이 최신)
 3. `git log --oneline -10` + `git status -sb` — 내가 만들지 않은 변경은 사용자 작업으로 보존
 
-### ✅ 현재 상태 (MODE-04a push 시점 기준)
+### ✅ 현재 상태 (2026-11-16 · PR #1~#6 머지 시점)
 
-- 워킹트리 clean · web/admin prod 라이브 · 전체 검증 79 태스크 green.
-  시작 시 `gh run list --branch main --limit 1` 로 최종 HEAD CI 확인
-- **MODE-01+02+03 완료 · prod 마이그레이션 적용 완료**(2026-08-09 01:13, 대표님 실행).
-  모드 선택 UX(웹툰 "준비 중") + 단위계 필터 + px 가드(생성·자동배치·publish·preflight) +
-  ai-layout 웹툰 스트립 분기(`strip.ts` — 장면당 세그먼트·스트립 연장·리듬 6%).
-  **웹툰 모드 개방은 MODE-04b(스트립 UI)+04c(mode 정합)+05(export) 완성과 한 세트**
-- **MODE-04a/b/c 완료**: `Format.unit` 정본화(타입→zod→직렬화→ai-layout) · 좌표용 dpi 치환으로
-  60여 호출처 무수정 · 인쇄 가드 구멍 3개 봉쇄 · **웹툰 세로 스트립 UI**(세그먼트별 캔버스 +
-  가상화 라이브 창 3/2 + 활성 pin, 실기 검증 완료) · **mode 저장 정합**(판형 파생값,
-  4개소 배선, 조회 응답에 판형 실치수)
-- **08-09 prod 장애 사후 기록**: 스키마 push 가 마이그레이션보다 먼저 배포돼 P2022 로
-  판형 API 503·저장 실패 ~2.5h → 마이그레이션 적용으로 복구. 함정 노트 ★★ 참조
-- **자동배치**: 채택률 100% · 대사 보존 100% · 페이지 222(장면 217 = 1.02배). 리포트 4건 `docs/eval/`
-- **배치 품질**(LAYOUT-04 지표 + LAYOUT-05 개선) — 종합 **87.6%**. 구도 균형 61.5% ·
-  지면 밀도 90.2% · 대사 밀도 86.5% · 시선 흐름 100% · 얼굴 가림 회피 **100%**.
-  LAYOUT-06(잔여 축)은 수확 체감 — 실사용 로그(FOLLOWUP-60) 이후 재개
-- **대사/지문 구분**(SCRIPT-KO-04) — 헤딩은 장면 메타로 흡수, 서술·지문은 캡션 박스로.
-  페이지 255 → 222
-- 포즈 자산 수치 정본 확정(ADR-0019): raw 1,260 · 태깅 대상 1,243 · 사이드카 1,058 · prod 1,262
-- 한글 PDF 실가동 — prod 배포 완료, 실 publish 육안 확인만 남음
+- main = prod. 워킹트리 clean. 시작 시 `gh run list --branch main --limit 1` 로 최종 HEAD CI 확인
+- **웹툰 트랙 코드 완료** — MODE-01~06 · LAYOUT-07/08. 이미지 내보내기(시퀀스 ZIP · 롱 이미지),
+  화면 스크롤 품질 지표(`pnpm adoption:webtoon`), 인물 없는 세그먼트 중앙 정렬, 세그먼트당 말풍선 4.
+  **웹툰 모드는 아직 닫혀 있다** — 개방은 대표님 결정(아래 액션 표 "신규")
+- **서술 손실 버그 2건 수정**(SCRIPT-KO-05/06) — 200자 초과 서술 잘림 + 대사 섞인 단락의 행동 묘사
+  전량 폐기(코퍼스 18.5%). 원고 글자가 배치에 돌아왔다
+- **측정**: POD 223p · 채택률/대사 보존 100% · 품질 87.9% / 웹툰 264seg · 스크롤 종합 95.4%
+- CI 액션 Node 24(checkout v7 · setup-node v7 · pnpm/action-setup v6) + Playwright apt 장애 폴백
+- 포즈 자산 수치 정본(ADR-0019): raw 1,260 · 태깅 대상 1,243 · 사이드카 1,058 · prod 1,262
 
-### 🔴 대표님 액션 — 잔여 4건(1·3·4·5). 세션 시작 시 진행 여부부터 물을 것
-
-2번(마이그레이션)은 2026-08-09 완료. 실행 결과만 공유해 주시면 후속은 어시가 이어받습니다.
+### 🔴 대표님 액션 — 잔여 4건 + 개방 결정. 세션 시작 시 진행 여부부터 물을 것
 
 1. **AI_GATEWAY_API_KEY 등록** ← **파급 최대**. `.env.local` 3곳(루트·apps/web·apps/admin) +
    `cd apps/web && vercel env add AI_GATEWAY_API_KEY production`.
    등록 즉시 CONTI-01 · AI-ACT-03 · SCRIPT-KO-02 착수 가능
-2. ~~FOLLOWUP-68 + MODE-01 deploy~~ — **✅ 2026-08-09 완료** (prod 200 + unit 백필 실측)
-3. **PERF-ADMIN-03 인증 저장** — `pnpm perf:admin:save-auth --env prod` (비번은 어시 취급 불가).
-   저장 후 알리면 측정·P75 분석은 어시가
+2. ~~FOLLOWUP-68 + MODE-01 deploy~~ — ✅ 2026-08-09 완료
+3. **PERF-ADMIN-03 인증 저장** — `pnpm perf:admin:save-auth --env prod` (비번은 어시 취급 불가)
 4. **prod 한글 PDF 육안 확인** — 편집기에서 publish 1회
-5. **MODE-01 웹툰 프리셋 시드 — 재실행 필요**: 1차 실행이 prod 미반영(px 0행 실측 —
-   구버전 워킹카피 추정). **반드시 `git pull` 후**:
+5. **웹툰 프리셋 시드 재실행** — **반드시 `git pull` 후**:
    ```bash
    set -a; source .env.local; set +a; pnpm tsx scripts/seed-formats.ts
    ```
+6. **(신규) 웹툰 모드 개방 결정** — 코드 준비 완료. 개방 = ① 모달 "준비 중" 해제 ② 서버 px 가드 해제
+   (`projects/save` · `script/full-pipeline` · `script/compose`) ③ prod 프리셋 isActive(5번 시드 후).
+   main 머지 = prod 배포
 
 > 어시스턴트는 prod DB 변경 CLI(권한 분류기 차단)·키 발급·비밀번호·결제를 수행할 수 없음.
-> **재확인 2026-08-08**: `.env.local` 3곳 모두 `AI_GATEWAY_API_KEY` 0건 · `tmp/perf/admin-auth.json`
-> 부재 — 1·3번 미실행 확정.
+> 2026-11 세션은 클라우드 컨테이너라 `.env.local` 을 확인하지 못했다 — 로컬 세션에서 재확인할 것.
 
 ### 🎯 다음 코드 큐 — 키 없이 바로 착수 가능
 
-- 🟢 **MODE-05** 웹툰 이미지 export — **게이트 개방의 마지막 관문**. 완성 시 모달 "준비 중"
-  해제 + 프리셋 isActive + 서버 px 가드 해제를 한 번에. 현재 `exportPng` 는 캔버스가
-  뷰포트 크기라 1:1 이 아니므로 판형 실측 렌더 전용 패스가 필요하다
-- 🟢 산문 서술 문장 단위 분할 — `parse-novel` 이 단락을 200자에서 자른다. 캡션이 여러 줄을 담게 된
-  지금은 문장 단위가 더 맞다
-- ⏸ LAYOUT-06 배치 품질 잔여 축(균형 61.5 · 대사 밀도 86.5) — 수확 체감 구간.
-  실사용 로그(FOLLOWUP-60) 도입 후 실측 채택률과 상관을 보고 재개
+- 🟢 **FOLLOWUP-71** `중복` 폴더 17장 — 태깅 제외 ↔ 적재 포함 불일치 정합화
+- 🟢 `.nvmrc` `v25`(비 LTS) → LTS 24 정렬 검토 — Vercel 런타임 설정과 함께
+- 🟢 플랫폼별 웹툰 분할 높이 프리셋 — 규격 확인 후 `maxSliceHeightPx` 메뉴 노출
+- ⏸ LAYOUT-06 · 웹툰 상한/화면 지표 상수 교정 — 실사용 로그(FOLLOWUP-60) 이후
 - 🚦 키 등록 시: **CONTI-01** → **AI-ACT-03** → **SCRIPT-KO-02**
-- 🚦 기타 게이트: onnxruntime-node(BUBBLE-02 ONNX 검출기) · Upstash(SEC-RATE-01) · POSE3D-01 결제
+- 🚦 기타 게이트: onnxruntime-node(BUBBLE-02) · Upstash(SEC-RATE-01) · POSE3D-01 결제
 
 ### 🔧 핵심 환경 (반복 질문 방지)
 
@@ -96,12 +81,22 @@
 pnpm turbo run typecheck lint test --concurrency=1
 # 채택률 + 배치 품질 재측정 (키·DB 불요, 결정론). --verbose 로 하위 페이지 상세
 pnpm adoption:measure
+# 웹툰(690px) 판형 + 화면 스크롤 품질 → data/eval/adoption-webtoon-baseline.json
+pnpm adoption:webtoon
 # push 후 CI 확인 (600초 타임아웃 — CI 는 ~11분이라 자주 놓친다. gh run view <id> 로 재확인)
 # 연속 push 하면 앞선 run 은 concurrency 로 cancelled — 최종 HEAD 의 run 만 보면 된다
 bash scripts/ci-watch.sh
 ```
 
 ### ⚠️ 함정 노트 (실측 누적 — 상세는 핸드오프 §5)
+
+- **"보존" 지표는 대사만 센다** — 서술 손실 버그 2건이 수개월간 안 잡혔다. 파서를 바꿀 때는
+  원문 글자 대비 보존율을 직접 확인할 것
+- **CI 가 `Temporary failure resolving 'azure.archive.ubuntu.com'` 로 실패하면 러너 apt 장애** —
+  Playwright 설치 단계에 폴백이 있으니 재실행 1회로 확인. 코드 문제 아님
+- **같은 브랜치에 열린 PR 이 있으면 다음 작업을 push 하지 말 것** — PR 에 섞이고 CI 가 취소된다.
+  로컬 `wip/*` 에 커밋 → 머지 후 `checkout -B <branch> origin/main` + cherry-pick
+- `parse-novel` 은 "그날·다음날·한편…"으로 시작하는 단락을 장면 구분자로 빼낸다(테스트 문장 주의)
 
 - **스키마 컬럼 추가는 "DB 먼저, 코드 나중"** — push=prod 자동배포라, 마이그레이션 미적용
   상태로 스키마 커밋을 push 하면 Prisma 가 select 없는 조회에도 새 컬럼을 나열해 **모든
@@ -135,6 +130,6 @@ breaking change push 는 보고 후
 
 ### 🎬 시작
 
-위 내용 검토 후: ① 대표님 액션 5건 진행 결과 ② 다음 작업 선택을 확인하고 진행해 주세요.
-**키 등록 전이면 MODE-05 부터** (MODE-04a/b/c 완료, 웹툰 시드는 액션 5번 재실행).
+위 내용 검토 후: ① 대표님 액션(1·3·4·5) 진행 결과와 6번 웹툰 개방 결정 ② 다음 작업 선택을
+확인하고 진행해 주세요. **키 등록 전이면 FOLLOWUP-71 부터**(웹툰 개방 결정 시 개방이 우선).
 세션 종료 시 `docs/handoff/SESSION_HANDOFF_<날짜>.md` 신규 작성 + 이 파일 갱신을 잊지 말 것.
