@@ -229,6 +229,30 @@ describe('scanAssets — subfolder rules', () => {
     expect(animalAsset?.categoryTags).toContain('animal')
   })
 
+  it('macOS NFD 폴더명도 NFC 룰에 매칭된다 — 중복 제외 · categoryTag 적용 (FOLLOWUP-71)', () => {
+    const nfdDir = fs.mkdtempSync(path.join(os.tmpdir(), 'ingest-nfd-'))
+    try {
+      fs.mkdirSync(path.join(nfdDir, '중복'.normalize('NFD')))
+      fs.writeFileSync(path.join(nfdDir, '중복'.normalize('NFD'), 'dup-01.png'), pngMagic())
+      fs.mkdirSync(path.join(nfdDir, '동물'.normalize('NFD')))
+      fs.writeFileSync(path.join(nfdDir, '동물'.normalize('NFD'), 'animal-01.png'), pngMagic())
+
+      const assets = scanAssets(nfdDir, [], {
+        중복: { include: false, reason: '중복' },
+        동물: { include: true, categoryTag: 'animal' },
+      })
+      const names = assets.map((a) => path.basename(a.filePath))
+      expect(names).not.toContain('dup-01.png')
+      const animal = assets.find((a) => path.basename(a.filePath) === 'animal-01.png')
+      expect(animal?.categoryTags).toContain('animal')
+      // 하위 폴더 이름도 NFC 로 넘긴다(filename-tagger 의 subfolderTags 조회와 일치)
+      expect(animal?.subfolder).toBe('동물')
+      expect(animal?.subfolder?.normalize('NFC')).toBe(animal?.subfolder)
+    } finally {
+      fs.rmSync(nfdDir, { recursive: true, force: true })
+    }
+  })
+
   it('LICENSE.json 은 포함 안 됨', () => {
     const assets = scanAssets(tmpDir, ['Thumbs.db'], {})
     const names = assets.map((a) => path.basename(a.filePath))

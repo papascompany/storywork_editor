@@ -303,17 +303,21 @@ export function scanAssets(
       const fullPath = path.join(dir, entry.name)
 
       if (entry.isDirectory()) {
-        const rule = subfolderRules[entry.name]
+        // macOS(APFS)는 한글 파일명을 NFD(자모 분리)로 돌려준다. LICENSE.json 의 룰 키는 NFC 라
+        // 정규화 없이 찾으면 '중복' 제외 룰이 매칭되지 않아 17장이 적재됐다(FOLLOWUP-71).
+        // 같은 이유로 '동물'·'사랑' 의 categoryTag 도 빠졌다. 폴더 이름은 NFC 로 맞춰 쓴다
+        const folderName = entry.name.normalize('NFC')
+        const rule = subfolderRules[folderName]
         if (rule) {
           if (!rule.include) {
             // exclude 폴더 — 건너뜀
             continue
           }
           const folderTags = rule.categoryTag ? [rule.categoryTag] : []
-          walkDir(fullPath, entry.name, folderTags)
+          walkDir(fullPath, folderName, folderTags)
         } else {
           // 룰 없는 폴더 — 루트 태그 상속으로 진입
-          walkDir(fullPath, entry.name, categoryTags)
+          walkDir(fullPath, folderName, categoryTags)
         }
         continue
       }
