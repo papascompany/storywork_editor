@@ -233,7 +233,11 @@
 
 ## 후속 이슈 (오토파일럿 진행 중 발견)
 
-- [ ] [FOLLOWUP-71] `중복` 폴더 17장 — 태깅 제외 ↔ 적재 포함 불일치 정합화 ([ADR-0019](decisions.md#adr-0019--포즈-자산-수치-정본-ssot-단일화-2026-08-07) 조사 중 발견). `filename-tagger` 는 `subfolderTags.중복.skip=true` 로 제외하는데 `scripts/ingest-poses.ts` 에는 폴더 제외 로직이 없어 **태그 없이 DB 에 적재**된다(skip 조건은 "이미 적재된 slug" 뿐). `llm-tagger.ts` 주석의 "중복 폴더 = 적재 제외"는 사실과 다름. 영향: 태그 없는 자산 17건이 검색 인덱스에 잔존(추천 노이즈 · 인쇄/법적 위험 없음). 선택지 ①ingest 도 제외 + 기존 17행 정리(🚦 prod 데이터 삭제) ②태깅 정책 변경 ③현행 유지 + 주석 정정 — @pose-curator
+- [x] [FOLLOWUP-71] `중복` 폴더 17장 — 태깅 제외 ↔ 적재 포함 불일치 정합화 — @pose-curator ✅ 2026-11-16 (코드) · **🚦 prod 17행 정리 대기**.
+  · **진단 정정**: "ingest 에 폴더 제외 로직이 없다"가 아니었다. `scanAssets` 는 LICENSE.json `subfolderRules`(중복 `include:false`)를 이미 적용하는데, 폴더 이름을 **정규화 없이** 룰 키(NFC)와 비교했다. macOS(APFS)는 한글 파일명을 NFD 로 돌려주므로 룰이 매칭되지 않아 `중복` 17장이 적재됐다. 같은 이유로 `동물`·`사랑` 의 categoryTag 도 빠졌을 수 있다(태그는 filename-tagger 가 NFC 정규화로 따로 붙여 영향은 제한적일 것 — prod 확인 필요)
+  · 수정: 폴더 이름을 `normalize('NFC')` 후 룰 조회 + 하위 폴더명도 NFC 로 전달. 회귀 테스트(NFD 폴더명으로 중복 제외 · categoryTag 적용)는 수정 전 코드에서 실패함을 확인
+  · `llm-tagger.ts` 주석 정정(태깅 제외 ↔ 적재 제외 구분)
+  · **남은 것(🚦 prod 데이터 삭제)**: 이미 적재된 17행 정리 — `중복` 폴더 파일명에서 만든 slug 로 식별, `Page.fabricJson` 참조 여부 확인 후 삭제. 기존 `cleanup-stale-poses.ts` 는 날짜 기준이라 그대로 못 쓴다 — 전용 dry-run 스크립트 필요 시 별도 작업
 
 - [x] **[FOLLOWUP-51] (P0) 시각 검증 자동화 (visual-check)** ✅ 2026-05-16 (커밋 b9b2f23) — 회고 §6.1-A 대응. 코드 변경 → AI 가 30초 안에 dev 화면 screenshot 으로 직접 검증. 산출물:
   1. `scripts/visual-check.sh` — headless chromium 기반. 인자로 URL/경로 + viewport 받아 `tmp/visual/{slug}.png` 저장. 서버 미기동 시 명확 에러.
