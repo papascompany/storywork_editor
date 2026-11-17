@@ -1,4 +1,4 @@
-# 세션 핸드오프 — 2026-11-05 ~ 11-16
+# 세션 핸드오프 — 2026-11-05 ~ 11-17
 
 > 이전: [SESSION_HANDOFF_2026-08-08.md](SESSION_HANDOFF_2026-08-08.md) (08-11 MODE-04c 이후 약 3개월 공백)
 > 이 세션 = **CI Node 24 + MODE-05 · MODE-06 · LAYOUT-07 · LAYOUT-08 + 서술 손실 버그 2건**.
@@ -46,6 +46,25 @@
   서술 행으로 원래 순서대로 보존
 - 겸사 MODE-06 지표 수정: 캡션 박스가 줄마다 레이어라 "화면당 대사"가 과대 계상 → 박스 단위
 
+### ⑦ 11-16 ~ 11-17 후속 (PR #7 ~ #13)
+- [#7](https://github.com/papascompany/storywork_editor/pull/7) 인계 문서 현행화
+- [#8](https://github.com/papascompany/storywork_editor/pull/8) **FOLLOWUP-71** — 진짜 원인은 macOS NFD 파일명.
+  `중복` 폴더 룰 조회가 NFC 키와 안 맞아 적재에 섞였다 → `scanAssets` 에서 폴더명 `normalize('NFC')`.
+  (머지 API 502 로 커밋은 main 에 들어갔으나 PR 이 열린 채 남아 코멘트 후 close)
+- [#9](https://github.com/papascompany/storywork_editor/pull/9) `.nvmrc` v25 → **v24**(Vercel 런타임 24.x 와 일치) +
+  CI 러너 `ubuntu-24.04` 임시 고정(ubuntu-latest 가 26.04 로 넘어가 Playwright 1.60 이 chromium 설치 거부)
+- [#10](https://github.com/papascompany/storywork_editor/pull/10) **Playwright 1.64.1** — 1.62+ 가 26.04 지원.
+  root `pnpm.overrides` 로 admin 의 next optional peer 까지 단일화. 러너 고정 해제(ubuntu-latest).
+  시각 회귀 12장 diff 픽셀 수까지 24.04 실행과 동일 → 스냅샷 재생성 불요
+- [#11](https://github.com/papascompany/storywork_editor/pull/11) **PERF-ADMIN-05** — `getEntriesByType('largest-contentful-paint')`
+  는 명세상 항상 빈 배열 → admin LCP 가 늘 0 이었다. init script 의 buffered observer 로 교체(perf-web 과 동일)
+- [#12](https://github.com/papascompany/storywork_editor/pull/12) **FOLLOWUP-01** — TS 파일에 `import/resolver` 가 없어
+  의존성 매트릭스 룰(`no-restricted-paths`)이 **상대경로까지 전면 무력화** 상태였다. resolver 연결 후 드러난
+  기존 위반 26건은 대표 결정으로 매트릭스를 실제 구조에 맞춤(ai-script→recommend→layout 순방향,
+  editor-history→layers, editor-export→history · 역방향 금지 유지)
+- [#13](https://github.com/papascompany/storywork_editor/pull/13) `editor-bubble` 이 매트릭스·tsconfig paths 에
+  빠져 있던 것 등록(editor-pose/text/effects 와 같은 계층)
+
 ## 2. 측정 (코퍼스 21편 · seed 0 · 키/DB 불요)
 
 | | POD (B5) | 웹툰 (690px) |
@@ -74,8 +93,9 @@
 
 ## 4. 다음 코드 큐 (키 없이 가능)
 
-- 🟢 **FOLLOWUP-71** `중복` 폴더 17장 — 태깅 제외 ↔ 적재 포함 불일치 정합화
-- 🟢 프로젝트 Node `.nvmrc` `v25`(비 LTS, 지원 종료 추정) → LTS 24 정렬 검토 — **Vercel 런타임 설정과 함께**
+- 🟢 **시각 회귀가 form 을 못 보고 있음** — CI 로그에 `waitForSelector 타임아웃: form/h1` 이 매번 찍히고
+  diff 2~6.6% 로 통과. CI(env 없음)에서 로그인 form 이 렌더되지 않는 상태를 찍고 있을 가능성 — 원인 확인 필요
+- 🟢 PERF-ADMIN-04(login FCP 폰트) · LEGAL-03(쿠키 배너) · M9-02/03(키보드·보안 점검) — 키 불요
 - 🟢 플랫폼별 웹툰 분할 높이 프리셋 — 규격(플랫폼·높이 상한) 확인 후 `maxSliceHeightPx` 로 메뉴 노출
 - ⏸ LAYOUT-06 · 웹툰 상한·화면 지표 상수 교정 — 실사용 로그(FOLLOWUP-60) 이후
 - 🚦 키 등록 시: CONTI-01 → AI-ACT-03 → SCRIPT-KO-02
@@ -97,6 +117,12 @@
 - ★ 클라우드 세션은 `.env` 가 없어 앱 E2E 불가 — 렌더 경로는 esbuild 번들 + 실 Chromium(Playwright)로
   따로 검증했다(`dpr=2` 로 레티나 배율 함정 확인)
 - ★ `pnpm/action-setup` v6 · `setup-node` v7 기준. 액션 메이저를 올릴 땐 태그의 `action.yml` `runs.using` 확인
+- ★ **ESLint import 룰은 resolver 없으면 조용히 통과한다** — 해석 못 한 import 는 `no-restricted-paths` 가 건너뛴다.
+  룰이 실제로 동작하는지는 위반 probe 파일을 넣어 error 가 나는지로 확인할 것(11-17 FOLLOWUP-01)
+- ★ `performance.getEntriesByType('largest-contentful-paint')` 는 항상 빈 배열 — LCP 는 buffered observer 로만
+- ★ Playwright 는 OS 지원 범위가 버전에 묶인다(26.04 = 1.62+). ubuntu-latest 이동 시 CI 가 설치 단계에서 깨진다
+- ★ 클라우드 세션은 `cdn.playwright.dev` 가 프록시에 막혀 `playwright install` 불가 — 컨테이너 기본 chromium
+  (`require('playwright')`) 으로 동작만 검증하고, 버전 고정 렌더 비교는 CI 에 맡긴다
 - 세션 종료 시 핸드오프+RESUME_PROMPT 갱신은 커밋과 한 세트
 
-_갱신: 2026-11-16 · PR #1~#6 머지 · 다음 착수 후보 = FOLLOWUP-71 (키 불요) 또는 웹툰 개방(결정 시)._
+_갱신: 2026-11-17 · PR #1~#13 머지 · 다음 착수 후보 = 시각 회귀 form 미렌더 조사 (키 불요) 또는 웹툰 개방(결정 시)._
