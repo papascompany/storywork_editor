@@ -159,9 +159,13 @@ const PAGES: PageDef[] = [
 
 // ── Playwright 동적 import (visual-check.ts 와 동일 패턴) ────────────────────
 
+interface GotoResponse {
+  status(): number
+}
+
 interface PageHandle {
   on(event: string, handler: (msg: { type(): string; text(): string }) => void): void
-  goto(url: string, opts: { waitUntil: string; timeout: number }): Promise<unknown>
+  goto(url: string, opts: { waitUntil: string; timeout: number }): Promise<GotoResponse | null>
   waitForTimeout(ms: number): Promise<void>
   waitForURL(pattern: string | RegExp, opts?: { timeout?: number }): Promise<void>
   url(): string
@@ -367,11 +371,19 @@ async function capturePage(
   try {
     await page.emulateMedia({ media: 'screen' })
 
+    let response: GotoResponse | null
     try {
-      await page.goto(url, { waitUntil: 'networkidle', timeout: 30_000 })
+      response = await page.goto(url, { waitUntil: 'networkidle', timeout: 30_000 })
     } catch {
       // SPA networkidle 타임아웃은 흔함 — domcontentloaded 폴백
-      await page.goto(url, { waitUntil: 'domcontentloaded', timeout: 30_000 })
+      response = await page.goto(url, { waitUntil: 'domcontentloaded', timeout: 30_000 })
+    }
+
+    // 서버 에러 페이지를 baseline 과 비교하면 diff 가 허용치 안에 들어와 PASS 로 위장될 수 있다
+    // (2026-11 실측: CI env 누락으로 전 페이지 500 인데 diffRatio 2~6% 로 통과). redirect 는 최종 응답 기준.
+    const status = response?.status()
+    if (status !== undefined && status >= 400) {
+      return { success: false, error: `HTTP ${status} (${page.url()}) — 서버 에러/env 누락 확인` }
     }
 
     // redirect 가 발생한 경우 (예: admin / → /login) 새 URL 에서 waitForSelector
@@ -381,7 +393,11 @@ async function capturePage(
       try {
         await page.locator(def.waitForSelector).waitFor({ timeout: 10_000 })
       } catch {
-        console.warn(`  [WARN] waitForSelector 타임아웃: ${def.waitForSelector} — 계속 진행`)
+        // 기대 화면이 아니면 비교 자체가 무의미 — 경고 후 진행하지 않고 실패 처리
+        return {
+          success: false,
+          error: `waitForSelector 타임아웃: ${def.waitForSelector} (${page.url()}) — 기대 화면이 렌더되지 않음`,
+        }
       }
     }
 

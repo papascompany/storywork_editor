@@ -84,6 +84,22 @@ jobs:
             pnpm --filter @storywork/web exec playwright install chromium
           fi
 
+      # env 가 없으면 web(instrumentation env 검증)·admin(middleware Supabase 검증)이 모든 라우트를 500 으로
+      # 응답해, 시각 회귀가 에러 페이지를 baseline 과 비교하고 있었다(2026-11-17 실측). 렌더링 게이트만
+      # 통과시키는 비밀이 아닌 더미 값이며 외부 접속은 하지 않는다(127.0.0.1 — 미인증 상태로 렌더).
+      # NEXT_PUBLIC_* 는 빌드 시 번들에 인라인되므로 빌드 이전에 주입한다. $GITHUB_ENV 로 이후 단계에만 적용.
+      - name: Inject dummy env for visual regression
+        run: |
+          {
+            echo "NEXT_PUBLIC_SUPABASE_URL=http://127.0.0.1:54321"
+            echo "NEXT_PUBLIC_SUPABASE_ANON_KEY=ci-visual-regression-dummy-anon-key"
+            echo "SUPABASE_SERVICE_ROLE_KEY=ci-visual-regression-dummy-service-role-key"
+            echo "DATABASE_URL=postgresql://ci:ci@127.0.0.1:5432/ci_visual_regression"
+            echo "DIRECT_URL=postgresql://ci:ci@127.0.0.1:5432/ci_visual_regression"
+            echo "CRON_SECRET=ci-visual-regression-dummy-cron-secret"
+            echo "ADMIN_JWT_SECRET=ci-visual-regression-dummy-admin-jwt-secret-0000"
+          } >> "$GITHUB_ENV"
+
       - name: Build web + admin for visual regression
         run: |
           pnpm --filter @storywork/web build
@@ -99,18 +115,21 @@ jobs:
         env:
           PORT: 3001
 
+      # 응답이 끝내 2xx/3xx 가 아니면(예: env 누락 500) 여기서 실패시킨다 — 이전엔 루프만 돌고 통과했다
       - name: Wait for servers to be ready
         run: |
-          echo "Waiting for web (port 3000)..."
-          for i in $(seq 1 30); do
-            curl -sf http://localhost:3000 > /dev/null 2>&1 && echo "web ready" && break
-            sleep 2
-          done
-          echo "Waiting for admin (port 3001)..."
-          for i in $(seq 1 30); do
-            curl -sf http://localhost:3001/login > /dev/null 2>&1 && echo "admin ready" && break
-            sleep 2
-          done
+          wait_ready() {
+            local url="$1" label="$2"
+            echo "Waiting for ${label} (${url})..."
+            for i in $(seq 1 30); do
+              curl -sf "$url" > /dev/null 2>&1 && echo "${label} ready" && return 0
+              sleep 2
+            done
+            echo "::error::${label} 가 60초 내 정상 응답하지 않음: $(curl -s -o /dev/null -w '%{http_code}' "$url")"
+            return 1
+          }
+          wait_ready http://localhost:3000/login web
+          wait_ready http://localhost:3001/login admin
 
       - name: Visual Regression (DESIGN-04)
         run: SKIP_SERVER_CHECK=1 bash scripts/visual-regression.sh --threshold 0.15 --max-diff-ratio 0.08
