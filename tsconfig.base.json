@@ -36,6 +36,7 @@
       "@storywork/editor-pose": ["./packages/editor-pose/src/index.ts"],
       "@storywork/editor-text": ["./packages/editor-text/src/index.ts"],
       "@storywork/editor-effects": ["./packages/editor-effects/src/index.ts"],
+      "@storywork/editor-bubble": ["./packages/editor-bubble/src/index.ts"],
       "@storywork/editor-export": ["./packages/editor-export/src/index.ts"],
       "@storywork/editor-ui": ["./packages/editor-ui/src/index.ts"],
       "@storywork/ai-script": ["./packages/ai-script/src/index.ts"],
