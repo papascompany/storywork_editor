@@ -95,7 +95,7 @@
 - [x] [PERF-ADMIN-02] 실제 navigation timing 측정 — local/prod waterfall 로 P75 목표 수립 — @qa-tester + @architect ✅ 2026-05-17 — `scripts/perf-admin-measure.ts` + `scripts/perf-admin-save-auth.ts` + `docs/perf/admin-navigation-baseline-2026-05-17.md`. prod 5회 측정: TTFB P75 261ms / FCP P75 1028ms(목표 초과) / Total P75 1480ms. 인증 후 보호 페이지 재측정(PERF-ADMIN-03) 필요.
 - [ ] [PERF-ADMIN-03] (P1) 인증 storage state 저장 후 보호 페이지 재측정 — `pnpm perf:admin:save-auth` 로 admin storage state 캡처 후 `pnpm perf:admin` 으로 audit/resources/templates Prisma 쿼리 실제 시간 포함된 P75 도출 — @architect
 - [ ] [PERF-ADMIN-04] (P2) login 페이지 FCP 개선 — 현재 P75 1028ms (목표 800ms, +228ms 초과). Pretendard Variable woff2 subset 분리 또는 `font-display: optional` — @ui-designer
-- [ ] [PERF-ADMIN-05] (P2) LCP 수집 방식 개선 — 현재 LCP=0 미수집. PerformanceObserver 를 page load 초기 등록 + buffered=true 로 변경 — @architect
+- [x] [PERF-ADMIN-05] (P2) LCP 수집 방식 개선 — 원인: `getEntriesByType('largest-contentful-paint')` 는 명세상 항상 빈 배열. context `addInitScript` 로 문서마다 buffered PerformanceObserver 등록(perf-web 과 동일 방식). 실 Chromium 검증: 기존 0건 → observer 값 수집 ✅ 2026-11-17 — prod 재측정은 PERF-ADMIN-03 인증 저장 후
 - [ ] [PERF-ADMIN-06] (P2) Lighthouse CI 통합 — perf 회귀 자동 차단 (PERF-ADMIN-03 후속) — @qa-tester + @architect
 - [x] [PERF-WEB-01] (P0) web speed audit Step 1 진단 — 5 시나리오 × 2 viewport × 3 반복 측정 — @architect ✅ 2026-06-05 (`dab88d4`, `docs/perf/2026-06-05_web-speed-audit.md`) — /notices desktop LCP P75 4016ms (Poor), /editor First Load 590KB. 권고 #1~#9.
 - [x] [PERF-WEB-02] (P0) Step 2 묶음 fix #1+#2+#3 — Speed Insights RUM + /notices Prisma 통합 + unstable_cache — @architect ✅ 2026-06-05 (`314e4f5`, `0d5eca7`, `010ef57`) — 데스크탑 LCP 4016ms → < 800ms 목표

@@ -133,6 +133,7 @@ interface PageHandle {
 
 interface ContextHandle {
   newPage(): Promise<PageHandle>
+  addInitScript(script: { content: string }): Promise<void>
   close(): Promise<void>
 }
 
@@ -248,9 +249,26 @@ function summarize(values: number[]): {
 // ── 타이밍 수집 (page.evaluate) ───────────────────────────────────────────────
 
 /**
- * Navigation Timing Level 2 + paint entries 를 페이지에서 수집.
- * FCP/LCP 는 PerformanceObserver 대신 getEntriesByType 로 조회 (navigate 완료 후 조회 가능).
+ * LCP 는 `performance.getEntriesByType('largest-contentful-paint')` 로는 조회되지 않는다
+ * (명세상 LCP 는 performance timeline 에 노출되지 않아 항상 빈 배열 → 기존 LCP=0 원인, PERF-ADMIN-05).
+ * 그래서 문서마다 navigation 전에 실행되는 init script 로 buffered PerformanceObserver 를 걸어
+ * window.__adminLcp 에 마지막 후보를 누적한다. perf-web-measure 의 VITALS_INIT_SCRIPT 와 같은 방식.
  */
+const LCP_INIT_SCRIPT = `
+(function() {
+  if (typeof window.__adminLcp === 'number') return;
+  window.__adminLcp = 0;
+  try {
+    new PerformanceObserver(function(list) {
+      var entries = list.getEntries();
+      var last = entries[entries.length - 1];
+      if (last && last.startTime > window.__adminLcp) window.__adminLcp = last.startTime;
+    }).observe({ type: 'largest-contentful-paint', buffered: true });
+  } catch (e) {}
+})();
+`
+
+/** Navigation Timing Level 2 + paint entries + init script 가 누적한 LCP 를 페이지에서 수집. */
 async function collectTiming(page: PageHandle): Promise<TimingResult> {
   return page.evaluate<TimingResult>(() => {
     const nav = performance.getEntriesByType('navigation')[0] as
@@ -281,10 +299,8 @@ async function collectTiming(page: PageHandle): Promise<TimingResult> {
     const fcpEntry = paintEntries.find((e) => e.name === 'first-contentful-paint')
     const fcp = fcpEntry ? Math.round(fcpEntry.startTime) : 0
 
-    // LCP: largest-contentful-paint (비동기 observer 결과, navigate 직후 바로 있을 수도 없을 수도)
-    const lcpEntries = performance.getEntriesByType('largest-contentful-paint')
-    const lastLcp = lcpEntries[lcpEntries.length - 1]
-    const lcp = lastLcp ? Math.round(lastLcp.startTime) : 0
+    // LCP: LCP_INIT_SCRIPT 가 측정 대상 문서에서 누적한 값
+    const lcp = Math.round((window as unknown as { __adminLcp?: number }).__adminLcp ?? 0)
 
     return { ttfb, fcp, lcp, tti, total, dcl }
   })
@@ -671,6 +687,7 @@ async function main(): Promise<void> {
         }
 
         const context = await browser.newContext(contextOpts)
+        await context.addInitScript({ content: LCP_INIT_SCRIPT })
         const page = await context.newPage()
 
         try {
