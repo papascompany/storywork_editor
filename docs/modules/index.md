@@ -285,14 +285,20 @@ src/
 |---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
 | editor-core | — | | | | | | | | | | | | | ✓ | | ✓ |
 | editor-layers | ✓ | — | | | | | | | | | | | | ✓ | | ✓ |
-| editor-history | ✓ | | — | | | | | | | | | | | ✓ | | ✓ |
+| editor-history | ✓ | ✓ | — | | | | | | | | | | | ✓ | | ✓ |
 | editor-template | ✓ | ✓ | ✓ | — | | | | | | | | | | ✓ | | ✓ |
 | editor-pose | ✓ | | | | — | | | | | | | | | ✓ | | ✓ |
 | editor-text | ✓ | | | | | — | | | | | | | | ✓ | | ✓ |
 | editor-effects | ✓ | | | | | | — | | | | | | | ✓ | | ✓ |
-| editor-export | ✓ | ✓ | | | | | | — | | | | | | ✓ | | ✓ |
+| editor-export | ✓ | ✓ | ✓ | | | | | — | | | | | | ✓ | | ✓ |
 | editor-ui | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | — | | | | | ✓ | ✓ | ✓ |
-| ai-* | | | | | | | | | | — | — | — | | ✓ | | ✓ |
+| ai-script | | | | | | | | | | — | | | | ✓ | | ✓ |
+| ai-recommend | | | | | | | | | | ✓ | — | | | ✓ | | ✓ |
+| ai-layout | ✓(헤드리스) | | | | | | | | | ✓ | ✓ | — | | ✓ | | ✓ |
 | pdf-engine | ✓(헤드리스) | ✓ | | ✓ | ✓ | ✓ | ✓ | | | | | | — | ✓ | | ✓ |
 
 ESLint `import/no-restricted-paths` 룰로 위 매트릭스를 강제한다. 룰 정의 파일: `eslint.config.js`.
+`import/resolver`(typescript, `tsconfig.base.json` paths)로 `.ts` 상대경로와 `@storywork/*` 패키지명 import 를
+모두 실제 소스로 해석해 검사한다 — resolver 가 없으면 해석 실패한 import 가 검사에서 빠진다(FOLLOWUP-01, 2026-11-17).
+ai-* 는 자동 배치 파이프라인 순방향(script → recommend → layout)만, editor-history → layers · editor-export → history 는
+2026-11-17 실제 의존을 매트릭스에 반영(순환 없음, 역방향은 계속 금지).
