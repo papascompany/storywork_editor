@@ -266,7 +266,7 @@
 - [x] **[FOLLOWUP-50] (P1) `apps/storybook` Storybook 8.x type migration** — 11개 stories 파일 meta에 `args: {}` 기본값 추가 (render() 전용 스토리 args optional화). `StickyNote` 컴포넌트 `style` prop 추가. storybook tsconfig + vite main.ts 에 `@/` alias 추가. `AdminResourceUpload` unknown→string 타입 수정. typecheck/build script echo 스킵 해제. storybook build 통과 — SHA: effce8c
 - [x] **[FOLLOWUP-59] (P1) 법무 검토 — 약관/PP 정식화** — `/legal/terms`, `/legal/privacy` 현재 베타 placeholder. 정식 출시 전 법무 검토 후 실 약관으로 교체 필요. 개인정보보호법 준수 여부, 국제 데이터 전송(Supabase/Anthropic), 이용자 권리 조항 검토 의무 — @architect 🚦(휴먼 게이트)
 - [ ] **[FOLLOWUP-60] (P1) PostHog/Sentry 부트스트랩** — `apps/web/app/layout.tsx` 에 NEXT_PUBLIC_POSTHOG_KEY/NEXT_PUBLIC_SENTRY_DSN 환경변수 자리 준비됨. M0-06 과 별도 PR 로 진행. 쿠키 동의 배너 연동 필요 (FOLLOWUP-59 법무 검토 후 진행) — @architect
-- [ ] [FOLLOWUP-01] `eslint-import-resolver-typescript` 추가 — `@storywork/*` 패키지명 import 도 역참조 차단 가능. 현재는 상대 경로만 차단됨 — @architect (M1 진입 전)
+- [x] [FOLLOWUP-01] `eslint-import-resolver-typescript` 연결 — 실제로는 resolver 부재로 `.ts` **상대 경로까지** 해석 실패 → no-restricted-paths 가 TS 에서 전면 무력화 상태였음. resolver 연결 후 드러난 기존 위반 26건(ai-layout→script/recommend, ai-recommend→script, editor-history→layers, editor-export→history)은 대표 결정으로 매트릭스를 실제 구조에 맞춤(순환 없음) ✅ 2026-11-17
 - [ ] [FOLLOWUP-02] `pnpm dev` (turbo --parallel) 일부 패키지가 시작되지 않는 이슈 — turbo 2.9.7 의 `--parallel` deprecated 이슈로 추정. `turbo run dev` 만 사용하도록 변경(persistent: true 이미 있음) 또는 `concurrency` 설정 추가 — @architect
 - [ ] [FOLLOWUP-03] Storybook 8.6 호환성 경고(`@storybook/addon-essentials@8.6.14` vs `8.6.18`) — 마이너 패치 — @ui-designer
 - [ ] [FOLLOWUP-04] Sheet `aria-describedby` 이중 description 위험 — SheetDescription 직접 제공 시 조건부 처리 — @ui-designer (M1 편집기 모바일 패널 작업 시)

@@ -95,11 +95,10 @@ const restrictedPaths = [
     message: 'editor-layers는 editor-history/template/pose 등을 참조할 수 없습니다.',
   },
 
-  // editor-history: editor-core만 허용
+  // editor-history: editor-core, editor-layers(레이어 명령) 허용
   {
     target: [`${PACKAGES_ROOT}/editor-history/**`],
     from: [
-      `${PACKAGES_ROOT}/editor-layers/**`,
       `${PACKAGES_ROOT}/editor-template/**`,
       `${PACKAGES_ROOT}/editor-pose/**`,
       `${PACKAGES_ROOT}/editor-text/**`,
@@ -112,7 +111,7 @@ const restrictedPaths = [
       `${PACKAGES_ROOT}/pdf-engine/**`,
       './apps/**',
     ],
-    message: 'editor-history는 editor-core와 shared-* 만 참조할 수 있습니다.',
+    message: 'editor-history는 editor-core/layers와 shared-* 만 참조할 수 있습니다.',
   },
 
   // editor-template: editor-core, editor-layers, editor-history만 허용
@@ -155,11 +154,10 @@ const restrictedPaths = [
     message: 'editor-pose/text/effects는 editor-core와 shared-* 만 참조할 수 있습니다.',
   },
 
-  // editor-export: editor-core, editor-layers만 허용
+  // editor-export: editor-core, editor-layers, editor-history(dirty 추적) 허용
   {
     target: [`${PACKAGES_ROOT}/editor-export/**`],
     from: [
-      `${PACKAGES_ROOT}/editor-history/**`,
       `${PACKAGES_ROOT}/editor-template/**`,
       `${PACKAGES_ROOT}/editor-pose/**`,
       `${PACKAGES_ROOT}/editor-text/**`,
@@ -171,7 +169,7 @@ const restrictedPaths = [
       `${PACKAGES_ROOT}/pdf-engine/**`,
       './apps/**',
     ],
-    message: 'editor-export는 editor-core/layers와 shared-* 만 참조할 수 있습니다.',
+    message: 'editor-export는 editor-core/layers/history와 shared-* 만 참조할 수 있습니다.',
   },
 
   // editor-ui: 모든 editor-* 허용, ai-*/pdf-engine 금지
@@ -187,7 +185,8 @@ const restrictedPaths = [
     message: 'editor-ui는 ai-* 또는 pdf-engine 을 직접 참조할 수 없습니다.',
   },
 
-  // ai-* 패키지: 서로 교차 참조 금지 (schema/utils만 허용)
+  // ai-* 패키지: 자동 배치 파이프라인(CLAUDE.md §5.1) 순방향만 허용
+  //   ai-script → ai-recommend → ai-layout  (역방향 금지)
   {
     target: [`${PACKAGES_ROOT}/ai-script/**`],
     from: [
@@ -210,7 +209,6 @@ const restrictedPaths = [
   {
     target: [`${PACKAGES_ROOT}/ai-recommend/**`],
     from: [
-      `${PACKAGES_ROOT}/ai-script/**`,
       `${PACKAGES_ROOT}/ai-layout/**`,
       `${PACKAGES_ROOT}/editor-core/**`,
       `${PACKAGES_ROOT}/editor-layers/**`,
@@ -224,13 +222,11 @@ const restrictedPaths = [
       `${PACKAGES_ROOT}/pdf-engine/**`,
       './apps/**',
     ],
-    message: 'ai-recommend는 schema/utils 만 참조할 수 있습니다.',
+    message: 'ai-recommend는 ai-script와 schema/utils 만 참조할 수 있습니다.',
   },
   {
     target: [`${PACKAGES_ROOT}/ai-layout/**`],
     from: [
-      `${PACKAGES_ROOT}/ai-script/**`,
-      `${PACKAGES_ROOT}/ai-recommend/**`,
       `${PACKAGES_ROOT}/editor-layers/**`,
       `${PACKAGES_ROOT}/editor-history/**`,
       `${PACKAGES_ROOT}/editor-template/**`,
@@ -242,7 +238,8 @@ const restrictedPaths = [
       `${PACKAGES_ROOT}/pdf-engine/**`,
       './apps/**',
     ],
-    message: 'ai-layout는 editor-core(헤드리스)와 schema/utils 만 참조할 수 있습니다.',
+    message:
+      'ai-layout는 ai-script/ai-recommend, editor-core(헤드리스), schema/utils 만 참조할 수 있습니다.',
   },
 
   // 모든 packages/* → apps/* 역참조 금지
@@ -294,6 +291,16 @@ export default [
       '@typescript-eslint': tsPlugin,
       import: importPlugin,
       'react-hooks': reactHooks,
+    },
+    // import/* 룰이 .ts 상대경로와 `@storywork/*` 패키지명을 실제 소스 파일로 해석하게 한다.
+    // resolver 가 없으면 해석 실패한 import 를 no-restricted-paths 가 조용히 건너뛰어
+    // 의존성 매트릭스가 TS 파일에서 사실상 꺼져 있었다 (FOLLOWUP-01).
+    // tsconfig.base.json 의 paths 가 패키지명을 각 패키지 src/index.ts 로 매핑한다.
+    settings: {
+      'import/resolver': {
+        typescript: { project: `${import.meta.dirname}/tsconfig.base.json` },
+        node: true,
+      },
     },
     rules: {
       // TypeScript가 타입 체크를 담당하므로 기본 JS 룰 비활성화 (TS 전용 룰로 대체)
