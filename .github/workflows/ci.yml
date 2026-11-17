@@ -17,7 +17,10 @@ env:
 jobs:
   ci:
     name: Lint / Typecheck / Test / Build
-    runs-on: ubuntu-latest
+    # ubuntu-latest 가 26.04 로 넘어가면서(2026-11) Playwright 1.60 이 chromium 설치를 거부한다
+    # ("does not support chromium on ubuntu26.04-x64"). 시각 회귀 스냅샷도 24.04 폰트 기준이라
+    # 러너를 고정한다. 해제는 Playwright 가 26.04 를 지원하는 버전으로 올린 뒤 스냅샷과 함께
+    runs-on: ubuntu-24.04
     timeout-minutes: 30
 
     steps:
@@ -129,7 +132,7 @@ jobs:
   # baseline 부재(ALTER-only) drift 가 재발하면 이 잡이 실패한다.
   migrate-smoke:
     name: Migration baseline smoke (fresh DB)
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 10
     services:
       postgres:
