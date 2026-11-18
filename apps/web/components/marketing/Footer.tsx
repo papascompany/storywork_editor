@@ -3,6 +3,7 @@ import * as React from 'react'
 
 import { getPublishedCompanyInfo } from '../../lib/company-info'
 import type { PublicCompanyInfo } from '../../lib/company-info'
+import { CookieSettingsButton } from '../legal/CookieConsentBanner'
 
 /**
  * Footer — 마케팅 푸터
@@ -174,6 +175,21 @@ export async function Footer() {
                     </Link>
                   </li>
                 ))}
+                {category === '법적 고지' && (
+                  <li>
+                    {/* LEGAL-03 — 동의 변경·철회 경로 */}
+                    <CookieSettingsButton
+                      style={{
+                        fontFamily: 'var(--mkt-font-sans)',
+                        fontSize: 'var(--mkt-body-sm-size)',
+                        fontWeight: 'var(--mkt-body-sm-weight)',
+                        color: 'var(--mkt-ink)',
+                        opacity: 0.65,
+                        transition: 'opacity 120ms ease',
+                      }}
+                    />
+                  </li>
+                )}
               </ul>
             </div>
           ))}

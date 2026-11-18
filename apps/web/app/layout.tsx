@@ -5,6 +5,8 @@ import { SpeedInsights } from '@vercel/speed-insights/next'
 import type { Metadata, Viewport } from 'next'
 
 import './globals.css'
+import { CookieConsentBanner } from '../components/legal/CookieConsentBanner'
+
 import { pretendard } from './fonts'
 
 const BASE_URL = 'https://storywork-editor-web.vercel.app'
@@ -72,6 +74,7 @@ export default function RootLayout({
         <ThemeProvider defaultTheme="system" storageKey="sw-ui-theme">
           <ToastProvider>{children}</ToastProvider>
         </ThemeProvider>
+        <CookieConsentBanner />
         <SpeedInsights />
       </body>
     </html>

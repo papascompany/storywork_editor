@@ -417,7 +417,8 @@ export default async function PrivacyPage() {
             <p className="mkt-body" style={{ color: 'var(--mkt-ink)', opacity: 0.75 }}>
               스토리워크는 로그인 상태 유지, UI 설정(다크 모드 등) 저장을 위해 필수 쿠키를
               사용합니다. 서비스 품질 개선을 위해 분석용 쿠키(PostHog)를 사용할 예정이며, 이는 별도
-              동의 후 적용됩니다. (FOLLOWUP-60)
+              동의 후에만 적용됩니다. 동의 여부는 사이트 하단의 &lsquo;쿠키 설정&rsquo;에서 언제든
+              변경·철회할 수 있습니다.
             </p>
           </LegalSection>
 
