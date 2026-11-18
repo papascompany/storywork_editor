@@ -1,4 +1,4 @@
-# 세션 핸드오프 — 2026-11-05 ~ 11-17
+# 세션 핸드오프 — 2026-11-05 ~ 11-18
 
 > 이전: [SESSION_HANDOFF_2026-08-08.md](SESSION_HANDOFF_2026-08-08.md) (08-11 MODE-04c 이후 약 3개월 공백)
 > 이 세션 = **CI Node 24 + MODE-05 · MODE-06 · LAYOUT-07 · LAYOUT-08 + 서술 손실 버그 2건**.
@@ -65,6 +65,21 @@
 - [#13](https://github.com/papascompany/storywork_editor/pull/13) `editor-bubble` 이 매트릭스·tsconfig paths 에
   빠져 있던 것 등록(editor-pose/text/effects 와 같은 계층)
 
+### ⑧ 11-18 (PR #14 ~ #17)
+- [#14](https://github.com/papascompany/storywork_editor/pull/14) 인계 현행화
+- [#15](https://github.com/papascompany/storywork_editor/pull/15) **시각 회귀가 500 에러 페이지를 찍고 있었다** —
+  CI 에 Supabase·DB env 가 없어 web(instrumentation)·admin(middleware) 이 모든 페이지 500. 배경색이 비슷해
+  diff 2~6.6% 로 통과해 왔다. 더미 env 주입 + HTTP 4xx/5xx·selector 타임아웃 FAIL + 서버 준비 실패 시 중단.
+  기준 스냅샷은 유효(재생성 안 함). 서버 대기 2분 → 0초
+- [#16](https://github.com/papascompany/storywork_editor/pull/16) **PERF-ADMIN-04** — 실측 결과 FCP 원인은 폰트
+  **preload**(크기 아님). 겸사 버그: `--font-pretendard` 가 `<body>` 에 있어 admin 은 웹폰트를 한 번도 안 썼다
+  (로컬 설치 PC 만 Pretendard). `<html>` 로 이동 + preload 끔 + KS X 1001 서브셋(2.0→0.5MB,
+  `scripts/subset-pretendard.py`). FCP p75 248→144ms(브로드밴드) · 608→448ms(Slow 4G), 폰트 도착 1984→757ms
+- [#17](https://github.com/papascompany/storywork_editor/pull/17) **LEGAL-03** 쿠키 동의 — 대표 결정:
+  분석 도구 env(`NEXT_PUBLIC_POSTHOG_KEY`)가 있을 때만 배너 자동 노출(지금은 동의 대상 없음).
+  `lib/consent.ts`(`hasAnalyticsConsent`/`onConsentChange` — FOLLOWUP-60 이 PostHog 게이트로 쓸 것) +
+  배너 + 푸터 '쿠키 설정' + 처리방침 §6 문구. 문구 법무 검토는 LEGAL-01 때
+
 ## 2. 측정 (코퍼스 21편 · seed 0 · 키/DB 불요)
 
 | | POD (B5) | 웹툰 (690px) |
@@ -93,10 +108,8 @@
 
 ## 4. 다음 코드 큐 (키 없이 가능)
 
-- ✅ ~~시각 회귀가 form 을 못 보고 있음~~ (11-18 해결) — 원인: CI 에 Supabase·DB env 가 없어 web/admin 이 **모든
-  페이지 500**. 에러 페이지를 찍어 기준과 비교했고 배경색이 비슷해 통과했다. 더미 env 주입 + HTTP 4xx/5xx·selector
-  타임아웃을 FAIL 로 + 서버 준비 대기 실패 시 중단. 기준 스냅샷은 유효(diff 0.1~3.3%)라 재생성 안 함
-- 🟢 PERF-ADMIN-04(login FCP 폰트) · LEGAL-03(쿠키 배너) · M9-02/03(키보드·보안 점검) — 키 불요
+- 🟢 M9-02 키보드 시나리오 · M9-03 보안 점검(SVG XSS/SSRF/업로드) — 키 불요
+- 🟢 web 폰트도 admin 과 같은 서브셋·preload 점검(web 은 변수 스코프는 정상, 2MB preload 는 동일) — PERF-WEB 트랙
 - 🟢 플랫폼별 웹툰 분할 높이 프리셋 — 규격(플랫폼·높이 상한) 확인 후 `maxSliceHeightPx` 로 메뉴 노출
 - ⏸ LAYOUT-06 · 웹툰 상한·화면 지표 상수 교정 — 실사용 로그(FOLLOWUP-60) 이후
 - 🚦 키 등록 시: CONTI-01 → AI-ACT-03 → SCRIPT-KO-02
@@ -124,6 +137,10 @@
 - ★ Playwright 는 OS 지원 범위가 버전에 묶인다(26.04 = 1.62+). ubuntu-latest 이동 시 CI 가 설치 단계에서 깨진다
 - ★ 클라우드 세션은 `cdn.playwright.dev` 가 프록시에 막혀 `playwright install` 불가 — 컨테이너 기본 chromium
   (`require('playwright')`) 으로 동작만 검증하고, 버전 고정 렌더 비교는 CI 에 맡긴다
+- ★ **CI 시각 회귀는 더미 env 로 production 서버를 띄운다** — web/admin 은 env 가 없으면 전 페이지 500 이다.
+  새 필수 env 를 추가하면 `.github/workflows/ci.yml` 의 "Set dummy env for visual regression" 에도 넣을 것
+- ★ **preload 된 웹폰트는 FCP 를 늦춘다**(Chrome 이 잠시 렌더 차단). 폰트 최적화는 크기보다 preload 여부부터 실측
+- ★ CSS 변수가 `:root` 에서 계산되는 다른 변수에 참조되면, 그 변수도 `:root`(html)에 있어야 한다 — body 에 두면 조용히 fallback
 - 세션 종료 시 핸드오프+RESUME_PROMPT 갱신은 커밋과 한 세트
 
-_갱신: 2026-11-17 · PR #1~#13 머지 · 다음 착수 후보 = 시각 회귀 form 미렌더 조사 (키 불요) 또는 웹툰 개방(결정 시)._
+_갱신: 2026-11-18 · PR #1~#17 머지 · 다음 착수 후보 = M9-02/03 (키 불요) 또는 웹툰 개방(결정 시)._

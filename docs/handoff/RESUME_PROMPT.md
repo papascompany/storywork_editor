@@ -1,4 +1,4 @@
-# 새 세션 시작 프롬프트 (2026-11-17 갱신 — MODE-05/06 · LAYOUT-07/08 · SCRIPT-KO-05/06 · CI/lint 정비 반영)
+# 새 세션 시작 프롬프트 (2026-11-18 갱신 — MODE-05/06 · LAYOUT-07/08 · SCRIPT-KO-05/06 · CI/lint · admin 폰트 · 쿠키 동의 반영)
 
 > 새 Claude Code 세션을 열 때 **"🚀 프롬프트" 섹션부터 끝까지 그대로 복사 붙여넣기** 하세요.
 > 이 파일은 세션 마무리 때마다 갱신됩니다 — 상단 날짜로 최신 여부 확인.
@@ -23,7 +23,7 @@
    - `docs/architecture/roadmap.md` — 작업 큐 (SW-BIZ (A) · MODE 섹션이 최신)
 3. `git log --oneline -10` + `git status -sb` — 내가 만들지 않은 변경은 사용자 작업으로 보존
 
-### ✅ 현재 상태 (2026-11-17 · PR #1~#13 머지 시점)
+### ✅ 현재 상태 (2026-11-18 · PR #1~#17 머지 시점)
 
 - main = prod. 워킹트리 clean. 시작 시 `gh run list --branch main --limit 1` 로 최종 HEAD CI 확인
 - **웹툰 트랙 코드 완료** — MODE-01~06 · LAYOUT-07/08. 이미지 내보내기(시퀀스 ZIP · 롱 이미지),
@@ -34,6 +34,7 @@
 - **측정**: POD 223p · 채택률/대사 보존 100% · 품질 87.9% / 웹툰 264seg · 스크롤 종합 95.4%
 - CI 액션 Node 24(checkout v7 · setup-node v7 · pnpm/action-setup v6) + Playwright apt 장애 폴백
 - `.nvmrc` v24 · Playwright 1.64.1 · CI 러너 ubuntu-latest(26.04) · ESLint 의존성 매트릭스 룰 실동작(FOLLOWUP-01)
+- 시각 회귀가 실제 화면을 비교(더미 env) · admin 웹폰트 실적용 + FCP −42% · 쿠키 동의(분석 도구 켜질 때 노출)
 - 포즈 자산 수치 정본(ADR-0019): raw 1,260 · 태깅 대상 1,243 · 사이드카 1,058 · prod 1,262
 
 ### 🔴 대표님 액션 — 잔여 4건 + 개방 결정. 세션 시작 시 진행 여부부터 물을 것
