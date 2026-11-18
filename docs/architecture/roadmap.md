@@ -182,7 +182,7 @@
 
 - [ ] [LEGAL-01] 개인정보처리방침 정식화 (법무 검토 + 실 약관) — FOLLOWUP-59 인계 — 🚦 휴먼 게이트
 - [ ] [LEGAL-02] 이용약관 정식화 + 전자상거래법 청약철회 조항 — 🚦 휴먼 게이트
-- [ ] [LEGAL-03] 쿠키 동의 배너 (GDPR 최소화 + 한국 정통망법) — @ui-designer
+- [x] [LEGAL-03] 쿠키 동의 배너 ✅ 2026-11-18 — 대표 결정: **분석 도구 env(`NEXT_PUBLIC_POSTHOG_KEY`)가 설정됐을 때만 자동 노출**(지금은 필수 저장소 + 쿠키 없는 Speed Insights 뿐이라 동의 대상 없음). `lib/consent.ts`(localStorage `sw-consent` v1 · `hasAnalyticsConsent`/`onConsentChange` — FOLLOWUP-60 이 PostHog 초기화 게이트로 사용) + `components/legal/CookieConsentBanner` + 푸터 '쿠키 설정'(변경·철회 경로) + 개인정보처리방침 §6 문구. 두 선택지 동일 스타일(다크패턴 금지)
 - [x] [LEGAL-04] 개인정보 수집·이용 동의 체크박스 (회원가입 + 문의 폼) — @ui-designer ✅ 2026-06-15. PIPA 명시적·분리 동의 준수. `components/legal/ConsentCheckbox`(공유, [필수] 빨강/[선택]) 신규. **회원가입**: 이용약관+개인정보 결합 동의 1개 → 분리된 [필수] 2개(/legal/terms·/legal/privacy 실링크, 기존 데드링크 `href="#"` 수정) + 미동의 시 해당 체크박스 강조. **문의 폼**: 묵시적 동의("제출 시 ... 간주됩니다", PIPA 위반) → 명시적 opt-in [필수] 체크박스(수집항목·목적·보유기간 명시) + 제출 게이트. 동의 타임스탬프 영속 저장은 [FOLLOWUP-67](마이그레이션, 휴먼게이트)로 분리. ⚠️ 로컬 node_modules/.bin 손상으로 CI 가 lint/tsc/build 권위 검증.
 - [ ] [LEGAL-05] 미성년자 이용 제한 고지 + 법정대리인 동의 처리 — 🚦 휴먼 게이트
 
