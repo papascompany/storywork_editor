@@ -79,6 +79,16 @@
   분석 도구 env(`NEXT_PUBLIC_POSTHOG_KEY`)가 있을 때만 배너 자동 노출(지금은 동의 대상 없음).
   `lib/consent.ts`(`hasAnalyticsConsent`/`onConsentChange` — FOLLOWUP-60 이 PostHog 게이트로 쓸 것) +
   배너 + 푸터 '쿠키 설정' + 처리방침 §6 문구. 문구 법무 검토는 LEGAL-01 때
+- [#18](https://github.com/papascompany/storywork_editor/pull/18) 인계 현행화
+- [#19](https://github.com/papascompany/storywork_editor/pull/19) **M9-03 SSRF** — pdf-engine 이 사용자 fabricJson 의
+  이미지 URL 을 서버에서 무제한 fetch(타임아웃·크기 제한도 없음). 허용 출처(data:image png/jpeg + Supabase origin
+  + `PDF_IMAGE_ALLOWED_ORIGINS`) · 리다이렉트 거부 · 10s/25MB. SVG XSS·업로드·innerHTML 0 위반
+  (`docs/audit/2026-11-18_m9-03-security.md`). **이미지를 Supabase 밖으로 옮기면 env 에 origin 추가 필수**
+- [#20](https://github.com/papascompany/storywork_editor/pull/20) **M9-02 키보드** — 실 브라우저 E2E 5종
+  (`apps/web/e2e/keyboard.spec.ts`, CI 단계). 겸사 버그 3건: ① 도구 단축키 이중 처리로 패널이 열렸다 닫힘
+  (데스크톱 단축키 전부 무효) ② 닫힌 사이드바가 Tab 순서에 남음 → `inert` ③ 복제·붙여넣기 후 선택 없음 → Delete 무효
+- [#21](https://github.com/papascompany/storywork_editor/pull/21) web 폰트 preload 제거 — FCP p75 랜딩 400→284ms ·
+  /login 252→148ms. web 은 서브셋 안 함(편집기 임의 한글 입력)
 
 ## 2. 측정 (코퍼스 21편 · seed 0 · 키/DB 불요)
 
@@ -108,8 +118,9 @@
 
 ## 4. 다음 코드 큐 (키 없이 가능)
 
-- 🟢 M9-02 키보드 시나리오 · M9-03 보안 점검(SVG XSS/SSRF/업로드) — 키 불요
-- 🟢 web 폰트도 admin 과 같은 서브셋·preload 점검(web 은 변수 스코프는 정상, 2MB preload 는 동일) — PERF-WEB 트랙
+- 🟢 키보드 잔여: 모달 닫힌 뒤 포커스가 body 로 감(WCAG 2.4.3) — 포커스 복귀 대상 결정 필요
+- 🟡 결정 필요: RightPanel 은 선택 시 레이어 탭을 보던 중에도 '속성'으로 자동 전환(right-panel.test 가 고정).
+  `userManualTab` 은 읽히지 않는 죽은 코드 — 레이어 탭 유지로 바꿀지 결정 후 정리
 - 🟢 플랫폼별 웹툰 분할 높이 프리셋 — 규격(플랫폼·높이 상한) 확인 후 `maxSliceHeightPx` 로 메뉴 노출
 - ⏸ LAYOUT-06 · 웹툰 상한·화면 지표 상수 교정 — 실사용 로그(FOLLOWUP-60) 이후
 - 🚦 키 등록 시: CONTI-01 → AI-ACT-03 → SCRIPT-KO-02
@@ -141,6 +152,10 @@
   새 필수 env 를 추가하면 `.github/workflows/ci.yml` 의 "Set dummy env for visual regression" 에도 넣을 것
 - ★ **preload 된 웹폰트는 FCP 를 늦춘다**(Chrome 이 잠시 렌더 차단). 폰트 최적화는 크기보다 preload 여부부터 실측
 - ★ CSS 변수가 `:root` 에서 계산되는 다른 변수에 참조되면, 그 변수도 `:root`(html)에 있어야 한다 — body 에 두면 조용히 fallback
+- ★ **로그인이 필요한 편집기 E2E**: `/editor` 는 미들웨어가 Supabase 로그인을 확인한다. 테스트는
+  `e2e/support/fake-supabase.ts`(더미 Supabase URL 포트의 가짜 인증 서버 + `sb-127-auth-token` 쿠키)로 대신 —
+  프로덕션 코드에 우회를 넣지 말 것. 로컬 실행: `WEB_BASE_URL=http://localhost:3000 pnpm --filter @storywork/web exec playwright test e2e/keyboard.spec.ts --workers=1`
+- ★ 서버가 사용자 데이터 속 URL 을 fetch 하는 코드를 새로 만들면 `pdf-engine` 의 `image-fetch` 처럼 허용 목록·시간·크기 제한부터
 - 세션 종료 시 핸드오프+RESUME_PROMPT 갱신은 커밋과 한 세트
 
-_갱신: 2026-11-18 · PR #1~#17 머지 · 다음 착수 후보 = M9-02/03 (키 불요) 또는 웹툰 개방(결정 시)._
+_갱신: 2026-11-18 · PR #1~#21 머지 · 다음 착수 후보 = 웹툰 개방(결정 시) · 키보드 잔여 · 대표님 액션 대기._
