@@ -14,6 +14,7 @@ import { rgb, degrees, type PDFDocument, type PDFPage } from 'pdf-lib'
 import type { CoverInput, CoverTone, PdfFormat } from '../types.js'
 import { MM_TO_PT } from '../types.js'
 
+import { getOrEmbedImage } from './page-renderer.js'
 import type { PageRenderContext } from './page-renderer.js'
 
 // ─── 배경 톤 매핑 (DESIGN-nike SSOT) ──────────────────────────────────────────
@@ -174,22 +175,8 @@ async function renderCoverImage(
   ctx: PageRenderContext,
 ): Promise<void> {
   try {
-    const cached = ctx.imageCache.get(url)
-    let image = cached
-
-    if (image === undefined) {
-      const res = await fetch(url)
-      if (!res.ok) return
-      const buf = await res.arrayBuffer()
-      const bytes = new Uint8Array(buf)
-      if (bytes[0] === 0x89 && bytes[1] === 0x50) {
-        image = await doc.embedPng(bytes)
-      } else {
-        image = await doc.embedJpg(bytes)
-      }
-      ctx.imageCache.set(url, image)
-    }
-
+    // 출처 허용 목록·시간·크기 제한은 getOrEmbedImage(image-fetch) 가 강제한다 (M9-03)
+    const image = await getOrEmbedImage(url, doc, ctx)
     if (!image) return
 
     // 상단 60% 영역 차지

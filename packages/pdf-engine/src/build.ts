@@ -22,12 +22,14 @@
  *   - 이미지 fetch Promise.all 병렬 (사전 프리페치)
  */
 
-import { PDFDocument, type PDFImage } from 'pdf-lib'
+import { PDFDocument } from 'pdf-lib'
 
 import { fabricLayersToCommands } from './adapter/fabric-to-pdf.js'
 import { loadPretendardFont } from './fonts.js'
 import { renderCoverPage } from './render/cover-renderer.js'
-import { createRenderContext, renderPage } from './render/page-renderer.js'
+import { defaultImageFetchPolicy } from './render/image-fetch.js'
+import { createRenderContext, getOrEmbedImage, renderPage } from './render/page-renderer.js'
+import type { PageRenderContext } from './render/page-renderer.js'
 import type { PdfBuildInput, PdfBuildOptions, PdfBuildResult } from './types.js'
 import { PDF_PRODUCER, SEED_EPOCH_MS } from './types.js'
 
@@ -65,28 +67,11 @@ function collectImageUrls(input: PdfBuildInput): string[] {
 async function prefetchImages(
   urls: string[],
   doc: PDFDocument,
-  cache: Map<string, PDFImage>,
+  ctx: PageRenderContext,
 ): Promise<void> {
-  await Promise.all(
-    urls.map(async (url) => {
-      if (cache.has(url)) return
-      try {
-        const res = await fetch(url)
-        if (!res.ok) return
-        const buf = await res.arrayBuffer()
-        const bytes = new Uint8Array(buf)
-        let image: PDFImage
-        if (bytes[0] === 0x89 && bytes[1] === 0x50) {
-          image = await doc.embedPng(bytes)
-        } else {
-          image = await doc.embedJpg(bytes)
-        }
-        cache.set(url, image)
-      } catch {
-        // 실패한 URL 은 renderPage 에서 warning 추가
-      }
-    }),
-  )
+  // 출처 허용 목록·시간·크기 제한은 getOrEmbedImage(image-fetch) 가 강제한다 (M9-03).
+  // 실패 URL 은 ctx.failedImageUrls 에 남아 renderPage 가 다시 요청하지 않는다.
+  await Promise.all(urls.map((url) => getOrEmbedImage(url, doc, ctx)))
 }
 
 // ─── fabricJson 에서 layers 추출 ─────────────────────────────────────────────
@@ -124,12 +109,18 @@ export async function buildPdf(
   const fontBytes = embedFonts ? await loadPretendardFont() : null
 
   // 3. 공유 컨텍스트 초기화
-  const ctx = await createRenderContext(doc, input.format.bleedMm, input.format.heightMm, fontBytes)
+  const ctx = await createRenderContext(
+    doc,
+    input.format.bleedMm,
+    input.format.heightMm,
+    fontBytes,
+    opts.imagePolicy ?? defaultImageFetchPolicy(),
+  )
 
   // 4. 이미지 병렬 프리페치 (성능: 16p ≤ 6초)
   const imageUrls = collectImageUrls(input)
   if (imageUrls.length > 0) {
-    await prefetchImages(imageUrls, doc, ctx.imageCache)
+    await prefetchImages(imageUrls, doc, ctx)
   }
 
   // 5. (선택) 표지 페이지
