@@ -17,21 +17,26 @@ export const viewport: Viewport = {
 }
 
 /**
- * Pretendard Variable — 한/영 균형 가변 폰트.
- * apps/web 의 fonts.ts 와 동일한 패턴.
- * CSS 변수: --font-pretendard (globals.css 의 --nike-font-text 에서 참조)
+ * Pretendard Variable — 한/영 균형 가변 폰트 (PERF-ADMIN-04).
+ * CSS 변수: --font-pretendard (globals.css :root 의 --nike-font-text 에서 참조)
+ *
+ * - 서브셋: KS X 1001 한글 2,350자 + 라틴·기호 (2.0MB → 0.5MB, wght 축 유지).
+ *   재생성은 scripts/subset-pretendard.py. 밖의 음절(똠·햏 등)은 글자 단위 fallback.
+ * - preload 끔: preload 된 폰트는 Chrome 이 잠깐 렌더를 막아 FCP 를 늦춘다
+ *   (실측 브로드밴드 248→144ms, Slow 4G 608→444ms). CSS 에서 바로 발견되므로
+ *   폰트 도착 시각은 preload 와 거의 같다(725 vs 757ms), CLS 0.0002.
  */
 const pretendard = localFont({
   src: [
     {
-      path: '../public/fonts/PretendardVariable.woff2',
+      path: '../public/fonts/PretendardVariable.subset.woff2',
       weight: '100 900',
       style: 'normal',
     },
   ],
   variable: '--font-pretendard',
   display: 'swap',
-  preload: true,
+  preload: false,
   fallback: [
     'Pretendard',
     'Noto Sans KR',
@@ -50,11 +55,14 @@ export default function AdminLayout({
   children: React.ReactNode
 }>) {
   return (
-    <html lang="ko" suppressHydrationWarning>
+    // --font-pretendard 는 :root 에서 계산되는 --nike-font-* 가 참조하므로 <html> 에 둬야 한다.
+    // <body> 에 두면 :root 에서 미정의 → fallback 'Pretendard Variable' 로 고정돼 웹폰트가 쓰이지
+    // 않았다(로컬에 Pretendard 가 설치된 PC 에서만 Pretendard 로 보였음, 2026-11-18 발견).
+    <html lang="ko" suppressHydrationWarning className={pretendard.variable}>
       <head>
         <script dangerouslySetInnerHTML={{ __html: themeInitScript }} />
       </head>
-      <body className={`${pretendard.variable} ${pretendard.className}`}>
+      <body className={pretendard.className}>
         <ThemeProvider defaultTheme="system" storageKey="sw-admin-theme">
           <ToastProvider>{children}</ToastProvider>
         </ThemeProvider>
