@@ -84,6 +84,23 @@ jobs:
             pnpm --filter @storywork/web exec playwright install chromium
           fi
 
+      # web/admin 은 production 에서 Supabase·DB env 가 없으면 instrumentation/middleware 가
+      # 예외를 던져 모든 페이지가 500 이 된다. 그동안 시각 회귀는 500 에러 페이지를 찍어
+      # 로그인 기준 이미지와 비교했고, 배경색이 비슷해 diff 허용치 안으로 통과했다(2026-11-18 확인).
+      # 화면만 렌더하면 되므로 비밀이 아닌 더미 값을 이후 단계에만 주입한다(NEXT_PUBLIC_* 는 빌드에 인라인).
+      # Supabase URL 은 아무것도 듣지 않는 로컬 포트라 인증 호출은 즉시 실패 → 미인증 화면이 렌더된다.
+      - name: Set dummy env for visual regression
+        run: |
+          {
+            echo "NEXT_PUBLIC_SUPABASE_URL=http://127.0.0.1:54321"
+            echo "NEXT_PUBLIC_SUPABASE_ANON_KEY=ci-visual-regression-dummy"
+            echo "SUPABASE_SERVICE_ROLE_KEY=ci-visual-regression-dummy"
+            echo "DATABASE_URL=postgresql://ci:ci@127.0.0.1:5432/ci"
+            echo "DIRECT_URL=postgresql://ci:ci@127.0.0.1:5432/ci"
+            echo "CRON_SECRET=ci-visual-regression-dummy"
+            echo "ADMIN_JWT_SECRET=ci-visual-regression-dummy-secret-32chars"
+          } >> "$GITHUB_ENV"
+
       - name: Build web + admin for visual regression
         run: |
           pnpm --filter @storywork/web build
@@ -99,18 +116,19 @@ jobs:
         env:
           PORT: 3001
 
+      # 루프가 끝나도 200 이 아니면 실패시킨다 — 500 인 채로 시각 회귀로 넘어가지 않게.
       - name: Wait for servers to be ready
         run: |
-          echo "Waiting for web (port 3000)..."
-          for i in $(seq 1 30); do
-            curl -sf http://localhost:3000 > /dev/null 2>&1 && echo "web ready" && break
-            sleep 2
-          done
-          echo "Waiting for admin (port 3001)..."
-          for i in $(seq 1 30); do
-            curl -sf http://localhost:3001/login > /dev/null 2>&1 && echo "admin ready" && break
-            sleep 2
-          done
+          wait_for() {
+            for i in $(seq 1 30); do
+              curl -sf "$1" > /dev/null 2>&1 && echo "ready: $1" && return 0
+              sleep 2
+            done
+            echo "::error::서버가 정상 응답하지 않음: $1 (HTTP $(curl -s -o /dev/null -w '%{http_code}' "$1"))"
+            return 1
+          }
+          wait_for http://localhost:3000/login
+          wait_for http://localhost:3001/login
 
       - name: Visual Regression (DESIGN-04)
         run: SKIP_SERVER_CHECK=1 bash scripts/visual-regression.sh --threshold 0.15 --max-diff-ratio 0.08
