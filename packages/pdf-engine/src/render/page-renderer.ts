@@ -31,6 +31,9 @@ import type {
 } from '../adapter/fabric-to-pdf.js'
 import { MM_TO_PT } from '../types.js'
 
+import { defaultImageFetchPolicy, fetchImageBytes } from './image-fetch.js'
+import type { ImageFetchPolicy } from './image-fetch.js'
+
 // ─── 내부 타입 ───────────────────────────────────────────────────────────────
 
 export interface PageRenderContext {
@@ -41,6 +44,10 @@ export interface PageRenderContext {
   embedFont: PDFFont | null
   /** 이미지 캐시 URL → PDFImage */
   imageCache: Map<string, PDFImage>
+  /** 거부·실패한 이미지 URL — 같은 URL 을 다시 요청하지 않는다(타임아웃 URL 이 시간을 두 번 먹지 않게) */
+  failedImageUrls: Set<string>
+  /** 이미지 출처 허용 목록·시간·크기 제한 (M9-03) */
+  imagePolicy: ImageFetchPolicy
   /** bleed 포함 전체 페이지 높이 pt (y-flip 계산용) */
   pageHeightPt: number
   /** bleed offset pt (컨텐츠 원점 보정) */
@@ -78,28 +85,21 @@ function toPoint(
 
 // ─── 이미지 fetch & 임베드 ──────────────────────────────────────────────────
 
-async function fetchImageBytes(url: string): Promise<Uint8Array | null> {
-  try {
-    const res = await fetch(url)
-    if (!res.ok) return null
-    const buf = await res.arrayBuffer()
-    return new Uint8Array(buf)
-  } catch {
-    return null
-  }
-}
-
-async function getOrEmbedImage(
+export async function getOrEmbedImage(
   url: string,
   doc: PDFDocument,
   ctx: PageRenderContext,
 ): Promise<PDFImage | null> {
   const cached = ctx.imageCache.get(url)
   if (cached !== undefined) return cached
+  if (ctx.failedImageUrls.has(url)) return null
 
-  const bytes = await fetchImageBytes(url)
+  const { bytes, reason } = await fetchImageBytes(url, ctx.imagePolicy)
   if (!bytes) {
-    ctx.warnings.push(`[page-renderer] 이미지 fetch 실패: ${url}`)
+    ctx.failedImageUrls.add(url)
+    ctx.warnings.push(
+      `[page-renderer] 이미지 fetch 실패 (${reason ?? 'unknown'}): ${shortUrl(url)}`,
+    )
     return null
   }
 
@@ -115,9 +115,15 @@ async function getOrEmbedImage(
     ctx.imageCache.set(url, image)
     return image
   } catch (e) {
-    ctx.warnings.push(`[page-renderer] 이미지 임베드 실패 (${url}): ${String(e)}`)
+    ctx.failedImageUrls.add(url)
+    ctx.warnings.push(`[page-renderer] 이미지 임베드 실패 (${shortUrl(url)}): ${String(e)}`)
     return null
   }
+}
+
+/** warning 에 data URL 전체(수 MB)가 실리지 않게 자른다 */
+function shortUrl(url: string): string {
+  return url.length > 120 ? `${url.slice(0, 120)}…` : url
 }
 
 // ─── 렌더 함수들 ─────────────────────────────────────────────────────────────
@@ -359,6 +365,7 @@ export async function createRenderContext(
   bleedMm: number,
   heightMm: number,
   embedFontBytes: Uint8Array | null,
+  imagePolicy: ImageFetchPolicy = defaultImageFetchPolicy(),
 ): Promise<PageRenderContext> {
   const defaultFont = await doc.embedFont(StandardFonts.Helvetica)
 
@@ -384,6 +391,8 @@ export async function createRenderContext(
     defaultFont,
     embedFont,
     imageCache: new Map(),
+    failedImageUrls: new Set(),
+    imagePolicy,
     pageHeightPt: (heightMm + 2 * bleedMm) * MM_TO_PT,
     bleedPt: bleedMm * MM_TO_PT,
     warnings,

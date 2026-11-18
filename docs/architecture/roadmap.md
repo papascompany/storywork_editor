@@ -228,7 +228,7 @@
 
 - [ ] [M9-01] Lighthouse 90+ 핵심 페이지 — 회귀 게이트 — @qa-tester + @ui-designer
 - [ ] [M9-02] 키보드 시나리오 5개 통과 — @qa-tester
-- [ ] [M9-03] 보안 점검: SVG XSS / SSRF / 업로드 — 0 위반 — @qa-tester
+- [x] [M9-03] 보안 점검: SVG XSS / SSRF / 업로드 ✅ 2026-11-18 — **SSRF 1건 발견·수정**: pdf-engine 이 사용자 fabricJson 의 이미지 URL 을 서버에서 무제한 fetch(타임아웃·크기 제한도 없음) → 출처 허용 목록(data:image png/jpeg + Supabase origin + `PDF_IMAGE_ALLOWED_ORIGINS`) · 리다이렉트 거부 · 10s/25MB 상한. SVG XSS·업로드·innerHTML 0 위반. 리포트 `docs/audit/2026-11-18_m9-03-security.md`
 - [ ] [M9-04] 부하/벤치 — 동시 편집 100 — @qa-tester + @architect
 
 ## 후속 이슈 (오토파일럿 진행 중 발견)

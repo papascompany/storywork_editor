@@ -9,6 +9,8 @@
  * ADR-0008 벡터 우선: pdf-lib 직접 렌더, 폴백만 래스터
  */
 
+import type { ImageFetchPolicy } from './render/image-fetch.js'
+
 // ─── 입력 ─────────────────────────────────────────────────────────────────────
 
 /** 인쇄 판형 규격 (Format 모델 subset) */
@@ -108,6 +110,11 @@ export interface PdfBuildOptions {
   metadataDate?: string
   /** 각 페이지 bleed/safe 가이드 라인 시각화 (기본 false) */
   showGuides?: boolean
+  /**
+   * 이미지 출처 허용 목록·시간·크기 제한 (M9-03 SSRF 방어).
+   * 미지정 시 env(NEXT_PUBLIC_SUPABASE_URL · SUPABASE_URL · PDF_IMAGE_ALLOWED_ORIGINS)에서 만든다.
+   */
+  imagePolicy?: ImageFetchPolicy
 }
 
 // ─── 내부 상수 ───────────────────────────────────────────────────────────────

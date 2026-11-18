@@ -21,6 +21,8 @@ export { fabricLayersToCommands } from './adapter/fabric-to-pdf.js'
 export type { RenderCommand, AdapterResult } from './adapter/fabric-to-pdf.js'
 
 export { buildPdf } from './build.js'
+export { defaultImageFetchPolicy, isAllowedImageUrl } from './render/image-fetch.js'
+export type { ImageFetchPolicy } from './render/image-fetch.js'
 
 // ─── Preflight ───────────────────────────────────────────────────────────────
 
