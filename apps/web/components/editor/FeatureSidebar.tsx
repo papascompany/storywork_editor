@@ -253,6 +253,8 @@ export function FeatureSidebar({
     <aside
       aria-label={`${meta.label} 패널`}
       aria-hidden={!isVisible}
+      // 닫힌(폭 0) 패널의 닫기 버튼·검색창이 Tab 순서에 남아 보이지 않는 곳으로 포커스가 가던 문제 (M9-02)
+      inert={!isVisible}
       data-testid="feature-sidebar"
       style={{
         width: isVisible ? '328px' : '0px',

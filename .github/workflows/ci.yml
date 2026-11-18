@@ -136,6 +136,14 @@ jobs:
           WEB_PORT: 3000
           ADMIN_PORT: 3001
 
+      # ── 키보드 단독 편집 시나리오 (M9-02) ─────────────────────────────────
+      # 위에서 더미 env 로 띄운 web(3000)에 대해 실제 브라우저로 키보드만 써서 편집 루프를 검증한다.
+      # /editor 로그인은 e2e/support/fake-supabase 가 127.0.0.1:54321(더미 Supabase URL)에서 대신한다.
+      - name: Keyboard scenarios (M9-02)
+        run: pnpm --filter @storywork/web exec playwright test e2e/keyboard.spec.ts --workers=1 --trace off
+        env:
+          WEB_BASE_URL: http://localhost:3000
+
       - name: Upload visual regression diff (on failure)
         if: failure()
         uses: actions/upload-artifact@v7

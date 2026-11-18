@@ -13,6 +13,20 @@ import { ActiveSelection } from 'fabric'
 
 import type { HistoryRef as History } from '../types'
 
+/**
+ * 새로 추가한 객체들을 선택 상태로 만든다 — 붙여넣기·복제 직후 바로 이동/삭제할 수 있게.
+ * (이전에는 선택을 해제만 해서 ⌘D 다음 Delete 가 아무것도 지우지 않았다, M9-02)
+ */
+function selectAdded(fc: StoryCanvas['_fabricCanvas'], objs: FabricObject[]): void {
+  if (objs.length === 0) return
+  const [first] = objs
+  if (objs.length === 1 && first) {
+    fc.setActiveObject(first)
+  } else {
+    fc.setActiveObject(new ActiveSelection(objs, { canvas: fc }))
+  }
+}
+
 // ─── 클립보드 버퍼 ───────────────────────────────────────────────────────────
 
 /** 클론된 fabric 객체 배열 (module-level — 탭 내 공유) */
@@ -82,6 +96,7 @@ export async function paste(
     history.push(cmd)
   }
 
+  selectAdded(fc, newClones)
   fc.requestRenderAll()
 
   // 다음 paste 는 다시 20px 오프셋 누적을 위해 버퍼 갱신
@@ -117,6 +132,7 @@ export async function duplicateSelection(
 
   fc.discardActiveObject()
 
+  const clones: FabricObject[] = []
   for (const obj of targets) {
     const cloned = await obj.clone()
     cloned.set({
@@ -133,8 +149,10 @@ export async function duplicateSelection(
       dataOverrides: { kind },
     })
     history.push(cmd)
+    clones.push(cloned)
   }
 
+  selectAdded(fc, clones)
   fc.requestRenderAll()
   return targets.length
 }
