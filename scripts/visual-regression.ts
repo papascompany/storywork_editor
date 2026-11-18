@@ -367,11 +367,23 @@ async function capturePage(
   try {
     await page.emulateMedia({ media: 'screen' })
 
+    let response: unknown
     try {
-      await page.goto(url, { waitUntil: 'networkidle', timeout: 30_000 })
+      response = await page.goto(url, { waitUntil: 'networkidle', timeout: 30_000 })
     } catch {
       // SPA networkidle 타임아웃은 흔함 — domcontentloaded 폴백
-      await page.goto(url, { waitUntil: 'domcontentloaded', timeout: 30_000 })
+      response = await page.goto(url, { waitUntil: 'domcontentloaded', timeout: 30_000 })
+    }
+
+    // 에러 페이지를 찍어 비교하거나(--update 시) 기준으로 저장하지 않는다.
+    // CI 에서 env 누락으로 모든 페이지가 500 이었는데도 배경색이 비슷해 diff 허용치 안으로
+    // 통과하던 문제(2026-11-18) 재발 방지.
+    const status = (response as { status?: () => number } | null)?.status?.()
+    if (typeof status === 'number' && status >= 400) {
+      return {
+        success: false,
+        error: `HTTP ${status} — 페이지가 정상 렌더되지 않음 (서버 env 확인)`,
+      }
     }
 
     // redirect 가 발생한 경우 (예: admin / → /login) 새 URL 에서 waitForSelector
@@ -381,7 +393,11 @@ async function capturePage(
       try {
         await page.locator(def.waitForSelector).waitFor({ timeout: 10_000 })
       } catch {
-        console.warn(`  [WARN] waitForSelector 타임아웃: ${def.waitForSelector} — 계속 진행`)
+        // 기다리던 요소가 없으면 비교 대상 화면이 아니다 — 경고로 넘기지 않고 실패 처리
+        return {
+          success: false,
+          error: `waitForSelector 타임아웃: ${def.waitForSelector} — 기대한 화면이 렌더되지 않음`,
+        }
       }
     }
 
