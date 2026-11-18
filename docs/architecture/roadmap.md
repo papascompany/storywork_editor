@@ -227,7 +227,7 @@
 ## M9 — Stabilization
 
 - [ ] [M9-01] Lighthouse 90+ 핵심 페이지 — 회귀 게이트 — @qa-tester + @ui-designer
-- [ ] [M9-02] 키보드 시나리오 5개 통과 — @qa-tester
+- [x] [M9-02] 키보드 시나리오 5개 통과 ✅ 2026-11-18 — `apps/web/e2e/keyboard.spec.ts`(실 브라우저, CI 단계 추가): S1 판형 모달 · S2 도구 단축키/도움말 · S3 명령 팔레트 · S4 도형 추가+화살표 1/10mm 이동 · S5 복제→삭제→undo→redo. 로그인은 가짜 Supabase 인증 서버(`e2e/support/fake-supabase.ts`, 프로덕션 코드 우회 없음). **발견·수정 3건**: ① 도구 단축키가 ToolBar·EditorShell 이중 처리라 패널이 열렸다 바로 닫힘(데스크톱 단축키 전부 무효) ② 닫힌 사이드바의 닫기·검색이 Tab 순서에 남음 → `inert` ③ 복제·붙여넣기 후 선택이 비어 Delete 무효 → 새 객체 선택. 수정 되돌리면 S2·S4·S5 실패 확인. 잔여: 모달 닫힌 뒤 포커스가 body 로 감(2.4.3), RightPanel `userManualTab` 은 읽히지 않는 죽은 코드(현 동작은 right-panel.test 가 고정한 의도)
 - [x] [M9-03] 보안 점검: SVG XSS / SSRF / 업로드 ✅ 2026-11-18 — **SSRF 1건 발견·수정**: pdf-engine 이 사용자 fabricJson 의 이미지 URL 을 서버에서 무제한 fetch(타임아웃·크기 제한도 없음) → 출처 허용 목록(data:image png/jpeg + Supabase origin + `PDF_IMAGE_ALLOWED_ORIGINS`) · 리다이렉트 거부 · 10s/25MB 상한. SVG XSS·업로드·innerHTML 0 위반. 리포트 `docs/audit/2026-11-18_m9-03-security.md`
 - [ ] [M9-04] 부하/벤치 — 동시 편집 100 — @qa-tester + @architect
 

@@ -65,27 +65,12 @@ import {
 import type { AlternativeCandidate, LayerAlternativesMeta } from './store/useAlternativesStore'
 import { useAlternativesStore } from './store/useAlternativesStore'
 import { usePageStore } from './store/usePageStore'
-import { type ToolId, useToolStore } from './store/useToolStore'
+import { useToolStore } from './store/useToolStore'
 import { ToolBar } from './ToolBar'
 import { TopBar } from './TopBar'
 import type { HistoryRef as History } from './types'
 import { StripCanvas } from './webtoon/StripCanvas'
 import type { WebtoonExportSource } from './webtoon/webtoonExport'
-
-// 도구 단축키 맵
-const TOOL_SHORTCUTS: Record<string, ToolId> = {
-  v: 'select',
-  t: 'template',
-  p: 'pose',
-  b: 'background',
-  q: 'bubble',
-  w: 'wordfx',
-  d: 'decoration',
-  s: 'shape',
-  x: 'text',
-  u: 'upload',
-  i: 'ai',
-}
 
 /**
  * EditorShell
@@ -174,7 +159,7 @@ export function EditorShell() {
     readyTick,
   )
 
-  const { active: activeTool, setActive: setActiveTool, tapTool } = useToolStore()
+  const { active: activeTool, setActive: setActiveTool } = useToolStore()
 
   const [mobileCloseRequest, setMobileCloseRequest] = useState(0)
 
@@ -680,13 +665,8 @@ export function EditorShell() {
       // input focus 중이면 나머지 무시
       if (isInput) return
 
-      // 도구 단축키 (V/T/P/B/Q/W/D/S/X/U/I)
-      const toolId = TOOL_SHORTCUTS[e.key.toLowerCase()]
-      if (toolId && !e.metaKey && !e.ctrlKey && !e.altKey) {
-        e.preventDefault()
-        tapTool(toolId)
-        return
-      }
+      // 도구 단축키(V/T/P/B/Q/W/D/S/X/U/I)는 ToolBar 가 단독 처리한다(잠긴 도구 안내 포함).
+      // 여기서도 tapTool 을 부르면 같은 키에 두 번 토글돼 패널이 열렸다 바로 닫혔다 (M9-02).
 
       // ⌘A / Ctrl+A → 전체 선택
       if ((e.metaKey || e.ctrlKey) && e.key === 'a') {
@@ -976,7 +956,6 @@ export function EditorShell() {
   }, [
     commandPaletteOpen,
     shortcutsModalOpen,
-    tapTool,
     handleNextPage,
     handlePrevPage,
     handleAddPage,
