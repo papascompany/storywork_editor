@@ -1,0 +1,216 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>StoryWork — Progress Dashboard · 2026-11-19</title>
+    <style>
+      :root {
+        --ink: #111111;
+        --ink2: #39393b;
+        --mute: #707072;
+        --canvas: #ffffff;
+        --soft: #f5f5f5;
+        --hairline: #e5e5e5;
+        --success: #007d48;
+        --info: #1151ff;
+        --warn: #c97a00;
+        --sale: #d30005;
+        --mint: #e3f2e6;
+        --cream: #fef3d8;
+        --pink: #fde7ec;
+        --lilac: #e8e4f8;
+        --bar-bg: #ececec;
+        --r: 14px;
+      }
+      @media (prefers-color-scheme: dark) {
+        :root:not([data-theme='light']) {
+          --ink: #f2f2f3;
+          --ink2: #c9c9cc;
+          --mute: #9e9ea0;
+          --canvas: #111214;
+          --soft: #1b1c1f;
+          --hairline: #2a2b2f;
+          --success: #4ade80;
+          --info: #7aa2ff;
+          --warn: #f5b041;
+          --sale: #f87171;
+          --mint: #12261a;
+          --cream: #2a2210;
+          --pink: #2a1418;
+          --lilac: #1d1a2e;
+          --bar-bg: #26272b;
+        }
+      }
+      * { box-sizing: border-box; }
+      body {
+        margin: 0;
+        background: var(--canvas);
+        color: var(--ink);
+        font: 15px/1.6 'Pretendard', -apple-system, 'Apple SD Gothic Neo', 'Noto Sans KR', sans-serif;
+      }
+      main { max-width: 1120px; margin: 0 auto; padding: 32px 16px 64px; }
+      a { color: var(--info); }
+      h1 { font-size: clamp(26px, 4vw, 40px); line-height: 1.2; margin: 6px 0 10px; letter-spacing: -0.02em; }
+      h2 { font-size: 20px; margin: 40px 0 12px; display: flex; align-items: center; gap: 10px; }
+      .badge { font-size: 12px; font-weight: 700; background: var(--ink); color: var(--canvas); border-radius: 999px; padding: 2px 9px; }
+      .eyebrow { color: var(--mute); font-size: 13px; letter-spacing: 0.04em; }
+      .lead { color: var(--ink2); max-width: 780px; margin: 0; }
+      .grid { display: grid; gap: 12px; }
+      .g4 { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+      .g3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+      .g2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      @media (max-width: 900px) { .g4, .g3 { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+      @media (max-width: 560px) { .g4, .g3, .g2 { grid-template-columns: 1fr; } }
+      .card { background: var(--soft); border: 1px solid var(--hairline); border-radius: var(--r); padding: 16px; min-width: 0; }
+      .card h3 { margin: 0 0 6px; font-size: 15px; }
+      .card ul { margin: 0; padding-left: 18px; color: var(--ink2); }
+      .stat .v { font-size: 30px; font-weight: 800; letter-spacing: -0.02em; }
+      .stat .k { color: var(--mute); font-size: 13px; }
+      .tone-ok { background: var(--mint); }
+      .tone-warn { background: var(--cream); }
+      .tone-err { background: var(--pink); }
+      .tone-acc { background: var(--lilac); }
+      .bars { display: grid; gap: 8px; }
+      .bar { display: grid; grid-template-columns: minmax(120px, 220px) 1fr 64px; gap: 10px; align-items: center; font-size: 14px; }
+      .bar .name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+      .bar .track { height: 10px; background: var(--bar-bg); border-radius: 999px; overflow: hidden; }
+      .bar .fill { height: 100%; background: var(--success); border-radius: 999px; }
+      .bar .fill.mid { background: var(--warn); }
+      .bar .fill.low { background: var(--sale); }
+      .bar .n { color: var(--mute); text-align: right; font-variant-numeric: tabular-nums; }
+      @media (max-width: 560px) { .bar { grid-template-columns: 1fr 52px; } .bar .track { grid-column: 1 / -1; grid-row: 2; } }
+      table { width: 100%; border-collapse: collapse; font-size: 14px; }
+      th, td { text-align: left; padding: 8px 10px; border-bottom: 1px solid var(--hairline); vertical-align: top; }
+      th { color: var(--mute); font-weight: 600; }
+      td.num { font-variant-numeric: tabular-nums; white-space: nowrap; }
+      .scroll { overflow-x: auto; }
+      .tl { list-style: none; margin: 0; padding: 0; border-left: 2px solid var(--hairline); }
+      .tl li { position: relative; padding: 0 0 14px 18px; }
+      .tl li::before { content: ''; position: absolute; left: -6px; top: 7px; width: 10px; height: 10px; border-radius: 50%; background: var(--ink); }
+      .tl .d { color: var(--mute); font-size: 13px; }
+      .pill { display: inline-block; font-size: 12px; border: 1px solid var(--hairline); border-radius: 999px; padding: 0 8px; margin-right: 4px; color: var(--ink2); }
+      code { font-size: 13px; background: var(--bar-bg); border-radius: 4px; padding: 0 4px; overflow-wrap: anywhere; }
+      footer { margin-top: 48px; color: var(--mute); font-size: 13px; }
+    </style>
+  </head>
+  <body>
+    <main>
+      <div class="eyebrow">PROGRESS DASHBOARD · 2026-11-19 · 이전 스냅샷 <a href="2026-05-17_progress_dashboard.html">2026-05-17</a></div>
+      <h1>제품 경로는 닫혔다,<br />남은 건 출시 안정화와 대표님 결정</h1>
+      <p class="lead">
+        2026-11-05 ~ 11-19 클라우드 세션에서 PR #1~#24 를 CI green 후 main 에 머지(= prod 자동배포).
+        웹툰 트랙 코드 완료, 원고 서술 손실 버그 수정, M9-02/03 종결. 웹툰 모드는 개방 결정 대기.
+      </p>
+
+      <h2><span class="badge">01</span>핵심 지표</h2>
+      <div class="grid g4">
+        <div class="card stat"><div class="v">154/220</div><div class="k">roadmap 완료 (70%)</div></div>
+        <div class="card stat"><div class="v">24</div><div class="k">이번 사이클 머지 PR</div></div>
+        <div class="card stat"><div class="v">87.9%</div><div class="k">POD 배치 품질 (채택률·대사 보존 100%)</div></div>
+        <div class="card stat"><div class="v">95.4%</div><div class="k">웹툰 스크롤 품질 종합</div></div>
+      </div>
+
+      <h2><span class="badge">02</span>마일스톤 진행률 (roadmap 체크박스)</h2>
+      <div class="card">
+        <div class="bars">
+          <div class="bar"><span class="name">M1 편집기 코어</span><div class="track"><div class="fill" style="width:100%"></div></div><span class="n">7/7</span></div>
+          <div class="bar"><span class="name">M2 포즈 라이브러리</span><div class="track"><div class="fill" style="width:70%"></div></div><span class="n">7/10</span></div>
+          <div class="bar"><span class="name">M3 관리자 콘솔</span><div class="track"><div class="fill" style="width:100%"></div></div><span class="n">6/6</span></div>
+          <div class="bar"><span class="name">M4 AI 파이프라인</span><div class="track"><div class="fill" style="width:100%"></div></div><span class="n">10/10</span></div>
+          <div class="bar"><span class="name">M5 텍스트·말풍선</span><div class="track"><div class="fill" style="width:100%"></div></div><span class="n">4/4</span></div>
+          <div class="bar"><span class="name">M6 POD PDF</span><div class="track"><div class="fill" style="width:100%"></div></div><span class="n">4/4</span></div>
+          <div class="bar"><span class="name">MODE 웹툰/POD</span><div class="track"><div class="fill" style="width:100%"></div></div><span class="n">10/10</span></div>
+          <div class="bar"><span class="name">M7 크리에이터·결제</span><div class="track"><div class="fill low" style="width:0%"></div></div><span class="n">0/4</span></div>
+          <div class="bar"><span class="name">M8 소셜</span><div class="track"><div class="fill mid" style="width:50%"></div></div><span class="n">3/6</span></div>
+          <div class="bar"><span class="name">M9 안정화</span><div class="track"><div class="fill mid" style="width:50%"></div></div><span class="n">2/4</span></div>
+          <div class="bar"><span class="name">LEGAL-OPS 법규</span><div class="track"><div class="fill mid" style="width:67%"></div></div><span class="n">6/9</span></div>
+          <div class="bar"><span class="name">SW-BIZ 사업화</span><div class="track"><div class="fill mid" style="width:40%"></div></div><span class="n">8/20</span></div>
+          <div class="bar"><span class="name">후속 이슈(FOLLOWUP)</span><div class="track"><div class="fill mid" style="width:69%"></div></div><span class="n">34/49</span></div>
+        </div>
+      </div>
+
+      <h2><span class="badge">03</span>이번 사이클 완료 (PR #1~#24)</h2>
+      <div class="grid g3">
+        <div class="card tone-acc">
+          <h3>웹툰 · 원고 품질</h3>
+          <ul>
+            <li>MODE-05 이미지 내보내기 — 시퀀스 ZIP · 롱 이미지</li>
+            <li>MODE-06 화면 스크롤 지표 · LAYOUT-07 중앙 정렬 · LAYOUT-08 말풍선 상한 4</li>
+            <li>SCRIPT-KO-05/06 서술 손실 2건 — 원고 글자 18.5% 복구</li>
+            <li>FOLLOWUP-71 ingest NFC 정규화(중복 폴더 적재 차단)</li>
+          </ul>
+        </div>
+        <div class="card tone-ok">
+          <h3>M9 안정화 · 접근성 · 보안</h3>
+          <ul>
+            <li>M9-02 키보드 E2E 5종(실 브라우저, CI) + 버그 3건</li>
+            <li>모달 5종 포커스 복귀 + Tab 트랩 (WCAG 2.4.3)</li>
+            <li>우측 패널 — 사용자가 고른 탭 유지</li>
+            <li>M9-03 PDF 이미지 SSRF 차단 · XSS/업로드 0 위반</li>
+          </ul>
+        </div>
+        <div class="card tone-warn">
+          <h3>성능 · CI · 법무</h3>
+          <ul>
+            <li>폰트 preload 제거 — admin FCP −42% · web 랜딩 400→284ms</li>
+            <li>admin 웹폰트 변수 스코프 버그 + KS X 1001 서브셋(2.0→0.5MB)</li>
+            <li>시각 회귀가 500 페이지를 비교하던 문제 수정</li>
+            <li>CI Node 24 · Playwright 1.64.1 · ESLint 매트릭스 실동작 · LEGAL-03 쿠키 동의</li>
+          </ul>
+        </div>
+      </div>
+
+      <h2><span class="badge">04</span>타임라인</h2>
+      <div class="card">
+        <ul class="tl">
+          <li><div class="d">11-10 ~ 11-11 · PR #1~#6</div>CI Node 24 · MODE-05/06 · LAYOUT-07/08 · SCRIPT-KO-05/06</li>
+          <li><div class="d">11-16 ~ 11-17 · PR #7~#13</div>FOLLOWUP-71 NFC · .nvmrc 24 · Playwright 1.64.1 · PERF-ADMIN-05 LCP · FOLLOWUP-01 lint resolver</li>
+          <li><div class="d">11-18 · PR #14~#21</div>시각 회귀 500 수정 · PERF-ADMIN-04 · LEGAL-03 · M9-03 SSRF · M9-02 키보드 · web 폰트</li>
+          <li><div class="d">11-19 · PR #22~#24</div>모달 포커스 복귀(WCAG 2.4.3) · 우측 패널 탭 유지 — M9-02 잔여 종결</li>
+        </ul>
+      </div>
+
+      <h2><span class="badge">05</span>측정 (코퍼스 21편 · seed 0 · 키/DB 불요)</h2>
+      <div class="card scroll">
+        <table>
+          <thead><tr><th>지표</th><th>POD (B5)</th><th>웹툰 (690px)</th></tr></thead>
+          <tbody>
+            <tr><td>페이지 / 세그먼트</td><td class="num">222 → 223</td><td class="num">222 → 264</td></tr>
+            <tr><td>채택률 · 대사 보존</td><td class="num">100% · 100%</td><td class="num">100% · 100%</td></tr>
+            <tr><td>품질 종합</td><td class="num">87.6 → 87.9%</td><td class="num">스크롤 90.7 → 95.4%</td></tr>
+            <tr><td>기타</td><td>시선·얼굴 100%</td><td>가로 균형 75.3 → 86.8% · 배경만 있는 화면 10.7 → 8.9%</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h2><span class="badge">06</span>열린 항목</h2>
+      <div class="grid g2">
+        <div class="card tone-err">
+          <h3>🔴 대표님 액션 (자동 진행 불가)</h3>
+          <ul>
+            <li><code>AI_GATEWAY_API_KEY</code> 등록 → CONTI-01 · AI-ACT-03 · SCRIPT-KO-02</li>
+            <li>PERF-ADMIN-03 인증 저장 (<code>pnpm perf:admin:save-auth --env prod</code>)</li>
+            <li>prod 한글 PDF 육안 확인 (publish 1회)</li>
+            <li>웹툰 프리셋 시드 재실행 → <b>웹툰 모드 개방 결정</b></li>
+          </ul>
+        </div>
+        <div class="card tone-ok">
+          <h3>🟢 다음 코드 큐 (키 없이 가능)</h3>
+          <ul>
+            <li>FOLLOWUP-71 <code>중복</code> 폴더 17장 정합화 (로컬 자산 필요)</li>
+            <li>M9-01 Lighthouse 90+ 회귀 게이트</li>
+            <li>M9-04 부하/벤치 — 동시 편집 100</li>
+            <li>플랫폼별 웹툰 분할 높이 프리셋</li>
+          </ul>
+        </div>
+      </div>
+
+      <footer>
+        출처: <a href="../architecture/roadmap.md">roadmap.md</a> ·
+        <a href="../handoff/SESSION_HANDOFF_2026-11-16.md">SESSION_HANDOFF_2026-11-16.md</a> ·
+        <a href="../plan.html#status">plan.html 진행 현황</a> · 갱신 2026-11-19
+      </footer>
+    </main>
+  </body>
+</html>
