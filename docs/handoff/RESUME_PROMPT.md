@@ -1,4 +1,4 @@
-# 새 세션 시작 프롬프트 (2026-11-18 갱신 — MODE-05/06 · LAYOUT-07/08 · SCRIPT-KO-05/06 · CI/lint · 폰트 FCP · 쿠키 동의 · M9-02/03 반영)
+# 새 세션 시작 프롬프트 (2026-11-19 갱신 — 로컬 모노레포 복귀용 · PR #1~#24 · M9-02 잔여 종결 반영)
 
 > 새 Claude Code 세션을 열 때 **"🚀 프롬프트" 섹션부터 끝까지 그대로 복사 붙여넣기** 하세요.
 > 이 파일은 세션 마무리 때마다 갱신됩니다 — 상단 날짜로 최신 여부 확인.
@@ -15,15 +15,18 @@
 /Users/yohan/Developer/claude/storywork
 ```
 
-1. `git pull` → `pnpm install` → 디스크 확인(`df -h /System/Volumes/Data`, 98%+ 면 **병렬 pnpm 절대 금지**·`turbo --concurrency=1`)
+1. `git checkout main && git pull` → `pnpm install` → 디스크 확인(`df -h /System/Volumes/Data`, 98%+ 면 **병렬 pnpm 절대 금지**·`turbo --concurrency=1`)
+   - 2026-11-05~19 작업은 **클라우드 세션**(브랜치 `claude/sharp-einstein-3ob2c6` → PR #1~#24 rebase 머지)에서 했다.
+     전부 main 에 들어가 있으므로 로컬은 main 만 받으면 된다. 원격 `claude/*` 브랜치는 머지 완료 — 지워도 됨
 2. 문서 읽기 (이 순서, 핵심만):
    - `CLAUDE.md` — 프로젝트 SSOT (도메인·스택·모듈 규칙·마일스톤)
    - `docs/handoff/SESSION_HANDOFF_2026-11-16.md` — **최신 핸드오프: 완료 내역·미완 액션·함정**
      (이전 누적 함정은 `SESSION_HANDOFF_2026-08-08.md` §5)
    - `docs/architecture/roadmap.md` — 작업 큐 (SW-BIZ (A) · MODE 섹션이 최신)
+   - (시각 요약) `docs/reports/2026-11-19_progress_dashboard.html` · `docs/plan.html#status` — 브라우저로 열기
 3. `git log --oneline -10` + `git status -sb` — 내가 만들지 않은 변경은 사용자 작업으로 보존
 
-### ✅ 현재 상태 (2026-11-18 · PR #1~#21 머지 시점)
+### ✅ 현재 상태 (2026-11-19 · PR #1~#24 머지 시점)
 
 - main = prod. 워킹트리 clean. 시작 시 `gh run list --branch main --limit 1` 로 최종 HEAD CI 확인
 - **웹툰 트랙 코드 완료** — MODE-01~06 · LAYOUT-07/08. 이미지 내보내기(시퀀스 ZIP · 롱 이미지),
@@ -36,6 +39,8 @@
 - `.nvmrc` v24 · Playwright 1.64.1 · CI 러너 ubuntu-latest(26.04) · ESLint 의존성 매트릭스 룰 실동작(FOLLOWUP-01)
 - 시각 회귀가 실제 화면을 비교(더미 env) · admin 웹폰트 실적용 + FCP −42% · web 폰트 preload 제거 · 쿠키 동의(분석 도구 켜질 때 노출)
 - M9-03 PDF 이미지 SSRF 차단 · M9-02 키보드 E2E 5종(CI) + 단축키/포커스/복제 선택 버그 수정
+- **M9-02 잔여 종결(11-19)**: 직접 구현 모달 5종 포커스 복귀 + Tab 트랩(`apps/web/lib/use-modal-focus.ts`, PR #23) ·
+  RightPanel 은 사용자가 고른 탭 유지 — 선택 변경 시 자동 전환 제거(대표 결정, PR #24)
 - 포즈 자산 수치 정본(ADR-0019): raw 1,260 · 태깅 대상 1,243 · 사이드카 1,058 · prod 1,262
 
 ### 🔴 대표님 액션 — 잔여 4건 + 개방 결정. 세션 시작 시 진행 여부부터 물을 것
@@ -55,11 +60,14 @@
    main 머지 = prod 배포
 
 > 어시스턴트는 prod DB 변경 CLI(권한 분류기 차단)·키 발급·비밀번호·결제를 수행할 수 없음.
-> 2026-11 세션은 클라우드 컨테이너라 `.env.local` 을 확인하지 못했다 — 로컬 세션에서 재확인할 것.
+> 2026-11 세션은 클라우드 컨테이너라 `.env.local` 을 확인하지 못했다 — **로컬 세션 첫 작업으로 재확인**할 것
+> (`AI_GATEWAY_API_KEY` 존재 여부만 확인, 값 출력 금지).
 
 ### 🎯 다음 코드 큐 — 키 없이 바로 착수 가능
 
-- 🟢 **FOLLOWUP-71** `중복` 폴더 17장 — 태깅 제외 ↔ 적재 포함 불일치 정합화
+- 🟢 **FOLLOWUP-71** `중복` 폴더 17장 — 태깅 제외 ↔ 적재 포함 불일치 정합화 (로컬에만 `data/poses/raw/` 가 있어 로컬 세션 적임)
+- 🟢 **M9-01** Lighthouse 90+ 핵심 페이지 회귀 게이트 · **M9-04** 부하/벤치(동시 편집 100)
+- ✅ ~~키보드 잔여(모달 포커스 · RightPanel 탭)~~ — 11-19 PR #23 · #24
 - ✅ `.nvmrc` v25 → v24 (운영 Vercel 24.x 와 일치, 2026-11-17). `engines.node: >=20.0.0` 고정 여부는 별도 검토
 - 🟢 플랫폼별 웹툰 분할 높이 프리셋 — 규격 확인 후 `maxSliceHeightPx` 메뉴 노출
 - ⏸ LAYOUT-06 · 웹툰 상한/화면 지표 상수 교정 — 실사용 로그(FOLLOWUP-60) 이후
@@ -86,6 +94,10 @@ pnpm turbo run typecheck lint test --concurrency=1
 pnpm adoption:measure
 # 웹툰(690px) 판형 + 화면 스크롤 품질 → data/eval/adoption-webtoon-baseline.json
 pnpm adoption:webtoon
+# 키보드 E2E 로컬 실행 (web 을 더미 Supabase URL 로 빌드·기동한 뒤 — CI 시각 회귀 단계와 동일 조건)
+#   env 값은 .github/workflows/ci.yml "Set dummy env for visual regression" 7개를 셸에 export 한 뒤
+#   pnpm --filter @storywork/web build && pnpm --filter @storywork/web start  (셸 env 가 .env.local 보다 우선)
+WEB_BASE_URL=http://localhost:3000 pnpm --filter @storywork/web exec playwright test e2e/keyboard.spec.ts --workers=1 --trace off
 # push 후 CI 확인 (600초 타임아웃 — CI 는 ~11분이라 자주 놓친다. gh run view <id> 로 재확인)
 # 연속 push 하면 앞선 run 은 concurrency 로 cancelled — 최종 HEAD 의 run 만 보면 된다
 bash scripts/ci-watch.sh
@@ -99,6 +111,9 @@ bash scripts/ci-watch.sh
   Playwright 설치 단계에 폴백이 있으니 재실행 1회로 확인. 코드 문제 아님
 - **같은 브랜치에 열린 PR 이 있으면 다음 작업을 push 하지 말 것** — PR 에 섞이고 CI 가 취소된다.
   로컬 `wip/*` 에 커밋 → 머지 후 `checkout -B <branch> origin/main` + cherry-pick
+- **직접 만든 모달은 `useModalFocus(open, ref, { onEscape })`** — 포커스 복귀·Tab 트랩(WCAG 2.4.3). Radix Dialog 는 자체 지원
+- **새 필수 env 추가 시 `.github/workflows/ci.yml` "Set dummy env for visual regression" 에도** — 없으면 CI 의 web/admin 전 페이지 500
+- **편집기 E2E 로그인은 `apps/web/e2e/support/fake-supabase.ts`** 로 — 프로덕션 코드에 인증 우회 금지
 - `parse-novel` 은 "그날·다음날·한편…"으로 시작하는 단락을 장면 구분자로 빼낸다(테스트 문장 주의)
 
 - **스키마 컬럼 추가는 "DB 먼저, 코드 나중"** — push=prod 자동배포라, 마이그레이션 미적용
@@ -133,6 +148,7 @@ breaking change push 는 보고 후
 
 ### 🎬 시작
 
-위 내용 검토 후: ① 대표님 액션(1·3·4·5) 진행 결과와 6번 웹툰 개방 결정 ② 다음 작업 선택을
-확인하고 진행해 주세요. **키 등록 전이면 FOLLOWUP-71 부터**(웹툰 개방 결정 시 개방이 우선).
+위 내용 검토 후: ① `.env.local` 키 존재 여부 확인(값 출력 금지) ② 대표님 액션(1·3·4·5) 진행 결과와 6번 웹툰 개방 결정
+③ 다음 작업 선택을 확인하고 진행해 주세요. **키 등록 전이면 FOLLOWUP-71 부터**(웹툰 개방 결정 시 개방이 우선).
+작업 흐름(11월 세션 방식): 기능 브랜치 → PR → CI green → rebase 머지(= prod 배포).
 세션 종료 시 `docs/handoff/SESSION_HANDOFF_<날짜>.md` 신규 작성 + 이 파일 갱신을 잊지 말 것.

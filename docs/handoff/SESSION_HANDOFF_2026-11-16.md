@@ -1,4 +1,4 @@
-# 세션 핸드오프 — 2026-11-05 ~ 11-18
+# 세션 핸드오프 — 2026-11-05 ~ 11-19
 
 > 이전: [SESSION_HANDOFF_2026-08-08.md](SESSION_HANDOFF_2026-08-08.md) (08-11 MODE-04c 이후 약 3개월 공백)
 > 이 세션 = **CI Node 24 + MODE-05 · MODE-06 · LAYOUT-07 · LAYOUT-08 + 서술 손실 버그 2건**.
@@ -90,6 +90,19 @@
 - [#21](https://github.com/papascompany/storywork_editor/pull/21) web 폰트 preload 제거 — FCP p75 랜딩 400→284ms ·
   /login 252→148ms. web 은 서브셋 안 함(편집기 임의 한글 입력)
 
+### ⑨ 11-19 (PR #22 ~ #24) — M9-02 잔여 종결
+- [#22](https://github.com/papascompany/storywork_editor/pull/22) 인계 현행화
+- 시각화: `docs/plan.html` §진행 현황 신설 · `docs/reports/2026-11-19_progress_dashboard.html` 신규 스냅샷
+- [#23](https://github.com/papascompany/storywork_editor/pull/23) **모달 포커스(WCAG 2.4.3)** — 직접 구현 모달 5종
+  (명령 팔레트·단축키 도움말·저장 로그인 게이트·회원 탈퇴·신고)이 닫히면 포커스가 body 로 떨어졌다.
+  `apps/web/lib/use-modal-focus.ts`: 열 때 직전 포커스 기억 → 닫힐 때 복귀(문서에서 빠졌으면 생략) ·
+  열린 동안 Tab 순환 · 선택적 Esc. 탈퇴·신고는 Esc 닫기도 없어 추가. Radix Dialog 는 자체 지원이라 제외.
+  `__tests__/modal-focus.test.tsx` 5종
+- [#24](https://github.com/papascompany/storywork_editor/pull/24) **RightPanel 탭** — 대표 결정 "직접 고른 탭 유지".
+  레이어 탭에서 복제·삭제·undo 때마다 속성 탭으로 튕기던 자동 전환 제거 + 죽은 `userManualTab` 정리.
+  탭이 3개(기본 속성)라 "유지"면 자동 전환 효과 자체가 무의미 → effect 삭제. **동작 변화**: 페이지 탭을 연 채
+  객체를 선택해도 속성 탭으로 가지 않는다. e2e S5 가 매 단계 레이어 탭 유지까지 확인
+
 ## 2. 측정 (코퍼스 21편 · seed 0 · 키/DB 불요)
 
 | | POD (B5) | 웹툰 (690px) |
@@ -118,9 +131,9 @@
 
 ## 4. 다음 코드 큐 (키 없이 가능)
 
-- 🟢 키보드 잔여: 모달 닫힌 뒤 포커스가 body 로 감(WCAG 2.4.3) — 포커스 복귀 대상 결정 필요
-- 🟡 결정 필요: RightPanel 은 선택 시 레이어 탭을 보던 중에도 '속성'으로 자동 전환(right-panel.test 가 고정).
-  `userManualTab` 은 읽히지 않는 죽은 코드 — 레이어 탭 유지로 바꿀지 결정 후 정리
+- ✅ ~~키보드 잔여 2건~~(모달 포커스 · RightPanel 탭) — 11-19 PR #23 · #24
+- 🟢 **FOLLOWUP-71** `중복` 폴더 17장 — 태깅 제외 ↔ 적재 포함 불일치 정합화
+- 🟢 **M9-01** Lighthouse 90+ 핵심 페이지 회귀 게이트 · **M9-04** 부하/벤치(동시 편집 100)
 - 🟢 플랫폼별 웹툰 분할 높이 프리셋 — 규격(플랫폼·높이 상한) 확인 후 `maxSliceHeightPx` 로 메뉴 노출
 - ⏸ LAYOUT-06 · 웹툰 상한·화면 지표 상수 교정 — 실사용 로그(FOLLOWUP-60) 이후
 - 🚦 키 등록 시: CONTI-01 → AI-ACT-03 → SCRIPT-KO-02
@@ -156,6 +169,7 @@
   `e2e/support/fake-supabase.ts`(더미 Supabase URL 포트의 가짜 인증 서버 + `sb-127-auth-token` 쿠키)로 대신 —
   프로덕션 코드에 우회를 넣지 말 것. 로컬 실행: `WEB_BASE_URL=http://localhost:3000 pnpm --filter @storywork/web exec playwright test e2e/keyboard.spec.ts --workers=1`
 - ★ 서버가 사용자 데이터 속 URL 을 fetch 하는 코드를 새로 만들면 `pdf-engine` 의 `image-fetch` 처럼 허용 목록·시간·크기 제한부터
+- ★ **직접 만든 모달은 `useModalFocus(open, ref, { onEscape })` 를 붙일 것** — 포커스 복귀·Tab 트랩. Radix Dialog 는 불필요
 - 세션 종료 시 핸드오프+RESUME_PROMPT 갱신은 커밋과 한 세트
 
-_갱신: 2026-11-18 · PR #1~#21 머지 · 다음 착수 후보 = 웹툰 개방(결정 시) · 키보드 잔여 · 대표님 액션 대기._
+_갱신: 2026-11-19 · PR #1~#24 머지 · M9-02 잔여 종결 · 다음 착수 후보 = 웹툰 개방(결정 시) · FOLLOWUP-71 · M9-01/04 · 대표님 액션 대기._

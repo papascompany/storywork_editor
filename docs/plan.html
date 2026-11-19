@@ -152,6 +152,7 @@
   <nav>
     <div class="group">전체</div>
     <a href="#overview" class="active">개요</a>
+    <a href="#status">진행 현황 (2026-11-19)</a>
     <a href="#decisions-now">지금 결정해야 할 것</a>
     <a href="#roadmap">개발 로드맵 (M0–M9)</a>
     <a href="#bizmodel">비즈니스 모델 & 수익 (사업화)</a>
@@ -220,6 +221,66 @@
         <li>DB 마이그레이션 실행</li>
         <li>외부 API 키 발급/회전</li>
         <li>프로덕션 배포</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<section id="status">
+  <h2>진행 현황 — 2026-11-19 기준 <span class="pill ok">PR #1~#24 머지</span></h2>
+  <p class="lead">roadmap 체크박스 <b>154 / 220</b> 완료(70%). 핵심 제품 경로(M1~M6 · MODE · 페이지 시스템 · BOARD)는 모두 닫혔고, 남은 것은 출시 전 안정화(M9) · 결제(M7) · AI 실가동(키 대기)입니다. 수치 출처: <a href="architecture/roadmap.md">roadmap.md</a> · 상세: <a href="handoff/SESSION_HANDOFF_2026-11-16.md">최신 핸드오프</a> · 스냅샷: <a href="reports/2026-11-19_progress_dashboard.html">진행 대시보드 2026-11-19</a>.</p>
+  <div class="grid g4" style="margin-top:12px">
+    <div class="card"><h3>✅ 완료 트랙</h3><p>M1 · M3 · M4 · M5 · M6 · MODE(웹툰/POD) · 페이지 시스템 · BOARD</p></div>
+    <div class="card"><h3>🟡 진행 중</h3><p>M9 안정화 2/4 · LEGAL-OPS 6/9 · SW-BIZ 8/20 · M8 3/6</p></div>
+    <div class="card"><h3>⏸ 대기</h3><p>M7 결제 0/4 · COMMS 0/4 · COMMERCE-EXT 0/6 (결제 연동 = 휴먼 게이트)</p></div>
+    <div class="card"><h3>📈 측정</h3><p>POD 223p · 채택률·대사 보존 100% · 품질 87.9% / 웹툰 264seg · 스크롤 95.4%</p></div>
+  </div>
+
+  <h3 style="margin-top:18px">이번 사이클 (2026-11-05 ~ 11-19) 완료</h3>
+  <div class="grid g3" style="margin-top:8px">
+    <div class="card">
+      <h4>웹툰 · 원고 품질</h4>
+      <ul style="margin:6px 0 0 18px;padding:0;color:var(--ink2)">
+        <li>MODE-05 웹툰 이미지 내보내기(시퀀스 ZIP · 롱 이미지)</li>
+        <li>MODE-06 화면 스크롤 품질 지표 · LAYOUT-07/08</li>
+        <li>SCRIPT-KO-05/06 서술 손실 버그 2건 — 원고 18.5% 복구</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>M9 안정화 · 접근성</h4>
+      <ul style="margin:6px 0 0 18px;padding:0;color:var(--ink2)">
+        <li><span class="pill ok">M9-02</span> 키보드 E2E 5종(CI) + 단축키·inert·복제 선택 버그 3건</li>
+        <li>모달 5종 포커스 복귀 + Tab 트랩 (WCAG 2.4.3)</li>
+        <li>RightPanel 사용자가 고른 탭 유지</li>
+        <li><span class="pill ok">M9-03</span> PDF 이미지 SSRF 차단 · XSS/업로드 0 위반</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>성능 · CI · 법무</h4>
+      <ul style="margin:6px 0 0 18px;padding:0;color:var(--ink2)">
+        <li>폰트 preload 제거 — FCP p75 admin −42% · web 랜딩 400→284ms</li>
+        <li>시각 회귀가 500 페이지를 찍던 문제 수정(더미 env)</li>
+        <li>CI Node 24 · Playwright 1.64.1 · ESLint 의존성 매트릭스 실동작</li>
+        <li>LEGAL-03 쿠키 동의(분석 도구 켜질 때 노출)</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="grid g2" style="margin-top:14px">
+    <div class="card" style="border-left:3px solid var(--err)">
+      <h4>🔴 대표님 액션 (자동 진행 불가)</h4>
+      <ul style="margin:6px 0 0 18px;padding:0;color:var(--ink2)">
+        <li><code>AI_GATEWAY_API_KEY</code> 등록 — CONTI-01 · AI-ACT-03 · SCRIPT-KO-02 착수 조건</li>
+        <li>PERF-ADMIN-03 인증 저장 · prod 한글 PDF 육안 확인</li>
+        <li>웹툰 프리셋 시드 재실행 → <b>웹툰 모드 개방 결정</b>(코드 준비 완료)</li>
+      </ul>
+    </div>
+    <div class="card" style="border-left:3px solid var(--ok)">
+      <h4>🟢 다음 코드 큐 (키 없이 가능)</h4>
+      <ul style="margin:6px 0 0 18px;padding:0;color:var(--ink2)">
+        <li>FOLLOWUP-71 <code>중복</code> 폴더 17장 정합화 (로컬 자산 필요)</li>
+        <li>M9-01 Lighthouse 90+ 회귀 게이트 · M9-04 동시 편집 100 부하</li>
+        <li>플랫폼별 웹툰 분할 높이 프리셋</li>
       </ul>
     </div>
   </div>
@@ -740,12 +801,12 @@
     <div class="body"><div class="kv"><b>DoD</b><span>회귀 게이트 등록</span></div></div>
   </details>
   <details class="task">
-    <summary><span class="id">M9-02</span><span class="t">키보드 시나리오 5개 통과</span><span class="pill err">@qa-tester</span></summary>
-    <div class="body"><div class="kv"><b>DoD</b><span>0 위반</span></div></div>
+    <summary><span class="id">M9-02</span><span class="t">키보드 시나리오 5개 통과</span><span class="pill ok">✅ 2026-11-19</span></summary>
+    <div class="body"><div class="kv"><b>DoD</b><span>0 위반</span></div><div class="kv"><b>결과</b><span>e2e/keyboard.spec.ts S1~S5 (CI) · 버그 3건 수정 · 모달 포커스 복귀 · 패널 탭 유지 (PR #20 · #23 · #24)</span></div></div>
   </details>
   <details class="task">
-    <summary><span class="id">M9-03</span><span class="t">보안 점검(SVG XSS / SSRF / 업로드)</span><span class="pill err">@qa-tester</span></summary>
-    <div class="body"><div class="kv"><b>DoD</b><span>0 위반 또는 사유 + 후속 이슈</span></div></div>
+    <summary><span class="id">M9-03</span><span class="t">보안 점검(SVG XSS / SSRF / 업로드)</span><span class="pill ok">✅ 2026-11-18</span></summary>
+    <div class="body"><div class="kv"><b>DoD</b><span>0 위반 또는 사유 + 후속 이슈</span></div><div class="kv"><b>결과</b><span>SSRF 1건 수정(pdf-engine 이미지 출처 허용 목록) · XSS/업로드 0 위반 — audit/2026-11-18_m9-03-security.md (PR #19)</span></div></div>
   </details>
   <details class="task">
     <summary><span class="id">M9-04</span><span class="t">부하/벤치 — 동시 편집 100</span><span class="pill err">@qa-tester</span> <span class="pill">@architect</span></summary>
