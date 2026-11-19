@@ -21,6 +21,8 @@ import { cn } from '@storywork/ui'
 import { BookOpen, Lock, X } from 'lucide-react'
 import React, { useEffect, useRef } from 'react'
 
+import { useModalFocus } from '../../lib/use-modal-focus'
+
 // ─── Props ────────────────────────────────────────────────────────────────────
 
 export type SaveLoginGateModalProps = {
@@ -33,6 +35,7 @@ export type SaveLoginGateModalProps = {
 export function SaveLoginGateModal({ open, onClose }: SaveLoginGateModalProps) {
   const primaryBtnRef = useRef<HTMLButtonElement>(null)
   const backdropRef = useRef<HTMLDivElement>(null)
+  useModalFocus(open, backdropRef)
 
   // 열릴 때 첫 CTA 에 포커스
   useEffect(() => {

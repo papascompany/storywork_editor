@@ -19,6 +19,8 @@ import { cn } from '@storywork/ui'
 import { Search, X } from 'lucide-react'
 import React, { useCallback, useEffect, useId, useMemo, useRef, useState } from 'react'
 
+import { useModalFocus } from '../../lib/use-modal-focus'
+
 import { BUILTIN_COMMANDS } from './commands/builtins'
 import {
   type Command,
@@ -154,6 +156,8 @@ export function CommandPalette({ open, onClose, ctx }: CommandPaletteProps) {
   const [activeIdx, setActiveIdx] = useState(0)
   const inputRef = useRef<HTMLInputElement>(null)
   const listRef = useRef<HTMLDivElement>(null)
+  const dialogRef = useRef<HTMLDivElement>(null)
+  useModalFocus(open, dialogRef)
   const instanceId = useId()
 
   // 최근 명령 ID
@@ -285,6 +289,7 @@ export function CommandPalette({ open, onClose, ctx }: CommandPaletteProps) {
 
       {/* 팔레트 카드 */}
       <div
+        ref={dialogRef}
         role="dialog"
         aria-modal="true"
         aria-label="명령 팔레트"

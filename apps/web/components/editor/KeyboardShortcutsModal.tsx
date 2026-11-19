@@ -19,6 +19,8 @@ import { cn } from '@storywork/ui'
 import { Search, X } from 'lucide-react'
 import React, { useEffect, useMemo, useRef, useState } from 'react'
 
+import { useModalFocus } from '../../lib/use-modal-focus'
+
 import { SHORTCUT_GROUPS } from './commands/builtins'
 import type { ShortcutGroup } from './commands/registry'
 
@@ -73,6 +75,8 @@ export function KeyboardShortcutsModal({ open, onClose }: KeyboardShortcutsModal
   const [query, setQuery] = useState('')
   const inputRef = useRef<HTMLInputElement>(null)
   const firstFocusableRef = useRef<HTMLButtonElement>(null)
+  const dialogRef = useRef<HTMLDivElement>(null)
+  useModalFocus(open, dialogRef)
 
   // 열릴 때 초기화 + 포커스
   useEffect(() => {
@@ -112,6 +116,7 @@ export function KeyboardShortcutsModal({ open, onClose }: KeyboardShortcutsModal
 
       {/* 모달 카드 */}
       <div
+        ref={dialogRef}
         role="dialog"
         aria-modal="true"
         aria-labelledby="shortcuts-modal-title"

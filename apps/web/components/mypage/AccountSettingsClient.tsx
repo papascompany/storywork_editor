@@ -13,6 +13,8 @@
 
 import * as React from 'react'
 
+import { useModalFocus } from '../../lib/use-modal-focus'
+
 type DeletionReason = '비용' | '사용성' | '기능 부족' | '기타'
 
 const DELETION_REASONS: DeletionReason[] = ['비용', '사용성', '기능 부족', '기타']
@@ -62,6 +64,8 @@ export function AccountSettingsClient({
   const [deleteReason, setDeleteReason] = React.useState<DeletionReason | ''>('')
   const [deleteLoading, setDeleteLoading] = React.useState(false)
   const [deleteError, setDeleteError] = React.useState<string | null>(null)
+  const deleteDialogRef = React.useRef<HTMLDivElement>(null)
+  useModalFocus(showDeleteModal, deleteDialogRef, { onEscape: closeDeleteModal })
 
   function openDeleteModal() {
     setDeleteStep(1)
@@ -419,6 +423,7 @@ export function AccountSettingsClient({
       {/* ─── 탈퇴 모달 ────────────────────────────────────────────────────────── */}
       {showDeleteModal && (
         <div
+          ref={deleteDialogRef}
           role="dialog"
           aria-modal="true"
           aria-labelledby="delete-modal-title"

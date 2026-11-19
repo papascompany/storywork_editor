@@ -12,6 +12,8 @@ import { REPORT_REASON_LABELS, type ReportReason, type ReportTargetType } from '
 import { Flag } from 'lucide-react'
 import * as React from 'react'
 
+import { useModalFocus } from '../../lib/use-modal-focus'
+
 const REASONS = Object.entries(REPORT_REASON_LABELS) as [ReportReason, string][]
 
 interface ReportButtonProps {
@@ -36,6 +38,8 @@ export function ReportButton({
   const [submitting, setSubmitting] = React.useState(false)
   const [done, setDone] = React.useState(false)
   const [error, setError] = React.useState<string | null>(null)
+  const dialogRef = React.useRef<HTMLDivElement>(null)
+  useModalFocus(open, dialogRef, { onEscape: () => !submitting && setOpen(false) })
 
   function handleOpen() {
     if (!isAuthenticated) {
@@ -128,6 +132,7 @@ export function ReportButton({
 
       {open && (
         <div
+          ref={dialogRef}
           role="dialog"
           aria-modal="true"
           aria-label="신고하기"
