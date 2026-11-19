@@ -157,18 +157,10 @@ test.describe('키보드 단독 편집 (M9-02)', () => {
     await expect(layerTab).toHaveAttribute('aria-selected', 'true')
     const rows = page.getByRole('row')
 
-    // 선택이 바뀌면 오른쪽 패널이 '속성' 탭으로 자동 전환된다(right-panel.test 가 고정한 의도된 UX).
-    // 복제·실행 취소는 비동기라 전환이 늦게 올 수 있다 — 포커스가 남아 있는 레이어 탭을 Enter 로 다시 열며
-    // 레이어 수가 맞을 때까지 확인한다(키보드 사용자의 실제 동작).
+    // 사용자가 고른 레이어 탭은 선택이 바뀌어도 유지된다 — 매 단계 탭이 그대로인지도 확인
     const expectLayers = async (n: number) => {
-      await expect(layerTab).toBeFocused()
-      await expect(async () => {
-        if ((await layerTab.getAttribute('aria-selected')) !== 'true') {
-          await page.keyboard.press('Enter')
-        }
-        await expect(layerTab).toHaveAttribute('aria-selected', 'true', { timeout: 500 })
-        await expect(rows).toHaveCount(n, { timeout: 500 })
-      }).toPass({ timeout: 5_000 })
+      await expect(rows).toHaveCount(n)
+      await expect(layerTab).toHaveAttribute('aria-selected', 'true')
     }
 
     await expectLayers(1)

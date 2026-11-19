@@ -11,8 +11,7 @@
 //   Pages 탭: PagePanel (다중 페이지 관리)
 //
 // 동작:
-//   - 객체 선택 → Properties 탭 자동 전환
-//   - 사용자가 Layers 탭을 클릭하면 그 상태 유지
+//   - 기본 탭은 Properties. 사용자가 고른 탭은 선택이 바뀌어도 유지(자동 전환 없음)
 //   - 선택 해제 시 Properties 탭 빈 상태
 //   - 데스크톱 전용 (hidden md:flex)
 //   - 너비 280px
@@ -22,7 +21,7 @@ import type { StoryCanvas } from '@storywork/editor-core'
 import type { LayerTree } from '@storywork/editor-layers'
 import { Tabs, TabsContent, TabsList, TabsTrigger, cn } from '@storywork/ui'
 import { BookOpen, Layers, Settings2 } from 'lucide-react'
-import React, { useEffect, useRef, useState } from 'react'
+import React, { useState } from 'react'
 
 import { AlignControlBar } from './AlignControlBar'
 import { ControlBar } from './ControlBar'
@@ -54,9 +53,7 @@ type TabValue = 'properties' | 'layers' | 'pages'
 /**
  * RightPanel
  *
- * 객체 선택 시 Properties 탭 자동 전환 로직:
- * - 이전 선택 상태에서 새 선택이 들어오면 → Properties 탭 전환
- * - 단, 사용자가 이미 Layers 탭을 명시적으로 클릭한 상태라면 유지
+ * 탭: 기본 Properties, 이후 사용자가 고른 탭을 유지(선택 변경에 따른 자동 전환 없음).
  */
 export function RightPanel({
   props,
@@ -69,45 +66,9 @@ export function RightPanel({
 }: RightPanelProps) {
   const hasAlternatives = useAlternativesStore(selectHasAlternatives)
   const [tab, setTab] = useState<TabValue>('properties')
-  // 사용자가 수동으로 Layers 탭을 클릭했는지 추적
-  const userManualTab = useRef(false)
-  const prevSelectedIds = useRef<string[]>([])
-
-  useEffect(() => {
-    const prevIds = prevSelectedIds.current
-    const currIds = selectedIds
-
-    // 선택된 객체가 새로 생기거나 교체됨 → Properties 탭 자동 전환
-    // (이전 선택이 없었거나 ID 목록이 달라진 경우)
-    const selectionChanged =
-      currIds.length > 0 &&
-      (prevIds.length === 0 ||
-        currIds.some((id) => !prevIds.includes(id)) ||
-        prevIds.some((id) => !currIds.includes(id)))
-
-    if (selectionChanged) {
-      setTab('properties')
-      userManualTab.current = false
-    }
-
-    // 선택 해제 시 userManualTab 리셋
-    if (currIds.length === 0) {
-      userManualTab.current = false
-    }
-
-    prevSelectedIds.current = currIds
-  }, [selectedIds])
-
-  const handleTabChange = (value: string) => {
-    const v = value as TabValue
-    setTab(v)
-    // 사용자가 Layers 또는 Pages 를 클릭 → 이후 선택에도 Properties 로 강제 전환 안 함
-    if (v === 'layers' || v === 'pages') {
-      userManualTab.current = true
-    } else {
-      userManualTab.current = false
-    }
-  }
+  // 탭은 사용자가 고른 대로 유지한다 — 선택이 바뀌어도 자동 전환하지 않는다.
+  // (레이어 탭에서 복제·삭제·실행 취소를 반복할 때 매번 속성 탭으로 튕기지 않도록)
+  const handleTabChange = (value: string) => setTab(value as TabValue)
 
   return (
     <aside
