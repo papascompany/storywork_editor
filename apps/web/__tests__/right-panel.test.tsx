@@ -3,7 +3,7 @@
  *
  * 검증 항목:
  * 1. 탭 전환 (Properties/Layers)
- * 2. 객체 선택 → Properties 탭 자동 전환
+ * 2. 레이어 탭을 연 채 선택이 바뀌어도 레이어 탭 유지
  * 3. 선택 해제 시 빈 상태
  * 4. Position/Size 입력 → 캔버스 객체 좌표 변경 (TransformObjectCommand)
  * 5. Background 객체 선택 후 Fill 색 변경 → fabric fill 변경
@@ -420,10 +420,10 @@ describe('RightPanel — 탭 전환', () => {
   })
 })
 
-// ── 객체 선택 자동 탭 전환 ───────────────────────────────────────────────────
+// ── 선택 변경 시 탭 유지 ─────────────────────────────────────────────────────
 
-describe('RightPanel — 객체 선택 자동 탭 전환', () => {
-  it('selectedIds 변경 → Properties 탭으로 자동 전환', async () => {
+describe('RightPanel — 선택 변경 시 사용자가 고른 탭 유지', () => {
+  it('레이어 탭을 연 채 selectedIds 가 바뀌어도 레이어 탭 그대로', async () => {
     const { RightPanel } = await import('../components/editor/RightPanel')
 
     function Wrapper() {
@@ -443,12 +443,10 @@ describe('RightPanel — 객체 선택 자동 탭 전환', () => {
     fireEvent.click(layersTab)
     expect(layersTab).toHaveAttribute('aria-selected', 'true')
 
-    // 객체 선택 → 자동으로 Properties 탭으로 이동
-    const selectBtn = screen.getByRole('button', { name: 'Select' })
-    fireEvent.click(selectBtn)
-
-    const propsTab = screen.getByRole('tab', { name: /속성/ })
-    expect(propsTab).toHaveAttribute('aria-selected', 'true')
+    // 객체 선택 → 레이어 탭 유지 (복제·삭제 반복 시 튕기지 않음)
+    fireEvent.click(screen.getByRole('button', { name: 'Select' }))
+    expect(layersTab).toHaveAttribute('aria-selected', 'true')
+    expect(screen.getByRole('tab', { name: /속성/ })).toHaveAttribute('aria-selected', 'false')
   })
 })
 
