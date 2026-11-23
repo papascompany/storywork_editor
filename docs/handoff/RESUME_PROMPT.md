@@ -1,4 +1,4 @@
-# 새 세션 시작 프롬프트 (2026-11-19 갱신 — 로컬 모노레포 복귀용 · PR #1~#24 · M9-02 잔여 종결 반영)
+# 새 세션 시작 프롬프트 (2026-11-23 갱신 — 로컬 모노레포 복귀용 · PR #1~#25 · M9-02 잔여 종결 반영)
 
 > 새 Claude Code 세션을 열 때 **"🚀 프롬프트" 섹션부터 끝까지 그대로 복사 붙여넣기** 하세요.
 > 이 파일은 세션 마무리 때마다 갱신됩니다 — 상단 날짜로 최신 여부 확인.
@@ -15,20 +15,29 @@
 /Users/yohan/Developer/claude/storywork
 ```
 
-1. `git checkout main && git pull` → `pnpm install` → 디스크 확인(`df -h /System/Volumes/Data`, 98%+ 면 **병렬 pnpm 절대 금지**·`turbo --concurrency=1`)
-   - 2026-11-05~19 작업은 **클라우드 세션**(브랜치 `claude/sharp-einstein-3ob2c6` → PR #1~#24 rebase 머지)에서 했다.
-     전부 main 에 들어가 있으므로 로컬은 main 만 받으면 된다. 원격 `claude/*` 브랜치는 머지 완료 — 지워도 됨
-2. 문서 읽기 (이 순서, 핵심만):
+1. **로컬 상태부터 확인 (pull 전)** — 이 저장소는 원래 로컬에서 작업해 왔고, 2026-11-05~19 작업만
+   **클라우드 세션**(브랜치 `claude/sharp-einstein-3ob2c6` → PR #1~#25 rebase 머지)에서 했다.
+   로컬에 08월 이후 push 안 한 커밋·미커밋 변경이 남아 있을 수 있다:
+   ```bash
+   git status -sb
+   git fetch origin && git log --oneline origin/main..HEAD
+   ```
+   - 미커밋 변경 → 지우지 말고 사용자에게 확인 후 커밋 또는 `git stash`
+   - push 안 한 커밋 → pull 시 merge 가 생긴다. 내용 확인 후 사용자와 정리 방식 결정(rebase·force push 임의 금지)
+   - 둘 다 비었으면 → `git checkout main && git pull`
+2. `pnpm install` → 디스크 확인(`df -h /System/Volumes/Data`, 98%+ 면 **병렬 pnpm 절대 금지**·`turbo --concurrency=1`).
+   원격 `claude/*` 브랜치는 머지 완료 — 지워도 됨. `data/poses/raw/`·`.env.local` 은 gitignored 라 pull 영향 없음
+3. 문서 읽기 (이 순서, 핵심만):
    - `CLAUDE.md` — 프로젝트 SSOT (도메인·스택·모듈 규칙·마일스톤)
    - `docs/handoff/SESSION_HANDOFF_2026-11-16.md` — **최신 핸드오프: 완료 내역·미완 액션·함정**
      (이전 누적 함정은 `SESSION_HANDOFF_2026-08-08.md` §5)
    - `docs/architecture/roadmap.md` — 작업 큐 (SW-BIZ (A) · MODE 섹션이 최신)
    - (시각 요약) `docs/reports/2026-11-19_progress_dashboard.html` · `docs/plan.html#status` — 브라우저로 열기
-3. `git log --oneline -10` + `git status -sb` — 내가 만들지 않은 변경은 사용자 작업으로 보존
+4. `git log --oneline -10` — 내가 만들지 않은 변경은 사용자 작업으로 보존
 
 ### ✅ 현재 상태 (2026-11-19 · PR #1~#24 머지 시점)
 
-- main = prod. 워킹트리 clean. 시작 시 `gh run list --branch main --limit 1` 로 최종 HEAD CI 확인
+- main = prod(원격 기준 — 로컬 워킹트리는 위 1번으로 확인). 시작 시 `gh run list --branch main --limit 1` 로 최종 HEAD CI 확인
 - **웹툰 트랙 코드 완료** — MODE-01~06 · LAYOUT-07/08. 이미지 내보내기(시퀀스 ZIP · 롱 이미지),
   화면 스크롤 품질 지표(`pnpm adoption:webtoon`), 인물 없는 세그먼트 중앙 정렬, 세그먼트당 말풍선 4.
   **웹툰 모드는 아직 닫혀 있다** — 개방은 대표님 결정(아래 액션 표 "신규")
