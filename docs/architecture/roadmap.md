@@ -101,6 +101,7 @@
 - [x] [PERF-WEB-02] (P0) Step 2 묶음 fix #1+#2+#3 — Speed Insights RUM + /notices Prisma 통합 + unstable_cache — @architect ✅ 2026-06-05 (`314e4f5`, `0d5eca7`, `010ef57`) — 데스크탑 LCP 4016ms → < 800ms 목표
 - [x] [PERF-WEB-03] (P1) Step 3 — `/editor` dynamic import — @architect ✅ 2026-06-05 — `EditorShellClient` 가 `EditorShell` 을 `next/dynamic({ ssr: false })` 로 lazy 로드해 fabric.js + editor-* 8개 패키지를 라우트 First Load JS 에서 분리. **First Load 590KB → 104kB** (route 1.68kB + shared 103kB, 목표 ~250KB 초과 달성). 셸 스켈레톤 추가(CLS 최소화). 런타임 검증: desktop+mobile 편집기 정상 마운트(fabric canvas 초기화, FormatPicker 표시, 콘솔 에러 0), 498 tests green. 잔재 `page 2.tsx` 정리.
 - [ ] [PERF-WEB-04] (P2) Speed Insights 7일 누적 후 실유저 RUM 분석 → E.2 #5/#6 우선순위 재평가
+- [ ] [PERF-WEB-05] (P2) Lighthouse 90 미달 2건 — `/login` perf 75(LCP 12.7s, 시뮬레이션 4G) · `/` perf 88(TBT 493ms). 원인 실측 후 개선, 달성하면 `pnpm lighthouse:baseline` 으로 하한 상향(M9-01 후속) — @architect
 
 ## M5 — Text/Bubble/Effects/Templates
 
@@ -226,7 +227,7 @@
 
 ## M9 — Stabilization
 
-- [ ] [M9-01] Lighthouse 90+ 핵심 페이지 — 회귀 게이트 — @qa-tester + @ui-designer
+- [x] [M9-01] Lighthouse 90+ 핵심 페이지 — 회귀 게이트 — @qa-tester + @ui-designer ✅ 2026-11-24 — `scripts/lighthouse-gate.ts`(`pnpm lighthouse:gate` / `lighthouse:baseline`) + CI 단계(시각 회귀·키보드 E2E 와 같은 더미 env web 서버 재사용, Playwright chromium 재사용). 대상 = 로그인 없이 더미 env 에서 200 인 공개 6페이지(`/` · `/login` · `/signup` · `/features` · `/notices` · `/legal/terms`). 하한 = `tests/lighthouse/budgets.json`: 달성(≥90)은 90 고정, 미달은 baseline−5. 감사 전에 전 페이지 응답을 확인해 3xx/4xx/5xx·연결 실패면 중단(500 화면을 기준선으로 굳히지 않게). **baseline(로컬 prod 빌드, 3회 중간값)**: perf 88/75/99/100/99/100 · a11y 94/96/96/90/94/96 · BP 96 전부 · SEO 100/100/100/100/91/66. **90 미달 3건**: ① `/` perf 88(TBT 493ms) ② `/login` perf 75(LCP 12.7s — 5회 74~75 안정) ③ `/legal/terms` SEO 66 = 의도된 `robots: noindex`(약관 초안, LEGAL-01 후 해제 시 baseline 갱신). 제외: `/showcase`·`/contest` 는 prisma 필수라 더미 env 500, `/editor*`·`/mypage*` 는 로그인 리다이렉트. **겸사**: lighthouse 추가가 lockfile 재해석으로 zod 4.4.2→4.6.7 을 끌어올려 web `ContactForm` 의 `zodResolver` 타입이 깨짐 → `pnpm.overrides.zod=4.4.2` 고정. 후속: [PERF-WEB-05] `/login` LCP · `/` TBT 개선(90 달성 시 baseline 갱신) · `/showcase` 는 CI 에 실 DB 가 생기면 편입
 - [x] [M9-02] 키보드 시나리오 5개 통과 ✅ 2026-11-18 — `apps/web/e2e/keyboard.spec.ts`(실 브라우저, CI 단계 추가): S1 판형 모달 · S2 도구 단축키/도움말 · S3 명령 팔레트 · S4 도형 추가+화살표 1/10mm 이동 · S5 복제→삭제→undo→redo. 로그인은 가짜 Supabase 인증 서버(`e2e/support/fake-supabase.ts`, 프로덕션 코드 우회 없음). **발견·수정 3건**: ① 도구 단축키가 ToolBar·EditorShell 이중 처리라 패널이 열렸다 바로 닫힘(데스크톱 단축키 전부 무효) ② 닫힌 사이드바의 닫기·검색이 Tab 순서에 남음 → `inert` ③ 복제·붙여넣기 후 선택이 비어 Delete 무효 → 새 객체 선택. 수정 되돌리면 S2·S4·S5 실패 확인. 잔여 2건 ✅ 2026-11-19: ① 직접 구현 모달 5종(명령 팔레트·단축키 도움말·저장 게이트·탈퇴·신고) 포커스 복귀 + Tab 트랩(`lib/use-modal-focus.ts`, WCAG 2.4.3 — PR #23, 탈퇴·신고 Esc 닫기 추가) ② RightPanel — 대표 결정 "직접 고른 탭 유지": 선택 변경 시 자동 전환 제거 + 죽은 `userManualTab` 정리(PR #24, e2e S5 가 매 단계 레이어 탭 유지 확인)
 - [x] [M9-03] 보안 점검: SVG XSS / SSRF / 업로드 ✅ 2026-11-18 — **SSRF 1건 발견·수정**: pdf-engine 이 사용자 fabricJson 의 이미지 URL 을 서버에서 무제한 fetch(타임아웃·크기 제한도 없음) → 출처 허용 목록(data:image png/jpeg + Supabase origin + `PDF_IMAGE_ALLOWED_ORIGINS`) · 리다이렉트 거부 · 10s/25MB 상한. SVG XSS·업로드·innerHTML 0 위반. 리포트 `docs/audit/2026-11-18_m9-03-security.md`
 - [ ] [M9-04] 부하/벤치 — 동시 편집 100 — @qa-tester + @architect
