@@ -1,0 +1,47 @@
+{
+  "$comment": "M9-01 Lighthouse 회귀 게이트 하한. 달성(>=target)은 target 고정, 미달은 측정값-tolerance. 점수를 올렸으면 pnpm lighthouse:baseline 으로 함께 올릴 것. 수동 편집도 가능하다.",
+  "generatedAt": "2026-11-24T11:20:30.624Z",
+  "params": {
+    "target": 90,
+    "tolerance": 5,
+    "runs": 3
+  },
+  "pages": {
+    "root": {
+      "performance": 83,
+      "accessibility": 90,
+      "best-practices": 90,
+      "seo": 90
+    },
+    "login": {
+      "performance": 70,
+      "accessibility": 90,
+      "best-practices": 90,
+      "seo": 90
+    },
+    "signup": {
+      "performance": 90,
+      "accessibility": 90,
+      "best-practices": 90,
+      "seo": 90
+    },
+    "features": {
+      "performance": 90,
+      "accessibility": 90,
+      "best-practices": 90,
+      "seo": 90
+    },
+    "notices": {
+      "performance": 90,
+      "accessibility": 90,
+      "best-practices": 90,
+      "seo": 90
+    },
+    "terms": {
+      "performance": 90,
+      "accessibility": 90,
+      "best-practices": 90,
+      "seo": 61
+    }
+  }
+}
