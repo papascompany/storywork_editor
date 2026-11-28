@@ -20,15 +20,20 @@
  *   --runs <n>            페이지당 반복 후 중간값 (기본 1, 최대 5)
  *   --update-baseline     측정값으로 예산 파일을 다시 쓴다(검사하지 않음)
  *   --target <n>          "달성한 카테고리"의 하한 (기본 90 — roadmap M9-01)
- *   --tolerance <n>       미달 카테고리의 회귀 허용 폭 (기본 5)
+ *   --tolerance <n>       미달 카테고리의 회귀 허용 폭 (기본 5, performance 제외)
+ *   --perf-tolerance <n>  performance 하한 여유 (기본 25)
  *   --output <path>       측정 원본 JSON 저장 경로
  *   --budgets <path>      예산 파일 경로 (기본 tests/lighthouse/budgets.json)
  *   --timeout <ms>        페이지당 감사 타임아웃 (기본 120000)
  *
  * 게이트 규칙(예산 생성 시 결정, 파일에 기록된 값이 정본):
+ *   accessibility / best-practices / seo — 정적 감사라 실행마다 같은 점수가 나온다
  *   · 측정값 >= target(90)  → 하한 = target        — 90 밑으로 내려가면 실패
  *   · 측정값 <  target      → 하한 = 측정값 - tolerance — 지금보다 나빠지면 실패
- * performance 는 러너 CPU 부하에 따라 흔들리므로 tolerance 가 이 노이즈를 흡수한다.
+ *   performance — 공용 CI 러너에서 코드 변경 없이 ±25 흔들린다(2026-11-28 실측:
+ *   /signup 96→71, /features 94→88). 그래서 90 고정을 걸지 않고
+ *   · 하한 = min(측정값, target) - perf-tolerance — 큰 폭의 퇴보만 잡는 거친 그물
+ *   CI 는 --runs 3 중간값으로 이상치를 한 번 더 걸러낸다.
  * 점수를 올렸으면 `pnpm lighthouse:baseline` 으로 하한을 함께 올려 둘 것.
  */
 /* eslint-disable no-console */
@@ -74,7 +79,7 @@ interface Budgets {
   $comment?: string
   generatedAt: string
   /** 생성 당시의 판정 파라미터 — 재현/검토용 */
-  params: { target: number; tolerance: number; runs: number }
+  params: { target: number; tolerance: number; perfTolerance: number; runs: number }
   pages: Record<string, Partial<Record<CategoryId, number>>>
 }
 
@@ -94,6 +99,7 @@ interface Args {
   updateBaseline: boolean
   target: number
   tolerance: number
+  perfTolerance: number
   outputPath: string | null
   budgetsPath: string
   timeout: number
@@ -218,6 +224,7 @@ function parseArgs(): Args {
     updateBaseline: has('--update-baseline'),
     target: intArg('--target', 90, 0, 100),
     tolerance: intArg('--tolerance', 5, 0, 50),
+    perfTolerance: intArg('--perf-tolerance', 25, 0, 90),
     outputPath: get('--output') ?? null,
     budgetsPath: get('--budgets') ?? path.join(REPO_ROOT, 'tests/lighthouse/budgets.json'),
     timeout: intArg('--timeout', 120_000, 10_000, 600_000),
@@ -299,10 +306,14 @@ async function auditPage(
 
 // ── 예산 ──────────────────────────────────────────────────────────────────────
 
-function minFor(score: number, target: number, tolerance: number): number {
+function minFor(category: CategoryId, score: number, args: Args): number {
+  // performance 는 러너 노이즈가 커서 90 고정 대신 넉넉한 여유만 둔다(헤더 주석 참고).
+  if (category === 'performance') {
+    return Math.max(0, Math.min(score, args.target) - args.perfTolerance)
+  }
   // 달성한 카테고리는 목표선을 하한으로 — 90 밑으로 내려가면 회귀.
   // 미달 카테고리는 현재 수준에서 tolerance 만큼만 흔들림을 허용.
-  return score >= target ? target : Math.max(0, score - tolerance)
+  return score >= args.target ? args.target : Math.max(0, score - args.tolerance)
 }
 
 function buildBudgets(results: PageScores[], args: Args): Budgets {
@@ -310,16 +321,22 @@ function buildBudgets(results: PageScores[], args: Args): Budgets {
   for (const r of results) {
     const entry: Partial<Record<CategoryId, number>> = {}
     for (const c of CATEGORIES) {
-      entry[c] = minFor(r.scores[c], args.target, args.tolerance)
+      entry[c] = minFor(c, r.scores[c], args)
     }
     pages[r.id] = entry
   }
   return {
     $comment:
-      'M9-01 Lighthouse 회귀 게이트 하한. 달성(>=target)은 target 고정, 미달은 측정값-tolerance. ' +
+      'M9-01 Lighthouse 회귀 게이트 하한. a11y/BP/SEO: 달성(>=target)은 target 고정, 미달은 측정값-tolerance. ' +
+      'performance: min(측정값,target)-perfTolerance(CI 러너 노이즈 흡수). ' +
       '점수를 올렸으면 pnpm lighthouse:baseline 으로 함께 올릴 것. 수동 편집도 가능하다.',
     generatedAt: new Date().toISOString(),
-    params: { target: args.target, tolerance: args.tolerance, runs: args.runs },
+    params: {
+      target: args.target,
+      tolerance: args.tolerance,
+      perfTolerance: args.perfTolerance,
+      runs: args.runs,
+    },
     pages,
   }
 }

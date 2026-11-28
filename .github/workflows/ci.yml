@@ -148,12 +148,13 @@ jobs:
       # 위에서 더미 env 로 띄운 web(3000)의 공개 핵심 페이지 6개를 Lighthouse 로 감사해
       # tests/lighthouse/budgets.json 의 하한과 비교한다. Chrome 은 위 단계에서 설치한
       # Playwright chromium 을 재사용하므로 추가 다운로드가 없다.
-      # 하한 규칙(예산 파일에 기록된 값이 정본): 90 이상 달성한 카테고리는 90 고정,
-      # 아직 미달인 카테고리는 기준치 -5(러너 CPU 변동 흡수). 점수를 올렸으면
-      # `pnpm lighthouse:baseline` 으로 예산을 함께 올려 커밋할 것.
+      # 하한 규칙(예산 파일에 기록된 값이 정본): a11y/BP/SEO 는 90 이상이면 90 고정,
+      # 미달이면 기준치 -5. performance 는 공용 러너에서 코드 변경 없이 ±25 흔들려
+      # (2026-11-28 실측) min(기준치,90)-25 의 거친 하한 + 3회 중간값으로 큰 퇴보만 잡는다.
+      # 점수를 올렸으면 `pnpm lighthouse:baseline` 으로 예산을 함께 올려 커밋할 것.
       # 서버가 500 이면 스크립트가 감사 전에 중단한다(시각 회귀 500 전례 재발 방지).
       - name: Lighthouse gate (M9-01)
-        run: pnpm lighthouse:gate --base-url http://localhost:3000 --output tmp/lighthouse/ci.json
+        run: pnpm lighthouse:gate --base-url http://localhost:3000 --runs 3 --output tmp/lighthouse/ci.json
 
       - name: Upload visual regression diff (on failure)
         if: failure()
