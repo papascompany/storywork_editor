@@ -1,4 +1,4 @@
-# 새 세션 시작 프롬프트 (2026-11-23 갱신 — 로컬 모노레포 복귀용 · PR #1~#25 · M9-02 잔여 종결 반영)
+# 새 세션 시작 프롬프트 (2026-11-28 갱신 — PR #1~#27 · M9-01 Lighthouse 게이트 · Anthropic 키 등록 반영)
 
 > 새 Claude Code 세션을 열 때 **"🚀 프롬프트" 섹션부터 끝까지 그대로 복사 붙여넣기** 하세요.
 > 이 파일은 세션 마무리 때마다 갱신됩니다 — 상단 날짜로 최신 여부 확인.
@@ -29,13 +29,20 @@
    원격 `claude/*` 브랜치는 머지 완료 — 지워도 됨. `data/poses/raw/`·`.env.local` 은 gitignored 라 pull 영향 없음
 3. 문서 읽기 (이 순서, 핵심만):
    - `CLAUDE.md` — 프로젝트 SSOT (도메인·스택·모듈 규칙·마일스톤)
-   - `docs/handoff/SESSION_HANDOFF_2026-11-16.md` — **최신 핸드오프: 완료 내역·미완 액션·함정**
-     (이전 누적 함정은 `SESSION_HANDOFF_2026-08-08.md` §5)
+   - `docs/handoff/SESSION_HANDOFF_2026-11-28.md` — **최신 핸드오프: 완료 내역·미완 액션·함정**
+     (직전 `SESSION_HANDOFF_2026-11-16.md` · 이전 누적 함정은 `SESSION_HANDOFF_2026-08-08.md` §5)
    - `docs/architecture/roadmap.md` — 작업 큐 (SW-BIZ (A) · MODE 섹션이 최신)
    - (시각 요약) `docs/reports/2026-11-19_progress_dashboard.html` · `docs/plan.html#status` — 브라우저로 열기
 4. `git log --oneline -10` — 내가 만들지 않은 변경은 사용자 작업으로 보존
 
-### ✅ 현재 상태 (2026-11-19 · PR #1~#24 머지 시점)
+### ✅ 현재 상태 (2026-11-28 · PR #1~#27 머지 시점)
+
+- **M9-01 Lighthouse 회귀 게이트(PR #27)** — CI 에서 공개 6페이지 하한 검사. perf 는 러너 노이즈로 거친 하한
+  (min(baseline,90)−25, 3회 중간값). 점수를 올리면 `pnpm lighthouse:baseline` 으로 예산 갱신 커밋
+- **Anthropic 키 등록 완료(11-28)** — `ANTHROPIC_API_KEY` 로컬 3곳 + Vercel prod. Console `storywork` 워크스페이스 월 $50.
+  `AI_GATEWAY_API_KEY` 불필요(코드가 ANTHROPIC 키 직접 지원). **`STORYWORK_LLM` 은 꺼져 있음 — 켜기 = 과금 시작, 대표 결정**
+- `pnpm.overrides.zod = 4.4.2` 고정(lighthouse 추가 시 zod 상향으로 web 타입 깨진 전례)
+- 원격 `claude/eager-johnson-6rmo0m` · `claude/heuristic-dubinsky-735b19` 와 `stash@{0}` 는 대표 결정으로 보존
 
 - main = prod(원격 기준 — 로컬 워킹트리는 위 1번으로 확인). 시작 시 `gh run list --branch main --limit 1` 로 최종 HEAD CI 확인
 - **웹툰 트랙 코드 완료** — MODE-01~06 · LAYOUT-07/08. 이미지 내보내기(시퀀스 ZIP · 롱 이미지),
@@ -52,35 +59,35 @@
   RightPanel 은 사용자가 고른 탭 유지 — 선택 변경 시 자동 전환 제거(대표 결정, PR #24)
 - 포즈 자산 수치 정본(ADR-0019): raw 1,260 · 태깅 대상 1,243 · 사이드카 1,058 · prod 1,262
 
-### 🔴 대표님 액션 — 잔여 4건 + 개방 결정. 세션 시작 시 진행 여부부터 물을 것
+### 🔴 대표님 액션 — 세션 시작 시 진행 여부부터 물을 것
 
-1. **AI_GATEWAY_API_KEY 등록** ← **파급 최대**. `.env.local` 3곳(루트·apps/web·apps/admin) +
-   `cd apps/web && vercel env add AI_GATEWAY_API_KEY production`.
-   등록 즉시 CONTI-01 · AI-ACT-03 · SCRIPT-KO-02 착수 가능
-2. ~~FOLLOWUP-68 + MODE-01 deploy~~ — ✅ 2026-08-09 완료
+1. ~~AI 키 등록~~ — ✅ 2026-11-28 `ANTHROPIC_API_KEY` 등록 완료
+2. **`STORYWORK_LLM=1` 켜기 결정** — = 과금 시작(워크스페이스 한도 $50)
 3. **PERF-ADMIN-03 인증 저장** — `pnpm perf:admin:save-auth --env prod` (비번은 어시 취급 불가)
 4. **prod 한글 PDF 육안 확인** — 편집기에서 publish 1회
-5. **웹툰 프리셋 시드 재실행** — **반드시 `git pull` 후**:
+5. **웹툰 프리셋 시드 재실행** — prod DB 쓰기(없는 행만 생성). 프리셋은 `isActive:false` 로 들어감 → 개방은 6번:
    ```bash
    set -a; source .env.local; set +a; pnpm tsx scripts/seed-formats.ts
    ```
-6. **(신규) 웹툰 모드 개방 결정** — 코드 준비 완료. 개방 = ① 모달 "준비 중" 해제 ② 서버 px 가드 해제
+6. **웹툰 모드 개방 결정** — 코드 준비 완료. 개방 = ① 모달 "준비 중" 해제 ② 서버 px 가드 해제
    (`projects/save` · `script/full-pipeline` · `script/compose`) ③ prod 프리셋 isActive(5번 시드 후).
    main 머지 = prod 배포
+7. **FOLLOWUP-71 prod `중복` 17행 삭제** — 코드는 PR #8 로 완료, 데이터 삭제만 남음(휴먼 게이트)
 
 > 어시스턴트는 prod DB 변경 CLI(권한 분류기 차단)·키 발급·비밀번호·결제를 수행할 수 없음.
-> 2026-11 세션은 클라우드 컨테이너라 `.env.local` 을 확인하지 못했다 — **로컬 세션 첫 작업으로 재확인**할 것
-> (`AI_GATEWAY_API_KEY` 존재 여부만 확인, 값 출력 금지).
+> 세션 시작 시 `.env.local` 키 존재 여부만 확인(값 출력 금지).
 
 ### 🎯 다음 코드 큐 — 키 없이 바로 착수 가능
 
-- 🟢 **FOLLOWUP-71** `중복` 폴더 17장 — 태깅 제외 ↔ 적재 포함 불일치 정합화 (로컬에만 `data/poses/raw/` 가 있어 로컬 세션 적임)
-- 🟢 **M9-01** Lighthouse 90+ 핵심 페이지 회귀 게이트 · **M9-04** 부하/벤치(동시 편집 100)
+- 🟢 **CONTI-01** → **AI-ACT-03** → **SCRIPT-KO-02** — 키 등록 완료로 착수 가능(실호출은 `STORYWORK_LLM` 결정 후)
+- 🟢 **PERF-WEB-05** `/login` LCP 12.7s · `/` TBT 493ms → 90 달성 시 `pnpm lighthouse:baseline`
+- 🟢 **M9-04** 부하/벤치(동시 편집 100)
+- ✅ ~~FOLLOWUP-71 코드~~ (PR #8) · ~~M9-01~~ (PR #27, 11-28)
 - ✅ ~~키보드 잔여(모달 포커스 · RightPanel 탭)~~ — 11-19 PR #23 · #24
 - ✅ `.nvmrc` v25 → v24 (운영 Vercel 24.x 와 일치, 2026-11-17). `engines.node: >=20.0.0` 고정 여부는 별도 검토
 - 🟢 플랫폼별 웹툰 분할 높이 프리셋 — 규격 확인 후 `maxSliceHeightPx` 메뉴 노출
 - ⏸ LAYOUT-06 · 웹툰 상한/화면 지표 상수 교정 — 실사용 로그(FOLLOWUP-60) 이후
-- 🚦 키 등록 시: **CONTI-01** → **AI-ACT-03** → **SCRIPT-KO-02**
+- 🚦 AI-ACT-01 실 임베딩 — Voyage 또는 OpenAI 키 필요
 - 🚦 기타 게이트: onnxruntime-node(BUBBLE-02) · Upstash(SEC-RATE-01) · POSE3D-01 결제
 
 ### 🔧 핵심 환경 (반복 질문 방지)
@@ -88,7 +95,7 @@
 - GitHub: `papascompany/storywork_editor` (PUBLIC, main). push = Vercel prod 자동배포
 - Supabase prod: `wjpyeqckuxyfeytuzgon` — 다른 계정이라 MCP 접근 불가. **로컬 `.env.local` 이 prod DB 를 가리킴**(스크립트 실행 주의)
 - 마이그레이션 이원화: 앱 스키마 `prisma/migrations/` · RLS/트리거 `supabase/migrations/`
-- AI 키(ANTHROPIC/VOYAGE/OPENAI/AI_GATEWAY) 미등록 — 검색은 mock 임베딩, LLM 경로는 env 하드 게이트
+- AI 키: `ANTHROPIC_API_KEY` 등록(11-28) · VOYAGE/OPENAI 미등록 — 검색은 mock 임베딩, LLM 경로는 `STORYWORK_LLM=1` 스위치(꺼짐)
 - 포즈 자산: `data/poses/raw/` 1,260 PNG(gitignored) + 25점 사이드카 1,058건(커밋됨) — 수치 정본 ADR-0019
 - PDF 폰트: `packages/pdf-engine/assets/fonts/PretendardVariable.ttf` 커밋됨 — cwd 자동 발견, env 불필요
 - 평가 자산: `data/eval/scripts/` 21편/217장면 + `data/eval/adoption-*.json`
@@ -97,6 +104,10 @@
 
 ```bash
 # dev 서버는 preview MCP 사용 (.claude/launch.json: web=3000, admin=3001, storybook=6006)
+# ⚠ 로컬 3000 은 다른 프로젝트가 쓰고 있을 수 있다 — prod 빌드 검증은 next start --port 3100
+# Lighthouse 게이트 (web 을 더미 env 로 빌드·기동한 뒤) / 점수 개선 후 예산 갱신
+pnpm lighthouse:gate --base-url http://localhost:3100
+pnpm lighthouse:baseline --base-url http://localhost:3100
 # 검증 (병렬 금지)
 pnpm turbo run typecheck lint test --concurrency=1
 # 채택률 + 배치 품질 재측정 (키·DB 불요, 결정론). --verbose 로 하위 페이지 상세
@@ -113,6 +124,10 @@ bash scripts/ci-watch.sh
 ```
 
 ### ⚠️ 함정 노트 (실측 누적 — 상세는 핸드오프 §5)
+
+- **`pnpm add` 는 lockfile 을 재해석해 무관한 의존성을 올린다** — 추가 후 `git diff pnpm-lock.yaml` 확인(zod 상향 전례)
+- **web 단독 빌드 전 전체 `pnpm build`** — 패키지 dist 가 오래되면 export 누락으로 실패
+- **Lighthouse perf 는 공용 러너에서 ±25 흔들린다** — CI 게이트는 큰 퇴보만, 정밀 측정은 로컬
 
 - **"보존" 지표는 대사만 센다** — 서술 손실 버그 2건이 수개월간 안 잡혔다. 파서를 바꿀 때는
   원문 글자 대비 보존율을 직접 확인할 것
@@ -157,7 +172,7 @@ breaking change push 는 보고 후
 
 ### 🎬 시작
 
-위 내용 검토 후: ① `.env.local` 키 존재 여부 확인(값 출력 금지) ② 대표님 액션(1·3·4·5) 진행 결과와 6번 웹툰 개방 결정
-③ 다음 작업 선택을 확인하고 진행해 주세요. **키 등록 전이면 FOLLOWUP-71 부터**(웹툰 개방 결정 시 개방이 우선).
+위 내용 검토 후: ① `.env.local` 키 존재 여부 확인(값 출력 금지) ② 대표님 액션(2~7) 진행 결과와 웹툰 개방 결정
+③ 다음 작업 선택을 확인하고 진행해 주세요. 기본 다음 작업은 **CONTI-01**(웹툰 개방 결정 시 개방이 우선).
 작업 흐름(11월 세션 방식): 기능 브랜치 → PR → CI green → rebase 머지(= prod 배포).
 세션 종료 시 `docs/handoff/SESSION_HANDOFF_<날짜>.md` 신규 작성 + 이 파일 갱신을 잊지 말 것.
