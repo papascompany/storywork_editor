@@ -1,5 +1,5 @@
 {
-  "$comment": "M9-01 Lighthouse 회귀 게이트 하한. 달성(>=target)은 target 고정, 미달은 측정값-tolerance. 점수를 올렸으면 pnpm lighthouse:baseline 으로 함께 올릴 것. 수동 편집도 가능하다.",
+  "$comment": "M9-01 Lighthouse 회귀 게이트 하한. 달성(>=target)은 target 고정, 미달은 측정값-tolerance. 점수를 올렸으면 pnpm lighthouse:baseline 으로 함께 올릴 것. 수동 편집도 가능하다. login.performance 는 CI 러너 실측 70(로컬 75) 이라 65 로 수동 하향(2026-11-28, 여유 0 방지).",
   "generatedAt": "2026-11-24T11:20:30.624Z",
   "params": {
     "target": 90,
@@ -14,7 +14,7 @@
       "seo": 90
     },
     "login": {
-      "performance": 70,
+      "performance": 65,
       "accessibility": 90,
       "best-practices": 90,
       "seo": 90
