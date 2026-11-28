@@ -127,7 +127,7 @@ export function ScriptImporterShell() {
             scriptRaw: state.scriptRaw,
             seed,
             format: 'auto',
-            llmEnabled: false,
+            // LLM 사용 여부는 서버 env(STORYWORK_LLM)가 결정 — 클라이언트는 끄는 방향만 가능
             maxAlternatives: 0,
           }),
         })
@@ -247,7 +247,14 @@ export function ScriptImporterShell() {
           title: `새 콘티 — ${new Date().toLocaleDateString('ko-KR')}`,
           characterMapping,
           seed: state.seed,
-          llmEnabled: false,
+          // CONTI-01: LLM 이 채운 콘티 메타를 되돌려 보내 확정 단계 LLM 재호출을 막는다
+          ...(state.conti && state.conti.modelVersion !== 'rule-only'
+            ? {
+                sceneMetaHints: state.conti.scenes
+                  .filter((sc) => Object.keys(sc.meta).length > 0)
+                  .map((sc) => ({ index: sc.index, ...sc.meta })),
+              }
+            : {}),
           excludeSceneIndices: state.excludedSceneIndices,
           sceneOrder: state.sceneOrder,
         }),

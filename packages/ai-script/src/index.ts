@@ -34,3 +34,12 @@ export type {
   ScriptInputFormat,
   TimeOfDay,
 } from './types.js'
+// CONTI-01: 장면 메타 영속화(SceneDoc.meta.sceneMeta) · 콘티 힌트 재사용
+export {
+  applySceneMetaHints,
+  PersistedSceneMetaSchema,
+  readPersistedSceneMetas,
+  SceneMetaSchema,
+  toPersistedSceneMetas,
+} from './scene-meta.js'
+export type { PersistedSceneMeta } from './scene-meta.js'

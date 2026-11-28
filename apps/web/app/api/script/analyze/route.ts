@@ -30,7 +30,7 @@
 import { NextResponse } from 'next/server'
 import { z } from 'zod'
 import { createWebServerClient } from '@/lib/supabase/server'
-import { analyze } from '@storywork/ai-script'
+import { analyze, toPersistedSceneMetas } from '@storywork/ai-script'
 import type { AnalyzeResult, ScriptInputFormat } from '@storywork/ai-script'
 import { getPrismaClient } from '../../_lib/prisma'
 import { checkRateLimit } from '../../_lib/rate-limit'
@@ -39,6 +39,9 @@ import { checkRateLimit } from '../../_lib/rate-limit'
 // ─── 상수 ─────────────────────────────────────────────────────────────────────
 
 const RATE_LIMIT_PER_MIN = 10
+
+// LLM 활성 시 장면 묶음별 호출(호출당 40s 타임아웃 → 룰 폴백)이 끝날 시간 — full-pipeline 과 동일
+export const maxDuration = 60
 
 // ─── 요청 스키마 ──────────────────────────────────────────────────────────────
 
@@ -109,6 +112,9 @@ async function upsertSceneDoc(
           seed: result.seed,
           modelVersion: result.modelVersion,
           characterCount: result.characters.length,
+          // CONTI-01: 장면별 전체 메타 (full-pipeline 과 같은 형식)
+          metaSource: result.modelVersion === 'rule-only' ? 'rule' : 'llm',
+          sceneMeta: toPersistedSceneMetas(result.scenes),
         },
       },
     })

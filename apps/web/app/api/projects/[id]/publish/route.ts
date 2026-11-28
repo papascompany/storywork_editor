@@ -40,10 +40,11 @@
 
 /* eslint-disable import/order */
 import { NextResponse } from 'next/server'
-import { composeContiSheets } from '@storywork/ai-layout'
+import { cameraAngleToShotLabel, composeContiSheets } from '@storywork/ai-layout'
 import type { ContiCut } from '@storywork/ai-layout'
 import { buildPdf } from '@storywork/pdf-engine'
 import type { PdfBuildInput, PageInput } from '@storywork/pdf-engine'
+import { readPersistedSceneMetas } from '@storywork/ai-script'
 import { inngest } from '@storywork/workers'
 import { createWebServerClient } from '@/lib/supabase/server'
 import { getAdminClient } from '@/lib/supabase-admin'
@@ -307,15 +308,19 @@ export async function POST(
           resources.filter((r) => r.format === 'png').map((r) => [r.id, r.fileUrl]),
         )
 
+        // CONTI-01: full-pipeline 이 SceneDoc.meta.sceneMeta 에 남긴 장면 메타 → 샷사이즈 라벨
+        const metaByScene = readPersistedSceneMetas(sceneDoc.meta)
+
         const cuts: ContiCut[] = sceneDoc.scenes.map((sc, i) => {
           const pageRef = pageByScene.get(sc.index)
+          const shotLabel = cameraAngleToShotLabel(metaByScene.get(sc.index)?.cameraAngle)
           const thumbUrl = pageRef?.resourceId ? urlByResource.get(pageRef.resourceId) : undefined
           return {
             cutNo: i + 1,
             sceneIndex: sc.index,
             summary: sc.summary,
             lines: sc.lines.map((l) => ({ speaker: l.speaker, text: l.text })),
-            // shotLabel: CONTI-01(장면 메타 영속화) 이후 cameraAngleToShotLabel 로 채움
+            ...(shotLabel ? { shotLabel } : {}),
             ...(pageRef ? { pageNo: pageRef.pageIndex + 1 } : {}),
             ...(thumbUrl ? { poseThumbUrl: thumbUrl } : {}),
           }

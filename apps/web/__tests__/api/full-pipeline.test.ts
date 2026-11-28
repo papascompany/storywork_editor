@@ -24,7 +24,9 @@ vi.mock('@/lib/supabase/server', () => ({
   createWebServerClient: vi.fn(),
 }))
 
-vi.mock('@storywork/ai-script', () => ({
+// analyze 만 mock — CONTI-01 장면 메타 헬퍼(순수 함수)는 실물 사용
+vi.mock('@storywork/ai-script', async (importOriginal) => ({
+  ...(await importOriginal<Record<string, unknown>>()),
   analyze: vi.fn(),
 }))
 
@@ -778,6 +780,100 @@ describe('POST /api/script/full-pipeline', () => {
       '철수: 안녕!',
       expect.objectContaining({ llmEnabled: false }),
     )
+  })
+
+  // ── 13. CONTI-01 장면 메타 영속화 + 콘티 힌트 ────────────────────
+
+  function withTx() {
+    const tx = makeMockTx()
+    const prismaMock = makeMockPrisma({
+      transaction: vi
+        .fn()
+        .mockImplementation(async (fn: (t: typeof tx) => Promise<unknown>) => fn(tx)),
+    })
+    mockGetPrismaClient.mockReturnValue(prismaMock as any)
+    return tx
+  }
+
+  function savedDocMeta(tx: ReturnType<typeof makeMockTx>): Record<string, unknown> {
+    const call = tx.sceneDoc.create.mock.calls[0] as unknown as [
+      { data: { meta: Record<string, unknown> } },
+    ]
+    return call[0].data.meta
+  }
+
+  it('CONTI-01: SceneDoc.meta 에 장면별 메타(sceneMeta) 저장 + 분석 대안 미요청', async () => {
+    const tx = withTx()
+    const { status } = await callRoute({
+      scriptRaw: '철수: 안녕!',
+      formatId: 'preset-b5-novel',
+      title: '메타 영속화',
+    })
+    expect(status).toBe(200)
+    expect(mockAnalyze).toHaveBeenCalledWith(
+      '철수: 안녕!',
+      expect.objectContaining({ maxAlternatives: 0 }),
+    )
+    const meta = savedDocMeta(tx)
+    expect(meta['metaSource']).toBe('rule')
+    expect(meta['sceneMeta']).toEqual([
+      { index: 0, emotion: 'neutral', view: 'front' },
+      { index: 1, emotion: 'neutral', view: 'front' },
+    ])
+  })
+
+  it('CONTI-01: 콘티 힌트가 맞으면 LLM 재호출 없이 힌트 메타를 저장', async () => {
+    process.env['STORYWORK_LLM'] = '1'
+    try {
+      const tx = withTx()
+      const { status } = await callRoute({
+        scriptRaw: '철수: 안녕!',
+        formatId: 'preset-b5-novel',
+        title: '힌트 적용',
+        sceneMetaHints: [{ index: 0, cameraAngle: 'closeup', view: 'side' }],
+      })
+      expect(status).toBe(200)
+      expect(mockAnalyze).toHaveBeenCalledTimes(1)
+      expect(mockAnalyze.mock.calls[0]?.[1]?.llmEnabled).toBe(false)
+      const meta = savedDocMeta(tx)
+      expect(meta['metaSource']).toBe('conti-hints')
+      expect(meta['sceneMeta']).toEqual([
+        { index: 0, emotion: 'neutral', view: 'side', cameraAngle: 'closeup' },
+        { index: 1, emotion: 'neutral', view: 'front' },
+      ])
+    } finally {
+      delete process.env['STORYWORK_LLM']
+    }
+  })
+
+  it('CONTI-01: 힌트 index 가 장면에 없으면 힌트를 버리고 LLM 으로 재분석', async () => {
+    process.env['STORYWORK_LLM'] = '1'
+    try {
+      withTx()
+      const { status } = await callRoute({
+        scriptRaw: '철수: 안녕!',
+        formatId: 'preset-b5-novel',
+        title: '힌트 불일치',
+        sceneMetaHints: [{ index: 9, cameraAngle: 'wide' }],
+      })
+      expect(status).toBe(200)
+      expect(mockAnalyze).toHaveBeenCalledTimes(2)
+      expect(mockAnalyze.mock.calls[1]?.[1]?.llmEnabled).toBe(true)
+    } finally {
+      delete process.env['STORYWORK_LLM']
+    }
+  })
+
+  it('CONTI-01: 힌트 형식이 어긋나도 400 이 아니라 힌트만 무시', async () => {
+    const tx = withTx()
+    const { status } = await callRoute({
+      scriptRaw: '철수: 안녕!',
+      formatId: 'preset-b5-novel',
+      title: '힌트 형식 오류',
+      sceneMetaHints: [{ index: 0, cameraAngle: 'zoom' }],
+    })
+    expect(status).toBe(200)
+    expect(savedDocMeta(tx)['metaSource']).toBe('rule')
   })
 
   it('공백/개행만 있는 대본 → 400', async () => {
