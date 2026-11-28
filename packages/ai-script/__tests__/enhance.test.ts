@@ -51,7 +51,7 @@ function cacheDir() {
 }
 
 function cacheKey(raw: string, seed: number): string {
-  return createHash('sha256').update(`${seed}:${raw}`).digest('hex').slice(0, 16)
+  return createHash('sha256').update(`v2:${seed}:${raw}`).digest('hex').slice(0, 16)
 }
 
 // ─────────────────────────────────────────────

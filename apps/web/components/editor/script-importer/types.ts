@@ -91,7 +91,21 @@ export interface ContiScene {
   summary: string
   lines: ContiLine[]
   characters: string[]
-  meta: { emotion?: string }
+  /** 장면 메타 — LLM 활성 분석이면 cameraAngle/view 등이 채워진다. 확정 시 full-pipeline 에
+   *  sceneMetaHints 로 되돌려 보내 LLM 재호출을 막는다 (CONTI-01) */
+  meta: ContiSceneMeta
+}
+
+export interface ContiSceneMeta {
+  emotion?: string
+  location?: string
+  timeOfDay?: string
+  cameraAngle?: string
+  pacing?: string
+  mood?: string
+  view?: string
+  props?: string[]
+  pageBreak?: boolean
 }
 
 export interface ContiAnalyzeResponse {

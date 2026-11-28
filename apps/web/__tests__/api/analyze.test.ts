@@ -19,7 +19,9 @@ vi.mock('@/lib/supabase/server', () => ({
   createWebServerClient: vi.fn(),
 }))
 
-vi.mock('@storywork/ai-script', () => ({
+// analyze 만 mock — CONTI-01 장면 메타 헬퍼(순수 함수)는 실물 사용
+vi.mock('@storywork/ai-script', async (importOriginal) => ({
+  ...(await importOriginal<Record<string, unknown>>()),
   analyze: vi.fn(),
 }))
 

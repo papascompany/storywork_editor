@@ -48,8 +48,13 @@
 import { NextResponse } from 'next/server'
 import { z } from 'zod'
 import { createWebServerClient } from '@/lib/supabase/server'
-import { analyze } from '@storywork/ai-script'
-import type { AnalyzeResult, ScriptInputFormat } from '@storywork/ai-script'
+import {
+  analyze,
+  applySceneMetaHints,
+  PersistedSceneMetaSchema,
+  toPersistedSceneMetas,
+} from '@storywork/ai-script'
+import type { AnalyzeResult, PersistedSceneMeta, ScriptInputFormat } from '@storywork/ai-script'
 import { recommend } from '@storywork/ai-recommend'
 import type { RecommendResult } from '@storywork/ai-recommend'
 import { compose } from '@storywork/ai-layout'
@@ -90,6 +95,11 @@ const FullPipelineRequestSchema = z
     /** CONTI-03 2차: 컷 표시 순서(Scene.index 순열) — DnD 재정렬 결과.
      *  제외 컷을 포함해도 무방 (서버가 제외 필터 후 상대 순서만 사용) */
     sceneOrder: z.array(z.number().int().min(0)).max(5_000).optional(),
+    /** CONTI-01: 콘티 미리보기(/api/script/analyze) 의 장면 메타 — 원본 Scene.index 기준.
+     *  있으면 확정 단계에서 LLM 을 다시 부르지 않고 이 메타를 쓴다(비용 2배·미리보기와 결과
+     *  불일치 방지). 레이아웃 힌트일 뿐이라 위조돼도 본인 프로젝트 배치만 바뀐다.
+     *  항목 검증은 아래에서 따로 — 형식이 어긋나도 400 대신 힌트만 버린다(확정을 막지 않게) */
+    sceneMetaHints: z.array(z.unknown()).max(5_000).optional(),
   })
   .refine((d) => d.projectId || d.title, { message: 'projectId 또는 title 둘 중 하나 필수' })
 
@@ -212,14 +222,38 @@ export async function POST(req: Request): Promise<NextResponse> {
   )
 
   // 6. analyze() — 대본 분석
+  //    대본 분석 대안(alternatives)은 이 라우트에서 쓰지 않는다 — LLM 활성 시 호출 수만 늘어
+  //    maxAlternatives 0. 콘티 힌트가 있으면 LLM 없이 룰 분석 + 힌트 적용(CONTI-01).
+  const parsedHints = (body.sceneMetaHints ?? []).map((h) => PersistedSceneMetaSchema.safeParse(h))
+  const hints: PersistedSceneMeta[] = parsedHints.every((r) => r.success)
+    ? parsedHints.map((r) => (r.success ? r.data : null)).filter((h) => h !== null)
+    : []
+  if (hints.length === 0 && parsedHints.length > 0) {
+    console.warn('[full-pipeline] 콘티 힌트 형식 불일치 — 무시')
+  }
   let analyzed: AnalyzeResult
+  let metaSource: 'conti-hints' | 'llm' | 'rule' = 'rule'
   try {
-    analyzed = await analyze(scriptRaw, {
-      seed,
-      format: 'auto' as ScriptInputFormat,
-      maxAlternatives: 3,
-      llmEnabled,
-    })
+    const runAnalyze = (useLlm: boolean): Promise<AnalyzeResult> =>
+      analyze(scriptRaw, {
+        seed,
+        format: 'auto' as ScriptInputFormat,
+        maxAlternatives: 0,
+        llmEnabled: useLlm,
+      })
+
+    analyzed = await runAnalyze(hints.length > 0 ? false : llmEnabled)
+    if (hints.length > 0) {
+      const hinted = applySceneMetaHints(analyzed.scenes, hints)
+      if (hinted.applied) {
+        analyzed = { ...analyzed, scenes: hinted.scenes }
+        metaSource = 'conti-hints'
+      } else {
+        console.warn('[full-pipeline] 콘티 힌트가 장면과 맞지 않음 — 무시')
+        if (llmEnabled) analyzed = await runAnalyze(true)
+      }
+    }
+    if (metaSource === 'rule' && analyzed.modelVersion !== 'rule-only') metaSource = 'llm'
   } catch (err) {
     console.error('[full-pipeline] analyze 실패:', err)
     return jsonError('대본 분석 중 오류가 발생했습니다.', 500)
@@ -409,6 +443,9 @@ export async function POST(req: Request): Promise<NextResponse> {
             seed: analyzed.seed,
             modelVersion: analyzed.modelVersion,
             characterCount: analyzed.characters.length,
+            // CONTI-01: 장면별 전체 메타(제외·재정렬 후 최종 index 기준) — 콘티 시트 샷 라벨 등
+            metaSource,
+            sceneMeta: toPersistedSceneMetas(analyzed.scenes),
           },
         },
       })
