@@ -5,7 +5,7 @@
 
 ## 0. 한 줄 상태
 
-로컬 모노레포로 복귀. **M9-01 Lighthouse 회귀 게이트 머지(PR #27)** + **Anthropic API 키 등록 완료**
+로컬 모노레포로 복귀. **M9-01 Lighthouse 회귀 게이트(PR #27)** + **Anthropic API 키 등록** + **CONTI-01 장면 메타(PR #29)**
 (로컬 3곳 + Vercel prod). LLM 경로는 `STORYWORK_LLM` 스위치가 꺼져 있어 아직 호출·과금 없음.
 
 ## 1. 완료
@@ -38,11 +38,22 @@
   포함 크레딧 우선 소진, **조직 내 모든 키·워크스페이스가 잔액 공유**(Storige prod 키 포함), 미사용분은 주기마다 소멸,
   다른 크레딧이 없으면 소진 시 요청 중단(자동 충전 꺼짐). 콘솔의 "$200,000" 은 조직 지출 상한값이지 잔액이 아님
 
+### ④ CONTI-01 장면 메타 실가동·영속화 — [#29](https://github.com/papascompany/storywork_editor/pull/29)
+- LLM 보강 컨텍스트 확대(장면당 100자 → 장면 원문 600자) + `view` 추가 + cameraAngle 을 샷사이즈(CU/MS/WS)로 정의
+  — 룰 파서는 cameraAngle 을 채우지 않아 page-split R2~R4 가 지금껏 한 번도 발화하지 않았다
+- 20장면 묶음 병렬(동시 4) + 호출당 40s 타임아웃, 부분 실패 허용 · analyze 라우트 `maxDuration = 60`
+- `SceneDoc.meta.sceneMeta` + `metaSource` 저장(마이그레이션 없음, `ai-script/src/scene-meta.ts`) → 콘티 시트 `shotLabel`
+- 마법사가 미리보기 메타를 full-pipeline `sceneMetaHints` 로 되돌려 확정 단계 LLM 재호출 차단.
+  기존 구조였다면 LLM 활성 시 미리보기 1회 + 확정 4회(미사용 분석 대안 3회 포함) 호출이었다 → `maxAlternatives` 0
+- 마법사 `llmEnabled:false` 하드코딩 제거 — env 가 결정
+- **제외**: Inngest 비동기(prod Inngest 키 없음 = 휴먼 게이트) · ContiBoard 샷 라벨 UI(UI SOP 대상)
+- **미검증**: 실제 LLM 호출 품질 — `STORYWORK_LLM` 꺼짐. 모델 `claude-sonnet-4-6` 제공 중만 확인(최신 `claude-sonnet-5-5` 존재)
+
 ## 2. 🔴 대표님 액션 (잔여)
 
 | # | 액션 | 비고 |
 |---|---|---|
-| 1 | **`STORYWORK_LLM=1` 켜기 결정** | = 과금 시작($50 한도 내). 켜기 전에 CONTI-01 등 코드 작업은 가능 |
+| 1 | **`STORYWORK_LLM=1` 켜기 결정** | = 과금 시작($50 한도 내). 켜면 CONTI-01 실호출 품질부터 확인. 모델 교체(`claude-sonnet-5-5`) 여부도 함께 |
 | 2 | 웹툰 프리셋 시드 | `set -a; source .env.local; set +a; pnpm tsx scripts/seed-formats.ts` — prod DB 쓰기, 없는 행만 생성. **프리셋은 `isActive:false` 로 들어가 웹툰 모드를 열지 않음** |
 | 3 | PERF-ADMIN-03 인증 저장 | `pnpm perf:admin:save-auth --env prod` (headed 브라우저 로그인) |
 | 4 | prod 한글 PDF 육안 확인 | 편집기에서 publish 1회 |
@@ -51,7 +62,9 @@
 
 ## 3. 다음 코드 큐
 
-- 🟢 **CONTI-01 → AI-ACT-03 → SCRIPT-KO-02** — 키 등록으로 착수 가능(실호출 검증은 1번 결정 후)
+- ✅ ~~CONTI-01~~ (PR #29)
+- 🟢 **AI-ACT-03 → SCRIPT-KO-02** — 키 등록으로 착수 가능(실호출 검증은 1번 결정 후)
+- 🚦 CONTI-01 실호출 측정(코퍼스 몇 편 cameraAngle 분포·R2~R4 발화) — 1번 결정 후
 - 🟢 **PERF-WEB-05** `/login` LCP · `/` TBT → 90 달성 시 `pnpm lighthouse:baseline` 으로 하한 상향
 - 🟢 **M9-04** 부하/벤치
 - 🚦 AI-ACT-01 실 임베딩 — Voyage 또는 OpenAI 키 필요

@@ -1,4 +1,4 @@
-# 새 세션 시작 프롬프트 (2026-11-28 갱신 — PR #1~#27 · M9-01 Lighthouse 게이트 · Anthropic 키 등록 반영)
+# 새 세션 시작 프롬프트 (2026-11-28 갱신 — PR #1~#29 · M9-01 Lighthouse 게이트 · Anthropic 키 등록 · CONTI-01 반영)
 
 > 새 Claude Code 세션을 열 때 **"🚀 프롬프트" 섹션부터 끝까지 그대로 복사 붙여넣기** 하세요.
 > 이 파일은 세션 마무리 때마다 갱신됩니다 — 상단 날짜로 최신 여부 확인.
@@ -35,7 +35,10 @@
    - (시각 요약) `docs/reports/2026-11-19_progress_dashboard.html` · `docs/plan.html#status` — 브라우저로 열기
 4. `git log --oneline -10` — 내가 만들지 않은 변경은 사용자 작업으로 보존
 
-### ✅ 현재 상태 (2026-11-28 · PR #1~#27 머지 시점)
+### ✅ 현재 상태 (2026-11-28 · PR #1~#29 머지 시점)
+
+- **CONTI-01 장면 메타(PR #29)** — LLM 컨텍스트 확대 · view · 샷사이즈 규칙 · 묶음 병렬+타임아웃 ·
+  `SceneDoc.meta.sceneMeta` 영속화 · 콘티 힌트로 확정 단계 LLM 재호출 차단. **`STORYWORK_LLM` 꺼짐 → 실호출 미검증**
 
 - **M9-01 Lighthouse 회귀 게이트(PR #27)** — CI 에서 공개 6페이지 하한 검사. perf 는 러너 노이즈로 거친 하한
   (min(baseline,90)−25, 3회 중간값). 점수를 올리면 `pnpm lighthouse:baseline` 으로 예산 갱신 커밋
@@ -62,7 +65,7 @@
 ### 🔴 대표님 액션 — 세션 시작 시 진행 여부부터 물을 것
 
 1. ~~AI 키 등록~~ — ✅ 2026-11-28 `ANTHROPIC_API_KEY` 등록 완료
-2. **`STORYWORK_LLM=1` 켜기 결정** — = 과금 시작(워크스페이스 한도 $50)
+2. **`STORYWORK_LLM=1` 켜기 결정** — = 과금 시작(워크스페이스 한도 $50). 모델 교체(`claude-sonnet-4-6` → `5-5`) 여부도
 3. **PERF-ADMIN-03 인증 저장** — `pnpm perf:admin:save-auth --env prod` (비번은 어시 취급 불가)
 4. **prod 한글 PDF 육안 확인** — 편집기에서 publish 1회
 5. **웹툰 프리셋 시드 재실행** — prod DB 쓰기(없는 행만 생성). 프리셋은 `isActive:false` 로 들어감 → 개방은 6번:
@@ -79,10 +82,11 @@
 
 ### 🎯 다음 코드 큐 — 키 없이 바로 착수 가능
 
-- 🟢 **CONTI-01** → **AI-ACT-03** → **SCRIPT-KO-02** — 키 등록 완료로 착수 가능(실호출은 `STORYWORK_LLM` 결정 후)
+- 🟢 **AI-ACT-03** → **SCRIPT-KO-02** — 키 등록 완료로 착수 가능(실호출은 `STORYWORK_LLM` 결정 후)
+- 🚦 CONTI-01 실호출 측정 · ContiBoard 샷 라벨 UI(`/ui-spec`) · Inngest 비동기(키 필요) — CONTI-01 후속
 - 🟢 **PERF-WEB-05** `/login` LCP 12.7s · `/` TBT 493ms → 90 달성 시 `pnpm lighthouse:baseline`
 - 🟢 **M9-04** 부하/벤치(동시 편집 100)
-- ✅ ~~FOLLOWUP-71 코드~~ (PR #8) · ~~M9-01~~ (PR #27, 11-28)
+- ✅ ~~FOLLOWUP-71 코드~~ (PR #8) · ~~M9-01~~ (PR #27) · ~~CONTI-01~~ (PR #29, 11-28)
 - ✅ ~~키보드 잔여(모달 포커스 · RightPanel 탭)~~ — 11-19 PR #23 · #24
 - ✅ `.nvmrc` v25 → v24 (운영 Vercel 24.x 와 일치, 2026-11-17). `engines.node: >=20.0.0` 고정 여부는 별도 검토
 - 🟢 플랫폼별 웹툰 분할 높이 프리셋 — 규격 확인 후 `maxSliceHeightPx` 메뉴 노출
@@ -173,6 +177,6 @@ breaking change push 는 보고 후
 ### 🎬 시작
 
 위 내용 검토 후: ① `.env.local` 키 존재 여부 확인(값 출력 금지) ② 대표님 액션(2~7) 진행 결과와 웹툰 개방 결정
-③ 다음 작업 선택을 확인하고 진행해 주세요. 기본 다음 작업은 **CONTI-01**(웹툰 개방 결정 시 개방이 우선).
+③ 다음 작업 선택을 확인하고 진행해 주세요. 기본 다음 작업은 **AI-ACT-03**(웹툰 개방 결정 시 개방이 우선. `STORYWORK_LLM` 을 켰다면 CONTI-01 실호출 측정 먼저).
 작업 흐름(11월 세션 방식): 기능 브랜치 → PR → CI green → rebase 머지(= prod 배포).
 세션 종료 시 `docs/handoff/SESSION_HANDOFF_<날짜>.md` 신규 작성 + 이 파일 갱신을 잊지 말 것.
